@@ -2,35 +2,29 @@
  * 组件注册表
  * 管理组件的注册和获取
  * 
- * 默认注册了 HTML 原生组件实现
- * 当安装 adapter（如 antd）后，adapter 会覆盖同名组件的默认实现
+ * 重要：
+ * - 不再提供 HTML 默认组件
+ * - 必须安装并注册 adapter 才能使用
+ * - adapter 通过 registerComponents 注册组件
+ * 
+ * 使用方式：
+ * ```typescript
+ * import { antdComponents } from '@form-engine/adapter-antd'
+ * import { registerComponents } from '@form-engine/core'
+ * 
+ * // 注册 antd 组件
+ * registerComponents(antdComponents)
+ * 
+ * // 或者使用 registerAdapter（推荐）
+ * import { antdAdapter } from '@form-engine/adapter-antd'
+ * import { registerAdapter } from '@form-engine/core'
+ * 
+ * registerAdapter(antdAdapter)
+ * ```
  */
 
 import React from 'react'
 import type { ComponentType } from '../types/component-props'
-
-// 导入默认 HTML 组件
-import {
-  Input as HTMLInput,
-  Password as HTMLPassword,
-  Select as HTMLSelect,
-  TextArea as HTMLTextArea,
-  Switch as HTMLSwitch,
-  Radio as HTMLRadio,
-  Checkbox as HTMLCheckbox,
-  InputNumber as HTMLInputNumber,
-  Slider as HTMLSlider,
-  Rate as HTMLRate,
-  DatePicker as HTMLDatePicker,
-  Upload as HTMLUpload,
-  Button as HTMLButton,
-  Grid as HTMLGrid,
-  Flex as HTMLFlex,
-  Text as HTMLText,
-  Image as HTMLImage,
-  Divider as HTMLDivider,
-  Container as HTMLContainer,
-} from '../components'
 
 type ComponentMap = Map<string, React.ComponentType<any>>
 
@@ -98,11 +92,25 @@ export function registerComponents(
 
 /**
  * 获取组件（根据当前场景）
+ * @throws 如果组件未注册，抛出错误提示安装 adapter
  */
 export function getComponent(type: string, scene?: DeviceScene): React.ComponentType<any> | null {
   const targetScene = scene || currentScene
   const components = targetScene === 'desktop' ? desktopComponents : mobileComponents
-  return components.get(type) || null
+  
+  const component = components.get(type)
+  
+  if (!component) {
+    console.error(
+      `[Form Engine] 组件 "${type}" 未注册。\n` +
+      `请安装并注册对应的 adapter，例如：\n` +
+      `  import { antdAdapter } from '@form-engine/adapter-antd'\n` +
+      `  import { registerAdapter } from '@form-engine/core'\n` +
+      `  registerAdapter(antdAdapter)\n`
+    )
+  }
+  
+  return component || null
 }
 
 /**
@@ -137,43 +145,17 @@ export function clearRegistry() {
 }
 
 /**
- * 初始化默认组件（HTML 原生实现）
- * 在模块加载时自动调用
+ * 获取所有已注册的组件类型
  */
-function initDefaultComponents() {
-  const defaultComponents = {
-    // 表单组件
-    'Input': HTMLInput,
-    'Password': HTMLPassword,
-    'TextArea': HTMLTextArea,
-    'Select': HTMLSelect,
-    'Radio': HTMLRadio,
-    'RadioGroup': HTMLRadio, // RadioGroup 使用相同实现
-    'Checkbox': HTMLCheckbox,
-    'CheckboxGroup': HTMLCheckbox, // CheckboxGroup 使用相同实现
-    'InputNumber': HTMLInputNumber,
-    'Slider': HTMLSlider,
-    'Rate': HTMLRate,
-    'DatePicker': HTMLDatePicker,
-    'DateRangePicker': HTMLDatePicker, // 实际应区分，暂时使用相同实现
-    'Upload': HTMLUpload,
-    'Switch': HTMLSwitch,
-    'Button': HTMLButton,
-
-    // 布局组件
-    'Grid': HTMLGrid,
-    'Flex': HTMLFlex,
-
-    // 展示组件
-    'Text': HTMLText,
-    'Image': HTMLImage,
-    'Divider': HTMLDivider,
-    'Container': HTMLContainer,
-  }
-
-  // 注册默认组件（如果用户后续注册同名组件，会自动覆盖）
-  registerComponents(defaultComponents)
+export function getRegisteredTypes(scene?: DeviceScene): string[] {
+  const targetScene = scene || currentScene
+  const components = targetScene === 'desktop' ? desktopComponents : mobileComponents
+  return Array.from(components.keys())
 }
 
-// 初始化默认组件
-initDefaultComponents()
+/**
+ * 检查是否已注册任何组件（即是否已安装 adapter）
+ */
+export function hasAnyComponent(): boolean {
+  return desktopComponents.size > 0 || mobileComponents.size > 0
+}

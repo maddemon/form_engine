@@ -1,5 +1,5 @@
 import type { FormFieldSchema, FormSchema, FormConfig, SubmitConfig } from './schema'
-import type { FormAdapter } from './adapter'
+import type { FormEngineAdapter } from './adapter'
 
 /**
  * 设计器内部状态：被选中字段的 id
@@ -50,7 +50,7 @@ export interface DesignerProps {
   /** 可选：只读模式 */
   readOnly?: boolean
   /** 可选：当前平台适配器，用于设计器属性面板风格统一 */
-  adapter?: FormAdapter
+  adapter?: FormEngineAdapter
 }
 
 /**
@@ -65,3 +65,5 @@ export type DesignerAction =
   | { type: 'UPDATE_FORM_CONFIG'; patch: Partial<FormConfig> }
   | { type: 'UPDATE_SUBMIT_CONFIG'; patch: Partial<SubmitConfig> }
   | { type: 'SET_SCHEMA'; schema: FormSchema }
+  | { type: 'UNDO' }
+  | { type: 'REDO' }

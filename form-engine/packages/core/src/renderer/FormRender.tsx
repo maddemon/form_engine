@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import type { FormFieldSchema, FormSchema, OptionItem } from '../types/schema'
-import type { FormAdapter } from '../types/adapter'
+import type { FormEngineAdapter } from '../types/adapter'
 import type { DataSourceResolver, CustomComponents } from '../types/render'
 import { matchVisibleWhen, evalExpr } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
@@ -16,8 +16,8 @@ export interface FormRenderProps {
   onSubmit?: (values: Record<string, unknown>) => void
   onChange?: (values: Record<string, unknown>) => void
   dataSourceResolver?: DataSourceResolver
-  components?: CustomComponents
-  adapter?: FormAdapter
+  components?: Record<string, (props: any) => React.ReactNode>
+  adapter?: FormEngineAdapter
   initialValues?: Record<string, unknown>
   loading?: boolean
 }

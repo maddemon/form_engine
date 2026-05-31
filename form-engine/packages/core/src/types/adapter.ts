@@ -1,77 +1,200 @@
-import React from 'react'
-import type { FormFieldSchema, OptionItem, FieldType } from './schema'
-
 /**
- * 字段渲染组件的 props 协议
- * 所有 adapter 的组件都遵循这个接口
+ * Form Engine Adapter 接口定义
+ * 
+ * Adapter 负责将 Form Engine 的组件类型映射到具体的 UI 库组件
+ * 并定义属性面板如何渲染组件配置
  */
+
+import * as React from 'react'
+import type { ComponentPropsMap } from './component-props'
+
+// ============================
+// 字段渲染相关类型
+// ============================
+
+/** 字段组件的 Props */
 export interface FieldComponentProps {
-  value?: unknown
-  onChange?: (value: unknown) => void
+  /** 字段值 */
+  value?: any
+  /** 值变化回调 */
+  onChange?: (value: any) => void
+  /** 字段 Schema */
+  fieldSchema?: any
+  /** 字段名称 */
+  name?: string
+  /** 是否禁用 */
   disabled?: boolean
+  /** 是否只读 */
   readOnly?: boolean
+  /** 占位符 */
   placeholder?: string
-  options?: OptionItem[]
-  fieldSchema: FormFieldSchema
-  [key: string]: unknown
+  /** 其他属性 */
+  [key: string]: any
 }
 
-/**
- * 字段渲染函数类型
- * adapter 不只是组件映射，还要处理 props 转换
- */
+/** 字段渲染函数类型 */
 export type FieldRendererFn = (props: FieldComponentProps) => React.ReactElement
 
-/**
- * 设计器属性面板所用小组件的 props 协议（精简版）
- */
-export interface DesignerInputProps {
-  value?: string | number
-  onChange?: (value: string | number) => void
-  placeholder?: string
-  disabled?: boolean
-  style?: React.CSSProperties
-}
-export interface DesignerSelectProps {
-  value?: string
-  onChange?: (value: string) => void
-  options: { label: string; value: string }[]
-  disabled?: boolean
-  style?: React.CSSProperties
-}
-export interface DesignerCheckboxProps {
-  checked?: boolean
-  onChange?: (checked: boolean) => void
-  disabled?: boolean
-  style?: React.CSSProperties
-}
-export interface DesignerNumberProps {
-  value?: number
-  onChange?: (value: number) => void
-  min?: number
-  max?: number
-  disabled?: boolean
-  style?: React.CSSProperties
+// ============================
+// 属性面板编辑器类型
+// ============================
+
+/** 属性编辑器配置 */
+export interface PropEditorConfig {
+  /** 编辑器类型 */
+  type: 'string' | 'number' | 'boolean' | 'select' | 'color' | 'options' | 'expression' | 'json'
+  /** 标签 */
+  label: string
+  /** 默认值 */
+  default?: unknown
+  /** 选项（type=select 时使用） */
+  options?: { label: string; value: unknown }[]
+  /** 是否必填 */
+  required?: boolean
+  /** 描述信息 */
+  description?: string
+  /** 条件显示（根据其他属性值） */
+  visibleWhen?: Record<string, unknown>
 }
 
-/**
- * 设计器小组件集合
- * 每个 adapter 实现自己的版本，让属性面板风格统一
- */
-export interface DesignerWidgets {
-  Input: React.ComponentType<DesignerInputProps>
-  Select: React.ComponentType<DesignerSelectProps>
-  Checkbox: React.ComponentType<DesignerCheckboxProps>
-  NumberInput: React.ComponentType<DesignerNumberProps>
-}
+// ============================
+// Adapter 接口
+// ============================
 
-/**
- * Adapter 接口
- * 将 field.type 映射为渲染函数（不是组件）
- * 渲染函数负责把 fieldSchema + value + onChange 转换成对应 UI 库的组件
+/** 
+ * Form Engine Adapter 接口
+ * 每个 UI 库（antd、antd-mobile 等）实现一个 adapter
  */
-export interface FormAdapter {
-  [fieldType: string]: FieldRendererFn
-  /** 设计器属性面板使用的小组件（可选，未提供时使用原生 HTML 兜底） */
+export interface FormEngineAdapter {
+  /** Adapter 名称 */
+  name: string
+  
+  /** Adapter 版本 */
+  version: string
+  
+  /** 字段组件映射（type -> React 组件） */
+  components: Partial<{
+    [K in keyof ComponentPropsMap]: React.ComponentType<ComponentPropsMap[K]>
+  }>
+  
+  /** 属性面板组件（用于设计器） */
+  propertyPanel?: {
+    /** 渲染属性面板 */
+    render: (props: PropertyPanelRenderProps) => React.ReactNode
+  }
+  
+  /** 主题配置（可选） */
+  theme?: AdapterTheme
+  
+  /** 布局组件覆写（可选，如果 UI 库有更好的实现） */
+  layout?: {
+    Grid?: React.ComponentType<any>
+    Container?: React.ComponentType<any>
+    Flex?: React.ComponentType<any>
+    Collapse?: React.ComponentType<any>
+    Tabs?: React.ComponentType<any>
+  }
+
+  /**
+   * 属性面板小组件（由 adapter 提供，用于设计器属性面板）
+   * 如果不提供，core 会用纯 HTML 兜底
+   */
   _designerWidgets?: DesignerWidgets
+}
+
+// ========================
+// 属性面板小组件接口（由 adapter 提供）
+// ========================
+
+/** 属性面板使用的基础小组件 */
+export interface DesignerWidgets {
+  /** 文本输入框 */
+  Input: React.ComponentType<{
+    value?: string | number
+    onChange?: (v: string | number) => void
+    placeholder?: string
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
+  /** 下拉选择 */
+  Select: React.ComponentType<{
+    value?: string
+    onChange?: (v: string) => void
+    options: { label: string; value: string }[]
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
+  /** 勾选框 */
+  Checkbox: React.ComponentType<{
+    checked?: boolean
+    onChange?: (v: boolean) => void
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
+  /** 数字输入框 */
+  NumberInput: React.ComponentType<{
+    value?: number
+    onChange?: (v: number) => void
+    min?: number
+    max?: number
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
+}
+
+/** 属性面板渲染 Props */
+export interface PropertyPanelRenderProps {
+  /** 当前选中的字段 Schema */
+  field: any
+  /** 字段更新回调 */
+  onChange: (updatedField: any) => void
+  /** 所有字段（用于联动配置） */
+  allFields?: any[]
+}
+
+/** Adapter 主题配置 */
+export interface AdapterTheme {
+  /** 主题 Token（如 Ant Design 的 token） */
+  token?: Record<string, unknown>
+  /** 组件级 Token */
+  components?: Record<string, Record<string, unknown>>
+  /** 全局样式覆写 */
+  styleOverrides?: Record<string, React.CSSProperties>
+}
+
+// ============================
+// Adapter 注册
+// ============================
+
+/** 已注册的 Adapter */
+let currentAdapter: FormEngineAdapter | null = null
+
+/** 注册 Adapter（设置当前使用的 adapter） */
+export function registerAdapter(adapter: FormEngineAdapter): void {
+  currentAdapter = adapter
+}
+
+/** 获取当前 Adapter */
+export function getAdapter(): FormEngineAdapter | null {
+  return currentAdapter
+}
+
+/** 检查是否已注册 Adapter */
+export function hasAdapter(): boolean {
+  return currentAdapter !== null
+}
+
+/** 获取 Adapter 的组件映射 */
+export function getAdapterComponents(): FormEngineAdapter['components'] {
+  return currentAdapter?.components || {}
+}
+
+/** 获取 Adapter 的属性面板渲染器 */
+export function getAdapterPropertyPanel() {
+  return currentAdapter?.propertyPanel
+}
+
+/** 清空 Adapter（用于测试） */
+export function clearAdapter(): void {
+  currentAdapter = null
 }

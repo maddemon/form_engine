@@ -3,18 +3,26 @@
  * 
  * 功能：
  * 1. 提供标准组件 Props 类型定义
- * 2. 提供默认 HTML 原生组件实现（无需安装任何 adapter 即可使用）
- * 3. 提供组件注册表 API（支持 adapter 覆盖默认组件）
- * 4. 提供 Schema 渲染器
- * 5. 提供设计器（即将迁移）
+ * 2. 提供组件属性配置（用于属性面板）
+ * 3. 提供 Schema 渲染器
+ * 4. 提供 Adapter 注册机制
+ * 5. 提供设计器
+ * 
+ * 重要：
+ * - 必须安装 adapter 才能使用（不再提供 HTML 兜底）
+ * - 支持 antd 和 antd-mobile 两个官方 adapter
  * 
  * 使用方式：
  * ```typescript
- * // 方式1：直接使用（默认 HTML 组件）
- * import { FormRender } from '@form-engine/core'
+ * import { FormRender } from '@form-engine/react'
+ * import { antdAdapter } from '@form-engine/adapter-antd'
  * 
- * // 方式2：安装 antd adapter 后，自动覆盖默认组件
- * import '@form-engine/adapter-antd' // 自动注册 antd 组件
+ * // 注册 adapter
+ * registerAdapter(antdAdapter)
+ * 
+ * function App() {
+ *   return <FormRender schema={schema} />
+ * }
  * ```
  */
 
@@ -28,15 +36,17 @@ export type {
   FormFieldSchema,
   OptionItem,
   DataSourceType,
+  FieldDataSource,
+  FormRule,
+  VisibleWhen,
   FormConfig,
   SubmitConfig,
   CustomComponent,
+  CustomSource,
   FieldMock,
-  FormRule,
-  VisibleWhen,
-  FieldDataSource,
   RegisteredComponent,
-  RegisteredComponentProp
+  RegisteredComponentProp,
+  FieldType,
 } from './types/schema'
 
 // 组件 Props 类型
@@ -55,11 +65,8 @@ export type {
   RateProps,
   DatePickerProps,
   DateRangeProps,
-  TimePickerProps,
   UploadProps,
   UploadFile,
-  CascaderProps,
-  TreeSelectProps,
   ButtonProps,
   TextProps,
   ImageProps,
@@ -67,23 +74,77 @@ export type {
   TitleProps,
   ContainerProps,
   GridProps,
+  GridRowConfig,
+  GridColConfig,
   FlexProps,
   ComponentPropsMap,
   ComponentProps,
-  ComponentType
+  ComponentType,
 } from './types/component-props'
+
+// Adapter 类型
+export type {
+  FormEngineAdapter,
+  PropEditorConfig,
+  PropertyPanelRenderProps,
+  AdapterTheme,
+} from './types/adapter'
 
 // 渲染器类型
 export type {
-  FormRenderProps
+  FormRenderProps,
 } from './renderer/FormRender'
 
 export type {
-  FieldRendererProps
+  FieldRendererProps,
 } from './renderer/FieldRenderer'
 
+// 设计器类型
+export type {
+  DesignerProps,
+} from './types/designer'
+
 // ============================
-// 组件注册表 API
+// 组件属性配置（用于属性面板）
+// ============================
+
+export {
+  // 属性配置
+  InputPropConfig,
+  TextAreaPropConfig,
+  InputNumberPropConfig,
+  SelectPropConfig,
+  RadioPropConfig,
+  CheckboxPropConfig,
+  SwitchPropConfig,
+  SliderPropConfig,
+  RatePropConfig,
+  DatePickerPropConfig,
+  UploadPropConfig,
+  ButtonPropConfig,
+  TextPropConfig,
+  ImagePropConfig,
+  DividerPropConfig,
+  ContainerPropConfig,
+  GridPropConfig,
+  FlexPropConfig,
+} from './components'
+
+// ============================
+// Adapter 注册 API
+// ============================
+
+export {
+  registerAdapter,
+  getAdapter,
+  hasAdapter,
+  getAdapterComponents,
+  getAdapterPropertyPanel,
+  clearAdapter,
+} from './types/adapter'
+
+// ============================
+// 组件注册表 API（兼容旧代码，推荐使用 Adapter）
 // ============================
 
 export {
@@ -97,42 +158,8 @@ export {
   getMobileComponent,
   hasComponent,
   clearRegistry,
-  type DeviceScene
+  type DeviceScene,
 } from './registry/componentRegistry'
-
-// ============================
-// 默认组件（HTML 实现）
-// ============================
-
-export {
-  // 表单组件
-  Input,
-  Password,
-  TextArea,
-  Select,
-  Radio,
-  RadioGroup,
-  Checkbox,
-  CheckboxGroup,
-  InputNumber,
-  Slider,
-  Rate,
-  DatePicker,
-  DateRangePicker,
-  Upload,
-  Switch,
-  Button,
-
-  // 布局组件
-  Grid,
-  Flex,
-
-  // 展示组件
-  Text,
-  Image,
-  Divider,
-  Container,
-} from './components'
 
 // ============================
 // 渲染器
@@ -176,25 +203,6 @@ export {
   useFieldActions,
 } from './designer/hooks'
 
-export type {
-  DesignerProps,
-} from './types/designer'
-
-// ============================
-// 快捷注册函数（供 adapter 使用）
-// ============================
-
-/**
- * 注册 adapter 组件
- * 供各 adapter 在 index.ts 中调用
- */
-export function registerAdapterComponents(
-  components: Record<string, React.ComponentType<any>>,
-  scene?: DeviceScene | 'both'
-) {
-  registerComponents(components, scene)
-}
-
 // ============================
 // 样式系统（CSS 变量 & 主题）
 // ============================
@@ -234,6 +242,7 @@ export function registerAdapterComponents(
  * [data-fe-theme="dark"] { --fe-primary: #1d39c4; }
  * ```
  */
+
 export {
   StyleProvider,
   useStyle,

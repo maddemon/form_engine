@@ -4,6 +4,8 @@
 
 import type { ThemeTokens } from './defaultTheme'
 
+export type { ThemeTokens }
+
 /**
  * 部分主题 Token（用于覆盖）
  */

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import type { FormFieldSchema, FormSchema } from '../../types/schema'
-import type { SelectedFieldId, DesignerAction, PaletteItem } from '../../types/designer'
+import type { FormFieldSchema, FormSchema } from '../types/schema'
+import type { SelectedFieldId, DesignerAction, PaletteItem } from '../types/designer'
 import { createFieldFromPalette } from './FieldList'
 import { FieldRenderer } from '../renderer/FieldRenderer'
 import { FormRender } from '../renderer/FormRender'
@@ -86,8 +86,6 @@ export const Canvas: React.FC<CanvasProps> = ({
       if (data.source === 'palette') {
         const newField = createFieldFromPalette(
           { type: data.fieldType, label: data.label, defaultProps: data.defaultProps } as PaletteItem,
-          data.fieldType,
-          data.label || data.fieldType,
         )
         dispatch({ type: 'ADD_FIELD', field: newField, index: targetIndex })
       } else if (data.source === 'canvas') {

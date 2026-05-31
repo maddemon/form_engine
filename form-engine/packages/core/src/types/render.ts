@@ -1,4 +1,4 @@
-import type { FormFieldSchema, OptionItem } from './schema'
+import type { FormFieldSchema, FormSchema, OptionItem } from './schema'
 
 /**
  * DataSourceResolver
@@ -13,7 +13,7 @@ export interface DataSourceContext {
   fieldName: string
   formValues: Record<string, unknown>
   fieldSchema: FormFieldSchema
-  formSchema: Record<string, unknown>
+  formSchema: FormSchema | Record<string, unknown>
 }
 
 /**

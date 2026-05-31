@@ -1,8 +1,6 @@
-import React from 'react'
+import { InputProps } from '@form-engine/core'
 import { Input as AntdInput } from 'antd'
-import type { InputProps } from '../../../types/component-props'
-
-const { Password } = AntdInput
+import React from 'react'
 
 /**
  * Antd Input 组件
@@ -53,7 +51,7 @@ export const Input: React.FC<InputProps> = ({
   }
   
   if (type === 'password') {
-    return <Password {...inputProps} />
+    return <AntdInput {...inputProps} type="password" />
   }
   
   return (

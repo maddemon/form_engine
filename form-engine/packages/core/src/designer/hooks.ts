@@ -11,10 +11,10 @@ import type {
   FormFieldSchema,
   FormConfig,
   SubmitConfig,
-} from '../../types/schema'
-import type { DesignerAction, PaletteItem } from '../../types/designer'
+} from '../types/schema'
+import type { DesignerAction, PaletteItem } from '../types/designer'
 import { createFieldFromPalette, generateFieldId } from './FieldList'
-import type { DeviceScene } from '../../registry/componentRegistry'
+import type { DeviceScene } from '../registry/componentRegistry'
 
 // ===========================
 // 默认配置
@@ -60,7 +60,7 @@ function designerReducer(
     }
 
     case 'REMOVE_FIELD': {
-      const fields = state.schema.fields.filter(f => f.id !== action.fieldId)
+      const fields = state.schema.fields.filter((f: FormFieldSchema) => f.id !== action.fieldId)
       return {
         ...state,
         selectedFieldId: state.selectedFieldId === action.fieldId ? null : state.selectedFieldId,
@@ -76,7 +76,7 @@ function designerReducer(
     }
 
     case 'UPDATE_FIELD': {
-      const fields = state.schema.fields.map(f =>
+      const fields = state.schema.fields.map((f: FormFieldSchema) =>
         f.id === action.fieldId ? { ...f, ...action.patch } : f,
       )
       return { ...state, schema: { ...state.schema, fields } }
@@ -95,7 +95,7 @@ function designerReducer(
       }
 
     case 'SET_SCHEMA': {
-      const stillExists = action.schema.fields.some(f => f.id === state.selectedFieldId)
+      const stillExists = (action.schema.fields as FormFieldSchema[]).some((f: FormFieldSchema) => f.id === state.selectedFieldId)
       return {
         ...state,
         schema: action.schema,
@@ -136,7 +136,7 @@ export function useFormDesigner(initialSchema?: FormSchema) {
   })
 
   const selectedField = useMemo(
-    () => state.schema.fields.find(f => f.id === state.selectedFieldId) || null,
+    () => (state.schema.fields as FormFieldSchema[]).find((f: FormFieldSchema) => f.id === state.selectedFieldId) || null,
     [state.schema.fields, state.selectedFieldId],
   )
 

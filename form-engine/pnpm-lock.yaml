@@ -24,6 +24,9 @@ importers:
         specifier: ^6.4.3
         version: 6.4.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
     devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.41
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.15
@@ -78,10 +81,6 @@ importers:
         version: 6.0.3
 
   packages/core:
-    dependencies:
-      react-icons:
-        specifier: ^5.6.0
-        version: 5.6.0(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.0.0
@@ -104,6 +103,9 @@ importers:
       rimraf:
         specifier: ^5.0.0
         version: 5.0.10
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(postcss@8.5.15)(typescript@5.9.3)
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
@@ -1480,11 +1482,6 @@ packages:
 
   react-fast-compare@3.2.2:
     resolution: {integrity: sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==}
-
-  react-icons@5.6.0:
-    resolution: {integrity: sha512-RH93p5ki6LfOiIt0UtDyNg/cee+HLVR6cHHtW3wALfo+eOHTp8RnU2kRkI6E+H19zMIs03DyxUG/GfZMOGvmiA==}
-    peerDependencies:
-      react: '*'
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
@@ -3019,10 +3016,6 @@ snapshots:
 
   react-fast-compare@3.2.2: {}
 
-  react-icons@5.6.0(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-
   react-is@18.3.1: {}
 
   react-refresh@0.17.0: {}
@@ -3162,6 +3155,34 @@ snapshots:
   ts-interface-checker@0.1.13: {}
 
   tslib@2.8.1: {}
+
+  tsup@8.5.1(postcss@8.5.15)(typescript@5.9.3):
+    dependencies:
+      bundle-require: 5.1.0(esbuild@0.27.7)
+      cac: 6.7.14
+      chokidar: 4.0.3
+      consola: 3.4.2
+      debug: 4.4.3
+      esbuild: 0.27.7
+      fix-dts-default-cjs-exports: 1.0.1
+      joycon: 3.1.1
+      picocolors: 1.1.1
+      postcss-load-config: 6.0.1(postcss@8.5.15)
+      resolve-from: 5.0.0
+      rollup: 4.60.4
+      source-map: 0.7.6
+      sucrase: 3.35.1
+      tinyexec: 0.3.2
+      tinyglobby: 0.2.17
+      tree-kill: 1.2.2
+    optionalDependencies:
+      postcss: 8.5.15
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - jiti
+      - supports-color
+      - tsx
+      - yaml
 
   tsup@8.5.1(postcss@8.5.15)(typescript@6.0.3):
     dependencies:

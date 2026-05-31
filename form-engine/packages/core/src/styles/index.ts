@@ -55,7 +55,7 @@
 // Theme Tokens & Types
 // ============================
 
-export type { ThemeTokens, PartialThemeTokens } from './defaultTheme'
+export type { ThemeTokens, PartialThemeTokens } from './types'
 export { defaultTheme, darkTheme, compactOverrides } from './defaultTheme'
 
 // ============================

@@ -104,7 +104,7 @@ export function createComponentStyle(
  * ```
  */
 export function createConditionalStyle(
-  conditions: Record<boolean, React.CSSProperties>
+  conditions: Record<string, React.CSSProperties>
 ): React.CSSProperties {
   let merged: React.CSSProperties = {}
   
@@ -140,7 +140,7 @@ export function createButtonStyle(
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.5 : 1,
     transition: 'all 0.2s',
-    border: `${theme.borderWidth} ${theme.borderStyle}`,
+    border: `${theme.inputBorder}`,
   }
   
   if (danger) {

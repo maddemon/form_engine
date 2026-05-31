@@ -65,5 +65,5 @@ export interface BaseLayoutComponentProps extends BaseComponentProps {
   // 布局相关
   padding?: number | string
   margin?: number | string
-  gap?: number
+  gap?: string | number | [number, number]
 }

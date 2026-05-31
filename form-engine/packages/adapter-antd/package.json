@@ -11,33 +11,41 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit"
   },
-  "keywords": ["form", "engine", "antd", "adapter"],
+  "keywords": [
+    "form",
+    "engine",
+    "antd",
+    "adapter"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@ant-design/icons": "^6.2.5",
     "@form-engine/core": "workspace:*",
-    "antd": "^6.4.3",
-    "@ant-design/icons": "^6.2.5"
+    "antd": "^6.4.3"
   },
   "peerDependencies": {
+    "antd": ">=6.0.0",
     "react": ">=19.0.0",
-    "react-dom": ">=19.0.0",
-    "antd": ">=6.0.0"
+    "react-dom": ">=19.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "typescript": "~6.0.2",
-    "tsup": "^8.0.0",
     "rimraf": "^5.0.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "tsup": "^8.0.0",
+    "typescript": "~6.0.2"
   }
 }

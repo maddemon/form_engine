@@ -1,16 +1,16 @@
 import React from 'react'
 import type { FormFieldSchema, OptionItem } from '../types/schema'
-import type { FormAdapter, FieldComponentProps, FieldRendererFn } from '../types/adapter'
+import type { FormEngineAdapter } from '../types/adapter'
 import { matchVisibleWhen, evalExpr } from '../utils'
 
-interface FieldRendererProps {
+export interface FieldRendererProps {
   field: FormFieldSchema
   value: unknown
   onChange: (val: unknown) => void
   options: OptionItem[]
   disabled: boolean
-  adapter: FormAdapter
-  components?: Record<string, FieldRendererFn>
+  adapter: FormEngineAdapter
+  components?: Record<string, (props: any) => React.ReactNode>
 }
 
 /**
@@ -64,7 +64,7 @@ export function FieldRenderer({
   )
 
   // 通用 props
-  const fieldProps: FieldComponentProps = {
+  const fieldProps: Record<string, unknown> = {
     value,
     onChange,
     disabled: isDisabled,
@@ -78,13 +78,13 @@ export function FieldRenderer({
   /**
    * 查找渲染函数（按优先级）
    */
-  const renderFn: FieldRendererFn | undefined =
+  const renderFn: ((props: any) => React.ReactNode) | undefined =
     // 1. 标准类型映射
-    adapter[field.type] ||
+    (adapter as any)[field.type] ||
     // 2. 自定义组件（按 componentId 查找）
     (field.custom?.componentId ? components[field.custom.componentId] : undefined) ||
     // 3. 兜底
-    adapter['default']
+    (adapter as any)['default']
 
   if (!renderFn) {
     // 开发模式下给出明确提示

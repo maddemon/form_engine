@@ -26,4 +26,4 @@ export type {
   DesignerAction,
   PaletteItem,
   SelectedFieldId,
-} from '../../types/designer'
+} from '../types/designer'

@@ -1,9 +1,9 @@
 import React from 'react'
-import type { FormFieldSchema, FieldType } from '../../types/schema'
-import type { PaletteItem } from '../../types/designer'
 
 // 从统一的图标文件导入
 import { Type, FileText, Hash, Lock, ChevronDown, CheckSquare, Circle, ToggleLeft, Slash, Star, Calendar, Clock, UploadIcon, GitBranch, GridIcon } from '../components/icons'
+import { PaletteItem } from '.'
+import { FieldType, FormFieldSchema } from '../types'
 
 // 组件类型到图标的映射
 const iconMap: Record<string, React.ReactNode> = {
@@ -112,7 +112,7 @@ export function createFieldFromPalette(item: PaletteItem): FormFieldSchema {
 
 interface FieldListProps {
   groups?: PaletteGroup[]
-  onDragStart: (item: PaletteItem, event: React.DragEvent) => void
+  onDragStart: (item: PaletteItem, event: React.DragEvent<HTMLDivElement>) => void
 }
 
 /**

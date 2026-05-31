@@ -1,11 +1,11 @@
 import React, { useReducer, useCallback, useState } from 'react'
-import type { FormSchema, FormFieldSchema, FormConfig, SubmitConfig } from '../../types/schema'
-import type { DesignerAction, PaletteItem } from '../../types/designer'
-import type { FormAdapter } from '../../types/adapter'
+import type { FormSchema, FormConfig, SubmitConfig } from '../types/schema'
+import type { DesignerAction, PaletteItem, PaletteGroup } from '../types/designer'
+import type { FormEngineAdapter } from '../types/adapter'
 import { FieldList, defaultPaletteGroups } from './FieldList'
 import { Canvas } from './Canvas'
 import { PropertyPanel } from './PropertyPanel'
-import { type DeviceScene } from '../../registry/componentRegistry'
+import type { DeviceScene } from '../registry/componentRegistry'
 
 /**
  * 默认表单配置
@@ -23,24 +23,19 @@ const DEFAULT_SUBMIT_CONFIG: SubmitConfig = {
 
 /**
  * designer reducer（含 undo/redo 快照）
- *
- * state 结构：
- *   schema, selectedFieldId,
- *   snapshots: 快照列表,
- *   historyIndex: 当前快照指针
  */
 function designerReducer(
   state: {
     schema: FormSchema
     selectedFieldId: string | null
-    snapshots: FormFieldSchema[][]
+    snapshots: FormSchema['fields'][]
     historyIndex: number
   },
   action: DesignerAction,
 ): {
   schema: FormSchema
   selectedFieldId: string | null
-  snapshots: FormFieldSchema[][]
+  snapshots: FormSchema['fields'][]
   historyIndex: number
 } {
   // 需要推快照的 action 列表
@@ -74,7 +69,7 @@ function designerReducer(
     }
 
     case 'REMOVE_FIELD': {
-      const fields = state.schema.fields.filter(f => f.id !== action.fieldId)
+      const fields = state.schema.fields.filter((f: any) => f.id !== action.fieldId)
       next = {
         ...state,
         selectedFieldId: state.selectedFieldId === action.fieldId ? null : state.selectedFieldId,
@@ -92,7 +87,7 @@ function designerReducer(
     }
 
     case 'UPDATE_FIELD': {
-      const fields = state.schema.fields.map(f =>
+      const fields = state.schema.fields.map((f: any) =>
         f.id === action.fieldId ? { ...f, ...action.patch } : f,
       )
       next = { ...state, schema: { ...state.schema, fields } }
@@ -114,7 +109,7 @@ function designerReducer(
       break
 
     case 'SET_SCHEMA': {
-      const stillExists = action.schema.fields.some(f => f.id === state.selectedFieldId)
+      const stillExists = (action.schema.fields as any[]).some((f: any) => f.id === state.selectedFieldId)
       next = {
         ...state,
         schema: action.schema,
@@ -149,11 +144,6 @@ function designerReducer(
       return state
   }
 
-  // 处理快照
-  if (action.type === 'UNDO' || action.type === 'REDO') {
-    return next as any // 已经在上面对手处理了
-  }
-
   if (shouldSnapshot) {
     const trimmed = state.snapshots.slice(0, state.historyIndex + 1)
     const nextSnapshots = [...trimmed, JSON.parse(JSON.stringify(next.schema.fields))]
@@ -177,16 +167,9 @@ interface DesignerProps {
   onSchemaChange?: (schema: FormSchema) => void
   groups?: PaletteGroup[]
   readOnly?: boolean
-  /** 当前平台适配器，传给属性面板使用 */
-  adapter?: FormAdapter
+  adapter?: FormEngineAdapter
 }
 
-/**
- * 表单设计器主组件
- *
- * 三栏布局：
- *  [控件库]  [画布 + 工具栏]  [属性面板]
- */
 export const Designer: React.FC<DesignerProps> = ({
   schema: externalSchema,
   onSchemaChange,
@@ -207,13 +190,10 @@ export const Designer: React.FC<DesignerProps> = ({
     historyIndex: 0,
   })
 
-  // 设计场景：desktop / mobile
   const [scene, setSceneState] = useState<DeviceScene>('desktop')
-  
-  // 设计模式：design / preview
   const [mode, setMode] = useState<'design' | 'preview'>('design')
 
-  // 同步外部 schema（受控模式）
+  // 同步外部 schema
   React.useEffect(() => {
     if (externalSchema) {
       dispatch({ type: 'SET_SCHEMA', schema: externalSchema })
@@ -232,10 +212,10 @@ export const Designer: React.FC<DesignerProps> = ({
     notifyChange(state.schema)
   }, [state.schema, notifyChange])
 
-  const selectedField = state.schema.fields.find(f => f.id === state.selectedFieldId) || null
+  const selectedField = state.schema.fields.find((f: any) => f.id === state.selectedFieldId) || null
 
   const handlePaletteDragStart = useCallback(
-    (item: PaletteItem, event: React.DragEvent) => {
+    (item: PaletteItem, event: React.DragEvent<HTMLDivElement>) => {
       event.dataTransfer.setData('designer-drag', JSON.stringify({
         source: 'palette',
         fieldType: item.type,
@@ -247,13 +227,16 @@ export const Designer: React.FC<DesignerProps> = ({
     [],
   )
 
-  // undo/redo 状态计算
+  const handleSelectField = useCallback((id: string | null) => {
+    dispatch({ type: 'SELECT_FIELD', fieldId: id })
+  }, [])
+
   const canUndo = state.historyIndex > 0
   const canRedo = state.historyIndex < state.snapshots.length - 1
 
   return (
     <div style={{ display: 'flex', height: '100%', fontFamily: '-apple-system, sans-serif', background: '#f5f5f5', overflow: 'hidden' }}>
-      {/* 左侧控件库 - 自己有滚动条 */}
+      {/* 左侧控件库 */}
       {!readOnly && (
         <FieldList
           groups={groups}
@@ -261,13 +244,13 @@ export const Designer: React.FC<DesignerProps> = ({
         />
       )}
 
-      {/* 中间画布 - 自己有滚动条（在 Canvas 组件内部） */}
+      {/* 中间画布 */}
       <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
         <Canvas
           fields={state.schema.fields}
           selectedFieldId={state.selectedFieldId}
           dispatch={dispatch}
-          onSelectField={(id) => dispatch({ type: 'SELECT_FIELD', fieldId: id })}
+          onSelectField={handleSelectField}
           schema={state.schema}
           scene={scene}
           onSceneChange={setSceneState}
@@ -278,7 +261,7 @@ export const Designer: React.FC<DesignerProps> = ({
         />
       </div>
 
-      {/* 右侧属性面板 - 自己有滚动条 */}
+      {/* 右侧属性面板 */}
       <PropertyPanel
         field={selectedField}
         formConfig={state.schema.form || DEFAULT_FORM_CONFIG}

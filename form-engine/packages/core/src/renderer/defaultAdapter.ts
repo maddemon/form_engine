@@ -1,6 +1,6 @@
 import React from 'react'
-import type { FormAdapter, FieldComponentProps, FieldRendererFn } from '../types/adapter'
 import { getComponent } from '../registry/componentRegistry'
+import { FormEngineAdapter, FieldComponentProps, FieldRendererFn } from '../types/adapter'
 
 /**
  * 默认 adapter：基于 componentRegistry 动态查找组件
@@ -10,8 +10,8 @@ import { getComponent } from '../registry/componentRegistry'
  * - 若 field.type 未注册，返回 undefined，让 FieldRenderer 的兜底逻辑生效
  * - adapter['default'] 返回统一的兜底渲染函数
  */
-const defaultAdapter: FormAdapter = new Proxy({} as FormAdapter, {
-  get(target, prop: string | symbol) {
+const defaultAdapter: FormEngineAdapter = new Proxy({} as FormEngineAdapter, {
+  get(_target, prop: string | symbol) {
     // 特殊处理内部属性
     if (prop === '_designerWidgets') return undefined
     if (prop === 'default') {

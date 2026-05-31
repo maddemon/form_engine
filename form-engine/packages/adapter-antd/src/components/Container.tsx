@@ -1,10 +1,16 @@
+/**
+ * Antd Container 组件
+ * 适配 Form Engine 的 ContainerProps
+ * 使用 Ant Design 的 Card 作为容器
+ */
+
 import React from 'react'
-import type { ContainerProps } from './types'
-import { useStyle } from '../../styles/useStyle'
+import { Card } from 'antd'
+import type { ContainerProps } from '@form-engine/core'
 
 /**
- * HTML Container 组件（默认实现）
- * Ant Design 风格 - 通用容器组件
+ * Container 组件
+ * 通用容器组件
  */
 export const Container: React.FC<ContainerProps> = ({
   children,
@@ -18,13 +24,11 @@ export const Container: React.FC<ContainerProps> = ({
   justify = 'start',
   align = 'stretch',
   wrap = false,
-  style: propsStyle,
+  style,
   className,
   id,
   ...rest
 }) => {
-  const { token } = useStyle()
-
   // 将 justify 值映射到 flexbox
   const justifyMap: Record<string, string> = {
     'start': 'flex-start',
@@ -32,24 +36,25 @@ export const Container: React.FC<ContainerProps> = ({
     'center': 'center',
     'between': 'space-between',
     'around': 'space-around',
+    'evenly': 'space-evenly',
   }
-
+  
   const containerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: layout === 'horizontal' ? 'row' : 'column',
     justifyContent: justifyMap[justify] || 'flex-start',
     alignItems: align,
     flexWrap: wrap ? 'wrap' : 'nowrap',
-    padding: padding === 0 ? undefined : `${token('spacingSm')} ${token('spacingMd')}`,
-    margin: margin === 0 ? undefined : `${token('spacingSm')}`,
-    background: background || token('bgPrimary') as string,
-    borderRadius: borderRadius === 0 ? undefined : token('borderRadiusMd') as string,
-    border: border || `1px solid ${token('borderTertiary') as string}`,
+    padding: padding === 0 ? undefined : `${padding}px`,
+    margin: margin === 0 ? undefined : `${margin}px`,
+    background,
+    borderRadius: borderRadius === 0 ? undefined : `${borderRadius}px`,
+    border,
     minHeight: minHeight ? `${minHeight}px` : undefined,
     boxSizing: 'border-box',
-    ...propsStyle,
+    ...style,
   }
-
+  
   return (
     <div
       id={id}

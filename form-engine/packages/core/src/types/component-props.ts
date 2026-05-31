@@ -7,29 +7,63 @@
  */
 
 // ============================
-// 从各组件文件夹导入具体 Props 类型
+// 从各组件文件夹导入具体 Props 类型（本地使用）
 // ============================
 
-export type { InputProps } from '../components/input/types'
-export type { TextAreaProps } from '../components/textarea/types'
-export type { InputNumberProps } from '../components/input-number/types'
-export type { SelectProps } from '../components/select/types'
-export type { RadioProps } from '../components/radio/types'
-export type { CheckboxProps } from '../components/checkbox/types'
-export type { SwitchProps } from '../components/switch/types'
-export type { SliderProps } from '../components/slider/types'
-export type { RateProps } from '../components/rate/types'
-export type { DatePickerProps, DateRangeProps } from '../components/date-picker/types'
-export type { UploadProps, UploadFile } from '../components/upload/types'
-export type { ButtonProps } from '../components/button/types'
-export type { TextProps } from '../components/text/types'
-export type { ImageProps } from '../components/image/types'
-export type { DividerProps } from '../components/divider/types'
-export type { ContainerProps } from '../components/container/types'
-export type { GridProps } from '../components/grid/types'
-export type { FlexProps } from '../components/flex/types'
+import type { InputProps } from '../components/input/types'
+import type { TextAreaProps } from '../components/textarea/types'
+import type { InputNumberProps } from '../components/input-number/types'
+import type { SelectProps } from '../components/select/types'
+import type { RadioProps } from '../components/radio/types'
+import type { CheckboxProps } from '../components/checkbox/types'
+import type { SwitchProps } from '../components/switch/types'
+import type { SliderProps } from '../components/slider/types'
+import type { RateProps } from '../components/rate/types'
+import type { DatePickerProps, DateRangeProps } from '../components/date-picker/types'
+import type { UploadProps, UploadFile } from '../components/upload/types'
+import type { ButtonProps } from '../components/button/types'
+import type { TextProps } from '../components/text/types'
+import type { ImageProps } from '../components/image/types'
+import type { DividerProps } from '../components/divider/types'
+import type { TitleProps } from '../components/title/types'
+import type { ContainerProps } from '../components/container/types'
+import type { GridProps, GridRowConfig, GridColConfig } from '../components/grid/types'
+import type { FlexProps } from '../components/flex/types'
 
+// ============================
+// 导出类型（供其他模块使用）
+// ============================
+
+export type {
+  InputProps,
+  TextAreaProps,
+  InputNumberProps,
+  SelectProps,
+  RadioProps,
+  CheckboxProps,
+  SwitchProps,
+  SliderProps,
+  RateProps,
+  DatePickerProps,
+  DateRangeProps,
+  UploadProps,
+  UploadFile,
+  ButtonProps,
+  TextProps,
+  ImageProps,
+  DividerProps,
+  TitleProps,
+  ContainerProps,
+  GridProps,
+  GridRowConfig,
+  GridColConfig,
+  FlexProps,
+}
+
+// ============================
 // 尚未实现组件的 Props（保留原有定义）
+// ============================
+
 export interface CascaderProps {
   value?: string[]
   onChange?: (value: string[]) => void
@@ -63,7 +97,37 @@ export interface TimePickerProps {
 }
 
 // ============================
-// 基类 Props（从 base-props.ts 导入）
+// 布局组件 Props（新增）
+// ============================
+
+export interface CollapseProps {
+  activeKey?: string | string[]
+  defaultActiveKey?: string | string[]
+  onChange?: (key: string | string[]) => void
+  accordion?: boolean
+  ghost?: boolean
+  style?: React.CSSProperties
+  className?: string
+  id?: string
+  children?: React.ReactNode
+}
+
+export interface TabsProps {
+  activeKey?: string
+  defaultActiveKey?: string
+  onChange?: (key: string) => void
+  type?: 'line' | 'card' | 'editable-card'
+  size?: 'small' | 'middle' | 'large'
+  tabPosition?: 'top' | 'right' | 'bottom' | 'left'
+  centered?: boolean
+  style?: React.CSSProperties
+  className?: string
+  id?: string
+  children?: React.ReactNode
+}
+
+// ============================
+// 基类 Props（从 base-props.ts 导入并导出）
 // ============================
 
 export type {
@@ -81,6 +145,7 @@ export interface ComponentPropsMap {
   'Input': InputProps
   'InputNumber': InputNumberProps
   'Textarea': TextAreaProps
+  'TextArea': TextAreaProps
   'Password': InputProps  // Password 复用 InputProps
   'Select': SelectProps
   'MultiSelect': SelectProps  // MultiSelect 复用 SelectProps
@@ -102,6 +167,9 @@ export interface ComponentPropsMap {
   'Container': ContainerProps
   'Grid': GridProps
   'Flex': FlexProps
+  'Collapse': CollapseProps
+  'Tabs': TabsProps
+  'Button': ButtonProps
 }
 
 /** 根据组件类型获取 Props 类型 */

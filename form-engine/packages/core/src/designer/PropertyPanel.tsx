@@ -1,20 +1,16 @@
 import React from 'react'
-import type { FormFieldSchema, FieldType, FormConfig, SubmitConfig } from '../../types/schema'
-import type { DesignerAction } from '../../types/designer'
-import type { FormAdapter, DesignerWidgets } from '../../types/adapter'
-import type { DeviceScene } from '../../registry/componentRegistry'
-import { Input, Select, Checkbox, InputNumber } from '../components'
+import type { DeviceScene } from '../registry/componentRegistry'
+import type { DesignerAction } from '../types/designer'
+import type { FieldType, FormConfig, FormFieldSchema, SubmitConfig } from '../types/schema'
+import type { FormEngineAdapter, DesignerWidgets } from '../types/adapter'
 
 interface PropertyPanelProps {
   field: FormFieldSchema | null
   formConfig: FormConfig
   submitConfig: SubmitConfig
   dispatch: React.Dispatch<DesignerAction>
-  /** 当前平台适配器，用于渲染属性面板小组件（风格统一） */
-  adapter?: FormAdapter
-  /** 当前设计场景 */
+  adapter?: FormEngineAdapter
   scene?: DeviceScene
-  /** 设计器场景切换回调 */
   onSceneChange?: (scene: DeviceScene) => void
 }
 
@@ -37,107 +33,74 @@ const SIZE_OPTIONS = [
 ]
 
 // ========================
-// 从 adapter 提取小组件，未提供则使用 core 组件兜底
+// 从 adapter 提取小组件，未提供则用纯 HTML 兜底
 // ========================
-function useWidgets(adapter?: FormAdapter): DesignerWidgets {
+function useWidgets(adapter?: FormEngineAdapter): DesignerWidgets {
   const w = (adapter as any)?._designerWidgets as DesignerWidgets | undefined
   if (w) return w
-  // 使用 core 已美化的组件兜底
   return {
-    Input: CoreInput,
-    Select: CoreSelect,
-    Checkbox: CoreCheckbox,
-    NumberInput: CoreNumberInput,
+    Input: HtmlInput,
+    Select: HtmlSelect,
+    Checkbox: HtmlCheckbox,
+    NumberInput: HtmlNumberInput,
   }
 }
 
 // ========================
-// Core 组件包装（适配 DesignerWidgets 接口）
+// 纯 HTML 兜底组件
 // ========================
-
-/**
- * 将 core Input 适配为 DesignerWidgets 接口
- */
-const CoreInput: React.FC<{
+const HtmlInput: React.FC<{
   value?: string | number
   onChange?: (v: string | number) => void
   placeholder?: string
   disabled?: boolean
   style?: React.CSSProperties
 }> = ({ value, onChange, placeholder, disabled, style }) => (
-  <Input
+  <input
+    type="text"
     value={String(value ?? '')}
-    onChange={v => onChange?.(v)}
+    onChange={e => onChange?.(e.target.value)}
     placeholder={placeholder}
     disabled={disabled}
-    style={{ width: '100%', ...style }}
+    style={{ width: '100%', padding: '4px 8px', borderRadius: 4, border: '1px solid #d9d9d9', fontSize: 12, ...style }}
   />
 )
 
-/**
- * 将 core Select 适配为 DesignerWidgets 接口
- * 
- * 注意：core Select 的 API 可能与 DesignerWidgets 不同，这里需要做适配
- */
-const CoreSelect: React.FC<{
+const HtmlSelect: React.FC<{
   value?: string
   onChange?: (v: string) => void
   options: { label: string; value: string }[]
   disabled?: boolean
   style?: React.CSSProperties
-}> = ({ value, onChange, options, disabled, style }) => {
-  // core Select 可能接受 options 作为 children 或者需要通过 componentProps
-  // 这里假设 core Select 支持 options prop（需要确认实际 API）
-  return (
-    <Select
-      value={value}
-      onChange={v => onChange?.(String(v))}
-      options={options}
-      disabled={disabled}
-      style={{ width: '100%', ...style }}
-    />
-  )
-}
+}> = ({ value, onChange, options, disabled, style }) => (
+  <select
+    value={value}
+    onChange={e => onChange?.(e.target.value)}
+    disabled={disabled}
+    style={{ width: '100%', padding: '4px 8px', borderRadius: 4, border: '1px solid #d9d9d9', fontSize: 12, ...style }}
+  >
+    {options.map(opt => (
+      <option key={opt.value} value={opt.value}>{opt.label}</option>
+    ))}
+  </select>
+)
 
-/**
- * 将 core Checkbox 适配为 DesignerWidgets 接口
- * 
- * 注意：core Checkbox 的 onChange 类型是 (value: unknown) => void
- * 而 DesignerWidgets.Checkbox 期望 (checked: boolean) => void
- * 这里需要做类型转换
- */
-const CoreCheckbox: React.FC<{
+const HtmlCheckbox: React.FC<{
   checked?: boolean
   onChange?: (v: boolean) => void
   disabled?: boolean
   style?: React.CSSProperties
-}> = ({ checked, onChange, disabled, style }) => {
-  // 核心：将 core Checkbox 的 onChange 转换为期望的 (checked: boolean) => void
-  const handleChange = (value: unknown) => {
-    // core Checkbox 在单选模式下，value 就是 checked 状态
-    if (typeof value === 'boolean') {
-      onChange?.(value)
-    } else {
-      // 如果是其他情况（比如多选），默认当作 unchecked
-      onChange?.(false)
-    }
-  }
+}> = ({ checked, onChange, disabled, style }) => (
+  <input
+    type="checkbox"
+    checked={!!checked}
+    onChange={e => onChange?.(e.target.checked)}
+    disabled={disabled}
+    style={{ ...style }}
+  />
+)
 
-  return (
-    <div style={{ display: 'inline-block', ...style }}>
-      <Checkbox
-        checked={!!checked}
-        onChange={handleChange}
-        disabled={disabled}
-      />
-    </div>
-  )
-}
-
-/**
- * 将 core InputNumber 适配为 DesignerWidgets 接口
- */
-const CoreNumberInput: React.FC<{
+const HtmlNumberInput: React.FC<{
   value?: number
   onChange?: (v: number) => void
   min?: number
@@ -145,13 +108,14 @@ const CoreNumberInput: React.FC<{
   disabled?: boolean
   style?: React.CSSProperties
 }> = ({ value, onChange, min, max, disabled, style }) => (
-  <InputNumber
-    value={value}
-    onChange={v => onChange?.(Number(v))}
+  <input
+    type="number"
+    value={value ?? ''}
+    onChange={e => onChange?.(Number(e.target.value))}
     min={min}
     max={max}
     disabled={disabled}
-    style={{ width: '100%', ...style }}
+    style={{ width: '100%', padding: '4px 8px', borderRadius: 4, border: '1px solid #d9d9d9', fontSize: 12, ...style }}
   />
 )
 
@@ -161,13 +125,13 @@ const CoreNumberInput: React.FC<{
 const FieldGroup: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <label style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
     {label}
-    {children}
+    <div style={{ marginTop: 2 }}>{children}</div>
   </label>
 )
 const InlineField: React.FC<{ label: string; children: React.ReactNode; style?: React.CSSProperties }> = ({ label, children, style }) => (
-  <label style={{ display: 'block', marginBottom: 4, fontSize: 12, ...style }}>
+  <label style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4, fontSize: 12, ...style }}>
     {children}
-    {' '}{label}
+    {label}
   </label>
 )
 
@@ -178,29 +142,28 @@ interface CollapsibleSectionProps {
   title: string
   children: React.ReactNode
   defaultCollapsed?: boolean
-  forceExpand?: boolean  // 强制展开（如：高级属性已配置）
+  forceExpand?: boolean
 }
 
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ 
-  title, 
-  children, 
+const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
+  title,
+  children,
   defaultCollapsed = false,
-  forceExpand = false 
+  forceExpand = false
 }) => {
   const [collapsed, setCollapsed] = React.useState(defaultCollapsed && !forceExpand)
 
-  // 当 forceExpand 或 defaultCollapsed 变化时，重置折叠状态
   React.useEffect(() => {
     setCollapsed(defaultCollapsed && !forceExpand)
   }, [forceExpand, defaultCollapsed])
 
   return (
     <div style={{ marginBottom: 12 }}>
-      <div 
+      <div
         onClick={() => setCollapsed(!collapsed)}
-        style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           cursor: 'pointer',
           padding: '6px 0',
@@ -226,7 +189,7 @@ function hasAdvancedConfig(field: FormFieldSchema): boolean {
   return !!(
     (typeof field.hidden === 'boolean' && field.hidden) ||
     (typeof field.hidden === 'string' && field.hidden) ||
-    field.disabled || 
+    field.disabled ||
     field.readOnly ||
     field.requiredIfExpr
   )
@@ -334,12 +297,12 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
       <CollapsibleSection title="基本属性" defaultCollapsed={false}>
         {/* 字段类型（只读显示，不可修改） */}
         <FieldGroup label="字段类型">
-          <div style={{ 
-            padding: '4px 8px', 
-            marginTop: 2, 
-            background: '#f5f5f5', 
-            borderRadius: 4, 
-            fontSize: 12, 
+          <div style={{
+            padding: '4px 8px',
+            marginTop: 2,
+            background: '#f5f5f5',
+            borderRadius: 4,
+            fontSize: 12,
             color: '#666',
             border: '1px solid #d9d9d9'
           }}>
@@ -384,8 +347,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
       </CollapsibleSection>
 
       {/* ========== 高级属性 ========== */}
-      <CollapsibleSection 
-        title="高级属性" 
+      <CollapsibleSection
+        title="高级属性"
         defaultCollapsed={true}
         forceExpand={hasAdvanced}
       >
@@ -415,7 +378,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
             value={typeof field.hidden === 'string' ? field.hidden : ''}
             onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } })}
             placeholder="如：form.type !== 'admin'"
-            style={{ fontSize: 11 }}
+            style={{ fontSize: 11 } as React.CSSProperties}
           />
         </FieldGroup>
         <FieldGroup label="必填表达式（requiredIfExpr）">
@@ -423,7 +386,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
             value={field.requiredIfExpr || ''}
             onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { requiredIfExpr: (v as string) || undefined } })}
             placeholder="如：form.type === 'admin'"
-            style={{ fontSize: 11 }}
+            style={{ fontSize: 11 } as React.CSSProperties}
           />
         </FieldGroup>
       </CollapsibleSection>
