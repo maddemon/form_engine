@@ -1,0 +1,193 @@
+/**
+ * Form Engine Schema 类型定义
+ * 对应 schema-spec.md 规范 v0.1
+ */
+
+// ============================
+// 数据源
+// ============================
+
+export type DataSourceType = 'static' | 'remote'
+
+export interface StaticDataSource {
+  type: 'static'
+  static: {
+    options: OptionItem[]
+  }
+}
+
+export interface RemoteDataSource {
+  type: 'remote'
+  remote: {
+    config: {
+      url?: string
+      method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+      dependencies?: string[]
+      requiredDeps?: string[]
+      labelField?: string
+      valueField?: string
+      resultPath?: string
+      skipEmpty?: boolean
+      [key: string]: unknown
+    }
+  }
+}
+
+export type FieldDataSource = StaticDataSource | RemoteDataSource
+
+export interface OptionItem {
+  label: string
+  value: string | number
+  disabled?: boolean
+  children?: OptionItem[]
+}
+
+// ============================
+// 校验规则
+// ============================
+
+export interface FormRule {
+  required?: boolean
+  message?: string
+  min?: number
+  max?: number
+  len?: number
+  pattern?: string
+  type?: 'string' | 'number' | 'boolean' | 'url' | 'email' | 'phone'
+  validator?: string
+}
+
+// ============================
+// 联动表达式
+// ============================
+
+export type VisibleWhen = string | Record<string, unknown> | null
+
+// ============================
+// 自定义组件
+// ============================
+
+export type CustomSource = 'registry' | 'remote' | 'inline'
+
+export interface CustomComponent {
+  source: CustomSource
+  componentId?: string
+  code?: string
+  language?: 'jsx' | 'tsx'
+  dependencies?: string[]
+}
+
+// ============================
+// Mock 数据
+// ============================
+
+export interface FieldMock {
+  formValue?: unknown
+  options?: OptionItem[]
+  [key: string]: unknown
+}
+
+// ============================
+// 字段 Schema
+// ============================
+
+export type FieldType =
+  | 'input'
+  | 'input-number'
+  | 'textarea'
+  | 'password'
+  | 'select'
+  | 'multi-select'
+  | 'radio'
+  | 'checkbox'
+  | 'switch'
+  | 'slider'
+  | 'date'
+  | 'date-range'
+  | 'time'
+  | 'datetime'
+  | 'upload'
+  | 'rate'
+  | 'cascader'
+  | 'tree-select'
+  | 'custom'
+
+export interface FormFieldSchema {
+  id?: string
+  name: string
+  type: FieldType
+  label?: string
+  placeholder?: string
+  tooltip?: string
+  defaultValue?: unknown
+  hidden?: boolean | string
+  disabled?: boolean | string
+  readOnly?: boolean
+  colSpan?: number
+  order?: number
+  newline?: boolean
+  rules?: FormRule[]
+  visibleWhen?: VisibleWhen
+  requiredWhen?: VisibleWhen
+  visibleIfExpr?: string
+  requiredIfExpr?: string
+  disabledIfExpr?: string
+  componentProps?: Record<string, unknown>
+  dataSource?: FieldDataSource
+  custom?: CustomComponent
+  mock?: FieldMock
+}
+
+// ============================
+// 表单配置
+// ============================
+
+export interface FormConfig {
+  layout?: 'horizontal' | 'vertical' | 'inline'
+  labelCol?: { span: number }
+  wrapperCol?: { span: number }
+  colon?: boolean
+  size?: 'small' | 'middle' | 'large'
+  disabled?: boolean
+  autoComplete?: string
+  labelAlign?: 'left' | 'right'
+  requiredMark?: boolean
+}
+
+export interface SubmitConfig {
+  text?: string
+  align?: 'left' | 'center' | 'right'
+  resetText?: string
+  showReset?: boolean
+}
+
+// ============================
+// 自定义组件注册表
+// ============================
+
+export interface RegisteredComponentProp {
+  type: string
+  default?: unknown
+  description?: string
+}
+
+export interface RegisteredComponent {
+  displayName: string
+  icon?: string
+  props?: Record<string, RegisteredComponentProp>
+}
+
+// ============================
+// 完整 Schema
+// ============================
+
+export interface FormSchema {
+  version?: string
+  id?: string
+  name?: string
+  description?: string
+  form?: FormConfig
+  fields: FormFieldSchema[]
+  submit?: SubmitConfig
+  componentRegistry?: Record<string, RegisteredComponent>
+}

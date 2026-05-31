@@ -1,0 +1,312 @@
+/**
+ * Form Engine - Design Tokens (CSS Custom Properties)
+ * 
+ * 使用方式：
+ * 1. 自动注入：使用 <StyleProvider> 组件会自动注入这些变量
+ * 2. 手动引入：import '@form-engine/core/styles/tokens.css'
+ * 3. 覆盖变量：在您的 CSS 中重新定义 --fe-* 变量即可
+ * 
+ * 覆盖示例：
+ * ```css
+ * :root {
+ *   --fe-primary: #722ed1;
+ *   --fe-border-radius: 8px;
+ * }
+ * ```
+ */
+
+:root {
+  /* ============================
+     Color System - 颜色系统
+     ============================ */
+
+  /* Primary - 主色 */
+  --fe-primary: #1677ff;
+  --fe-primary-hover: #4096ff;
+  --fe-primary-active: #0958d9;
+  --fe-primary-bg: rgba(22, 119, 255, 0.06);
+  --fe-primary-border: rgba(22, 119, 255, 0.3);
+
+  /* Success - 成功色 */
+  --fe-success: #52c41a;
+  --fe-success-hover: #73d13d;
+  --fe-success-active: #389e0d;
+  --fe-success-bg: rgba(82, 196, 26, 0.06);
+
+  /* Warning - 警告色 */
+  --fe-warning: #faad14;
+  --fe-warning-hover: #ffc53d;
+  --fe-warning-active: #d48806;
+  --fe-warning-bg: rgba(250, 173, 20, 0.06);
+
+  /* Error/Danger - 错误/危险色 */
+  --fe-error: #ff4d4f;
+  --fe-error-hover: #ff7875;
+  --fe-error-active: #cf1322;
+  --fe-error-bg: rgba(255, 77, 79, 0.06);
+
+  /* Info - 信息色 */
+  --fe-info: #1677ff;
+  --fe-info-hover: #4096ff;
+  --fe-info-active: #0958d9;
+  --fe-info-bg: rgba(22, 119, 255, 0.06);
+
+  /* Neutral - 中性色 */
+  --fe-text-primary: rgba(0, 0, 0, 0.88);
+  --fe-text-secondary: rgba(0, 0, 0, 0.65);
+  --fe-text-tertiary: rgba(0, 0, 0, 0.45);
+  --fe-text-quaternary: rgba(0, 0, 0, 0.25);
+  --fe-text-placeholder: rgba(0, 0, 0, 0.25);
+
+  --fe-bg-primary: #ffffff;
+  --fe-bg-secondary: #f5f5f5;
+  --fe-bg-tertiary: #fafafa;
+  --fe-bg-elevated: #ffffff;
+  --fe-bg-container: #ffffff;
+  --fe-bg-mask: rgba(0, 0, 0, 0.45);
+
+  --fe-border-primary: #d9d9d9;
+  --fe-border-secondary: #e8e8e8;
+  --fe-border-tertiary: #f0f0f0;
+  --fe-border-color-split: rgba(0, 0, 0, 0.06);
+
+  /* Disabled - 禁用状态 */
+  --fe-disabled-bg: rgba(0, 0, 0, 0.04);
+  --fe-disabled-color: rgba(0, 0, 0, 0.25);
+  --fe-disabled-border: #d9d9d9;
+
+  /* ============================
+     Spacing System - 间距系统
+     ============================ */
+
+  --fe-spacing-xs: 4px;
+  --fe-spacing-sm: 8px;
+  --fe-spacing-md: 12px;
+  --fe-spacing-lg: 16px;
+  --fe-spacing-xl: 24px;
+  --fe-spacing-2xl: 32px;
+  --fe-spacing-3xl: 48px;
+
+  /* Component-specific spacing */
+  --fe-padding-xs: 4px 8px;
+  --fe-padding-sm: 8px 12px;
+  --fe-padding-md: 8px 16px;
+  --fe-padding-lg: 12px 24px;
+  --fe-padding-xl: 16px 32px;
+
+  /* ============================
+     Typography - 字体系统
+     ============================ */
+
+  --fe-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --fe-font-family-code: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  --fe-font-family-cn: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
+  --fe-font-size-xs: 12px;
+  --fe-font-size-sm: 13px;
+  --fe-font-size-md: 14px;
+  --fe-font-size-lg: 16px;
+  --fe-font-size-xl: 20px;
+  --fe-font-size-2xl: 24px;
+  --fe-font-size-3xl: 32px;
+
+  --fe-font-weight-regular: 400;
+  --fe-font-weight-medium: 500;
+  --fe-font-weight-seibold: 600;
+  --fe-font-weight-bold: 700;
+
+  --fe-line-height-xs: 1.4;
+  --fe-line-height-sm: 1.5;
+  --fe-line-height-md: 1.57;
+  --fe-line-height-lg: 1.8;
+
+  /* ============================
+     Border System - 边框系统
+     ============================ */
+
+  --fe-border-width: 1px;
+  --fe-border-style: solid;
+  --fe-border: var(--fe-border-width) var(--fe-border-style) var(--fe-border-primary);
+
+  --fe-border-radius-xs: 2px;
+  --fe-border-radius-sm: 4px;
+  --fe-border-radius-md: 6px;
+  --fe-border-radius-lg: 8px;
+  --fe-border-radius-xl: 12px;
+  --fe-border-radius-circle: 50%;
+  --fe-border-radius-round: 9999px;
+
+  /* ============================
+     Shadow - 阴影系统
+     ============================ */
+
+  --fe-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  --fe-shadow-md: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02), 0 3px 12px 0 rgba(0, 0, 0, 0.05);
+  --fe-shadow-lg: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  --fe-shadow-xl: 0 6px 16px -8px rgba(0, 0, 0, 0.16), 0 9px 28px 0 rgba(0, 0, 0, 0.12), 0 12px 48px 16px rgba(0, 0, 0, 0.09);
+
+  /* ============================
+     Animation - 动画系统
+     ============================ */
+
+  --fe-transition-fast: 0.1s;
+  --fe-transition-normal: 0.2s;
+  --fe-transition-slow: 0.3s;
+  --fe-transition-slower: 0.5s;
+
+  --fe-transition-fn: cubic-bezier(0.4, 0, 0.2, 1);
+  --fe-transition-all: all var(--fe-transition-normal) var(--fe-transition-fn);
+  --fe-transition-colors: background-color var(--fe-transition-normal), border-color var(--fe-transition-normal), color var(--fe-transition-normal);
+
+  /* ============================
+     Z-Index - 层级系统
+     ============================ */
+
+  --fe-z-base: 0;
+  --fe-z-dropdown: 1050;
+  --fe-z-sticky: 1020;
+  --fe-z-fixed: 1030;
+  --fe-z-modal: 1040;
+  --fe-z-popover: 1060;
+  --fe-z-tooltip: 1070;
+  --fe-z-toast: 1080;
+
+  /* ============================
+     Component Variables - 组件变量
+     ============================ */
+
+  /* Button */
+  --fe-btn-height-sm: 24px;
+  --fe-btn-height-md: 32px;
+  --fe-btn-height-lg: 40px;
+  --fe-btn-font-size-sm: var(--fe-font-size-xs);
+  --fe-btn-font-size-md: var(--fe-font-size-md);
+  --fe-btn-font-size-lg: var(--fe-font-size-lg);
+  --fe-btn-padding-sm: var(--fe-padding-xs);
+  --fe-btn-padding-md: var(--fe-padding-md);
+  --fe-btn-padding-lg: var(--fe-padding-lg);
+
+  /* Input */
+  --fe-input-height-sm: 24px;
+  --fe-input-height-md: 32px;
+  --fe-input-height-lg: 40px;
+  --fe-input-padding: 4px 8px;
+  --fe-input-bg: var(--fe-bg-primary);
+  --fe-input-border: var(--fe-border);
+  --fe-input-border-radius: var(--fe-border-radius-sm);
+  --fe-input-focus-border-color: var(--fe-primary);
+  --fe-input-focus-box-shadow: 0 0 0 2px var(--fe-primary-border);
+  --fe-input-placeholder-color: var(--fe-text-placeholder);
+  --fe-input-hover-border-color: var(--fe-primary-hover);
+
+  /* Select */
+  --fe-select-dropdown-bg: var(--fe-bg-elevated);
+  --fe-select-dropdown-shadow: var(--fe-shadow-lg);
+  --fe-select-option-height: 32px;
+  --fe-select-option-selected-bg: var(--fe-primary-bg);
+  --fe-select-option-hover-bg: var(--fe-bg-secondary);
+
+  /* Checkbox/Radio */
+  --fe-checkbox-size: 16px;
+  --fe-radio-size: 16px;
+  --fe-checkbox-color: var(--fe-primary);
+  --fe-radio-color: var(--fe-primary);
+
+  /* Switch */
+  --fe-switch-width: 44px;
+  --fe-switch-height: 22px;
+  --fe-switch-bg: rgba(0, 0, 0, 0.25);
+  --fe-switch-checked-bg: var(--fe-primary);
+
+  /* Slider */
+  --fe-slider-track-height: 4px;
+  --fe-slider-track-bg: var(--fe-border-secondary);
+  --fe-slider-fill-bg: var(--fe-primary);
+  --fe-slider-thumb-size: 14px;
+  --fe-slider-thumb-bg: var(--fe-bg-primary);
+  --fe-slider-thumb-border: 2px solid var(--fe-primary);
+
+  /* Rate */
+  --fe-rate-star-size: 20px;
+  --fe-rate-star-color: #f5a623;
+  --fe-rate-star-bg: var(--fe-border-secondary);
+
+  /* DatePicker */
+  --fe-datepicker-cell-size: 36px;
+  --fe-datepicker-header-height: 40px;
+  --fe-datepicker-panel-bg: var(--fe-bg-elevated);
+
+  /* Upload */
+  --fe-upload-dragger-bg: var(--fe-bg-tertiary);
+  --fe-upload-dragger-border: 2px dashed var(--fe-border-primary);
+  --fe-upload-list-item-bg: var(--fe-bg-secondary);
+
+  /* Container/Layout */
+  --fe-container-padding: var(--fe-spacing-lg);
+  --fe-container-bg: var(--fe-bg-container);
+  --fe-container-border-radius: var(--fe-border-radius-md);
+
+  /* Canvas/Designer */
+  --fe-canvas-bg: var(--fe-bg-secondary);
+  --fe-canvas-field-hover-bg: var(--fe-primary-bg);
+  --fe-canvas-field-selected-border: var(--fe-primary);
+  --fe-canvas-field-selected-shadow: 0 0 0 2px var(--fe-primary-border);
+  --fe-canvas-toolbar-bg: var(--fe-bg-elevated);
+  --fe-canvas-toolbar-shadow: var(--fe-shadow-md);
+
+  /* ============================
+     Dark Mode - 暗黑模式
+     ============================ */
+}
+
+/* Dark Mode - 暗黑模式 */
+[data-fe-theme='dark'] {
+  --fe-primary: #1668dc;
+  --fe-primary-hover: #3b82f6;
+  --fe-primary-active: #0958d9;
+  --fe-primary-bg: rgba(22, 104, 220, 0.15);
+  --fe-primary-border: rgba(22, 104, 220, 0.3);
+
+  --fe-text-primary: rgba(255, 255, 255, 0.85);
+  --fe-text-secondary: rgba(255, 255, 255, 0.65);
+  --fe-text-tertiary: rgba(255, 255, 255, 0.45);
+  --fe-text-quaternary: rgba(255, 255, 255, 0.25);
+  --fe-text-placeholder: rgba(255, 255, 255, 0.25);
+
+  --fe-bg-primary: #141414;
+  --fe-bg-secondary: #1f1f1f;
+  --fe-bg-tertiary: #262626;
+  --fe-bg-elevated: #1f1f1f;
+  --fe-bg-container: #141414;
+  --fe-bg-mask: rgba(0, 0, 0, 0.65);
+
+  --fe-border-primary: #434343;
+  --fe-border-secondary: #303030;
+  --fe-border-tertiary: #1f1f1f;
+  --fe-border-color-split: rgba(255, 255, 255, 0.06);
+
+  --fe-disabled-bg: rgba(255, 255, 255, 0.04);
+  --fe-disabled-color: rgba(255, 255, 255, 0.25);
+  --fe-disabled-border: #434343;
+
+  --fe-input-bg: var(--fe-bg-primary);
+  --fe-input-border: var(--fe-border);
+  --fe-select-dropdown-bg: var(--fe-bg-elevated);
+  --fe-select-option-hover-bg: var(--fe-bg-secondary);
+  --fe-upload-dragger-bg: var(--fe-bg-tertiary);
+  --fe-canvas-bg: var(--fe-bg-secondary);
+  --fe-canvas-toolbar-bg: var(--fe-bg-elevated);
+}
+
+/* Compact Mode - 紧凑模式 */
+[data-fe-size='compact'] {
+  --fe-btn-height-sm: 20px;
+  --fe-btn-height-md: 28px;
+  --fe-btn-height-lg: 36px;
+  --fe-input-height-sm: 20px;
+  --fe-input-height-md: 28px;
+  --fe-input-height-lg: 36px;
+  --fe-font-size-md: 13px;
+  --fe-padding-md: 6px 12px;
+  --fe-spacing-lg: 12px;
+}

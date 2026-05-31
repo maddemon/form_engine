@@ -1,0 +1,52 @@
+{
+  "name": "@form-engine/core",
+  "version": "0.1.0",
+  "description": "Form Engine 核心包 - 类型定义 + 默认 HTML 组件 + 设计器",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "form",
+    "engine",
+    "schema",
+    "renderer",
+    "designer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./designer": {
+      "import": "./src/designer/index.ts",
+      "types": "./src/designer/index.ts"
+    }
+  }
+}
