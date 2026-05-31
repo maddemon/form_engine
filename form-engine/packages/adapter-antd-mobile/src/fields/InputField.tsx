@@ -1,8 +1,7 @@
-import { Input, Picker, Radio, Checkbox, Switch, Slider, Rate, DatePicker, ImageUploader, Cascader, Stepper, Button } from 'antd-mobile'
-import type { FieldRendererFn, FieldComponentProps } from '../../../types/adapter'
-import type { OptionItem } from '../../../types/schema'
+import { Input, Picker, Radio, Checkbox, Switch, Slider, Rate, DatePicker, ImageUploader, Cascader, Stepper, Button, TextArea } from 'antd-mobile'
+import { OptionItem } from '@form-engine/core'
+import { FieldComponentProps, FieldRendererFn } from '@form-engine/core/types/adapter'
 
-const { TextArea } = Input
 
 // ============================
 // 工具函数

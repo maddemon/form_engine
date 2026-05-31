@@ -1,11 +1,13 @@
-import React, { useState, useCallback } from 'react'
-import { Designer, FormRender, defaultAdapter } from '@form-engine/core'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { Designer, FormRender, defaultAdapter, getScene, setScene, autoDetectScene } from '@form-engine/core'
 import type { FormSchema } from '@form-engine/core'
 
 type Tab = 'design' | 'preview'
 
 const App: React.FC = () => {
   const [tab, setTab] = useState<Tab>('design')
+  // 将 scene 纳入 state，变化时自动重新渲染
+  const [scene, setSceneState] = useState<ReturnType<typeof getScene>>(getScene)
   const [schema, setSchema] = useState<FormSchema>({
     version: '0.1',
     name: '未命名表单',
@@ -21,6 +23,17 @@ const App: React.FC = () => {
 
   const handleChange = useCallback((values: Record<string, unknown>) => {
     console.log('变化:', values)
+  }, [])
+
+  // 监听 resize，更新 scene state（驱动重新渲染）
+  useEffect(() => {
+    const onResize = () => {
+      const newScene = autoDetectScene()
+      setScene(newScene)
+      setSceneState(newScene)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
   }, [])
 
   return (
@@ -75,6 +88,9 @@ const App: React.FC = () => {
 
         <div style={{ fontSize: 13, color: '#999' }}>
           表单名：{schema.name}
+          <span style={{ marginLeft: 12, padding: '2px 8px', background: scene === 'mobile' ? '#1677ff' : '#52c41a', color: '#fff', borderRadius: 4 }}>
+            {scene === 'mobile' ? '📱 Mobile' : '🖥️ Desktop'}
+          </span>
         </div>
       </header>
 
@@ -84,6 +100,7 @@ const App: React.FC = () => {
           <Designer
             schema={schema}
             onSchemaChange={setSchema}
+            onSceneChange={(s) => setSceneState(s)}
             adapter={defaultAdapter}
           />
         ) : (

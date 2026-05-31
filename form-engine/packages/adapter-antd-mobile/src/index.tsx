@@ -1,11 +1,14 @@
-import React from 'react'
-import type { FieldRendererFn, DesignerWidgets } from '../../../types/adapter'
-import type { OptionItem } from '../../../types/schema'
+import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
+import { DesignerWidgets, FieldRendererFn } from '@form-engine/core/types/adapter'
+
+
+// 导入 antd-mobile 基础组件（用于 designerWidgets）
+import { Button, Checkbox, Input, Picker, Stepper } from 'antd-mobile'
 
 // 导入所有字段组件
-import { InputField, TextAreaField, InputNumberField, PasswordField, SelectField } from './fields/InputField'
-import { RadioField, CheckboxField, SwitchField, SliderField, RateField } from './fields/SwitchField'
-import { DateField, DateRangeField, TimeField, UploadField, CascaderField, TreeSelectField } from './fields/DateField'
+import { CascaderField, DateField, DateRangeField, TimeField, TreeSelectField, UploadField } from './fields/DateField'
+import { InputField, InputNumberField, PasswordField, SelectField, TextAreaField } from './fields/InputField'
+import { CheckboxField, RadioField, RateField, SliderField, SwitchField } from './fields/SwitchField'
 
 // ----- 兜底渲染（未知字段类型）-----
 const DefaultField: FieldRendererFn = (props: any) => {
@@ -66,7 +69,33 @@ const designerWidgets: DesignerWidgets = {
   ),
 }
 
+// ----- 组件映射（用于注册）-----
+export const antdMobileComponents = {
+  'Input': InputField,
+  'Password': PasswordField,
+  'Textarea': TextAreaField,
+  'TextArea': TextAreaField,
+  'InputNumber': InputNumberField,
+  'Select': SelectField,
+  'MultiSelect': SelectField,
+  'Radio': RadioField,
+  'RadioGroup': RadioField,
+  'Checkbox': CheckboxField,
+  'CheckboxGroup': CheckboxField,
+  'Switch': SwitchField,
+  'Slider': SliderField,
+  'Rate': RateField,
+  'DatePicker': DateField,
+  'DateRangePicker': DateRangeField,
+  'TimePicker': TimeField,
+  'Upload': UploadField,
+}
+
 export const antdMobileAdapter = {
+  name: 'antd-mobile',
+  version: '5.0.0',
+
+  // 字段渲染组件
   'default': DefaultField,
   'input': InputField,
   'input-number': InputNumberField,
@@ -87,5 +116,25 @@ export const antdMobileAdapter = {
   'cascader': CascaderField,
   'tree-select': TreeSelectField,
 
-  '_designerWidgets': designerWidgets,
+  // 属性面板小组件
+  _designerWidgets: designerWidgets,
+}
+
+// ----- 自动注册（副作用）-----
+function autoRegister() {
+  try {
+    if (registerComponents) {
+      registerComponents(antdMobileComponents as any, 'mobile')
+      console.log('[Form Engine] antd-mobile adapter 已自动注册 (mobile)')
+    }
+    if (registerDesignerWidgets) {
+      registerDesignerWidgets(designerWidgets as any, 'mobile')
+    }
+  } catch (e) {
+    console.warn('[Form Engine] 无法自动注册 antd-mobile adapter，请手动注册', e)
+  }
+}
+
+if (typeof window !== 'undefined') {
+  autoRegister()
 }

@@ -1,24 +1,26 @@
 /**
  * Form Engine - Antd Adapter
  * 提供 antd 组件实现
- * 
+ *
  * 使用方式：
  * ```typescript
  * // 方式1：使用 registerAdapter（推荐）
  * import { antdAdapter } from '@form-engine/adapter-antd'
  * import { registerAdapter } from '@form-engine/core'
- * 
+ *
  * registerAdapter(antdAdapter)
- * 
+ *
  * // 方式2：手动注册组件
  * import { antdComponents } from '@form-engine/adapter-antd'
  * import { registerComponents } from '@form-engine/core'
- * 
+ *
  * registerComponents(antdComponents)
  * ```
  */
 
 import React from 'react'
+import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
+import { Input as AntdInput, Select as AntdSelect, Checkbox as AntdCheckbox, InputNumber as AntdInputNumber } from 'antd'
 
 // ============================
 // 导入所有 antd 组件实现
@@ -99,17 +101,56 @@ export const antdComponents = {
 /**
  * Antd Adapter
  * 完整的 adapter 定义，包含组件映射和属性面板配置
- * 
+ *
  * 注意：为了简化，这里不使用 FormEngineAdapter 类型
  * 用户可以直接使用 antdComponents 进行注册
  */
+export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidgets = {
+  Input: ({ value, onChange, placeholder, disabled, style }) => (
+    <AntdInput
+      value={value ?? ''}
+      onChange={v => onChange?.(v.target.value)}
+      placeholder={placeholder}
+      disabled={disabled}
+      style={{ width: '100%', ...style }}
+    />
+  ),
+  Select: ({ value, onChange, options, disabled, style }) => (
+    <AntdSelect
+      value={value}
+      onChange={v => onChange?.(v)}
+      options={options}
+      disabled={disabled}
+      style={{ width: '100%', ...style }}
+    />
+  ),
+  Checkbox: ({ checked, onChange, disabled, style }) => (
+    <AntdCheckbox
+      checked={!!checked}
+      onChange={v => onChange?.(v.target.checked)}
+      disabled={disabled}
+      style={style}
+    />
+  ),
+  NumberInput: ({ value, onChange, min, max, disabled, style }) => (
+    <AntdInputNumber
+      value={value}
+      onChange={v => onChange?.(v)}
+      min={min}
+      max={max}
+      disabled={disabled}
+      style={{ width: '100%', ...style }}
+    />
+  ),
+}
+
 export const antdAdapter = {
   name: 'antd',
   version: '5.0.0',
-  
+
   // 组件映射
   components: antdComponents,
-  
+
   // 主题配置（Ant Design 5 的 token）
   theme: {
     token: {
@@ -119,7 +160,7 @@ export const antdAdapter = {
       // 组件级 token
     }
   },
-  
+
   // 布局组件覆写（使用 antd 的布局组件）
   layout: {
     Grid: undefined, // 将在运行时设置
@@ -127,7 +168,10 @@ export const antdAdapter = {
     Flex: undefined,
     Collapse: undefined,
     Tabs: undefined,
-  }
+  },
+
+  // 属性面板小组件（由 core 按场景获取）
+  _designerWidgets: antdWidgets,
 }
 
 // 设置 layout 的引用（避免循环引用）
@@ -138,29 +182,22 @@ export const antdAdapter = {
 ;(antdAdapter.layout as any).Tabs = antdComponents['Tabs']
 
 /**
- * 自动注册 antd 组件（副作用）
+ * 自动注册 antd 组件和小组件（副作用）
  * 当导入此模块时自动执行
- * 
+ *
  * 注意：推荐使用 registerAdapter 代替自动注册
  */
 function autoRegister() {
   try {
-    // 动态导入 core 的注册函数
-    // 使用动态 import 代替 require
-    import('@form-engine/core').then((mod: any) => {
-      const { registerComponents } = mod
-      if (registerComponents) {
-        // 使用类型断言避免 LazyExoticComponent 与 ComponentType 的类型不匹配
-        registerComponents(antdComponents as any)
-        console.log('[Form Engine] antd adapter 已自动注册')
-      }
-    }).catch(() => {
-      // 如果 @form-engine/core 未安装，忽略
-      console.warn('[Form Engine] 无法自动注册 antd adapter，请手动注册')
-    })
+    if (registerComponents) {
+      registerComponents(antdComponents as any, 'desktop')
+      console.log('[Form Engine] antd adapter 已自动注册 (desktop)')
+    }
+    if (registerDesignerWidgets) {
+      registerDesignerWidgets(antdWidgets as any, 'desktop')
+    }
   } catch (e) {
-    // 如果出错，忽略
-    console.warn('[Form Engine] 无法自动注册 antd adapter，请手动注册')
+    console.warn('[Form Engine] 无法自动注册 antd adapter，请手动注册', e)
   }
 }
 

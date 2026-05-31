@@ -153,6 +153,8 @@ export {
   autoDetectScene,
   registerComponent,
   registerComponents,
+  registerDesignerWidgets,
+  getDesignerWidgets,
   getComponent,
   getDesktopComponent,
   getMobileComponent,

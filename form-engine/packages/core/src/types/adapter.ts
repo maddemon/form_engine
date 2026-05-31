@@ -116,6 +116,15 @@ export interface DesignerWidgets {
     disabled?: boolean
     style?: React.CSSProperties
   }>
+  /** 多行文本 */
+  TextArea?: React.ComponentType<{
+    value?: string
+    onChange?: (v: string) => void
+    placeholder?: string
+    disabled?: boolean
+    rows?: number
+    style?: React.CSSProperties
+  }>
   /** 下拉选择 */
   Select: React.ComponentType<{
     value?: string
@@ -131,12 +140,34 @@ export interface DesignerWidgets {
     disabled?: boolean
     style?: React.CSSProperties
   }>
+  /** 开关 */
+  Switch?: React.ComponentType<{
+    checked?: boolean
+    onChange?: (v: boolean) => void
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
   /** 数字输入框 */
   NumberInput: React.ComponentType<{
     value?: number
     onChange?: (v: number) => void
     min?: number
     max?: number
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
+  /** 按钮 */
+  Button?: React.ComponentType<{
+    children?: React.ReactNode
+    onClick?: () => void
+    type?: 'default' | 'primary' | 'danger' | 'dashed'
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
+  /** 选项编辑器（用于 select/radio/checkbox 等） */
+  OptionsEditor?: React.ComponentType<{
+    value?: { label: string; value: string }[]
+    onChange?: (v: { label: string; value: string }[]) => void
     disabled?: boolean
     style?: React.CSSProperties
   }>

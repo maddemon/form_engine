@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback, useState } from 'react'
+import React, { useReducer, useCallback, useState, useEffect } from 'react'
 import type { FormSchema, FormConfig, SubmitConfig } from '../types/schema'
 import type { DesignerAction, PaletteItem, PaletteGroup } from '../types/designer'
 import type { FormEngineAdapter } from '../types/adapter'
@@ -6,6 +6,7 @@ import { FieldList, defaultPaletteGroups } from './FieldList'
 import { Canvas } from './Canvas'
 import { PropertyPanel } from './PropertyPanel'
 import type { DeviceScene } from '../registry/componentRegistry'
+import { setScene } from '../registry/componentRegistry'
 
 /**
  * 默认表单配置
@@ -165,6 +166,7 @@ function designerReducer(
 interface DesignerProps {
   schema?: FormSchema
   onSchemaChange?: (schema: FormSchema) => void
+  onSceneChange?: (scene: DeviceScene) => void
   groups?: PaletteGroup[]
   readOnly?: boolean
   adapter?: FormEngineAdapter
@@ -173,6 +175,7 @@ interface DesignerProps {
 export const Designer: React.FC<DesignerProps> = ({
   schema: externalSchema,
   onSchemaChange,
+  onSceneChange,
   groups = defaultPaletteGroups,
   readOnly = false,
   adapter,
@@ -199,6 +202,12 @@ export const Designer: React.FC<DesignerProps> = ({
       dispatch({ type: 'SET_SCHEMA', schema: externalSchema })
     }
   }, [externalSchema])
+
+  // 同步场景到 core 全局状态（供 getComponent 使用）
+  React.useEffect(() => {
+    setScene(scene)
+    onSceneChange?.(scene)
+  }, [scene, onSceneChange])
 
   // 通知外部 schema 变化
   const notifyChange = useCallback(

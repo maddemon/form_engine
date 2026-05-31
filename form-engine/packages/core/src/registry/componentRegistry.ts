@@ -25,12 +25,17 @@
 
 import React from 'react'
 import type { ComponentType } from '../types/component-props'
+import type { DesignerWidgets } from '../types/adapter'
 
 type ComponentMap = Map<string, React.ComponentType<any>>
 
 // 存储 desktop 和 mobile 两种场景的组件
 const desktopComponents: ComponentMap = new Map()
 const mobileComponents: ComponentMap = new Map()
+
+// 存储 desktop 和 mobile 两种场景的设计器小组件
+let desktopWidgets: DesignerWidgets | null = null
+let mobileWidgets: DesignerWidgets | null = null
 
 // 当前场景
 export type DeviceScene = 'desktop' | 'mobile'
@@ -92,25 +97,33 @@ export function registerComponents(
 
 /**
  * 获取组件（根据当前场景）
- * @throws 如果组件未注册，抛出错误提示安装 adapter
+ * 优先使用显式传入的 scene，否则使用 core 全局场景（由 setScene 设置）
+ * 如果当前场景未注册该组件，自动 fallback 到另一个场景
+ * （适用于两端通用只注册一次的 UI 库）
+ * @throws 如果两个场景都未注册，抛出错误提示安装 adapter
  */
 export function getComponent(type: string, scene?: DeviceScene): React.ComponentType<any> | null {
-  const targetScene = scene || currentScene
-  const components = targetScene === 'desktop' ? desktopComponents : mobileComponents
-  
-  const component = components.get(type)
-  
+  const targetScene = scene || getScene()
+  const primaryMap = targetScene === 'desktop' ? desktopComponents : mobileComponents
+  const fallbackMap = targetScene === 'desktop' ? mobileComponents : desktopComponents
+
+  // 优先从当前场景获取，找不到则 fallback 到另一场景
+  const component = primaryMap.get(type) || fallbackMap.get(type) || null
+
   if (!component) {
+    const adapterHint = targetScene === 'desktop'
+      ? `  import { antdAdapter } from '@form-engine/adapter-antd'\n`
+      : `  import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'\n`
     console.error(
       `[Form Engine] 组件 "${type}" 未注册。\n` +
       `请安装并注册对应的 adapter，例如：\n` +
-      `  import { antdAdapter } from '@form-engine/adapter-antd'\n` +
+      adapterHint +
       `  import { registerAdapter } from '@form-engine/core'\n` +
       `  registerAdapter(antdAdapter)\n`
     )
   }
-  
-  return component || null
+
+  return component
 }
 
 /**
@@ -129,11 +142,13 @@ export function getMobileComponent(type: string): React.ComponentType<any> | nul
 
 /**
  * 检查组件是否已注册
+ * 会同时检查当前场景和 fallback 场景
  */
 export function hasComponent(type: string, scene?: DeviceScene): boolean {
-  const targetScene = scene || currentScene
-  const components = targetScene === 'desktop' ? desktopComponents : mobileComponents
-  return components.has(type)
+  const targetScene = scene || getScene()
+  const primaryMap = targetScene === 'desktop' ? desktopComponents : mobileComponents
+  const fallbackMap = targetScene === 'desktop' ? mobileComponents : desktopComponents
+  return primaryMap.has(type) || fallbackMap.has(type)
 }
 
 /**
@@ -146,11 +161,15 @@ export function clearRegistry() {
 
 /**
  * 获取所有已注册的组件类型
+ * 返回当前场景 + fallback 场景的并集（去重）
  */
 export function getRegisteredTypes(scene?: DeviceScene): string[] {
-  const targetScene = scene || currentScene
-  const components = targetScene === 'desktop' ? desktopComponents : mobileComponents
-  return Array.from(components.keys())
+  const targetScene = scene || getScene()
+  const primaryMap = targetScene === 'desktop' ? desktopComponents : mobileComponents
+  const fallbackMap = targetScene === 'desktop' ? mobileComponents : desktopComponents
+  // 合并去重
+  const allKeys = new Set([...primaryMap.keys(), ...fallbackMap.keys()])
+  return Array.from(allKeys)
 }
 
 /**
@@ -158,4 +177,33 @@ export function getRegisteredTypes(scene?: DeviceScene): string[] {
  */
 export function hasAnyComponent(): boolean {
   return desktopComponents.size > 0 || mobileComponents.size > 0
+}
+
+// ========================
+// 设计器小组件（DesignerWidgets）
+// ========================
+
+/**
+ * 注册设计器小组件（按场景）
+ */
+export function registerDesignerWidgets(widgets: DesignerWidgets, scene?: DeviceScene | 'both') {
+  if (scene === 'both' || !scene) {
+    desktopWidgets = widgets
+    mobileWidgets = widgets
+  } else if (scene === 'desktop') {
+    desktopWidgets = widgets
+  } else if (scene === 'mobile') {
+    mobileWidgets = widgets
+  }
+}
+
+/**
+ * 获取设计器小组件
+ * 设计器永远在桌面端使用，因此 scene 固定为 'desktop'
+ * 不 fallback 到 mobile（移动端小组件不适合桌面设计器）
+ */
+export function getDesignerWidgets(scene?: DeviceScene): DesignerWidgets | null {
+  // 设计器永远用 desktop widgets，忽略传入的 scene 参数
+  void scene
+  return desktopWidgets || null
 }

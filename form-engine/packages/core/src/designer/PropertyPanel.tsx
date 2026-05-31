@@ -3,6 +3,7 @@ import type { DeviceScene } from '../registry/componentRegistry'
 import type { DesignerAction } from '../types/designer'
 import type { FieldType, FormConfig, FormFieldSchema, SubmitConfig } from '../types/schema'
 import type { FormEngineAdapter, DesignerWidgets } from '../types/adapter'
+import { defaultDesignerWidgets } from './widgets'
 
 interface PropertyPanelProps {
   field: FormFieldSchema | null
@@ -10,6 +11,8 @@ interface PropertyPanelProps {
   submitConfig: SubmitConfig
   dispatch: React.Dispatch<DesignerAction>
   adapter?: FormEngineAdapter
+  /** 自定义属性面板小组件（不传则使用内置默认小组件） */
+  designerWidgets?: DesignerWidgets
   scene?: DeviceScene
   onSceneChange?: (scene: DeviceScene) => void
 }
@@ -33,91 +36,13 @@ const SIZE_OPTIONS = [
 ]
 
 // ========================
-// 从 adapter 提取小组件，未提供则用纯 HTML 兜底
+// 获取属性面板小组件
+// 优先级：designerWidgets prop > 内置默认小组件
 // ========================
-function useWidgets(adapter?: FormEngineAdapter): DesignerWidgets {
-  const w = (adapter as any)?._designerWidgets as DesignerWidgets | undefined
-  if (w) return w
-  return {
-    Input: HtmlInput,
-    Select: HtmlSelect,
-    Checkbox: HtmlCheckbox,
-    NumberInput: HtmlNumberInput,
-  }
+function useWidgets(designerWidgets?: DesignerWidgets): DesignerWidgets {
+  if (designerWidgets) return designerWidgets
+  return defaultDesignerWidgets
 }
-
-// ========================
-// 纯 HTML 兜底组件
-// ========================
-const HtmlInput: React.FC<{
-  value?: string | number
-  onChange?: (v: string | number) => void
-  placeholder?: string
-  disabled?: boolean
-  style?: React.CSSProperties
-}> = ({ value, onChange, placeholder, disabled, style }) => (
-  <input
-    type="text"
-    value={String(value ?? '')}
-    onChange={e => onChange?.(e.target.value)}
-    placeholder={placeholder}
-    disabled={disabled}
-    style={{ width: '100%', padding: '4px 8px', borderRadius: 4, border: '1px solid #d9d9d9', fontSize: 12, ...style }}
-  />
-)
-
-const HtmlSelect: React.FC<{
-  value?: string
-  onChange?: (v: string) => void
-  options: { label: string; value: string }[]
-  disabled?: boolean
-  style?: React.CSSProperties
-}> = ({ value, onChange, options, disabled, style }) => (
-  <select
-    value={value}
-    onChange={e => onChange?.(e.target.value)}
-    disabled={disabled}
-    style={{ width: '100%', padding: '4px 8px', borderRadius: 4, border: '1px solid #d9d9d9', fontSize: 12, ...style }}
-  >
-    {options.map(opt => (
-      <option key={opt.value} value={opt.value}>{opt.label}</option>
-    ))}
-  </select>
-)
-
-const HtmlCheckbox: React.FC<{
-  checked?: boolean
-  onChange?: (v: boolean) => void
-  disabled?: boolean
-  style?: React.CSSProperties
-}> = ({ checked, onChange, disabled, style }) => (
-  <input
-    type="checkbox"
-    checked={!!checked}
-    onChange={e => onChange?.(e.target.checked)}
-    disabled={disabled}
-    style={{ ...style }}
-  />
-)
-
-const HtmlNumberInput: React.FC<{
-  value?: number
-  onChange?: (v: number) => void
-  min?: number
-  max?: number
-  disabled?: boolean
-  style?: React.CSSProperties
-}> = ({ value, onChange, min, max, disabled, style }) => (
-  <input
-    type="number"
-    value={value ?? ''}
-    onChange={e => onChange?.(Number(e.target.value))}
-    min={min}
-    max={max}
-    disabled={disabled}
-    style={{ width: '100%', padding: '4px 8px', borderRadius: 4, border: '1px solid #d9d9d9', fontSize: 12, ...style }}
-  />
-)
 
 // ========================
 // 通用字段行样式
@@ -204,10 +129,11 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   submitConfig,
   dispatch,
   adapter,
+  designerWidgets,
   scene = 'desktop',
   onSceneChange,
 }) => {
-  const w = useWidgets(adapter)
+  const w = useWidgets(designerWidgets)
 
   // ---- 未选中字段：编辑表单配置 ----
   if (!field) {

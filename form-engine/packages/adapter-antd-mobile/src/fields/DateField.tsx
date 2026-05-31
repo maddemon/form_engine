@@ -4,11 +4,9 @@ import { Cascader } from 'antd-mobile'
 import { Picker } from 'antd-mobile'
 import { Stepper } from 'antd-mobile'
 import { ImageUploader } from 'antd-mobile'
-import type { FieldRendererFn, FieldComponentProps } from '../../../types/adapter'
-import type { OptionItem } from '../../../types/schema'
 import { SelectField } from './InputField'
-
-const { TextArea } = Input
+import { OptionItem } from '@form-engine/core'
+import { FieldComponentProps, FieldRendererFn } from '@form-engine/core/types/adapter'
 
 // ============================
 // 工具函数
