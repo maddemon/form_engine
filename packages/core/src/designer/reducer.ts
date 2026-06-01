@@ -17,17 +17,6 @@ function shouldSnapshot(action: DesignerAction): boolean {
   return ['ADD_FIELD', 'REMOVE_FIELD', 'MOVE_FIELD', 'UPDATE_FIELD', 'COPY_FIELD'].includes(action.type)
 }
 
-function findFieldById(fields: FormFieldSchema[], id: string): FormFieldSchema | undefined {
-  for (const f of fields) {
-    if (f.id === id) return f
-    if (f.children) {
-      const found = findFieldById(f.children, id)
-      if (found) return found
-    }
-  }
-  return undefined
-}
-
 function insertAfter(fields: FormFieldSchema[], targetId: string, newField: FormFieldSchema): FormFieldSchema[] {
   const idx = fields.findIndex(f => f.id === targetId)
   if (idx >= 0) {
@@ -52,10 +41,56 @@ function cloneField(field: FormFieldSchema): FormFieldSchema {
   }
 }
 
-function removeFieldFromChildren(fields: FormFieldSchema[], fieldId: string): FormFieldSchema[] {
+function cloneFields(fields: FormFieldSchema[]): FormFieldSchema[] {
+  return structuredClone(fields)
+}
+
+function removeFieldFromTree(
+  fields: FormFieldSchema[],
+  parentId: string | undefined,
+  index: number,
+): { fields: FormFieldSchema[]; removed: FormFieldSchema | null } {
+  if (parentId) {
+    let removed: FormFieldSchema | null = null
+    const result = fields.map(n => {
+      if (n.id === parentId && n.children) {
+        removed = n.children[index] || null
+        return { ...n, children: n.children.filter((_, i) => i !== index) }
+      }
+      return n.children ? { ...n, children: removeFieldFromTree(n.children, parentId, index).fields } : n
+    })
+    return { fields: result, removed }
+  }
+  const copy = [...fields]
+  const [removed] = copy.splice(index, 1)
+  return { fields: copy, removed: removed || null }
+}
+
+function insertIntoTree(
+  fields: FormFieldSchema[],
+  parentId: string | undefined,
+  index: number,
+  field: FormFieldSchema,
+): FormFieldSchema[] {
+  if (parentId) {
+    return fields.map(n => {
+      if (n.id === parentId) {
+        const children = [...(n.children || [])]
+        children.splice(index, 0, field)
+        return { ...n, children }
+      }
+      return n.children ? { ...n, children: insertIntoTree(n.children, parentId, index, field) } : n
+    })
+  }
+  const copy = [...fields]
+  copy.splice(index, 0, field)
+  return copy
+}
+
+function removeFieldById(fields: FormFieldSchema[], fieldId: string): FormFieldSchema[] {
   return fields
     .filter(f => f.id !== fieldId)
-    .map(f => f.children ? { ...f, children: removeFieldFromChildren(f.children, fieldId) } : f)
+    .map(f => f.children ? { ...f, children: removeFieldById(f.children, fieldId) } : f)
 }
 
 function updateFieldInTree(fields: FormFieldSchema[], fieldId: string, patch: Partial<FormFieldSchema>): FormFieldSchema[] {
@@ -66,8 +101,15 @@ function updateFieldInTree(fields: FormFieldSchema[], fieldId: string, patch: Pa
   })
 }
 
-function cloneFields(fields: FormFieldSchema[]): FormFieldSchema[] {
-  return structuredClone(fields)
+export function findInTree(fields: FormFieldSchema[], id: string): FormFieldSchema | undefined {
+  for (const f of fields) {
+    if (f.id === id) return f
+    if (f.children) {
+      const found = findInTree(f.children, id)
+      if (found) return found
+    }
+  }
+  return undefined
 }
 
 export function designerReducer(state: DesignerState, action: DesignerAction): DesignerState {
@@ -98,7 +140,7 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
     }
 
     case 'REMOVE_FIELD': {
-      const fields = removeFieldFromChildren(state.schema.fields, action.fieldId)
+      const fields = removeFieldById(state.schema.fields, action.fieldId)
       return {
         ...state,
         selectedFieldId: state.selectedFieldId === action.fieldId ? null : state.selectedFieldId,
@@ -107,66 +149,18 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
     }
 
     case 'MOVE_FIELD': {
-      if (action.toParentId) {
-        const sourceFields = cloneFields(state.schema.fields)
-        let moved: FormFieldSchema | null = null
-
-        if (action.fromParentId) {
-          const removeFromContainer = (nodes: FormFieldSchema[]): FormFieldSchema[] =>
-            nodes.map(n => {
-              if (n.id === action.fromParentId && n.children) {
-                moved = n.children[action.fromIndex] || null
-                return { ...n, children: n.children.filter((_, i) => i !== action.fromIndex) }
-              }
-              return n.children ? { ...n, children: removeFromContainer(n.children) } : n
-            })
-          const afterRemove = removeFromContainer(sourceFields)
-          if (!moved) return state
-          const addToContainer = (nodes: FormFieldSchema[]): FormFieldSchema[] =>
-            nodes.map(n => {
-              if (n.id === action.toParentId) return { ...n, children: [...(n.children || []), moved!] }
-              return n.children ? { ...n, children: addToContainer(n.children) } : n
-            })
-          return { ...state, schema: { ...state.schema, fields: addToContainer(afterRemove) } }
-        }
-
-        const [removed] = sourceFields.splice(action.fromIndex, 1)
-        if (!removed) return state
-        moved = removed
-        const addToContainer = (nodes: FormFieldSchema[]): FormFieldSchema[] =>
-          nodes.map(n => {
-            if (n.id === action.toParentId) return { ...n, children: [...(n.children || []), moved!] }
-            return n.children ? { ...n, children: addToContainer(n.children) } : n
-          })
-        return { ...state, schema: { ...state.schema, fields: addToContainer(sourceFields) } }
-      }
-
-      if (action.fromParentId) {
-        const sourceFields = cloneFields(state.schema.fields)
-        let moved: FormFieldSchema | null = null
-        const removeFromContainer = (nodes: FormFieldSchema[]): FormFieldSchema[] =>
-          nodes.map(n => {
-            if (n.id === action.fromParentId && n.children) {
-              moved = n.children[action.fromIndex] || null
-              return { ...n, children: n.children.filter((_, i) => i !== action.fromIndex) }
-            }
-            return n.children ? { ...n, children: removeFromContainer(n.children) } : n
-          })
-        const afterRemove = removeFromContainer(sourceFields)
-        if (!moved) return state
-        const result = [...afterRemove]
-        result.splice(action.toIndex, 0, moved)
-        return { ...state, schema: { ...state.schema, fields: result } }
-      }
-
-      const fields = [...state.schema.fields]
-      const [moved] = fields.splice(action.fromIndex, 1)
-      fields.splice(action.toIndex, 0, moved)
+      const { fields: afterRemove, removed } = removeFieldFromTree(
+        state.schema.fields,
+        action.fromParentId,
+        action.fromIndex,
+      )
+      if (!removed) return state
+      const fields = insertIntoTree(afterRemove, action.toParentId, action.toIndex, removed)
       return { ...state, schema: { ...state.schema, fields } }
     }
 
     case 'COPY_FIELD': {
-      const field = findFieldById(state.schema.fields, action.fieldId)
+      const field = findInTree(state.schema.fields, action.fieldId)
       if (!field) return state
       const copy = cloneField(field)
       const fields = insertAfter(state.schema.fields, action.fieldId, copy)

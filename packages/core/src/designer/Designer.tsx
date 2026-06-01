@@ -4,12 +4,15 @@ import type { PaletteItem, PaletteGroup } from '../types/designer'
 import type { FormEngineAdapter } from '../types/adapter'
 import { FieldList, getFullPaletteGroups } from './FieldList'
 import type { FormFieldSchema } from '../types/schema'
+import { writeDragData } from '../types/designer-drag'
+import { findInTree } from './reducer'
 import { Canvas } from './Canvas'
 import { PropertyPanel } from './PropertyPanel'
 import type { DeviceScene } from '../registry/componentRegistry'
 import { setScene } from '../registry/componentRegistry'
 import { designerReducerWithHistory } from './reducer'
 import type { DesignerStateWithHistory } from './reducer'
+import { DesignerContext } from './DesignerContext'
 
 interface DesignerProps {
   schema?: FormSchema
@@ -73,27 +76,16 @@ export const Designer: React.FC<DesignerProps> = ({
     notifyChange(state.schema)
   }, [state.schema, notifyChange])
 
-  const findFieldById = (fields: FormFieldSchema[], id: string): FormFieldSchema | null => {
-    for (const f of fields) {
-      if (f.id === id) return f
-      if (f.children) {
-        const found = findFieldById(f.children, id)
-        if (found) return found
-      }
-    }
-    return null
-  }
-
-  const selectedField = state.selectedFieldId ? findFieldById(state.schema.fields, state.selectedFieldId) : null
+  const selectedField = state.selectedFieldId ? findInTree(state.schema.fields, state.selectedFieldId) || null : null
 
   const handlePaletteDragStart = useCallback(
     (item: PaletteItem, event: React.DragEvent<HTMLDivElement>) => {
-      event.dataTransfer.setData('designer-drag', JSON.stringify({
+      writeDragData(event, {
         source: 'palette',
         fieldType: item.type,
         label: item.label,
         defaultProps: item.defaultProps || {},
-      }))
+      })
       event.dataTransfer.effectAllowed = 'copy'
     },
     [],
@@ -118,16 +110,14 @@ export const Designer: React.FC<DesignerProps> = ({
 
       {/* 中间画布 */}
       <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-        <Canvas
-          fields={state.schema.fields}
-          selectedFieldId={state.selectedFieldId}
-          dispatch={dispatch}
-          onSelectField={handleSelectField}
-          scene={scene}
-          onSceneChange={setSceneState}
-          canUndo={canUndo}
-          canRedo={canRedo}
-        />
+        <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene }}>
+          <Canvas
+            fields={state.schema.fields}
+            onSceneChange={setSceneState}
+            canUndo={canUndo}
+            canRedo={canRedo}
+          />
+        </DesignerContext.Provider>
       </div>
 
       {/* 右侧属性面板 */}

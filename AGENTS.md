@@ -1,6 +1,7 @@
 本仓库已启用 CodeGraph（`.codegraph/`），AI 助手需优先使用 CodeGraph MCP 工具进行代码查询，减少 grep/glob/read 调用。
 
 使用方法：
+
 - `codegraph_search` — 按名称或语义搜索符号
 - `codegraph_explore` — 一次性获取多个相关符号的完整源码（替代多次 read）
 - `codegraph_callers` / `codegraph_callees` — 追踪调用链
@@ -14,20 +15,23 @@
 2、严格遵守职责单一原则，保持文件结构清晰。例如：列表页文件仅包含列表逻辑，弹窗等独立功能必须抽离为单独组件。
 3、执行顺手优化原则：在开发过程中，若发现不符合规范的代码，请顺手重构；若发现非自身引入的错误，也请顺手修复。
 4、代码修改完成后，必须执行编译操作，并确保解决所有编译报错，保证项目可正常运行。
-5、若项目步骤比较多，请先生成md文档，不用写代码，只写要完成的目标
+5、若项目步骤比较多，请先生成md文档存入docs文件夹里，不用写代码，只写要完成的目标
 6、编译通过后，必须发起sub agent对本次改动进行Code Review，若有md文档，要以md文档的目标，而非diff审批代码。确保代码质量与规范一致性。
 7、全部修改完毕后，更新md文档，标记完成状态。
 
 ## 关键架构决策
 
 ### 组件分类体系
+
 所有组件通过 `ComponentCategory` 分为四类（`types/component-category.ts`）：
+
 - **form**: 表单输入组件，PropertyPanel 显示 label/placeholder/name
 - **display**: 展示组件，PropertyPanel 仅显示 name
 - **container**: 容器组件，PropertyPanel 仅显示 name，Canvas 中支持嵌套渲染子组件
 - **button**: 按钮组件，PropertyPanel 仅显示 name
 
 ### 容器嵌套
+
 - 容器组件的 `FormFieldSchema.children` 存储子字段
 - Canvas 递归渲染，容器区域可拖入新组件或移动已有组件
 - Reducer 支持 `parentId` 参数来操作嵌套字段
