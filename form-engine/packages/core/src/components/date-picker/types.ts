@@ -1,5 +1,4 @@
-import type { FormRule, VisibleWhen } from '../../types/schema'
-import type { BaseFormComponentProps, BaseComponentProps } from '../../types/component-props'
+import type { BaseComponentProps, BaseFormComponentProps } from '../../types/component-props'
 
 /** DatePicker */
 export interface DatePickerProps extends BaseFormComponentProps<string | undefined> {
@@ -21,7 +20,7 @@ export interface DateRangeProps extends BaseComponentProps {
   rules?: import('../../types/schema').FormRule[]
   visibleWhen?: import('../../types/schema').VisibleWhen
   disabledWhen?: import('../../types/schema').VisibleWhen
-  
+
   format?: string
   showTime?: boolean | { format?: string }
   picker?: 'date' | 'week' | 'month' | 'quarter' | 'year'

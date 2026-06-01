@@ -129,11 +129,13 @@ export function getFullPaletteGroups(): PaletteGroup[] {
   // 将自定义组件按分类添加到控件库
   const customGroups: PaletteGroup[] = Object.entries(grouped).map(([groupName, configs]) => ({
     groupName,
-    items: configs.map(config => ({
-      type: config.type,
-      label: config.label,
-      defaultProps: config.defaultProps || {},
-    })),
+    items: configs
+      .filter(config => isValidFieldType(config.type)) // 运行时过滤
+      .map(config => ({
+        type: config.type as FieldType,  // 现在这个断言是安全的
+        label: config.label,
+        defaultProps: config.defaultProps || {},
+      })),
   }))
   
   return [...defaultPaletteGroups, ...customGroups]
@@ -252,4 +254,28 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, onDragStart }) => 
       ))}
     </div>
   )
+}
+
+/**
+ * 类型守卫函数：检查是否为有效的 FieldType
+ */
+function isValidFieldType(type: string): type is FieldType {
+  const validTypes: FieldType[] = [
+    'input', 'input-number', 'textarea', 'password', 'select',
+    'multi-select', 'radio', 'checkbox', 'switch', 'slider',
+    'date', 'date-range', 'time', 'datetime', 'upload',
+    'rate', 'cascader', 'tree-select', 'custom'
+  ]
+  
+  // 检查是否为内置类型
+  if ((validTypes as string[]).includes(type)) {
+    return true
+  }
+  
+  // 检查是否为自定义组件类型（以 'custom:' 开头）
+  if (type.startsWith('custom:')) {
+    return true
+  }
+  
+  return false
 }

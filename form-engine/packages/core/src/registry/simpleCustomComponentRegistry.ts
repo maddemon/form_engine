@@ -110,7 +110,7 @@ function generatePropertyConfig(defaultProps: Record<string, unknown>): Property
  * @param options 配置选项
  */
 export function registerSimpleCustomComponent(
-  type: string,
+  type: `custom:${string}`,
   component: React.ComponentType<any>,
   options: SimpleCustomComponentOptions
 ): void {
@@ -156,7 +156,7 @@ export function registerSimpleCustomComponent(
  * ```
  */
 export function registerCustomComponent(
-  type: string,
+  type: `custom:${string}`,
   component: React.ComponentType<any>,
   config: CustomComponentConfig
 ): void {
@@ -169,6 +169,6 @@ export function registerCustomComponent(
 /**
  * 注销自定义组件
  */
-export function unregisterCustomComponent(type: string): void {
+export function unregisterCustomComponent(type: `custom:${string}`): void {
   customComponentRegistry.unregister(type)
 }

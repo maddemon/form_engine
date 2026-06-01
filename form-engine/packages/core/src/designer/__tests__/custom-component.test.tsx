@@ -8,12 +8,38 @@
  * 4. 自定义属性 Widget
  */
 
-import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { Designer } from '../Designer'
 import { registerSimpleCustomComponent } from '../../registry/simpleCustomComponentRegistry'
 import { customComponentRegistry } from '../../registry/customComponentRegistry'
 import { customPropertyWidgetRegistry } from '../../registry/customComponentRegistry'
+import { beforeEach, describe, it } from 'node:test'
+
+// Node.js 测试器全局函数类型声明
+declare const expect: (value: unknown) => {
+  toBe: (expected: unknown) => void
+  toBeDefined: () => void
+  toBeUndefined: () => void
+  toBeNull: () => void
+  toBeTruthy: () => void
+  toBeFalsy: () => void
+  toEqual: (expected: unknown) => void
+  toBeGreaterThan: (expected: number) => void
+  toBeLessThan: (expected: number) => void
+  toContain: (expected: unknown) => void
+  toMatch: (expected: string | RegExp) => void
+  toThrow: (expected?: string | Error) => void
+  not: {
+    toBe: (expected: unknown) => void
+    toBeDefined: () => void
+    toBeUndefined: () => void
+    toBeNull: () => void
+    toBeTruthy: () => void
+    toBeFalsy: () => void
+    toEqual: (expected: unknown) => void
+    toContain: (expected: unknown) => void
+    toMatch: (expected: string | RegExp) => void
+    toThrow: (expected?: string | Error) => void
+  }
+}
 
 // 模拟自定义按钮组件
 function TestButton(props: any) {
@@ -46,7 +72,7 @@ describe('自定义组件注册', () => {
   })
 
   it('应该能注册自定义组件', () => {
-    registerSimpleCustomComponent('test-button', TestButton, {
+    registerSimpleCustomComponent('custom:test-button', TestButton, {
       label: '测试按钮',
       category: '测试',
       defaultProps: {
@@ -56,16 +82,16 @@ describe('自定义组件注册', () => {
     })
 
     // 验证注册成功
-    expect(customComponentRegistry.has('test-button')).toBe(true)
+    expect(customComponentRegistry.has('custom:test-button')).toBe(true)
     
-    const config = customComponentRegistry.get('test-button')
+    const config = customComponentRegistry.get('custom:test-button')
     expect(config).toBeDefined()
     expect(config?.label).toBe('测试按钮')
     expect(config?.category).toBe('测试')
   })
 
   it('应该自动推断 propertyConfig', () => {
-    registerSimpleCustomComponent('test-button', TestButton, {
+    registerSimpleCustomComponent('custom:test-button', TestButton, {
       label: '测试按钮',
       defaultProps: {
         text: '点击我',
@@ -75,7 +101,7 @@ describe('自定义组件注册', () => {
       },
     })
 
-    const config = customComponentRegistry.get('test-button')
+    const config = customComponentRegistry.get('custom:test-button')
     expect(config?.propertyConfig).toBeDefined()
     expect(config?.propertyConfig?.length).toBe(4) // text, bgColor, disabled, count
     
@@ -101,19 +127,19 @@ describe('自定义组件注册', () => {
   })
 
   it('应该按分类分组自定义组件', () => {
-    registerSimpleCustomComponent('comp1', TestButton, {
+    registerSimpleCustomComponent('custom:comp1', TestButton, {
       label: '组件1',
       category: '分组A',
       defaultProps: {},
     })
     
-    registerSimpleCustomComponent('comp2', TestButton, {
+    registerSimpleCustomComponent('custom:comp2', TestButton, {
       label: '组件2',
       category: '分组B',
       defaultProps: {},
     })
     
-    registerSimpleCustomComponent('comp3', TestButton, {
+    registerSimpleCustomComponent('custom:comp3', TestButton, {
       label: '组件3',
       category: '分组A',
       defaultProps: {},

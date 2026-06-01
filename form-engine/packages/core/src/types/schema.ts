@@ -111,6 +111,7 @@ export type FieldType =
   | 'cascader'
   | 'tree-select'
   | 'custom'
+  | `custom:${string}`  // 支持自定义组件类型
 
 export interface FormFieldSchema {
   id?: string

@@ -12,18 +12,18 @@
 import type { PropertyConfigItem } from '../types/custom-component'
 
 // 导入各组件的 PropConfig（旧格式）
-import { InputPropConfig } from '../components/input/types'
-import { TextAreaPropConfig } from '../components/textarea/types'
-import { InputNumberPropConfig } from '../components/input-number/types'
-import { SelectPropConfig } from '../components/select/types'
-import { RadioPropConfig } from '../components/radio/types'
-import { CheckboxPropConfig } from '../components/checkbox/types'
-import { SwitchPropConfig } from '../components/switch/types'
-import { SliderPropConfig } from '../components/slider/types'
-import { RatePropConfig } from '../components/rate/types'
-import { DatePickerPropConfig } from '../components/date-picker/types'
-import { UploadPropConfig } from '../components/upload/types'
 import { ButtonPropConfig } from '../components/button/types'
+import { CheckboxPropConfig } from '../components/checkbox/types'
+import { DatePickerPropConfig } from '../components/date-picker/types'
+import { InputNumberPropConfig } from '../components/input-number/types'
+import { InputPropConfig } from '../components/input/types'
+import { RadioPropConfig } from '../components/radio/types'
+import { RatePropConfig } from '../components/rate/types'
+import { SelectPropConfig } from '../components/select/types'
+import { SliderPropConfig } from '../components/slider/types'
+import { SwitchPropConfig } from '../components/switch/types'
+import { TextAreaPropConfig } from '../components/textarea/types'
+import { UploadPropConfig } from '../components/upload/types'
 
 /**
  * 将旧格式 PropConfig 转换为 PropertyConfigItem[]
@@ -33,10 +33,7 @@ import { ButtonPropConfig } from '../components/button/types'
  * 新格式示例：
  *   [{ key: 'placeholder', label: '占位文本', widget: 'input' }]
  */
-function convertOldConfig(
-  oldConfig: Record<string, { type: string; label: string; default?: unknown; options?: { label: string; value: unknown }[] }>,
-  groupName?: string,
-): PropertyConfigItem[] {
+function convertOldConfig(oldConfig: Record<string, { type: string; label: string; default?: unknown; options?: { label: string; value: unknown }[] }>, groupName?: string): PropertyConfigItem[] {
   const widgetMap: Record<string, PropertyConfigItem['widget']> = {
     string: 'input',
     textarea: 'textarea',
@@ -76,64 +73,49 @@ function convertOldConfig(
 // ============================
 
 /** input */
-export const inputPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(InputPropConfig as Record<string, any>, '组件属性')
+export const inputPropertyConfig: PropertyConfigItem[] = convertOldConfig(InputPropConfig, '组件属性')
 
 /** textarea */
-export const textareaPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(TextAreaPropConfig as Record<string, any>, '组件属性')
+export const textareaPropertyConfig: PropertyConfigItem[] = convertOldConfig(TextAreaPropConfig, '组件属性')
 
 /** input-number */
-export const inputNumberPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(InputNumberPropConfig as Record<string, any>, '组件属性')
+export const inputNumberPropertyConfig: PropertyConfigItem[] = convertOldConfig(InputNumberPropConfig as Record<string, any>, '组件属性')
 
 /** select */
-export const selectPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(SelectPropConfig as Record<string, any>, '组件属性')
+export const selectPropertyConfig: PropertyConfigItem[] = convertOldConfig(SelectPropConfig as Record<string, any>, '组件属性')
 
 /** radio */
-export const radioPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(RadioPropConfig as Record<string, any>, '组件属性')
+export const radioPropertyConfig: PropertyConfigItem[] = convertOldConfig(RadioPropConfig as Record<string, any>, '组件属性')
 
 /** checkbox */
-export const checkboxPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(CheckboxPropConfig as Record<string, any>, '组件属性')
+export const checkboxPropertyConfig: PropertyConfigItem[] = convertOldConfig(CheckboxPropConfig as Record<string, any>, '组件属性')
 
 /** switch */
-export const switchPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(SwitchPropConfig as Record<string, any>, '组件属性')
+export const switchPropertyConfig: PropertyConfigItem[] = convertOldConfig(SwitchPropConfig as Record<string, any>, '组件属性')
 
 /** slider */
-export const sliderPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(SliderPropConfig as Record<string, any>, '组件属性')
+export const sliderPropertyConfig: PropertyConfigItem[] = convertOldConfig(SliderPropConfig as Record<string, any>, '组件属性')
 
 /** rate */
-export const ratePropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(RatePropConfig as Record<string, any>, '组件属性')
+export const ratePropertyConfig: PropertyConfigItem[] = convertOldConfig(RatePropConfig as Record<string, any>, '组件属性')
 
 /** date */
-export const datePropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(DatePickerPropConfig as Record<string, any>, '组件属性')
+export const datePropertyConfig: PropertyConfigItem[] = convertOldConfig(DatePickerPropConfig as Record<string, any>, '组件属性')
 
 /** date-range（复用 DatePickerPropConfig） */
-export const dateRangePropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(DatePickerPropConfig as Record<string, any>, '组件属性')
+export const dateRangePropertyConfig: PropertyConfigItem[] = convertOldConfig(DatePickerPropConfig as Record<string, any>, '组件属性')
 
 /** datetime（复用 DatePickerPropConfig） */
-export const datetimePropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(DatePickerPropConfig as Record<string, any>, '组件属性')
+export const datetimePropertyConfig: PropertyConfigItem[] = convertOldConfig(DatePickerPropConfig as Record<string, any>, '组件属性')
 
 /** time（复用 DatePickerPropConfig，但只保留 format / showTime） */
-export const timePropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(DatePickerPropConfig as Record<string, any>, '组件属性')
+export const timePropertyConfig: PropertyConfigItem[] = convertOldConfig(DatePickerPropConfig as Record<string, any>, '组件属性')
 
 /** upload */
-export const uploadPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(UploadPropConfig as Record<string, any>, '组件属性')
+export const uploadPropertyConfig: PropertyConfigItem[] = convertOldConfig(UploadPropConfig as Record<string, any>, '组件属性')
 
 /** button（布局组件，无 label/name 等表单属性） */
-export const buttonPropertyConfig: PropertyConfigItem[] =
-  convertOldConfig(ButtonPropConfig as Record<string, any>, '组件属性')
+export const buttonPropertyConfig: PropertyConfigItem[] = convertOldConfig(ButtonPropConfig as Record<string, any>, '组件属性')
 
 // ============================
 // 类型 → 属性配置的映射表

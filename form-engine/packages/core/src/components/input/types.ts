@@ -1,4 +1,3 @@
-import type { OptionItem, FormRule, VisibleWhen } from '../../types/schema'
 import type { BaseFormComponentProps } from '../../types/component-props'
 
 /** Input & Password */

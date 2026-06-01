@@ -1,13 +1,12 @@
 import React from 'react'
 import type { DeviceScene } from '../registry/componentRegistry'
 import type { DesignerAction } from '../types/designer'
-import type { FieldType, FormConfig, FormFieldSchema, SubmitConfig } from '../types/schema'
+import type { FormConfig, FormFieldSchema, SubmitConfig } from '../types/schema'
 import type { FormEngineAdapter, DesignerWidgets } from '../types/adapter'
 import { defaultDesignerWidgets } from './widgets'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { PropertyEditor } from './PropertyEditor'
 import { getComponentPropertyConfig } from './componentPropertyConfigs'
-import type { PropertyConfigItem } from '../types/custom-component'
 
 interface PropertyPanelProps {
   field: FormFieldSchema | null
@@ -20,13 +19,6 @@ interface PropertyPanelProps {
   scene?: DeviceScene
   onSceneChange?: (scene: DeviceScene) => void
 }
-
-const FIELD_TYPES: FieldType[] = [
-  'input', 'textarea', 'input-number', 'password',
-  'select', 'multi-select', 'radio', 'checkbox',
-  'switch', 'slider', 'rate', 'date', 'datetime',
-  'date-range', 'time', 'upload', 'cascader', 'tree-select',
-]
 
 const LAYOUT_OPTIONS = [
   { label: '水平', value: 'horizontal' },
@@ -132,7 +124,6 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   formConfig,
   submitConfig,
   dispatch,
-  adapter,
   designerWidgets,
   scene = 'desktop',
   onSceneChange,
@@ -292,8 +283,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
         <CollapsibleSection title="组件属性" defaultCollapsed={false}>
           <PropertyEditor
             configs={componentPropertyConfig}
-            fieldProps={field}
-            fieldSchema={field as Record<string, unknown>}
+            fieldProps={field as unknown as Record<string, unknown>}
+            fieldSchema={field as unknown as Record<string, unknown>}
             onChange={(key, value) => {
               dispatch({
                 type: 'UPDATE_FIELD',

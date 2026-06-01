@@ -101,8 +101,8 @@ export interface PropertyWidgetProps {
  * 自定义组件配置
  */
 export interface CustomComponentConfig {
-  /** 组件类型标识（唯一） */
-  type: string
+  /** 组件类型标识（唯一，必须以 'custom:' 开头） */
+  type: `custom:${string}`
   
   /** 显示名称 */
   label: string
