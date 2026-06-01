@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField, PropsRenderProps } from '../../propRenders'
+import { FieldGroup, RowField, PropsRenderProps } from '../../propRenders'
 
 const DATE_PRESET_OPTIONS = [
   { label: '不限', value: '' },
@@ -21,15 +21,9 @@ const PICKER_OPTIONS = [
 export default function DatePickerPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="默认值">
-        <w.Input value={(values.defaultValue as string) ?? ''} onChange={(v) => onChange('defaultValue', v)} />
-      </FieldGroup>
-      <FieldGroup label="占位文本">
-        <w.Input value={(values.placeholder as string) ?? ''} onChange={(v) => onChange('placeholder', v)} />
-      </FieldGroup>
-      <FieldGroup label="格式">
+      <RowField label="格式">
         <w.Input value={(values.format as string) ?? 'YYYY-MM-DD'} onChange={(v) => onChange('format', v)} />
-      </FieldGroup>
+      </RowField>
       <FieldGroup label="选择器类型">
         <w.Select
           value={(values.picker as string) ?? 'date'}
@@ -37,12 +31,6 @@ export default function DatePickerPropsRender({ widgets: w, values, onChange }: 
           options={PICKER_OPTIONS}
         />
       </FieldGroup>
-      <InlineField label="显示时间">
-        <w.Checkbox checked={!!values.showTime} onChange={(v) => onChange('showTime', v)} />
-      </InlineField>
-      <InlineField label="允许清除">
-        <w.Checkbox checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
-      </InlineField>
       <FieldGroup label="最小值/相对日期">
         <w.Select
           value={(values.minDate as string) ?? ''}
@@ -57,9 +45,9 @@ export default function DatePickerPropsRender({ widgets: w, values, onChange }: 
           options={DATE_PRESET_OPTIONS}
         />
       </FieldGroup>
-      <FieldGroup label="不可选日期表达式">
+      <RowField label="不可选日期表达式">
         <w.Input value={(values.disabledDate as string) ?? ''} onChange={(v) => onChange('disabledDate', v)} placeholder="如：date < new Date()" />
-      </FieldGroup>
+      </RowField>
     </>
   )
 }

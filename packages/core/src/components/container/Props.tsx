@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField } from '../../propRenders/shared'
+import { FieldGroup, InlineField, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function ContainerPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -17,24 +17,24 @@ export default function ContainerPropsRender({ widgets: w, values, onChange }: P
       <InlineField label="自动换行">
         <w.Checkbox checked={!!values.wrap} onChange={(v) => onChange('wrap', v)} />
       </InlineField>
-      <FieldGroup label="背景色">
+      <RowField label="背景色">
         <w.Input value={(values.background as string) ?? ''} onChange={(v) => onChange('background', v)} placeholder="如：#f5f5f5" />
-      </FieldGroup>
-      <FieldGroup label="圆角">
+      </RowField>
+      <RowField label="圆角">
         <w.NumberInput value={(values.borderRadius as number) ?? 0} onChange={(v) => onChange('borderRadius', v)} min={0} max={50} />
-      </FieldGroup>
-      <FieldGroup label="最小高度(px)">
+      </RowField>
+      <RowField label="最小高度(px)">
         <w.NumberInput value={(values.minHeight as number) ?? 0} onChange={(v) => onChange('minHeight', v)} min={0} max={2000} />
-      </FieldGroup>
-      <FieldGroup label="内边距(px)">
+      </RowField>
+      <RowField label="内边距(px)">
         <w.NumberInput value={(values.padding as number) ?? 0} onChange={(v) => onChange('padding', v)} min={0} max={200} />
-      </FieldGroup>
-      <FieldGroup label="外边距(px)">
+      </RowField>
+      <RowField label="外边距(px)">
         <w.NumberInput value={(values.margin as number) ?? 0} onChange={(v) => onChange('margin', v)} min={0} max={200} />
-      </FieldGroup>
-      <FieldGroup label="间距(px)">
+      </RowField>
+      <RowField label="间距(px)">
         <w.NumberInput value={(values.gap as number) ?? 0} onChange={(v) => onChange('gap', v)} min={0} max={100} />
-      </FieldGroup>
+      </RowField>
     </>
   )
 }

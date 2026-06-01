@@ -1,4 +1,5 @@
 import React from 'react'
+import { RowField } from '../propRenders/shared'
 import type { DeviceScene } from '../registry/componentRegistry'
 import { Monitor, Smartphone } from '../components/icons'
 import type { DesignerAction } from '../types/designer'
@@ -15,6 +16,7 @@ const SIZE_OPTIONS = [
   { label: '中', value: 'middle' },
   { label: '大', value: 'large' },
 ]
+const COL_SPAN_OPTIONS = Array.from({ length: 24 }, (_, i) => ({ label: `${i + 1}`, value: String(i + 1) }))
 
 const FieldGroup: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <label style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
@@ -105,6 +107,46 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({
         onChange={(v: boolean) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { colon: v } })}
       />
     </InlineField>
+
+    <div style={{ marginTop: 12, borderTop: '1px solid #eee', paddingTop: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 8, color: '#666' }}>标签/控件宽度（{scene === 'desktop' ? '桌面' : '手机'}）</div>
+      <RowField label="标签宽度">
+        <w.Select
+          value={String(formConfig.scenes?.[scene]?.labelCol?.span ?? formConfig.labelCol?.span ?? 6)}
+          onChange={(v: string) => {
+            const num = Number(v)
+            dispatch({
+              type: 'UPDATE_FORM_CONFIG',
+              patch: {
+                scenes: {
+                  ...formConfig.scenes,
+                  [scene]: { ...formConfig.scenes?.[scene], labelCol: num ? { span: num } : undefined },
+                },
+              },
+            })
+          }}
+          options={COL_SPAN_OPTIONS}
+        />
+      </RowField>
+      <RowField label="控件宽度">
+        <w.Select
+          value={String(formConfig.scenes?.[scene]?.wrapperCol?.span ?? formConfig.wrapperCol?.span ?? 18)}
+          onChange={(v: string) => {
+            const num = Number(v)
+            dispatch({
+              type: 'UPDATE_FORM_CONFIG',
+              patch: {
+                scenes: {
+                  ...formConfig.scenes,
+                  [scene]: { ...formConfig.scenes?.[scene], wrapperCol: num ? { span: num } : undefined },
+                },
+              },
+            })
+          }}
+          options={COL_SPAN_OPTIONS}
+        />
+      </RowField>
+    </div>
 
     <div style={{ marginTop: 16 }}>
       <h4 style={{ margin: '0 0 8px 0', fontSize: 14 }}>提交按钮</h4>

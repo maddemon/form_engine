@@ -453,7 +453,88 @@ Upload 属性面板已补充：**上传地址（action）**、默认值、文件
 
 - [ ] Collapse 面板项数据编辑器（类似 OptionsEditor，配置多个面板的 key/header/children）
 - [ ] Tabs 标签项数据编辑器（类似 OptionsEditor，配置多个标签页的标题和内容）
-- [ ] 统一 Props.tsx 导入风格（`../../propRenders` vs `../../propRenders/shared` + `../../propRenders/types`）
+
+---
+
+## 属性面板布局优化（2026-06-01）
+
+### 变更概览
+
+| 分类 | 改动 | 涉及文件 |
+|------|------|---------|
+| 新增组件 | `RowField` — 标签+输入框单行布局 | `propRenders/shared.tsx` |
+| 头部改造 | 标题改为组件英文类型名，显示分类标签 | `PropertyPanel.tsx` |
+| 基本属性 | 移除"字段类型"显示块、移除 placeholder 配置 | `PropertyPanel.tsx` |
+| 高级属性 | colSpan 从基本属性移至高级属性 | `PropertyPanel.tsx` |
+| 页面配置 | labelCol/wrapperCol 移至 FormConfigPanel，支持 desktop/mobile 分别配置 | `FormConfigPanel.tsx`, `schema.ts` |
+| 组件面板 | 简单属性改用单行 RowField（前缀、后缀、步长、格式等） | 全部 `Props.tsx` 文件 |
+
+### RowField 组件
+
+```tsx
+export const RowField: React.FC<{ label: string; children: React.ReactNode; style?: React.CSSProperties }> = ({ label, children, style }) => (
+  <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 12, ...style }}>
+    <span style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>{label}</span>
+    <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
+  </label>
+)
+```
+
+单行布局（`RowField`）：标签在左，控件在右，水平排列，适合简单输入属性。
+块级布局（`FieldGroup`）：标签在上，控件在下，保留给 ButtonGroup、OptionRender 等复杂控件。
+
+### 布局分类原则
+
+| 布局方式 | 适用属性 | 示例 |
+|---------|---------|------|
+| `RowField` | 简单文本/数字输入 | 前缀、后缀、步长、格式、最大长度等 |
+| `InlineField` | 开关/勾选框 | 显示字数、允许清除、可搜索等 |
+| `FieldGroup` | 按钮组/选项编辑/多选 | ButtonGroup、OptionRender、Select 下拉等 |
+
+### FormConfigPanel 新增配置
+
+- 标签宽度（labelCol）：1-24 span，按场景（desktop/mobile）分别存储
+- 控件宽度（wrapperCol）：1-24 span，按场景（desktop/mobile）分别存储
+- 数据存储于 `formConfig.scenes.desktop` / `formConfig.scenes.mobile`
+
+### schema.ts 变更
+
+```ts
+export interface FormConfig {
+  // ...已有字段...
+  scenes?: {
+    desktop?: { labelCol?: { span: number }; wrapperCol?: { span: number } }
+    mobile?: { labelCol?: { span: number }; wrapperCol?: { span: number } }
+  }
+}
+```
+
+### 涉及文件清单
+
+| 文件 | 改动 |
+|------|------|
+| `propRenders/shared.tsx` | 新增 RowField 组件 |
+| `propRenders/index.ts` | 导出 RowField |
+| `designer/PropertyPanel.tsx` | 头部改为 type 名、移除字段类型/placeholder、colSpan 移入高级 |
+| `designer/FormConfigPanel.tsx` | 新增 labelCol/wrapperCol 场景配置 |
+| `types/schema.ts` | FormConfig 新增 scenes 字段 |
+| `components/input/Props.tsx` | 占位文本/最大长度/前缀/后缀/前置标签/后置标签/自动完成 → RowField |
+| `components/password/Props.tsx` | 占位文本/最大长度/前缀 → RowField |
+| `components/textarea/Props.tsx` | 占位文本/行数/最大长度 → RowField |
+| `components/select/Props.tsx` | 最多标签数/无匹配文本 → RowField，移除占位文本/可搜索/允许清除 |
+| `components/input-number/Props.tsx` | 最小值/最大值/步长/精度/前缀/后缀/小数分隔符 → RowField |
+| `components/date-picker/Props.tsx` | 格式/不可选日期表达式 → RowField |
+| `components/time-picker/Props.tsx` | 格式/分钟步长/秒步长 → RowField |
+| `components/date-time/Props.tsx` | 格式 → RowField |
+| `components/slider/Props.tsx` | 全部简单属性 → RowField |
+| `components/rate/Props.tsx` | 全部简单属性 → RowField |
+| `components/text/Props.tsx` | 字号/颜色 → RowField |
+| `components/title/Props.tsx` | 颜色 → RowField |
+| `components/image/Props.tsx` | 全部输入属性 → RowField |
+| `components/divider/Props.tsx` | 文字内容/颜色/粗细 → RowField |
+| `components/container/Props.tsx` | 背景色/圆角/最小高度/内边距/外边距/间距 → RowField |
+| `components/flex/Props.tsx` | 间距/内边距/外边距 → RowField |
+| `components/grid/Props.tsx` | 列数/间距/内边距/外边距 → RowField |
 
 ---
 

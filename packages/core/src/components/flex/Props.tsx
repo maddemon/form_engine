@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField } from '../../propRenders/shared'
+import { FieldGroup, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 const WRAP_OPTIONS = [
@@ -51,9 +51,9 @@ export default function FlexPropsRender({ widgets: w, values, onChange }: PropsR
           options={ALIGN_OPTIONS}
         />
       </FieldGroup>
-      <FieldGroup label="间距">
+      <RowField label="间距">
         <w.NumberInput value={(values.gap as number) ?? 0} onChange={(v) => onChange('gap', v)} min={0} max={100} />
-      </FieldGroup>
+      </RowField>
       <FieldGroup label="换行">
         <w.Select
           value={(values.wrap as string) ?? 'nowrap'}
@@ -61,12 +61,12 @@ export default function FlexPropsRender({ widgets: w, values, onChange }: PropsR
           options={WRAP_OPTIONS}
         />
       </FieldGroup>
-      <FieldGroup label="内边距(px)">
+      <RowField label="内边距(px)">
         <w.NumberInput value={(values.padding as number) ?? 0} onChange={(v) => onChange('padding', v)} min={0} max={200} />
-      </FieldGroup>
-      <FieldGroup label="外边距(px)">
+      </RowField>
+      <RowField label="外边距(px)">
         <w.NumberInput value={(values.margin as number) ?? 0} onChange={(v) => onChange('margin', v)} min={0} max={200} />
-      </FieldGroup>
+      </RowField>
     </>
   )
 }

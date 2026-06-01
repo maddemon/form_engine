@@ -3,9 +3,6 @@ import { FieldGroup, OptionRender, PropsRenderProps } from '../../propRenders'
 export default function RadioPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="默认值">
-        <w.Input value={(values.defaultValue as string) ?? ''} onChange={(v) => onChange('defaultValue', v)} />
-      </FieldGroup>
       <FieldGroup label="选项">
         <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
       </FieldGroup>
@@ -19,16 +16,18 @@ export default function RadioPropsRender({ widgets: w, values, onChange }: Props
           ]}
         />
       </FieldGroup>
-      <FieldGroup label="按钮样式">
-        <w.ButtonGroup
-          value={(values.buttonStyle as string) ?? 'outline'}
-          onChange={(v) => onChange('buttonStyle', v)}
-          options={[
-            { label: '边框', value: 'outline' },
-            { label: '实心', value: 'solid' },
-          ]}
-        />
-      </FieldGroup>
+      {values.optionType === 'button' && (
+        <FieldGroup label="按钮样式">
+          <w.ButtonGroup
+            value={(values.buttonStyle as string) ?? 'outline'}
+            onChange={(v) => onChange('buttonStyle', v)}
+            options={[
+              { label: '边框', value: 'outline' },
+              { label: '实心', value: 'solid' },
+            ]}
+          />
+        </FieldGroup>
+      )}
       <FieldGroup label="排列方向">
         <w.ButtonGroup
           value={(values.direction as string) ?? 'horizontal'}

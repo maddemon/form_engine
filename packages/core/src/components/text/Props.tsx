@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField } from '../../propRenders/shared'
+import { FieldGroup, InlineField, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function TextPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -20,12 +20,12 @@ export default function TextPropsRender({ widgets: w, values, onChange }: PropsR
           ]}
         />
       </FieldGroup>
-      <FieldGroup label="字号">
+      <RowField label="字号">
         <w.Input value={(values.fontSize as string) ?? ''} onChange={(v) => onChange('fontSize', v ? Number(v) : undefined)} placeholder="如: 16" />
-      </FieldGroup>
-      <FieldGroup label="颜色">
+      </RowField>
+      <RowField label="颜色">
         <w.Input value={(values.color as string) ?? ''} onChange={(v) => onChange('color', v)} placeholder="如: #333" />
-      </FieldGroup>
+      </RowField>
       <FieldGroup label="对齐方式">
         <w.ButtonGroup
           value={(values.align as string) ?? 'left'}

@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField } from '../../propRenders/shared'
+import { FieldGroup, InlineField, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function TitlePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -31,9 +31,9 @@ export default function TitlePropsRender({ widgets: w, values, onChange }: Props
           ]}
         />
       </FieldGroup>
-      <FieldGroup label="颜色">
+      <RowField label="颜色">
         <w.Input value={(values.color as string) ?? ''} onChange={(v) => onChange('color', v)} placeholder="如: #333" />
-      </FieldGroup>
+      </RowField>
       <InlineField label="加粗">
         <w.Checkbox checked={!!values.strong} onChange={(v) => onChange('strong', v)} />
       </InlineField>

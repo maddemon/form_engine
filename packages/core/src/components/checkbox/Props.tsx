@@ -3,9 +3,6 @@ import { FieldGroup, InlineField, OptionRender, PropsRenderProps } from '../../p
 export default function CheckboxPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="默认值">
-        <w.Input value={(values.defaultValue as string) ?? ''} onChange={(v) => onChange('defaultValue', v)} placeholder="多个值用逗号分隔" />
-      </FieldGroup>
       <FieldGroup label="选项">
         <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
       </FieldGroup>

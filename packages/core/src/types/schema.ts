@@ -165,6 +165,10 @@ export interface FormConfig {
   autoComplete?: string
   labelAlign?: 'left' | 'right'
   requiredMark?: boolean
+  scenes?: {
+    desktop?: { labelCol?: { span: number }; wrapperCol?: { span: number } }
+    mobile?: { labelCol?: { span: number }; wrapperCol?: { span: number } }
+  }
 }
 
 export interface SubmitConfig {

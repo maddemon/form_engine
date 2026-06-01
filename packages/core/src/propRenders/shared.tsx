@@ -11,7 +11,14 @@ export const FieldGroup: React.FC<{ label: string; children: React.ReactNode }> 
 export const InlineField: React.FC<{ label: string; children: React.ReactNode; style?: React.CSSProperties }> = ({ label, children, style }) => (
   <label style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4, fontSize: 12, ...style }}>
     {children}
-    {label}
+    <span style={{ minWidth: 64 }}>{label}</span>
+  </label>
+)
+
+export const RowField: React.FC<{ label: string; children: React.ReactNode; style?: React.CSSProperties }> = ({ label, children, style }) => (
+  <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 12, ...style }}>
+    <span style={{ whiteSpace: 'nowrap', flexShrink: 0, minWidth: 64 }}>{label}</span>
+    <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
   </label>
 )
 
