@@ -21,6 +21,6 @@
     }
   },
   "include": ["src"],
-  "references": [{ "path": "../core" }],
+  "references": [{ "path": "../core/tsconfig.json" }],
   "exclude": ["node_modules", "dist"]
 }

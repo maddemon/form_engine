@@ -44,7 +44,6 @@ export const Designer: React.FC<DesignerProps> = ({
   } as DesignerStateWithHistory)
 
   const [scene, setSceneState] = useState<DeviceScene>('desktop')
-  const [mode, setMode] = useState<'design' | 'preview'>('design')
 
   // 同步外部 schema
   React.useEffect(() => {
@@ -110,13 +109,10 @@ export const Designer: React.FC<DesignerProps> = ({
           selectedFieldId={state.selectedFieldId}
           dispatch={dispatch}
           onSelectField={handleSelectField}
-          schema={state.schema}
           scene={scene}
           onSceneChange={setSceneState}
           canUndo={canUndo}
           canRedo={canRedo}
-          mode={mode}
-          onModeChange={setMode}
         />
       </div>
 

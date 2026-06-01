@@ -1,3 +1,14 @@
+本仓库已启用 CodeGraph（`.codegraph/`），AI 助手需优先使用 CodeGraph MCP 工具进行代码查询，减少 grep/glob/read 调用。
+
+使用方法：
+- `codegraph_search` — 按名称或语义搜索符号
+- `codegraph_explore` — 一次性获取多个相关符号的完整源码（替代多次 read）
+- `codegraph_callers` / `codegraph_callees` — 追踪调用链
+- `codegraph_impact` — 修改前的波及范围分析
+- `codegraph_context` — 为任务构建上下文
+
+代码变更由 MCP 服务的文件监听器自动同步，无需手动 `codegraph sync`。
+
 作为一名代码开发助手，请严格遵循以下开发规范与流程执行任务：
 1、使用PowerShell时，避免使用`&&`连接命令，请改用分号`;`替代。
 2、严格遵守职责单一原则，保持文件结构清晰。例如：列表页文件仅包含列表逻辑，弹窗等独立功能必须抽离为单独组件。

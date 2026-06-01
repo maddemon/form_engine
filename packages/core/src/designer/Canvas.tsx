@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react'
-import type { FormFieldSchema, FormSchema } from '../types/schema'
+import type { FormFieldSchema } from '../types/schema'
 import type { SelectedFieldId, DesignerAction, PaletteItem } from '../types/designer'
 import { createFieldFromPalette } from './FieldList'
 import { FieldRenderer } from '../renderer/FieldRenderer'
-import { FormRender } from '../renderer/FormRender'
 import defaultAdapter from '../renderer/defaultAdapter'
 import type { DeviceScene } from '../registry/componentRegistry'
 import { CanvasToolbar } from './CanvasToolbar'
@@ -14,13 +13,10 @@ interface CanvasProps {
   selectedFieldId: SelectedFieldId
   dispatch: React.Dispatch<DesignerAction>
   onSelectField: (id: string | null) => void
-  schema?: FormSchema
   scene?: DeviceScene
   onSceneChange?: (scene: DeviceScene) => void
   canUndo?: boolean
   canRedo?: boolean
-  mode?: 'design' | 'preview'
-  onModeChange?: (mode: 'design' | 'preview') => void
 }
 
 export const Canvas: React.FC<CanvasProps> = ({
@@ -28,13 +24,10 @@ export const Canvas: React.FC<CanvasProps> = ({
   selectedFieldId,
   dispatch,
   onSelectField,
-  schema,
   scene = 'desktop',
   onSceneChange,
   canUndo = false,
   canRedo = false,
-  mode = 'design',
-  onModeChange,
 }) => {
   const [showTree, setShowTree] = useState(false)
 
@@ -94,8 +87,6 @@ export const Canvas: React.FC<CanvasProps> = ({
         canRedo={canRedo}
         onUndo={() => dispatch({ type: 'UNDO' })}
         onRedo={() => dispatch({ type: 'REDO' })}
-        mode={mode}
-        onModeChange={onModeChange}
         onTreeClick={() => setShowTree(!showTree)}
         showTree={showTree}
       />
@@ -115,12 +106,13 @@ export const Canvas: React.FC<CanvasProps> = ({
           padding: 16,
           display: 'flex',
           justifyContent: scene === 'mobile' ? 'center' : 'flex-start',
+          alignItems: 'flex-start',
           background: '#f5f5f5',
           minHeight: 0,
           overflow: 'auto',
         }}
-        onDragOver={mode === 'design' ? handleDragOver : undefined}
-        onDrop={mode === 'design' ? (e) => { e.stopPropagation(); handleDrop(e, fields.length) } : undefined}
+        onDragOver={handleDragOver}
+        onDrop={(e) => { e.stopPropagation(); handleDrop(e, fields.length) }}
       >
         <div
           style={{
@@ -131,34 +123,24 @@ export const Canvas: React.FC<CanvasProps> = ({
             padding: 16,
             boxShadow: scene === 'mobile' ? '0 2px 12px rgba(0,0,0,0.08)' : 'none',
             minHeight: 300,
-            height: 'auto',
           }}
         >
-          {fields.length === 0 && mode === 'design' && (
+          {fields.length === 0 && (
             <div style={{ color: '#999', fontSize: 12, padding: 24, textAlign: 'center', border: '1px dashed #ddd', borderRadius: 4 }}>
               从左侧拖拽控件到此处
             </div>
           )}
 
-          {mode === 'preview' && fields.length > 0 && schema && (
-            <FormRender
-              schema={schema}
-              onSubmit={(values) => console.log('预览提交:', values)}
-              onChange={(values) => console.log('预览变化:', values)}
-              adapter={defaultAdapter}
-            />
-          )}
-
-          {mode === 'design' && fields.map((field, index) => {
+          {fields.map((field, index) => {
             const isSelected = selectedFieldId === field.id
             return (
               <div
                 key={field.id}
-                draggable={mode === 'design'}
-                onDragStart={mode === 'design' ? (e => handleDragStart(e, index, field)) : undefined}
-                onDragOver={mode === 'design' ? (e => e.preventDefault()) : undefined}
-                onDrop={mode === 'design' ? (e => handleDrop(e, index)) : undefined}
-                onClick={() => mode === 'design' && onSelectField(field.id || null)}
+                draggable
+                onDragStart={e => handleDragStart(e, index, field)}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => handleDrop(e, index)}
+                onClick={() => onSelectField(field.id || null)}
                 style={{
                   position: 'relative',
                   padding: '8px 12px',

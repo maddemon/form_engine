@@ -1,5 +1,6 @@
 import React from 'react'
 import type { DeviceScene } from '../registry/componentRegistry'
+import { Monitor, Smartphone } from '../components/icons'
 import type { DesignerAction } from '../types/designer'
 import type { FormConfig, SubmitConfig } from '../types/schema'
 import type { DesignerWidgets } from '../types/adapter'
@@ -53,15 +54,19 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({
       <div style={{ display: 'flex', gap: 4 }}>
         {(
           [
-            { key: 'desktop' as const, label: '🖥 桌面' },
-            { key: 'mobile' as const, label: '📱 手机' },
-          ] as { key: DeviceScene; label: string }[]
+            { key: 'desktop' as const, label: '桌面', icon: Monitor },
+            { key: 'mobile' as const, label: '手机', icon: Smartphone },
+          ] as { key: DeviceScene; label: string; icon: React.FC<{ size?: number; color?: string }> }[]
         ).map(item => (
           <button
             key={item.key}
             onClick={() => onSceneChange?.(item.key)}
             style={{
               flex: 1,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
               padding: '4px 0',
               border: scene === item.key ? '1px solid #1677ff' : '1px solid #d9d9d9',
               background: scene === item.key ? '#e6f4ff' : '#fff',
@@ -71,6 +76,7 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({
               fontWeight: scene === item.key ? 500 : 400,
             }}
           >
+            <item.icon size={14} color={scene === item.key ? '#1677ff' : '#666'} />
             {item.label}
           </button>
         ))}

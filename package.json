@@ -5,15 +5,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter './packages/*' dev",
+    "dev": "pnpm --filter @form-engine/* dev",
     "dev:example": "pnpm --filter example dev",
-    "build": "pnpm --filter './packages/*' build",
+    "build": "pnpm --filter @form-engine/core --filter @form-engine/adapter-antd --filter @form-engine/adapter-antd-mobile build",
     "clean": "pnpm -r clean",
-    "test": "pnpm --filter './packages/*' test",
+    "test": "pnpm --filter @form-engine/* test",
     "publish:core": "pnpm --filter @form-engine/core publish",
     "publish:adapter-antd": "pnpm --filter @form-engine/adapter-antd publish",
     "publish:adapter-antd-mobile": "pnpm --filter @form-engine/adapter-antd-mobile publish",
-    "publish:all": "pnpm --filter './packages/*' publish"
+    "publish:all": "pnpm --filter @form-engine/core --filter @form-engine/adapter-antd --filter @form-engine/adapter-antd-mobile publish"
   },
   "devDependencies": {
     "pnpm": "^8.0.0"
