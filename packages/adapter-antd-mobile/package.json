@@ -1,10 +1,9 @@
 {
-  "name": "@form-engine/adapter-antd",
+  "name": "@form-engine/adapter-antd-mobile",
   "version": "0.1.0",
-  "description": "Form Engine - Antd 组件适配器",
+  "description": "Form Engine - Antd Mobile 组件适配器",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -20,31 +19,28 @@
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit"
   },
-  "keywords": [
-    "form",
-    "engine",
-    "antd",
-    "adapter"
-  ],
+  "keywords": ["form", "engine", "antd-mobile", "adapter"],
   "author": "",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@form-engine/core": "workspace:*",
-    "antd": "^6.4.3"
+    "antd-mobile": "^5.42.3"
   },
   "peerDependencies": {
-    "antd": ">=6.0.0",
     "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
+    "react-dom": ">=19.0.0",
+    "antd-mobile": ">=5.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "rimraf": "^5.0.0",
+    "typescript": "~6.0.2",
     "tsup": "^8.0.0",
-    "typescript": "~6.0.2"
+    "rimraf": "^5.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3"
   }
 }

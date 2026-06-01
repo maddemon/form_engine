@@ -9,8 +9,8 @@ form-engine/
 ├── packages/
 │   ├── core/              # 核心包（类型定义 + 默认 HTML 组件 + 设计器）
 │   ├── adapter-antd/      # Antd 适配器
-│   ├── adapter-antd-mobile/ # Antd Mobile 适配器
-│   └── example/          # 示例项目
+│   └── adapter-antd-mobile/ # Antd Mobile 适配器
+├── example/               # 示例项目
 ```
 
 ## Features
@@ -55,7 +55,7 @@ import '@form-engine/adapter-antd'
 pnpm install
 
 # 启动示例项目
-cd packages/example
+cd example
 pnpm dev
 
 # 构建所有包

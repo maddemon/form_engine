@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@form-engine/core': path.resolve(__dirname, '../../packages/core/src'),
+      '@form-engine/core': path.resolve(__dirname, '../packages/core/src'),
     },
   },
   build: {

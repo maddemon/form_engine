@@ -87,10 +87,6 @@ export function FieldRenderer({
     (adapter as any)['default']
 
   if (!renderFn) {
-    // 开发模式下给出明确提示
-    if (process.env.NODE_ENV === 'development') {
-      console.warn(`[form-engine] 未找到字段 "${field.name}" (type="${field.type}") 的渲染函数，请在 adapter 中补充或提供 adapter['default'] 兜底。`)
-    }
     return (
       <div className="fe-field" style={{ padding: '8px 0', color: '#999' }}>
         {label}

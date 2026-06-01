@@ -6,8 +6,7 @@
   "module": "./src/index.ts",
   "types": "./src/index.ts",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "dev": "tsup --watch",
@@ -24,6 +23,24 @@
   ],
   "author": "",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.mjs",
+        "require": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "./designer": {
+        "import": "./dist/designer/index.mjs",
+        "require": "./dist/designer/index.js",
+        "types": "./dist/designer/index.d.ts"
+      }
+    }
+  },
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"

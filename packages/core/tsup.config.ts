@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: ['src/index.ts', 'src/designer/index.ts'],
   format: ['cjs', 'esm'],
   dts: true,              // 生成 .d.ts 文件
   splitting: true,
