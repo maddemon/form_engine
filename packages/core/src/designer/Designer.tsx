@@ -10,7 +10,8 @@ import { isPaletteDrag, toPaletteItem, type DesignerDragData } from '../types/de
 import type { FormFieldSchema, FormSchema } from '../types/schema'
 import { Canvas } from './Canvas'
 import { DesignerContext } from './DesignerContext'
-import { createFieldFromPalette, FieldList, getFullPaletteGroups, iconMap } from './FieldList'
+import { createFieldFromPalette, FieldList, getFullPaletteGroups } from './FieldList'
+import { getComponentIcon } from '../components/paletteRegistry'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
 import { designerReducerWithHistory, findInTree } from './reducer'
@@ -343,7 +344,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
                 boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
               }}
             >
-              <span style={{ display: 'inline-flex', alignItems: 'center' }}>{iconMap[activeDragType] || null}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>{getComponentIcon(activeDragType) || null}</span>
               {activeDragLabel}
             </div>
           ) : null}

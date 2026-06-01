@@ -64,13 +64,19 @@ export function FieldRenderer({
   )
 
   // 通用 props
+  const resolvedOptions: OptionItem[] =
+    field.mock?.options?.length ? field.mock.options as OptionItem[] :
+    options.length ? options :
+    field.dataSource?.type === 'static' ? field.dataSource.static.options :
+    []
+
   const fieldProps: Record<string, unknown> = {
     value,
     onChange,
     disabled: isDisabled,
     readOnly: field.readOnly,
     placeholder: field.placeholder,
-    options: field.mock?.options?.length ? field.mock.options as OptionItem[] : options,
+    options: resolvedOptions,
     fieldSchema: field,
     ...field.componentProps,
   }

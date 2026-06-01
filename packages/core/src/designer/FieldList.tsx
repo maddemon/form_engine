@@ -4,27 +4,15 @@ import type { FormFieldSchema, FieldType } from '../types'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { defaultPaletteGroups } from './paletteData'
 import { useDraggable } from '@dnd-kit/core'
-import { Type, FileText, Hash, Lock, ChevronDown, CheckSquare, Circle, ToggleLeft, Slash, Star, Calendar, Clock, UploadIcon, GridIcon, Columns, Square, Minus, Layout, FolderOpen, ImageIcon } from '../components/icons'
-
-export const iconMap: Record<string, React.ReactNode> = {
-  'input': <Type />, 'textarea': <FileText />, 'input-number': <Hash />,
-  'password': <Lock />, 'select': <ChevronDown />,
-  'radio': <Circle />, 'checkbox': <CheckSquare />, 'switch': <ToggleLeft />,
-  'slider': <Slash />, 'rate': <Star />, 'date': <Calendar />,
-  'datetime': <Calendar />, 'date-range': <Calendar />, 'time': <Clock />,
-  'upload': <UploadIcon />,
-  'button': <Square />,
-  'grid': <GridIcon />, 'flex': <Layout />, 'container': <Square />,
-  'collapse': <FolderOpen />, 'tabs': <Minus />,
-  'text': <Type />,   'image': <ImageIcon />, 'divider': <Minus />, 'title': <Type />,
-}
+import { getComponentIcon } from '../components/paletteRegistry'
 
 function DefaultIcon() {
   return <span style={{ fontSize: 14, color: '#999' }}>⬜</span>
 }
 
 function getIcon(item: PaletteItem): React.ReactNode {
-  if (iconMap[item.type]) return iconMap[item.type]
+  const icon = getComponentIcon(item.type)
+  if (icon) return icon
 
   const customConfig = customComponentRegistry.get(item.type)
   if (customConfig?.icon) {

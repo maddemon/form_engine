@@ -117,7 +117,6 @@ export type {
   ComponentCategory,
 } from './types/component-category'
 export {
-  componentCategoryMap,
   getComponentCategory,
   isFormComponent,
   isDisplayComponent,
