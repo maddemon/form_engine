@@ -53,7 +53,6 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
   children,
   key,
   header,
-  disabled = false,
   showArrow = true,
   extra,
   style,
@@ -64,7 +63,6 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
     <Panel
       key={key}
       header={header}
-      disabled={disabled}
       showArrow={showArrow}
       extra={extra}
       style={style}
@@ -81,7 +79,6 @@ interface CollapsePanelProps {
   children?: React.ReactNode
   key: string
   header: React.ReactNode
-  disabled?: boolean
   showArrow?: boolean
   extra?: React.ReactNode
   style?: React.CSSProperties

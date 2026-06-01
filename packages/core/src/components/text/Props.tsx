@@ -8,7 +8,7 @@ export default function TextPropsRender({ widgets: w, values, onChange }: PropsR
         <w.TextArea value={(values.content as string) ?? ''} onChange={(v) => onChange('content', v)} placeholder="输入文本内容" />
       </FieldGroup>
       <FieldGroup label="类型">
-        <w.Select
+        <w.ButtonGroup
           value={(values.type as string) ?? ''}
           onChange={(v) => onChange('type', v || undefined)}
           options={[
@@ -20,6 +20,26 @@ export default function TextPropsRender({ widgets: w, values, onChange }: PropsR
           ]}
         />
       </FieldGroup>
+      <FieldGroup label="字号">
+        <w.Input value={(values.fontSize as string) ?? ''} onChange={(v) => onChange('fontSize', v ? Number(v) : undefined)} placeholder="如: 16" />
+      </FieldGroup>
+      <FieldGroup label="颜色">
+        <w.Input value={(values.color as string) ?? ''} onChange={(v) => onChange('color', v)} placeholder="如: #333" />
+      </FieldGroup>
+      <FieldGroup label="对齐方式">
+        <w.ButtonGroup
+          value={(values.align as string) ?? 'left'}
+          onChange={(v) => onChange('align', v)}
+          options={[
+            { label: '左', value: 'left' },
+            { label: '中', value: 'center' },
+            { label: '右', value: 'right' },
+          ]}
+        />
+      </FieldGroup>
+      <InlineField label="键盘样式">
+        <w.Checkbox checked={!!values.keyboard} onChange={(v) => onChange('keyboard', v)} />
+      </InlineField>
       <InlineField label="加粗">
         <w.Checkbox checked={!!values.strong} onChange={(v) => onChange('strong', v)} />
       </InlineField>

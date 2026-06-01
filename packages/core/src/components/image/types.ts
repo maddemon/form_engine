@@ -9,6 +9,7 @@ export interface ImageProps extends BaseComponentProps {
   fallback?: string
   preview?: boolean
   placeholder?: React.ReactNode
+  borderRadius?: number
 }
 
 

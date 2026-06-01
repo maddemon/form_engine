@@ -1,4 +1,5 @@
 export { WidgetButton } from '../widgets/Button'
+export { WidgetButtonGroup } from '../widgets/ButtonGroup'
 export { WidgetCheckbox } from '../widgets/Checkbox'
 export { defaultDesignerWidgets, defaultDesignerWidgets as designerWidgets } from '../widgets/index'
 export { WidgetInput } from '../widgets/Input'

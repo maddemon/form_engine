@@ -79,6 +79,12 @@ export const antdComponents = {
   'DatePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker }))),
   'DateRangePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DateRangePicker }))),
   'TimePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.TimePicker }))),
+  
+  // 日期类型别名（兼容 field.type 小写命名）
+  'date': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker }))),
+  'time': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.TimePicker }))),
+  'datetime': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker }))),
+  'date-range': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DateRangePicker }))),
   'Upload': React.lazy(() => import('./components/Upload').then(m => ({ default: m.Upload }))),
   'Button': React.lazy(() => import('./components/Button').then(m => ({ default: m.Button }))),
   
@@ -108,7 +114,7 @@ export const antdComponents = {
  * 用户可以直接使用 antdComponents 进行注册
  */
 export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidgets = {
-  Input: ({ value, onChange, placeholder, disabled, style }) => (
+  Input: ({ value, onChange, placeholder, disabled, style }: any) => (
     <AntdInput
       value={value ?? ''}
       onChange={v => onChange?.(v.target.value)}
@@ -117,7 +123,7 @@ export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidg
       style={{ width: '100%', ...style }}
     />
   ),
-  Select: ({ value, onChange, options, disabled, style }) => (
+  Select: ({ value, onChange, options, disabled, style }: any) => (
     <AntdSelect
       value={value}
       onChange={v => onChange?.(v)}
@@ -126,7 +132,7 @@ export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidg
       style={{ width: '100%', ...style }}
     />
   ),
-  Checkbox: ({ checked, onChange, disabled, style }) => (
+  Checkbox: ({ checked, onChange, disabled, style }: any) => (
     <AntdCheckbox
       checked={!!checked}
       onChange={v => onChange?.(v.target.checked)}
@@ -134,7 +140,7 @@ export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidg
       style={style}
     />
   ),
-  NumberInput: ({ value, onChange, min, max, disabled, style }) => (
+  NumberInput: ({ value, onChange, min, max, disabled, style }: any) => (
     <AntdInputNumber
       value={value}
       onChange={v => onChange?.(v)}

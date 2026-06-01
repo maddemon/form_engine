@@ -3,6 +3,9 @@ import { FieldGroup, InlineField, PropsRenderProps } from '../../propRenders'
 export default function SliderPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
+      <FieldGroup label="默认值">
+        <w.Input value={(values.defaultValue as string) ?? ''} onChange={(v) => onChange('defaultValue', v)} placeholder="如: 30 或 [20,80]" />
+      </FieldGroup>
       <FieldGroup label="最小值">
         <w.NumberInput value={(values.min as number) ?? 0} onChange={(v) => onChange('min', v)} />
       </FieldGroup>
@@ -23,6 +26,9 @@ export default function SliderPropsRender({ widgets: w, values, onChange }: Prop
       </InlineField>
       <FieldGroup label="刻度标记 (JSON)">
         <w.Input value={values.marks ? JSON.stringify(values.marks) : ''} onChange={(v) => onChange('marks', v ? JSON.parse(v as string) : undefined)} placeholder='{"0":"0%","50":"50%","100":"100%"}' />
+      </FieldGroup>
+      <FieldGroup label="Tooltip 格式化">
+        <w.Input value={(values.tooltip as any)?.formatter as string ?? ''} onChange={(v) => onChange('tooltip', v ? { formatter: v } : undefined)} placeholder="如: {value}%" />
       </FieldGroup>
     </>
   )

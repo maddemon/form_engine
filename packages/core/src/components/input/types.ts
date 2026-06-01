@@ -11,6 +11,7 @@ export interface InputProps extends BaseFormComponentProps<string | undefined> {
   addonAfter?: React.ReactNode
   type?: 'text' | 'password' | 'email' | 'tel' | 'url'
   autoComplete?: string
+  visibilityToggle?: boolean
 }
 
 

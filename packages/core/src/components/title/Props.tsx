@@ -8,17 +8,31 @@ export default function TitlePropsRender({ widgets: w, values, onChange }: Props
         <w.Input value={(values.content as string) ?? ''} onChange={(v) => onChange('content', v)} placeholder="输入标题" />
       </FieldGroup>
       <FieldGroup label="级别">
-        <w.Select
-          value={(values.level as number) ?? 1}
-          onChange={(v) => onChange('level', v)}
+        <w.ButtonGroup
+          value={String((values.level as number) ?? 1)}
+          onChange={(v) => onChange('level', Number(v))}
           options={[
-            { label: 'H1', value: 1 },
-            { label: 'H2', value: 2 },
-            { label: 'H3', value: 3 },
-            { label: 'H4', value: 4 },
-            { label: 'H5', value: 5 },
+            { label: 'H1', value: '1' },
+            { label: 'H2', value: '2' },
+            { label: 'H3', value: '3' },
+            { label: 'H4', value: '4' },
+            { label: 'H5', value: '5' },
           ]}
         />
+      </FieldGroup>
+      <FieldGroup label="对齐方式">
+        <w.ButtonGroup
+          value={(values.align as string) ?? 'left'}
+          onChange={(v) => onChange('align', v)}
+          options={[
+            { label: '左', value: 'left' },
+            { label: '中', value: 'center' },
+            { label: '右', value: 'right' },
+          ]}
+        />
+      </FieldGroup>
+      <FieldGroup label="颜色">
+        <w.Input value={(values.color as string) ?? ''} onChange={(v) => onChange('color', v)} placeholder="如: #333" />
       </FieldGroup>
       <InlineField label="加粗">
         <w.Checkbox checked={!!values.strong} onChange={(v) => onChange('strong', v)} />

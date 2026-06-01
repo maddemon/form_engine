@@ -6,6 +6,8 @@ export interface DividerProps extends BaseComponentProps {
   orientation?: 'left' | 'center' | 'right'
   plain?: boolean
   children?: React.ReactNode
+  color?: string
+  thickness?: number
 }
 
 

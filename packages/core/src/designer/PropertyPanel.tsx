@@ -22,9 +22,9 @@ interface PropertyPanelProps {
   onSceneChange?: (scene: DeviceScene) => void
 }
 
-function useWidgets(designerWidgets?: DesignerWidgets): DesignerWidgets {
-  if (designerWidgets) return designerWidgets
-  return defaultDesignerWidgets
+function useWidgets(designerWidgets?: DesignerWidgets) {
+  const merged = { ...defaultDesignerWidgets, ...designerWidgets }
+  return merged as Required<Pick<DesignerWidgets, 'ButtonGroup' | 'TextArea'>> & Omit<DesignerWidgets, 'ButtonGroup' | 'TextArea'>
 }
 
 function hasAdvancedConfig(field: FormFieldSchema): boolean {
@@ -45,6 +45,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
   const category = getComponentCategory(field.type)
   const isForm = category === 'form'
   const isContainer = category === 'container'
+  const isButton = category === 'button'
+  const isDisplay = category === 'display'
 
   return (
     <div style={{ width: 280, borderLeft: '1px solid #eee', padding: 12, overflow: 'auto', height: '100%' }}>
@@ -72,15 +74,17 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
               <w.Input value={field.placeholder || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { placeholder: String(v) || undefined } })} />
             </FieldGroup>
           </>
-        ) : (
+        ) : isButton ? null : (
           <FieldGroup label="字段名（name）">
             <w.Input value={field.name} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: String(v) } })} />
           </FieldGroup>
         )}
 
-        <FieldGroup label="列宽（colSpan，24=满宽）">
-          <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
-        </FieldGroup>
+        {isForm && (
+          <FieldGroup label="列宽（colSpan，24=满宽）">
+            <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
+          </FieldGroup>
+        )}
 
         {isContainer && (
           <div style={{ fontSize: 12, color: '#999', padding: '4px 0' }}>

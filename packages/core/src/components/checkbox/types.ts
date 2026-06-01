@@ -5,6 +5,7 @@ import type { OptionItem } from '../../types/schema'
 export interface CheckboxProps extends BaseFormComponentProps<string[] | undefined> {
   options?: OptionItem[]
   indeterminate?: boolean
+  direction?: 'horizontal' | 'vertical'
 }
 
 

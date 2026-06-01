@@ -52,7 +52,7 @@ export const Select: React.FC<SelectProps> = ({
     <AntdSelect
       {...selectProps}
     >
-      {options.map(opt => (
+      {options.map((opt: OptionItem) => (
         <AntdSelect.Option key={String(opt.value)} value={String(opt.value)} disabled={opt.disabled}>
           {opt.label}
         </AntdSelect.Option>

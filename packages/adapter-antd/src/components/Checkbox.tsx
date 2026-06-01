@@ -17,6 +17,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   onChange,
   options = [],
   indeterminate,
+  direction,
   disabled,
   style,
   className,
@@ -34,7 +35,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         value={value || []}
         onChange={handleChange}
         disabled={disabled}
-        style={style}
+        style={{ ...style, flexDirection: direction === 'vertical' ? 'column' : undefined }}
         className={className}
         id={id}
         options={options}

@@ -1,6 +1,6 @@
 /**
  * Form Engine Adapter 接口定义
- * 
+ *
  * Adapter 负责将 Form Engine 的组件类型映射到具体的 UI 库组件
  * 并定义属性面板如何渲染组件配置
  */
@@ -61,31 +61,31 @@ export interface PropEditorConfig {
 // Adapter 接口
 // ============================
 
-/** 
+/**
  * Form Engine Adapter 接口
  * 每个 UI 库（antd、antd-mobile 等）实现一个 adapter
  */
 export interface FormEngineAdapter {
   /** Adapter 名称 */
   name: string
-  
+
   /** Adapter 版本 */
   version: string
-  
+
   /** 字段组件映射（type -> React 组件） */
   components: Partial<{
     [K in keyof ComponentPropsMap]: React.ComponentType<ComponentPropsMap[K]>
   }>
-  
+
   /** 属性面板组件（用于设计器） */
   propertyPanel?: {
     /** 渲染属性面板 */
     render: (props: PropertyPanelRenderProps) => React.ReactNode
   }
-  
+
   /** 主题配置（可选） */
   theme?: AdapterTheme
-  
+
   /** 布局组件覆写（可选，如果 UI 库有更好的实现） */
   layout?: {
     Grid?: React.ComponentType<any>
@@ -171,6 +171,14 @@ export interface DesignerWidgets {
     disabled?: boolean
     style?: React.CSSProperties
   }>
+  /** 按钮组（用于少量选项的平铺选择，替代 Select） */
+  ButtonGroup: React.ComponentType<{
+    value?: string
+    onChange?: (v: string) => void
+    options: { label: string; value: string }[]
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
 }
 
 /** 属性面板渲染 Props */
@@ -192,5 +200,3 @@ export interface AdapterTheme {
   /** 全局样式覆写 */
   styleOverrides?: Record<string, React.CSSProperties>
 }
-
-

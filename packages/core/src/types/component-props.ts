@@ -31,6 +31,8 @@ import type { GridProps, GridRowConfig, GridColConfig } from '../components/grid
 import type { FlexProps } from '../components/flex/types'
 import type { CollapseProps } from '../components/collapse/types'
 import type { TabsProps } from '../components/tabs/types'
+import type { CascaderProps } from '../components/cascader/types'
+import type { TreeSelectProps } from '../components/tree-select/types'
 
 // ============================
 // 导出类型（供其他模块使用）
@@ -62,32 +64,13 @@ export type {
   FlexProps,
   CollapseProps,
   TabsProps,
+  CascaderProps,
+  TreeSelectProps,
 }
 
 // ============================
 // 尚未实现组件的 Props（保留原有定义）
 // ============================
-
-export interface CascaderProps {
-  value?: string[]
-  onChange?: (value: string[]) => void
-  options?: import('./schema').OptionItem[]
-  placeholder?: string
-  allowClear?: boolean
-  showSearch?: boolean
-  expandTrigger?: 'click' | 'hover'
-}
-
-export interface TreeSelectProps {
-  value?: string | string[]
-  onChange?: (value: string | string[]) => void
-  options?: import('./schema').OptionItem[]
-  placeholder?: string
-  allowClear?: boolean
-  multiple?: boolean
-  treeCheckable?: boolean
-  showSearch?: boolean
-}
 
 export interface TimePickerProps {
   value?: string | null

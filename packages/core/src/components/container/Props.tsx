@@ -5,7 +5,7 @@ export default function ContainerPropsRender({ widgets: w, values, onChange }: P
   return (
     <>
       <FieldGroup label="布局方向">
-        <w.Select
+        <w.ButtonGroup
           value={(values.layout as string) ?? 'vertical'}
           onChange={(v) => onChange('layout', v)}
           options={[
@@ -25,6 +25,15 @@ export default function ContainerPropsRender({ widgets: w, values, onChange }: P
       </FieldGroup>
       <FieldGroup label="最小高度(px)">
         <w.NumberInput value={(values.minHeight as number) ?? 0} onChange={(v) => onChange('minHeight', v)} min={0} max={2000} />
+      </FieldGroup>
+      <FieldGroup label="内边距(px)">
+        <w.NumberInput value={(values.padding as number) ?? 0} onChange={(v) => onChange('padding', v)} min={0} max={200} />
+      </FieldGroup>
+      <FieldGroup label="外边距(px)">
+        <w.NumberInput value={(values.margin as number) ?? 0} onChange={(v) => onChange('margin', v)} min={0} max={200} />
+      </FieldGroup>
+      <FieldGroup label="间距(px)">
+        <w.NumberInput value={(values.gap as number) ?? 0} onChange={(v) => onChange('gap', v)} min={0} max={100} />
       </FieldGroup>
     </>
   )

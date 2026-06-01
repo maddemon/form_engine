@@ -7,7 +7,7 @@ export default function SwitchPropsRender({ widgets: w, values, onChange }: Prop
         <w.Checkbox checked={!!values.defaultValue} onChange={(v) => onChange('defaultValue', v)} />
       </InlineField>
       <FieldGroup label="尺寸">
-        <w.Select
+        <w.ButtonGroup
           value={(values.size as string) ?? 'default'}
           onChange={(v) => onChange('size', v)}
           options={[

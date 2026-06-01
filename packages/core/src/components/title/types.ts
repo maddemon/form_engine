@@ -14,6 +14,8 @@ export interface TitleProps extends BaseComponentProps {
   disabled?: boolean
   ellipsis?: boolean | { rows?: number; expandable?: boolean }
   strong?: boolean
+  textAlign?: 'left' | 'center' | 'right'
+  color?: string
 }
 
 

@@ -5,7 +5,7 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
   return (
     <>
       <FieldGroup label="样式类型">
-        <w.Select
+        <w.ButtonGroup
           value={(values.type as string) ?? 'line'}
           onChange={(v) => onChange('type', v)}
           options={[
@@ -16,7 +16,7 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
         />
       </FieldGroup>
       <FieldGroup label="尺寸">
-        <w.Select
+        <w.ButtonGroup
           value={(values.size as string) ?? 'middle'}
           onChange={(v) => onChange('size', v)}
           options={[
@@ -27,7 +27,7 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
         />
       </FieldGroup>
       <FieldGroup label="标签位置">
-        <w.Select
+        <w.ButtonGroup
           value={(values.tabPosition as string) ?? 'top'}
           onChange={(v) => onChange('tabPosition', v)}
           options={[

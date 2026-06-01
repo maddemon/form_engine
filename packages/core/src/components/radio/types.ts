@@ -6,6 +6,7 @@ export interface RadioProps extends BaseFormComponentProps<string | undefined> {
   options?: OptionItem[]
   buttonStyle?: 'outline' | 'solid'
   optionType?: 'default' | 'button'
+  direction?: 'horizontal' | 'vertical'
 }
 
 

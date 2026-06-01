@@ -18,6 +18,7 @@ export const Radio: React.FC<RadioProps> = ({
   options = [],
   optionType = 'default',
   buttonStyle = 'outline',
+  direction,
   disabled,
   style,
   className,
@@ -37,7 +38,7 @@ export const Radio: React.FC<RadioProps> = ({
         optionType={optionType === 'button' ? 'button' : undefined}
         buttonStyle={buttonStyle}
         disabled={disabled}
-        style={style}
+        style={{ ...style, flexDirection: direction === 'vertical' ? 'column' : undefined }}
         className={className}
         id={id}
         options={options}

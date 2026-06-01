@@ -5,7 +5,7 @@ export default function ButtonPropsRender({ widgets: w, values, onChange }: Prop
   return (
     <>
       <FieldGroup label="按钮类型">
-        <w.Select
+        <w.ButtonGroup
           value={(values.type as string) ?? 'default'}
           onChange={(v) => onChange('type', v)}
           options={[
@@ -18,7 +18,7 @@ export default function ButtonPropsRender({ widgets: w, values, onChange }: Prop
         />
       </FieldGroup>
       <FieldGroup label="HTML 类型">
-        <w.Select
+        <w.ButtonGroup
           value={(values.htmlType as string) ?? 'button'}
           onChange={(v) => onChange('htmlType', v)}
           options={[
@@ -28,6 +28,15 @@ export default function ButtonPropsRender({ widgets: w, values, onChange }: Prop
           ]}
         />
       </FieldGroup>
+      <FieldGroup label="图标">
+        <w.Input value={(values.icon as string) ?? ''} onChange={(v) => onChange('icon', v)} placeholder="如: SearchOutlined" />
+      </FieldGroup>
+      <FieldGroup label="文字内容">
+        <w.Input value={(values.children as string) ?? ''} onChange={(v) => onChange('children', v)} placeholder="按钮文字" />
+      </FieldGroup>
+      <InlineField label="宽度铺满">
+        <w.Checkbox checked={!!values.block} onChange={(v) => onChange('block', v)} />
+      </InlineField>
       <InlineField label="危险">
         <w.Checkbox checked={!!values.danger} onChange={(v) => onChange('danger', v)} />
       </InlineField>

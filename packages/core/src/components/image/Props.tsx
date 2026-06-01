@@ -19,6 +19,9 @@ export default function ImagePropsRender({ widgets: w, values, onChange }: Props
       <InlineField label="可预览">
         <w.Checkbox checked={values.preview !== false} onChange={(v) => onChange('preview', v)} />
       </InlineField>
+      <FieldGroup label="圆角">
+        <w.NumberInput value={(values.borderRadius as number) ?? 0} onChange={(v) => onChange('borderRadius', v)} min={0} max={50} />
+      </FieldGroup>
     </>
   )
 }

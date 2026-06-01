@@ -13,6 +13,9 @@ export interface TextProps extends BaseComponentProps {
   code?: boolean
   disabled?: boolean
   ellipsis?: boolean | { rows?: number; expandable?: boolean }
+  fontSize?: number
+  color?: string
+  textAlign?: 'left' | 'center' | 'right'
 }
 
 

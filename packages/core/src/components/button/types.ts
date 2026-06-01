@@ -7,6 +7,8 @@ export interface ButtonProps extends BaseComponentProps {
   htmlType?: 'button' | 'submit' | 'reset'
   loading?: boolean
   danger?: boolean
+  icon?: string
+  block?: boolean
 }
 
 
