@@ -5,6 +5,7 @@ import type { DataSourceResolver, CustomComponents } from '../types/render'
 import { matchVisibleWhen, evalExpr } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import defaultAdapter from './defaultAdapter'
+import { isContainerComponent } from '../types/component-category'
 import {
   resolveDataSource,
   checkRequiredDeps,
@@ -183,6 +184,29 @@ export const FormRender: React.FC<FormRenderProps> = ({
     onSubmit?.(formValues)
   }
 
+  function renderNestedField(field: FormFieldSchema): React.ReactNode {
+    const isContainer = isContainerComponent(field.type)
+    const childNodes = isContainer && field.children?.length
+      ? field.children.map(renderNestedField)
+      : undefined
+
+    const enhancedField: FormFieldSchema = childNodes
+      ? { ...field, componentProps: { ...field.componentProps, children: childNodes } }
+      : field
+
+    return (
+      <FieldRenderer
+        field={enhancedField}
+        value={formValues[field.name]}
+        onChange={val => handleFieldChange(field.name, val)}
+        options={fieldOptions[field.name] || []}
+        disabled={loading || field.disabled === true}
+        adapter={adapter}
+        components={components}
+      />
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit} className="fe-form" style={{ maxWidth: 640 }}>
       <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -191,15 +215,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
             key={field.id || field.name}
             style={{ width: `${(field.colSpan || 24) / 24 * 100}%` }}
           >
-            <FieldRenderer
-              field={field}
-              value={formValues[field.name]}
-              onChange={val => handleFieldChange(field.name, val)}
-              options={fieldOptions[field.name] || []}
-              disabled={loading || field.disabled === true}
-              adapter={adapter}
-              components={components}
-            />
+            {renderNestedField(field)}
           </div>
         ))}
       </div>

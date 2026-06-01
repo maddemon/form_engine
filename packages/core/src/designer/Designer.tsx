@@ -3,6 +3,7 @@ import type { FormSchema } from '../types/schema'
 import type { PaletteItem, PaletteGroup } from '../types/designer'
 import type { FormEngineAdapter } from '../types/adapter'
 import { FieldList, getFullPaletteGroups } from './FieldList'
+import type { FormFieldSchema } from '../types/schema'
 import { Canvas } from './Canvas'
 import { PropertyPanel } from './PropertyPanel'
 import type { DeviceScene } from '../registry/componentRegistry'
@@ -72,7 +73,18 @@ export const Designer: React.FC<DesignerProps> = ({
     notifyChange(state.schema)
   }, [state.schema, notifyChange])
 
-  const selectedField = state.schema.fields.find((f) => f.id === state.selectedFieldId) || null
+  const findFieldById = (fields: FormFieldSchema[], id: string): FormFieldSchema | null => {
+    for (const f of fields) {
+      if (f.id === id) return f
+      if (f.children) {
+        const found = findFieldById(f.children, id)
+        if (found) return found
+      }
+    }
+    return null
+  }
+
+  const selectedField = state.selectedFieldId ? findFieldById(state.schema.fields, state.selectedFieldId) : null
 
   const handlePaletteDragStart = useCallback(
     (item: PaletteItem, event: React.DragEvent<HTMLDivElement>) => {

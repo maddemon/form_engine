@@ -107,6 +107,21 @@ export type {
   DesignerProps,
 } from './types/designer'
 
+// 组件分类
+export type {
+  ComponentCategory,
+} from './types/component-category'
+export {
+  componentCategoryMap,
+  getComponentCategory,
+  isFormComponent,
+  isDisplayComponent,
+  isContainerComponent,
+  isButtonComponent,
+  getFormFieldTypes,
+  getContainerFieldTypes,
+} from './types/component-category'
+
 // ============================
 // Adapter 注册 API
 // ============================

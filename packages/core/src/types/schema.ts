@@ -147,6 +147,8 @@ export interface FormFieldSchema {
   dataSource?: FieldDataSource
   custom?: CustomComponent
   mock?: FieldMock
+  /** 子字段（仅容器组件使用，如 grid/flex/container/collapse/tabs） */
+  children?: FormFieldSchema[]
 }
 
 // ============================

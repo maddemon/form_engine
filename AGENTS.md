@@ -17,3 +17,18 @@
 5、若项目步骤比较多，请先生成md文档，不用写代码，只写要完成的目标
 6、编译通过后，必须发起sub agent对本次改动进行Code Review，若有md文档，要以md文档的目标，而非diff审批代码。确保代码质量与规范一致性。
 7、全部修改完毕后，更新md文档，标记完成状态。
+
+## 关键架构决策
+
+### 组件分类体系
+所有组件通过 `ComponentCategory` 分为四类（`types/component-category.ts`）：
+- **form**: 表单输入组件，PropertyPanel 显示 label/placeholder/name
+- **display**: 展示组件，PropertyPanel 仅显示 name
+- **container**: 容器组件，PropertyPanel 仅显示 name，Canvas 中支持嵌套渲染子组件
+- **button**: 按钮组件，PropertyPanel 仅显示 name
+
+### 容器嵌套
+- 容器组件的 `FormFieldSchema.children` 存储子字段
+- Canvas 递归渲染，容器区域可拖入新组件或移动已有组件
+- Reducer 支持 `parentId` 参数来操作嵌套字段
+- 获取所有表单组件：`getFormFieldTypes()`

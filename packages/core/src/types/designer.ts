@@ -60,12 +60,13 @@ export interface DesignerProps {
  */
 export type DesignerAction =
   | { type: 'SELECT_FIELD'; fieldId: string | null }
-  | { type: 'ADD_FIELD'; field: FormFieldSchema; index: number }
+  | { type: 'ADD_FIELD'; field: FormFieldSchema; index: number; parentId?: string }
   | { type: 'REMOVE_FIELD'; fieldId: string }
-  | { type: 'MOVE_FIELD'; fromIndex: number; toIndex: number }
+  | { type: 'MOVE_FIELD'; fromIndex: number; toIndex: number; parentId?: string; fromParentId?: string; toParentId?: string }
   | { type: 'UPDATE_FIELD'; fieldId: string; patch: Partial<FormFieldSchema> }
   | { type: 'UPDATE_FORM_CONFIG'; patch: Partial<FormConfig> }
   | { type: 'UPDATE_SUBMIT_CONFIG'; patch: Partial<SubmitConfig> }
+  | { type: 'COPY_FIELD'; fieldId: string }
   | { type: 'SET_SCHEMA'; schema: FormSchema }
   | { type: 'UNDO' }
   | { type: 'REDO' }

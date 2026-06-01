@@ -27,6 +27,20 @@
 
 `collapse`、`tabs` 的 Props 类型已迁移至独立目录，且所有布局/展示组件均有 `Props.tsx`。
 
+### 3. 组件分类体系（新增 ✅）
+
+新增 `ComponentCategory` 类型和 `componentCategoryMap`，将所有组件分为 `form` / `display` / `container` / `button` 四类：
+- **表单组件 (form)**：包含 label/placeholder/name 等基本属性
+- **展示组件 (display)**：仅显示 name，无 label/placeholder
+- **容器组件 (container)**：支持嵌套子组件，属性面板显示拖入提示
+- **按钮组件 (button)**：仅显示 name，无 label/placeholder
+
+API 导出：
+- `getComponentCategory(type)` → 获取分类
+- `isFormComponent(type)` / `isDisplayComponent(type)` / `isContainerComponent(type)` / `isButtonComponent(type)`
+- `getFormFieldTypes()` → 获取所有表单组件类型（过滤展示/容器/按钮）
+- `getContainerFieldTypes()` → 获取所有容器组件类型
+
 ---
 
 ## 二、组件逐项审计

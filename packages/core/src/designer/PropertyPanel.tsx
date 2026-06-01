@@ -6,6 +6,7 @@ import { customComponentRegistry } from '../registry/customComponentRegistry'
 import type { DesignerWidgets, FormEngineAdapter } from '../types/adapter'
 import type { DesignerAction } from '../types/designer'
 import type { FormFieldSchema } from '../types/schema'
+import { getComponentCategory } from '../types/component-category'
 import { CollapsibleSection } from './CollapsibleSection'
 import { FormConfigPanel } from './FormConfigPanel'
 import { defaultDesignerWidgets } from './widgets'
@@ -41,6 +42,9 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
 
   const ComponentPropsRender = PropsRenderMap[field.type]
   const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
+  const category = getComponentCategory(field.type)
+  const isForm = category === 'form'
+  const isContainer = category === 'container'
 
   return (
     <div style={{ width: 280, borderLeft: '1px solid #eee', padding: 12, overflow: 'auto', height: '100%' }}>
@@ -48,24 +52,41 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
 
       <CollapsibleSection title="基本属性" defaultCollapsed={false}>
         <FieldGroup label="字段类型">
-          <div style={{ padding: '4px 8px', marginTop: 2, background: '#f5f5f5', borderRadius: 4, fontSize: 12, color: '#666', border: '1px solid #d9d9d9' }}>{field.type}</div>
+          <div style={{ padding: '4px 8px', marginTop: 2, background: '#f5f5f5', borderRadius: 4, fontSize: 12, color: '#666', border: '1px solid #d9d9d9' }}>
+            {field.type}
+            <span style={{ marginLeft: 6, fontSize: 11, color: '#aaa' }}>
+              ({category === 'form' ? '表单' : category === 'display' ? '展示' : category === 'container' ? '容器' : '按钮'})
+            </span>
+          </div>
         </FieldGroup>
 
-        <FieldGroup label="字段名（name）">
-          <w.Input value={field.name} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: String(v) } })} />
-        </FieldGroup>
-
-        <FieldGroup label="标签（label）">
-          <w.Input value={field.label || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { label: String(v) || undefined } })} placeholder="字段标签" />
-        </FieldGroup>
-
-        <FieldGroup label="placeholder">
-          <w.Input value={field.placeholder || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { placeholder: String(v) || undefined } })} />
-        </FieldGroup>
+        {isForm ? (
+          <>
+            <FieldGroup label="字段名（name）">
+              <w.Input value={field.name} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: String(v) } })} />
+            </FieldGroup>
+            <FieldGroup label="标签（label）">
+              <w.Input value={field.label || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { label: String(v) || undefined } })} placeholder="字段标签" />
+            </FieldGroup>
+            <FieldGroup label="placeholder">
+              <w.Input value={field.placeholder || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { placeholder: String(v) || undefined } })} />
+            </FieldGroup>
+          </>
+        ) : (
+          <FieldGroup label="字段名（name）">
+            <w.Input value={field.name} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: String(v) } })} />
+          </FieldGroup>
+        )}
 
         <FieldGroup label="列宽（colSpan，24=满宽）">
           <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
         </FieldGroup>
+
+        {isContainer && (
+          <div style={{ fontSize: 12, color: '#999', padding: '4px 0' }}>
+            容器组件支持拖入子组件
+          </div>
+        )}
       </CollapsibleSection>
 
       {(ComponentPropsRender || customConfig?.propertyConfig?.length) && (
