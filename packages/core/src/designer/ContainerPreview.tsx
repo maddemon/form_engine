@@ -1,19 +1,24 @@
 import React from 'react'
+import { useDroppable } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import type { FormFieldSchema } from '../types/schema'
 import { useDesignerContext } from './DesignerContext'
-import { createFieldFromPalette } from './FieldList'
 import { NestedField } from './NestedField'
-import { readDragData, isPaletteDrag, isCanvasDrag, toPaletteItem } from '../types/designer-drag'
 
 interface ContainerPreviewProps {
   field: FormFieldSchema
 }
 
 export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field }) => {
-  const { scene, dispatch } = useDesignerContext()
+  const { scene } = useDesignerContext()
+  const dropId = `${field.id}__container`
+  const { setNodeRef, isOver } = useDroppable({ id: dropId })
+  const children = field.children || []
+  const childIds = React.useMemo(() => children.map(c => c.id!), [children])
+
   const compProps = field.componentProps as Record<string, unknown> | undefined
   const gap = Number(compProps?.gap) || 8
-  const childCount = field.children?.length || 0
+  const childCount = children.length
   const isMobile = scene === 'mobile'
 
   const isGrid = field.type === 'grid'
@@ -28,9 +33,9 @@ export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field }) => 
   const containerStyle: React.CSSProperties = {
     minHeight: 60,
     position: 'relative',
-    border: '1px dashed #d9d9d9',
+    border: isOver ? '2px solid #1890ff' : '1px dashed #d9d9d9',
     borderRadius: 4,
-    background: '#fafafa',
+    background: isOver ? '#f0f5ff' : '#fafafa',
     padding: 8,
     gap: `${gap}px`,
   }
@@ -47,40 +52,16 @@ export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field }) => 
     containerStyle.flexDirection = 'column'
   }
 
-  const handleDropOnContainer = (e: React.DragEvent, parentId: string) => {
-    e.preventDefault()
-    e.stopPropagation()
-    const data = readDragData(e)
-    if (!data) return
-
-    if (isPaletteDrag(data)) {
-      const newField = createFieldFromPalette(toPaletteItem(data))
-      dispatch({ type: 'ADD_FIELD', field: newField, index: 0, parentId })
-    } else if (isCanvasDrag(data)) {
-      if (data.fieldId === parentId) return
-      dispatch({
-        type: 'MOVE_FIELD',
-        fromIndex: data.index,
-        toIndex: 0,
-        fromParentId: data.fromParentId,
-        toParentId: parentId,
-      })
-    }
-  }
-
   return (
-    <div
-      style={containerStyle}
-      onDragOver={e => { e.preventDefault(); e.stopPropagation(); e.currentTarget.style.borderColor = '#1890ff'; e.currentTarget.style.background = '#f0f5ff' }}
-      onDragLeave={e => { e.currentTarget.style.borderColor = '#d9d9d9'; e.currentTarget.style.background = '#fafafa' }}
-      onDrop={e => { e.currentTarget.style.borderColor = '#d9d9d9'; e.currentTarget.style.background = '#fafafa'; handleDropOnContainer(e, field.id!) }}
-    >
-      {field.children?.length ? (
-        field.children.map((child, i) => (
-          <div key={child.id || i} style={{ width: isGrid ? childWidth : undefined, minWidth: 0 }}>
-            <NestedField field={child} parentContainerId={field.id} childIndex={i} />
-          </div>
-        ))
+    <div ref={setNodeRef} style={containerStyle}>
+      {childCount > 0 ? (
+        <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
+          {children.map((child, i) => (
+            <div key={child.id || i} style={{ width: isGrid ? childWidth : undefined, minWidth: 0 }}>
+              <NestedField field={child} parentContainerId={field.id} childIndex={i} />
+            </div>
+          ))}
+        </SortableContext>
       ) : (
         <div style={{ fontSize: 12, color: '#bbb', textAlign: 'center', padding: 16, userSelect: 'none', width: '100%' }}>
           拖入组件到此容器

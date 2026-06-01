@@ -14,7 +14,7 @@ export interface DesignerStateWithHistory extends DesignerState {
 const MAX_SNAPSHOTS = 50
 
 function shouldSnapshot(action: DesignerAction): boolean {
-  return ['ADD_FIELD', 'REMOVE_FIELD', 'MOVE_FIELD', 'UPDATE_FIELD', 'COPY_FIELD'].includes(action.type)
+  return ['ADD_FIELD', 'REMOVE_FIELD', 'MOVE_FIELD', 'UPDATE_FIELD', 'COPY_FIELD', 'REORDER_FIELDS'].includes(action.type)
 }
 
 function insertAfter(fields: FormFieldSchema[], targetId: string, newField: FormFieldSchema): FormFieldSchema[] {
@@ -155,7 +155,11 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
         action.fromIndex,
       )
       if (!removed) return state
-      const fields = insertIntoTree(afterRemove, action.toParentId, action.toIndex, removed)
+      // 如果源索引小于目标索引，移除后目标索引需要减1（因为数组缩短了）
+      const adjustedToIndex = action.fromIndex < action.toIndex
+        ? action.toIndex - 1
+        : action.toIndex
+      const fields = insertIntoTree(afterRemove, action.toParentId, adjustedToIndex, removed)
       return { ...state, schema: { ...state.schema, fields } }
     }
 
@@ -193,6 +197,10 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
         schema: action.schema,
         selectedFieldId: stillExists ? state.selectedFieldId : null,
       }
+    }
+
+    case 'REORDER_FIELDS': {
+      return { ...state, schema: { ...state.schema, fields: action.fields } }
     }
 
     default:

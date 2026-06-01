@@ -17,9 +17,9 @@ export const colors = {
 }
 
 export const borders = {
-  selected: `2px solid ${colors.primary}`,
+  selected: `1px solid ${colors.primary}`,
   container: `1px dashed ${colors.border}`,
-  transparent: '2px solid transparent',
+  transparent: '1px solid transparent',
   empty: '1px dashed #ddd',
 }
 

@@ -70,3 +70,4 @@ export type DesignerAction =
   | { type: 'SET_SCHEMA'; schema: FormSchema }
   | { type: 'UNDO' }
   | { type: 'REDO' }
+  | { type: 'REORDER_FIELDS'; fields: FormFieldSchema[] }

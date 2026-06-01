@@ -3,9 +3,10 @@ import type { PaletteItem, PaletteGroup } from '../types/designer'
 import type { FormFieldSchema, FieldType } from '../types'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { defaultPaletteGroups } from './paletteData'
+import { useDraggable } from '@dnd-kit/core'
 import { Type, FileText, Hash, Lock, ChevronDown, CheckSquare, Circle, ToggleLeft, Slash, Star, Calendar, Clock, UploadIcon, GridIcon, Columns, Square, Minus, Layout, FolderOpen, ImageIcon } from '../components/icons'
 
-const iconMap: Record<string, React.ReactNode> = {
+export const iconMap: Record<string, React.ReactNode> = {
   'input': <Type />, 'textarea': <FileText />, 'input-number': <Hash />,
   'password': <Lock />, 'select': <ChevronDown />,
   'radio': <Circle />, 'checkbox': <CheckSquare />, 'switch': <ToggleLeft />,
@@ -39,7 +40,6 @@ export function getFullPaletteGroups(excludeTypes?: string[]): PaletteGroup[] {
   const customGrouped = customComponentRegistry.getGrouped()
   const merged = defaultPaletteGroups.map(group => ({ ...group, items: [...group.items] }))
 
-  // 将自定义组件合并到同名的内置分组中
   if (Object.keys(customGrouped).length > 0) {
     for (const [groupName, configs] of Object.entries(customGrouped)) {
       const existingGroup = merged.find(g => g.groupName === groupName)
@@ -58,7 +58,6 @@ export function getFullPaletteGroups(excludeTypes?: string[]): PaletteGroup[] {
     }
   }
 
-  // 过滤排除项
   if (excludeTypes && excludeTypes.length > 0) {
     const excludeSet = new Set(excludeTypes)
     return merged
@@ -89,13 +88,56 @@ export function createFieldFromPalette(item: PaletteItem): FormFieldSchema {
   }
 }
 
+const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `palette-${item.type}`,
+    data: {
+      source: 'palette',
+      fieldType: item.type,
+      label: item.label,
+      defaultProps: item.defaultProps || {},
+    },
+  })
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      title={item.label}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '8px 4px',
+        border: '1px solid #eee',
+        borderRadius: 6,
+        cursor: 'grab',
+        fontSize: 11,
+        color: '#595959',
+        background: isDragging ? '#e6f4ff' : '#fff',
+        borderColor: isDragging ? '#91caff' : '#eee',
+        userSelect: 'none',
+        transition: 'all 0.2s',
+        gap: 4,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+    >
+      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20 }}>
+        {getIcon(item)}
+      </span>
+      <span style={{ lineHeight: 1.2, textAlign: 'center' }}>{item.label}</span>
+    </div>
+  )
+}
+
 interface FieldListProps {
   groups?: PaletteGroup[]
   excludeTypes?: string[]
-  onDragStart: (item: PaletteItem, event: React.DragEvent<HTMLDivElement>) => void
 }
 
-export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, onDragStart }) => {
+export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes }) => {
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
   return (
     <div style={{ width: 220, borderRight: '1px solid #eee', padding: '8px 10px', overflow: 'auto', height: '100%', background: '#fafafa' }}>
@@ -106,19 +148,7 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, onDr
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
             {group.items.map(item => (
-              <div
-                key={item.type} draggable
-                onDragStart={(e) => onDragStart(item, e)}
-                title={item.label}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8px 4px', border: '1px solid #eee', borderRadius: 6, cursor: 'grab', fontSize: 11, color: '#595959', background: '#fff', userSelect: 'none', transition: 'all 0.2s', gap: 4 }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#e6f4ff'; e.currentTarget.style.borderColor = '#91caff'; e.currentTarget.style.color = '#1677ff' }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#eee'; e.currentTarget.style.color = '#595959' }}
-              >
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20 }}>
-                  {getIcon(item)}
-                </span>
-                <span style={{ lineHeight: 1.2, textAlign: 'center' }}>{item.label}</span>
-              </div>
+              <PaletteItemCard key={item.type} item={item} />
             ))}
           </div>
         </div>

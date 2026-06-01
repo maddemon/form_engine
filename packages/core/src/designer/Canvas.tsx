@@ -1,16 +1,26 @@
 import React, { useMemo, useState } from 'react'
+import { useDroppable, type UniqueIdentifier } from '@dnd-kit/core'
 import type { FormFieldSchema } from '../types/schema'
-import type { SelectedFieldId, DesignerAction, PaletteItem } from '../types/designer'
-import { createFieldFromPalette } from './FieldList'
 import type { DeviceScene } from '../registry/componentRegistry'
 import { CanvasToolbar } from './CanvasToolbar'
 import { ComponentTree } from './ComponentTree'
 import { useDesignerContext } from './DesignerContext'
 import { RootFields } from './RootFields'
-import { readDragData, isPaletteDrag, isCanvasDrag, toPaletteItem, writeDragData } from '../types/designer-drag'
+
+export const CANVAS_ROOT_ID = 'canvas-root'
+
+const CanvasDroppable: React.FC<{ children: React.ReactNode; onClick: () => void; style: React.CSSProperties }> = ({ children, onClick, style }) => {
+  const { setNodeRef, isOver } = useDroppable({ id: CANVAS_ROOT_ID })
+  return (
+    <div ref={setNodeRef} onClick={onClick} style={{ ...style, background: isOver ? '#f0f8ff' : style.background }}>
+      {children}
+    </div>
+  )
+}
 
 interface CanvasProps {
   fields: FormFieldSchema[]
+  activeId?: UniqueIdentifier | null
   onSceneChange?: (scene: DeviceScene) => void
   canUndo?: boolean
   canRedo?: boolean
@@ -27,6 +37,7 @@ function buildTreeData(fields: FormFieldSchema[]): { id: string; label: string; 
 
 export const Canvas: React.FC<CanvasProps> = ({
   fields,
+  activeId,
   onSceneChange,
   canUndo = false,
   canRedo = false,
@@ -35,30 +46,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   const [showTree, setShowTree] = useState(false)
 
   const treeData = useMemo(() => buildTreeData(fields), [fields])
-
   const canvasWidth = scene === 'mobile' ? 375 : '100%'
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-  }
-
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault()
-    e.stopPropagation()
-    const data = readDragData(e)
-    if (!data) return
-
-    if (isPaletteDrag(data)) {
-      const newField = createFieldFromPalette(toPaletteItem(data))
-      dispatch({ type: 'ADD_FIELD', field: newField, index: targetIndex })
-    } else if (isCanvasDrag(data)) {
-      dispatch({ type: 'MOVE_FIELD', fromIndex: data.index, toIndex: targetIndex, fromParentId: data.fromParentId })
-    }
-  }
-
-  const handleDragStart = (e: React.DragEvent, index: number, field: FormFieldSchema) => {
-    writeDragData(e, { source: 'canvas', index, fieldId: field.id })
-  }
 
   return (
     <div style={{
@@ -95,16 +83,14 @@ export const Canvas: React.FC<CanvasProps> = ({
           flex: 1,
           padding: 16,
           display: 'flex',
-          justifyContent: scene === 'mobile' ? 'center' : 'flex-start',
-          alignItems: 'flex-start',
+          justifyContent: scene === 'mobile' ? 'center' : 'stretch',
+          alignItems: 'stretch',
           background: '#f5f5f5',
           minHeight: 0,
-          overflow: 'auto',
+          overflow: 'hidden',
         }}
-        onDragOver={handleDragOver}
-        onDrop={(e) => { e.stopPropagation(); handleDrop(e, fields.length) }}
       >
-        <div
+        <CanvasDroppable
           onClick={() => onSelectField(null)}
           style={{
             width: canvasWidth,
@@ -113,21 +99,17 @@ export const Canvas: React.FC<CanvasProps> = ({
             borderRadius: 8,
             padding: 16,
             boxShadow: scene === 'mobile' ? '0 2px 12px rgba(0,0,0,0.08)' : 'none',
-            minHeight: 300,
+            overflow: 'auto',
           }}
         >
-          {fields.length === 0 && (
+          {fields.length === 0 && !activeId && (
             <div style={{ color: '#999', fontSize: 12, padding: 24, textAlign: 'center', border: '1px dashed #ddd', borderRadius: 4 }}>
               从左侧拖拽控件到此处
             </div>
           )}
 
-          <RootFields
-            fields={fields}
-            onDragStart={handleDragStart}
-            onDrop={handleDrop}
-          />
-        </div>
+          <RootFields fields={fields} />
+        </CanvasDroppable>
       </div>
     </div>
   )
