@@ -25,6 +25,9 @@ export default function DatePickerPropsRender({ widgets: w, values, onChange }: 
       <InlineField label="允许清除">
         <w.Checkbox checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
       </InlineField>
+      <FieldGroup label="不可选日期表达式">
+        <w.Input value={(values.disabledDate as string) ?? ''} onChange={(v) => onChange('disabledDate', v)} placeholder="如：date < new Date()" />
+      </FieldGroup>
     </>
   )
 }

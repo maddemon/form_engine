@@ -1,10 +1,13 @@
-import { FieldGroup, InlineField, PropsRenderProps } from '../../propRenders'
+import { FieldGroup, InlineField, OptionRender, PropsRenderProps } from '../../propRenders'
 
 export default function SelectPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
       <FieldGroup label="占位文本">
         <w.Input value={(values.placeholder as string) ?? ''} onChange={(v) => onChange('placeholder', v)} />
+      </FieldGroup>
+      <FieldGroup label="选项">
+        <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
       </FieldGroup>
       <FieldGroup label="模式">
         <w.Select

@@ -1,0 +1,46 @@
+import { FieldGroup, InlineField } from '../../propRenders/shared'
+import type { PropsRenderProps } from '../../propRenders/types'
+
+export default function TabsPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+  return (
+    <>
+      <FieldGroup label="样式类型">
+        <w.Select
+          value={(values.type as string) ?? 'line'}
+          onChange={(v) => onChange('type', v)}
+          options={[
+            { label: '线框', value: 'line' },
+            { label: '卡片', value: 'card' },
+            { label: '可编辑卡片', value: 'editable-card' },
+          ]}
+        />
+      </FieldGroup>
+      <FieldGroup label="尺寸">
+        <w.Select
+          value={(values.size as string) ?? 'middle'}
+          onChange={(v) => onChange('size', v)}
+          options={[
+            { label: '大', value: 'large' },
+            { label: '中', value: 'middle' },
+            { label: '小', value: 'small' },
+          ]}
+        />
+      </FieldGroup>
+      <FieldGroup label="标签位置">
+        <w.Select
+          value={(values.tabPosition as string) ?? 'top'}
+          onChange={(v) => onChange('tabPosition', v)}
+          options={[
+            { label: '顶部', value: 'top' },
+            { label: '右侧', value: 'right' },
+            { label: '底部', value: 'bottom' },
+            { label: '左侧', value: 'left' },
+          ]}
+        />
+      </FieldGroup>
+      <InlineField label="居中展示">
+        <w.Checkbox checked={!!values.centered} onChange={(v) => onChange('centered', v)} />
+      </InlineField>
+    </>
+  )
+}

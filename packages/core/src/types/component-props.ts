@@ -29,6 +29,8 @@ import type { TitleProps } from '../components/title/types'
 import type { ContainerProps } from '../components/container/types'
 import type { GridProps, GridRowConfig, GridColConfig } from '../components/grid/types'
 import type { FlexProps } from '../components/flex/types'
+import type { CollapseProps } from '../components/collapse/types'
+import type { TabsProps } from '../components/tabs/types'
 
 // ============================
 // 导出类型（供其他模块使用）
@@ -58,6 +60,8 @@ export type {
   GridRowConfig,
   GridColConfig,
   FlexProps,
+  CollapseProps,
+  TabsProps,
 }
 
 // ============================
@@ -97,36 +101,6 @@ export interface TimePickerProps {
 }
 
 // ============================
-// 布局组件 Props（新增）
-// ============================
-
-export interface CollapseProps {
-  activeKey?: string | string[]
-  defaultActiveKey?: string | string[]
-  onChange?: (key: string | string[]) => void
-  accordion?: boolean
-  ghost?: boolean
-  style?: React.CSSProperties
-  className?: string
-  id?: string
-  children?: React.ReactNode
-}
-
-export interface TabsProps {
-  activeKey?: string
-  defaultActiveKey?: string
-  onChange?: (key: string) => void
-  type?: 'line' | 'card' | 'editable-card'
-  size?: 'small' | 'middle' | 'large'
-  tabPosition?: 'top' | 'right' | 'bottom' | 'left'
-  centered?: boolean
-  style?: React.CSSProperties
-  className?: string
-  id?: string
-  children?: React.ReactNode
-}
-
-// ============================
 // 基类 Props（从 base-props.ts 导入并导出）
 // ============================
 
@@ -163,7 +137,7 @@ export interface ComponentPropsMap {
   'Text': TextProps
   'Image': ImageProps
   'Divider': DividerProps
-  'Title': { level?: 1 | 2 | 3 | 4 | 5; content?: string }
+  'Title': TitleProps
   'Container': ContainerProps
   'Grid': GridProps
   'Flex': FlexProps

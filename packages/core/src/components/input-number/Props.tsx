@@ -15,6 +15,12 @@ export default function InputNumberPropsRender({ widgets: w, values, onChange }:
       <FieldGroup label="精度">
         <w.NumberInput value={(values.precision as number) ?? undefined} onChange={(v) => onChange('precision', v)} min={0} max={20} />
       </FieldGroup>
+      <FieldGroup label="前缀">
+        <w.Input value={(values.prefix as string) ?? ''} onChange={(v) => onChange('prefix', v)} placeholder="如：¥" />
+      </FieldGroup>
+      <FieldGroup label="后缀">
+        <w.Input value={(values.suffix as string) ?? ''} onChange={(v) => onChange('suffix', v)} placeholder="如：%" />
+      </FieldGroup>
     </>
   )
 }

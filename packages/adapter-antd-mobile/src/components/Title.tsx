@@ -1,0 +1,26 @@
+import React from 'react'
+import type { FieldRendererFn } from '@form-engine/core'
+
+const levelFontSize = ['', '24px', '20px', '18px', '16px', '14px']
+
+export const TitleField: FieldRendererFn = (props: any) => {
+  const { componentProps, children, style } = props
+  const content = children || componentProps?.content || ''
+  const level = componentProps?.level || 1
+  const strong = componentProps?.strong
+  const italic = componentProps?.italic
+  const underline = componentProps?.underline
+  const mark = componentProps?.mark
+
+  let el: React.ReactNode = content
+  if (mark) el = <mark>{el}</mark>
+  if (underline) el = <u>{el}</u>
+  if (italic) el = <i>{el}</i>
+  if (strong) el = <strong>{el}</strong>
+
+  return (
+    <div style={{ fontSize: levelFontSize[level] || '20px', fontWeight: 600, margin: '8px 0', ...style }}>
+      {el}
+    </div>
+  )
+}

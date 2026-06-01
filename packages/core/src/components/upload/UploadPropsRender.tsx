@@ -23,6 +23,9 @@ export default function UploadPropsRender({ widgets: w, values, onChange }: Prop
       <InlineField label="多文件">
         <w.Checkbox checked={!!values.multiple} onChange={(v) => onChange('multiple', v)} />
       </InlineField>
+      <InlineField label="显示上传列表">
+        <w.Checkbox checked={values.showUploadList !== false} onChange={(v) => onChange('showUploadList', v)} />
+      </InlineField>
     </>
   )
 }

@@ -50,6 +50,7 @@ export { Tabs, TabPane } from './components/Tabs'
 export { Text } from './components/Text'
 export { Image } from './components/Image'
 export { Divider } from './components/Divider'
+export { Title } from './components/Title'
 
 // ============================
 // 组件映射（用于注册）
@@ -92,6 +93,7 @@ export const antdComponents = {
   'Text': React.lazy(() => import('./components/Text').then(m => ({ default: m.Text }))),
   'Image': React.lazy(() => import('./components/Image').then(m => ({ default: m.Image }))),
   'Divider': React.lazy(() => import('./components/Divider').then(m => ({ default: m.Divider }))),
+  'Title': React.lazy(() => import('./components/Title').then(m => ({ default: m.Title }))),
 }
 
 // ============================

@@ -21,6 +21,9 @@ export default function SliderPropsRender({ widgets: w, values, onChange }: Prop
       <InlineField label="刻度点">
         <w.Checkbox checked={!!values.dots} onChange={(v) => onChange('dots', v)} />
       </InlineField>
+      <FieldGroup label="刻度标记 (JSON)">
+        <w.Input value={values.marks ? JSON.stringify(values.marks) : ''} onChange={(v) => onChange('marks', v ? JSON.parse(v as string) : undefined)} placeholder='{"0":"0%","50":"50%","100":"100%"}' />
+      </FieldGroup>
     </>
   )
 }

@@ -49,6 +49,7 @@ export const defaultPaletteGroups: PaletteGroup[] = [
     groupName: '展示',
     items: [
       { type: 'text', label: '文本展示', defaultProps: {} },
+      { type: 'title', label: '标题', defaultProps: { componentProps: { level: 1, content: '标题内容' } } },
       { type: 'image', label: '图片展示', defaultProps: {} },
       { type: 'divider', label: '分割线', defaultProps: {} },
     ],

@@ -9,6 +9,9 @@ export default function RatePropsRender({ widgets: w, values, onChange }: PropsR
       <InlineField label="允许半选">
         <w.Checkbox checked={!!values.allowHalf} onChange={(v) => onChange('allowHalf', v)} />
       </InlineField>
+      <FieldGroup label="自定义字符">
+        <w.Input value={(values.character as string) ?? ''} onChange={(v) => onChange('character', v)} placeholder="如：A（留空用星号）" />
+      </FieldGroup>
     </>
   )
 }

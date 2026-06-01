@@ -15,7 +15,7 @@ const iconMap: Record<string, React.ReactNode> = {
   'button': <Square />,
   'grid': <GridIcon />, 'flex': <Layout />, 'container': <Square />,
   'collapse': <FolderOpen />, 'tabs': <Minus />,
-  'text': <Type />, 'image': <ImageIcon />, 'divider': <Minus />,
+  'text': <Type />,   'image': <ImageIcon />, 'divider': <Minus />, 'title': <Type />,
 }
 
 function DefaultIcon() {
@@ -134,7 +134,7 @@ function isValidFieldType(type: string): type is FieldType {
     'date', 'date-range', 'time', 'datetime', 'upload',
     'rate', 'custom',
     'button', 'grid', 'flex', 'container', 'collapse', 'tabs',
-    'text', 'image', 'divider',
+    'text', 'image', 'divider', 'title',
   ]
   return (validTypes as string[]).includes(type) || type.startsWith('custom:')
 }

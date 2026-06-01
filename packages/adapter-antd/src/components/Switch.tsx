@@ -12,7 +12,7 @@ export const Switch: React.FC<SwitchProps> = ({
   disabled,
   checkedChildren,
   unCheckedChildren,
-  defaultChecked,
+  defaultValue,
   style,
   className,
   id,
@@ -29,7 +29,7 @@ export const Switch: React.FC<SwitchProps> = ({
       disabled={disabled}
       checkedChildren={checkedChildren}
       unCheckedChildren={unCheckedChildren}
-      defaultChecked={defaultChecked}
+      defaultChecked={defaultValue}
       style={style}
       className={className}
       id={id}

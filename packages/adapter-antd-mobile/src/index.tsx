@@ -1,16 +1,34 @@
 import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
 import type { DesignerWidgets, FieldRendererFn } from '@form-engine/core'
 
-
-// 导入 antd-mobile 基础组件（用于 designerWidgets）
 import { Button, Checkbox, Input, Picker, Stepper } from 'antd-mobile'
 
-// 导入所有字段组件
-import { CascaderField, DateField, DateRangeField, TimeField, TreeSelectField, UploadField } from './fields/DateField'
-import { InputField, InputNumberField, PasswordField, SelectField, TextAreaField } from './fields/InputField'
-import { CheckboxField, RadioField, RateField, SliderField, SwitchField } from './fields/SwitchField'
+import { InputField } from './components/Input'
+import { TextAreaField } from './components/TextArea'
+import { PasswordField } from './components/Password'
+import { InputNumberField } from './components/InputNumber'
+import { SelectField } from './components/Select'
+import { RadioField } from './components/Radio'
+import { CheckboxField } from './components/Checkbox'
+import { SwitchField } from './components/Switch'
+import { SliderField } from './components/Slider'
+import { RateField } from './components/Rate'
+import { DateField } from './components/DatePicker'
+import { DateRangeField } from './components/DateRange'
+import { TimeField } from './components/TimePicker'
+import { UploadField } from './components/Upload'
+import { CascaderField } from './components/Cascader'
+import { TreeSelectField } from './components/TreeSelect'
+import { GridField } from './components/Grid'
+import { FlexField } from './components/Flex'
+import { ContainerField } from './components/Container'
+import { CollapseField } from './components/Collapse'
+import { TabsField } from './components/Tabs'
+import { TextField } from './components/Text'
+import { ImageField } from './components/Image'
+import { DividerField } from './components/Divider'
+import { TitleField } from './components/Title'
 
-// ----- 兜底渲染（未知字段类型）-----
 const DefaultField: FieldRendererFn = (props: any) => {
   const { fieldSchema } = props
   return (
@@ -20,7 +38,6 @@ const DefaultField: FieldRendererFn = (props: any) => {
   )
 }
 
-// ----- 设计器属性面板小组件（Ant Design Mobile 风格）-----
 const designerWidgets: DesignerWidgets = {
   Input: ({ value, onChange, placeholder, disabled, style }: any) => (
     <Input
@@ -69,7 +86,6 @@ const designerWidgets: DesignerWidgets = {
   ),
 }
 
-// ----- 组件映射（用于注册）-----
 export const antdMobileComponents = {
   'Input': InputField,
   'Password': PasswordField,
@@ -89,13 +105,21 @@ export const antdMobileComponents = {
   'DateRangePicker': DateRangeField,
   'TimePicker': TimeField,
   'Upload': UploadField,
+  'Grid': GridField,
+  'Flex': FlexField,
+  'Container': ContainerField,
+  'Collapse': CollapseField,
+  'Tabs': TabsField,
+  'Text': TextField,
+  'Image': ImageField,
+  'Divider': DividerField,
+  'Title': TitleField,
 }
 
 export const antdMobileAdapter = {
   name: 'antd-mobile',
   version: '5.0.0',
 
-  // 字段渲染组件
   'default': DefaultField,
   'input': InputField,
   'input-number': InputNumberField,
@@ -115,12 +139,19 @@ export const antdMobileAdapter = {
   'upload': UploadField,
   'cascader': CascaderField,
   'tree-select': TreeSelectField,
+  'grid': GridField,
+  'flex': FlexField,
+  'container': ContainerField,
+  'collapse': CollapseField,
+  'tabs': TabsField,
+  'text': TextField,
+  'image': ImageField,
+  'divider': DividerField,
+  'title': TitleField,
 
-  // 属性面板小组件
   _designerWidgets: designerWidgets,
 }
 
-// ----- 自动注册（副作用）-----
 function autoRegister() {
   try {
     if (registerComponents) {

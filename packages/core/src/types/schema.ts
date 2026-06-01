@@ -119,6 +119,7 @@ export type FieldType =
   | 'text'
   | 'image'
   | 'divider'
+  | 'title'
   | 'custom'
   | `custom:${string}`
 
