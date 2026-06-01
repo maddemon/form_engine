@@ -2,15 +2,15 @@ import React from 'react'
 import type { FieldRendererFn } from '@form-engine/core'
 
 export const TextField: FieldRendererFn = (props: any) => {
-  const { componentProps, children, style } = props
-  const content = children || componentProps?.content || ''
-  const strong = componentProps?.strong
-  const italic = componentProps?.italic
-  const underline = componentProps?.underline
-  const delProp = componentProps?.delete
-  const code = componentProps?.code
-  const mark = componentProps?.mark
-  const type = componentProps?.type
+  const { children, style } = props
+  const content = children || props.content || ''
+  const strong = props.strong
+  const italic = props.italic
+  const underline = props.underline
+  const delProp = props.delete
+  const code = props.code
+  const mark = props.mark
+  const type = props.type
 
   const typeColorMap: Record<string, string> = {
     secondary: '#999',

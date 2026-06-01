@@ -2,14 +2,14 @@ import React from 'react'
 import type { FieldRendererFn } from '@form-engine/core'
 
 export const ContainerField: FieldRendererFn = (props: any) => {
-  const { children, componentProps, style } = props
-  const layout = componentProps?.layout || 'vertical'
-  const justify = componentProps?.justify || 'start'
-  const align = componentProps?.align || 'stretch'
-  const wrap = componentProps?.wrap || false
-  const background = componentProps?.background
-  const borderRadius = componentProps?.borderRadius || 0
-  const minHeight = componentProps?.minHeight
+  const { children, style } = props
+  const layout = props.layout ?? 'vertical'
+  const justify = props.justify ?? 'start'
+  const align = props.align ?? 'stretch'
+  const wrap = props.wrap ?? false
+  const background = props.background
+  const borderRadius = props.borderRadius ?? 0
+  const minHeight = props.minHeight
 
   const justifyMap: Record<string, string> = {
     start: 'flex-start', end: 'flex-end', center: 'center',

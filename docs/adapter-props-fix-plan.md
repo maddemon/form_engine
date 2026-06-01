@@ -6,9 +6,9 @@ antd-mobile adapter 的容器/展示组件从 `componentProps?.xxx` 读取属性
 
 ## 目标
 
-- 修复 antd-mobile 9 个容器/展示组件的 props 读取路径
-- 补齐 antd adapter 的小写 key 字段映射，使其可作为独立 adapter 使用
-- 验证修复后编译通过
+- [x] 修复 antd-mobile 9 个容器/展示组件的 props 读取路径
+- [x] 补齐 antd adapter 的小写 key 字段映射，使其可作为独立 adapter 使用
+- [x] 验证修复后编译通过
 
 ## 任务
 

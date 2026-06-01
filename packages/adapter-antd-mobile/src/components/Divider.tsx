@@ -2,9 +2,9 @@ import React from 'react'
 import type { FieldRendererFn } from '@form-engine/core'
 
 export const DividerField: FieldRendererFn = (props: any) => {
-  const { componentProps, style } = props
-  const type = componentProps?.type || 'horizontal'
-  const children = componentProps?.children
+  const { style } = props
+  const type = props.type || 'horizontal'
+  const children = props.children
 
   if (type === 'vertical') {
     return <span style={{ borderLeft: '1px solid #ddd', margin: '0 8px', ...style }} />

@@ -20,6 +20,7 @@
 
 import React from 'react'
 import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 import { Input as AntdInput, Select as AntdSelect, Checkbox as AntdCheckbox, InputNumber as AntdInputNumber } from 'antd'
 
 // ============================
@@ -113,6 +114,14 @@ export const antdComponents = {
  * 注意：为了简化，这里不使用 FormEngineAdapter 类型
  * 用户可以直接使用 antdComponents 进行注册
  */
+
+function createFieldRenderer(Component: React.ComponentType<any>): FieldRendererFn {
+  return (props: FieldComponentProps) => {
+    const { value, onChange, fieldSchema, ...rest } = props
+    return React.createElement(Component, { ...rest, value, onChange, fieldSchema })
+  }
+}
+
 export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidgets = {
   Input: ({ value, onChange, placeholder, disabled, style }: any) => (
     <AntdInput
@@ -180,6 +189,17 @@ export const antdAdapter = {
 
   // 属性面板小组件（由 core 按场景获取）
   _designerWidgets: antdWidgets,
+
+  // 小写字段类型映射（兼容 FieldRenderer 按 field.type 查找）
+  'container': createFieldRenderer(antdComponents['Container']),
+  'grid': createFieldRenderer(antdComponents['Grid']),
+  'flex': createFieldRenderer(antdComponents['Flex']),
+  'collapse': createFieldRenderer(antdComponents['Collapse']),
+  'tabs': createFieldRenderer(antdComponents['Tabs']),
+  'text': createFieldRenderer(antdComponents['Text']),
+  'image': createFieldRenderer(antdComponents['Image']),
+  'divider': createFieldRenderer(antdComponents['Divider']),
+  'title': createFieldRenderer(antdComponents['Title']),
 }
 
 // 设置 layout 的引用（避免循环引用）
