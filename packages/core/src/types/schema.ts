@@ -97,7 +97,7 @@ export type FieldType =
   | 'textarea'
   | 'password'
   | 'select'
-  | 'multi-select'
+  | 'multi-select'      // 已从调色板移除，保留类型兼容
   | 'radio'
   | 'checkbox'
   | 'switch'
@@ -108,10 +108,19 @@ export type FieldType =
   | 'datetime'
   | 'upload'
   | 'rate'
-  | 'cascader'
-  | 'tree-select'
+  | 'cascader'          // 已从调色板移除，保留类型兼容
+  | 'tree-select'       // 已从调色板移除，保留类型兼容
+  | 'button'
+  | 'grid'
+  | 'flex'
+  | 'container'
+  | 'collapse'
+  | 'tabs'
+  | 'text'
+  | 'image'
+  | 'divider'
   | 'custom'
-  | `custom:${string}`  // 支持自定义组件类型
+  | `custom:${string}`
 
 export interface FormFieldSchema {
   id?: string

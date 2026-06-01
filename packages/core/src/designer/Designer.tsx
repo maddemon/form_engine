@@ -15,6 +15,7 @@ interface DesignerProps {
   onSchemaChange?: (schema: FormSchema) => void
   onSceneChange?: (scene: DeviceScene) => void
   groups?: PaletteGroup[]
+  excludeTypes?: string[]
   readOnly?: boolean
   adapter?: FormEngineAdapter
 }
@@ -24,11 +25,12 @@ export const Designer: React.FC<DesignerProps> = ({
   onSchemaChange,
   onSceneChange,
   groups,
+  excludeTypes,
   readOnly = false,
   adapter,
 }) => {
   // 如果没有传入 groups，则使用包含自定义组件的完整控件库
-  const finalGroups = groups || getFullPaletteGroups()
+  const finalGroups = groups || getFullPaletteGroups(excludeTypes)
   
   const [state, dispatch] = useReducer(designerReducerWithHistory, {
     schema: externalSchema || {

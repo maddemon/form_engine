@@ -47,6 +47,8 @@ export interface DesignerProps {
   onSchemaChange?: (schema: FormSchema) => void
   /** 可选：自定义控件库分组（覆盖默认） */
   groups?: PaletteGroup[]
+  /** 可选：排除的调色板组件类型列表（用于屏蔽系统自带组件，如 ['cascader', 'tree-select']） */
+  excludeTypes?: string[]
   /** 可选：只读模式 */
   readOnly?: boolean
   /** 可选：当前平台适配器，用于设计器属性面板风格统一 */

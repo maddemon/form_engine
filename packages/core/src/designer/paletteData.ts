@@ -21,12 +21,9 @@ export const defaultPaletteGroups: PaletteGroup[] = [
     groupName: '选择',
     items: [
       { type: 'select', label: '下拉', defaultProps: {} },
-      { type: 'multi-select', label: '多选', defaultProps: { componentProps: { mode: 'multiple' } } },
       { type: 'radio', label: '单选', defaultProps: {} },
       { type: 'checkbox', label: '多选框', defaultProps: {} },
       { type: 'switch', label: '开关', defaultProps: { defaultValue: false } },
-      { type: 'cascader', label: '级联', defaultProps: {} },
-      { type: 'tree-select', label: '树选择', defaultProps: {} },
     ],
   },
   {
@@ -39,8 +36,27 @@ export const defaultPaletteGroups: PaletteGroup[] = [
     ],
   },
   {
+    groupName: '布局',
+    items: [
+      { type: 'grid', label: '栅格布局', defaultProps: {} },
+      { type: 'flex', label: '弹性布局', defaultProps: {} },
+      { type: 'container', label: '容器', defaultProps: {} },
+      { type: 'collapse', label: '折叠面板', defaultProps: {} },
+      { type: 'tabs', label: '标签页', defaultProps: {} },
+    ],
+  },
+  {
+    groupName: '展示',
+    items: [
+      { type: 'text', label: '文本展示', defaultProps: {} },
+      { type: 'image', label: '图片展示', defaultProps: {} },
+      { type: 'divider', label: '分割线', defaultProps: {} },
+    ],
+  },
+  {
     groupName: '其他',
     items: [
+      { type: 'button', label: '按钮', defaultProps: {} },
       { type: 'upload', label: '上传', defaultProps: {} },
     ],
   },

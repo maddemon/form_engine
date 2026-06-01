@@ -2,6 +2,9 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { Designer, FormRender, defaultAdapter, getScene, setScene, autoDetectScene } from '@form-engine/core'
 import type { FormSchema } from '@form-engine/core'
 
+// 注册自定义组件示例
+import '../custom-component-demo'
+
 type Tab = 'design' | 'preview'
 
 const App: React.FC = () => {

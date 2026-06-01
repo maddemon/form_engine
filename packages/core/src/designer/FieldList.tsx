@@ -3,15 +3,19 @@ import type { PaletteItem, PaletteGroup } from '../types/designer'
 import type { FormFieldSchema, FieldType } from '../types'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { defaultPaletteGroups } from './paletteData'
-import { Type, FileText, Hash, Lock, ChevronDown, CheckSquare, Circle, ToggleLeft, Slash, Star, Calendar, Clock, UploadIcon, GitBranch, GridIcon } from '../components/icons'
+import { Type, FileText, Hash, Lock, ChevronDown, CheckSquare, Circle, ToggleLeft, Slash, Star, Calendar, Clock, UploadIcon, GridIcon, Columns, Square, Minus, Layout, FolderOpen, ImageIcon } from '../components/icons'
 
 const iconMap: Record<string, React.ReactNode> = {
   'input': <Type />, 'textarea': <FileText />, 'input-number': <Hash />,
-  'password': <Lock />, 'select': <ChevronDown />, 'multi-select': <CheckSquare />,
+  'password': <Lock />, 'select': <ChevronDown />,
   'radio': <Circle />, 'checkbox': <CheckSquare />, 'switch': <ToggleLeft />,
   'slider': <Slash />, 'rate': <Star />, 'date': <Calendar />,
   'datetime': <Calendar />, 'date-range': <Calendar />, 'time': <Clock />,
-  'upload': <UploadIcon />, 'cascader': <GitBranch />, 'tree-select': <GridIcon />,
+  'upload': <UploadIcon />,
+  'button': <Square />,
+  'grid': <GridIcon />, 'flex': <Layout />, 'container': <Square />,
+  'collapse': <FolderOpen />, 'tabs': <Minus />,
+  'text': <Type />, 'image': <ImageIcon />, 'divider': <Minus />,
 }
 
 function DefaultIcon() {
@@ -31,21 +35,41 @@ function getIcon(item: PaletteItem): React.ReactNode {
   return <DefaultIcon />
 }
 
-export function getFullPaletteGroups(): PaletteGroup[] {
-  const grouped = customComponentRegistry.getGrouped()
-  if (Object.keys(grouped).length === 0) return defaultPaletteGroups
+export function getFullPaletteGroups(excludeTypes?: string[]): PaletteGroup[] {
+  const customGrouped = customComponentRegistry.getGrouped()
+  const merged = defaultPaletteGroups.map(group => ({ ...group, items: [...group.items] }))
 
-  const customGroups: PaletteGroup[] = Object.entries(grouped).map(([groupName, configs]) => ({
-    groupName,
-    items: configs
-      .filter(config => isValidFieldType(config.type))
-      .map(config => ({
-        type: config.type as FieldType,
-        label: config.label,
-        defaultProps: config.defaultProps || {},
-      })),
-  }))
-  return [...defaultPaletteGroups, ...customGroups]
+  // 将自定义组件合并到同名的内置分组中
+  if (Object.keys(customGrouped).length > 0) {
+    for (const [groupName, configs] of Object.entries(customGrouped)) {
+      const existingGroup = merged.find(g => g.groupName === groupName)
+      const paletteItems = configs
+        .filter(config => isValidFieldType(config.type))
+        .map(config => ({
+          type: config.type as FieldType,
+          label: config.label,
+          defaultProps: config.defaultProps || {},
+        }))
+      if (existingGroup) {
+        existingGroup.items.push(...paletteItems)
+      } else {
+        merged.push({ groupName, items: paletteItems })
+      }
+    }
+  }
+
+  // 过滤排除项
+  if (excludeTypes && excludeTypes.length > 0) {
+    const excludeSet = new Set(excludeTypes)
+    return merged
+      .map(group => ({
+        ...group,
+        items: group.items.filter(item => !excludeSet.has(item.type)),
+      }))
+      .filter(group => group.items.length > 0)
+  }
+
+  return merged
 }
 
 let _counter = 0
@@ -67,11 +91,12 @@ export function createFieldFromPalette(item: PaletteItem): FormFieldSchema {
 
 interface FieldListProps {
   groups?: PaletteGroup[]
+  excludeTypes?: string[]
   onDragStart: (item: PaletteItem, event: React.DragEvent<HTMLDivElement>) => void
 }
 
-export const FieldList: React.FC<FieldListProps> = ({ groups, onDragStart }) => {
-  const finalGroups = groups || getFullPaletteGroups()
+export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, onDragStart }) => {
+  const finalGroups = groups || getFullPaletteGroups(excludeTypes)
   return (
     <div style={{ width: 220, borderRight: '1px solid #eee', padding: '8px 10px', overflow: 'auto', height: '100%', background: '#fafafa' }}>
       {finalGroups.map(group => (
@@ -105,9 +130,11 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, onDragStart }) => 
 function isValidFieldType(type: string): type is FieldType {
   const validTypes: FieldType[] = [
     'input', 'input-number', 'textarea', 'password', 'select',
-    'multi-select', 'radio', 'checkbox', 'switch', 'slider',
+    'radio', 'checkbox', 'switch', 'slider',
     'date', 'date-range', 'time', 'datetime', 'upload',
-    'rate', 'cascader', 'tree-select', 'custom'
+    'rate', 'custom',
+    'button', 'grid', 'flex', 'container', 'collapse', 'tabs',
+    'text', 'image', 'divider',
   ]
   return (validTypes as string[]).includes(type) || type.startsWith('custom:')
 }
