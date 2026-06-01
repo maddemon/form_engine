@@ -1,12 +1,12 @@
-import type { DesignerWidgets } from '../../types/adapter'
-import { WidgetInput } from './Input'
-import { WidgetSelect } from './Select'
-import { WidgetCheckbox } from './Checkbox'
-import { WidgetNumberInput } from './NumberInput'
-import { WidgetTextArea } from './TextArea'
-import { WidgetSwitch } from './Switch'
+import type { DesignerWidgets } from '../types/adapter'
 import { WidgetButton } from './Button'
+import { WidgetCheckbox } from './Checkbox'
+import { WidgetInput } from './Input'
+import { WidgetNumberInput } from './NumberInput'
 import { WidgetOptionsEditor } from './OptionsEditor'
+import { WidgetSelect } from './Select'
+import { WidgetSwitch } from './Switch'
+import { WidgetTextArea } from './TextArea'
 
 export const defaultDesignerWidgets: DesignerWidgets = {
   Input: WidgetInput,

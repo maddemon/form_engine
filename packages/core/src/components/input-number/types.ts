@@ -16,13 +16,4 @@ export interface InputNumberProps extends BaseFormComponentProps<number | undefi
   addonAfter?: React.ReactNode
 }
 
-/**
- * InputNumber 属性面板配置
- */
-export const InputNumberPropConfig = {
-  min: { type: 'number', label: '最小值', default: undefined },
-  max: { type: 'number', label: '最大值', default: undefined },
-  step: { type: 'number', label: '步长', default: 1 },
-  precision: { type: 'number', label: '精度', default: undefined },
-  decimalSeparator: { type: 'string', label: '小数分隔符', default: '.' },
-} as const
+

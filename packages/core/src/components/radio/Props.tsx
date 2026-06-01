@@ -1,0 +1,31 @@
+import { FieldGroup, OptionRender, PropsRenderProps } from '../../propRenders'
+
+export default function RadioPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+  return (
+    <>
+      <FieldGroup label="选项">
+        <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
+      </FieldGroup>
+      <FieldGroup label="选项类型">
+        <w.Select
+          value={(values.optionType as string) ?? 'default'}
+          onChange={(v) => onChange('optionType', v)}
+          options={[
+            { label: '默认', value: 'default' },
+            { label: '按钮', value: 'button' },
+          ]}
+        />
+      </FieldGroup>
+      <FieldGroup label="按钮样式">
+        <w.Select
+          value={(values.buttonStyle as string) ?? 'outline'}
+          onChange={(v) => onChange('buttonStyle', v)}
+          options={[
+            { label: '边框', value: 'outline' },
+            { label: '实心', value: 'solid' },
+          ]}
+        />
+      </FieldGroup>
+    </>
+  )
+}

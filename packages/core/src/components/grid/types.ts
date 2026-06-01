@@ -32,19 +32,4 @@ export interface GridColConfig {
   xxl?: number
 }
 
-/**
- * Grid 属性面板配置
- */
-export const GridPropConfig = {
-  variant: {
-    type: 'select',
-    label: '布局模式',
-    default: 'grid',
-    options: [
-      { label: '网格', value: 'grid' },
-      { label: '弹性', value: 'flex' },
-    ],
-  },
-  columns: { type: 'number', label: '列数', default: 24 },
-  gap: { type: 'number', label: '间距', default: 8 },
-} as const
+

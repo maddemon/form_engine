@@ -29,23 +29,4 @@ export interface DateRangeProps extends BaseComponentProps {
   disabledDate?: (currentDate: string) => boolean
 }
 
-/**
- * DatePicker 属性面板配置
- */
-export const DatePickerPropConfig = {
-  format: { type: 'string', label: '日期格式', default: 'YYYY-MM-DD' },
-  picker: {
-    type: 'select',
-    label: '选择器类型',
-    default: 'date',
-    options: [
-      { label: '日期', value: 'date' },
-      { label: '周', value: 'week' },
-      { label: '月', value: 'month' },
-      { label: '季度', value: 'quarter' },
-      { label: '年', value: 'year' },
-    ],
-  },
-  showTime: { type: 'boolean', label: '显示时间', default: false },
-  allowClear: { type: 'boolean', label: '允许清除', default: true },
-} as const
+

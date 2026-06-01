@@ -108,32 +108,6 @@ export type {
 } from './types/designer'
 
 // ============================
-// 组件属性配置（用于属性面板）
-// ============================
-
-export {
-  // 属性配置
-  InputPropConfig,
-  TextAreaPropConfig,
-  InputNumberPropConfig,
-  SelectPropConfig,
-  RadioPropConfig,
-  CheckboxPropConfig,
-  SwitchPropConfig,
-  SliderPropConfig,
-  RatePropConfig,
-  DatePickerPropConfig,
-  UploadPropConfig,
-  ButtonPropConfig,
-  TextPropConfig,
-  ImagePropConfig,
-  DividerPropConfig,
-  ContainerPropConfig,
-  GridPropConfig,
-  FlexPropConfig,
-} from './components'
-
-// ============================
 // Adapter 注册 API
 // ============================
 

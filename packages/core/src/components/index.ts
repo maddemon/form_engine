@@ -28,29 +28,6 @@ export type { GridProps, GridRowConfig, GridColConfig } from './grid/types'
 export type { FlexProps } from './flex/types'
 
 // ============================
-// 属性配置导出（用于属性面板）
-// ============================
-
-export { InputPropConfig } from './input/types'
-export { TextAreaPropConfig } from './textarea/types'
-export { InputNumberPropConfig } from './input-number/types'
-export { SelectPropConfig } from './select/types'
-export { RadioPropConfig } from './radio/types'
-export { CheckboxPropConfig } from './checkbox/types'
-export { SwitchPropConfig } from './switch/types'
-export { SliderPropConfig } from './slider/types'
-export { RatePropConfig } from './rate/types'
-export { DatePickerPropConfig } from './date-picker/types'
-export { UploadPropConfig } from './upload/types'
-export { ButtonPropConfig } from './button/types'
-export { TextPropConfig } from './text/types'
-export { ImagePropConfig } from './image/types'
-export { DividerPropConfig } from './divider/types'
-export { ContainerPropConfig } from './container/types'
-export { GridPropConfig } from './grid/types'
-export { FlexPropConfig } from './flex/types'
-
-// ============================
 // 图标（保留，与设计器相关）
 // ============================
 
