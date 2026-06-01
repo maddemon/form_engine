@@ -2,11 +2,13 @@ import React, { useReducer, useCallback, useState, useEffect } from 'react'
 import type { FormSchema, FormConfig, SubmitConfig } from '../types/schema'
 import type { DesignerAction, PaletteItem, PaletteGroup } from '../types/designer'
 import type { FormEngineAdapter } from '../types/adapter'
-import { FieldList, defaultPaletteGroups } from './FieldList'
+import { FieldList, defaultPaletteGroups, getFullPaletteGroups } from './FieldList'
 import { Canvas } from './Canvas'
 import { PropertyPanel } from './PropertyPanel'
 import type { DeviceScene } from '../registry/componentRegistry'
-import { setScene } from '../registry/componentRegistry'
+import { setScene, registerComponent } from '../registry/componentRegistry'
+import { customComponentRegistry } from '../registry/customComponentRegistry'
+import type { CustomComponentConfig } from '../types/custom-component'
 
 /**
  * 默认表单配置
@@ -176,10 +178,13 @@ export const Designer: React.FC<DesignerProps> = ({
   schema: externalSchema,
   onSchemaChange,
   onSceneChange,
-  groups = defaultPaletteGroups,
+  groups,
   readOnly = false,
   adapter,
 }) => {
+  // 如果没有传入 groups，则使用包含自定义组件的完整控件库
+  const finalGroups = groups || getFullPaletteGroups()
+  
   const [state, dispatch] = useReducer(designerReducer, {
     schema: externalSchema || {
       version: '0.1',
@@ -248,7 +253,7 @@ export const Designer: React.FC<DesignerProps> = ({
       {/* 左侧控件库 */}
       {!readOnly && (
         <FieldList
-          groups={groups}
+          groups={finalGroups}
           onDragStart={handlePaletteDragStart}
         />
       )}

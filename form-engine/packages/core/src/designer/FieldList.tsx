@@ -4,6 +4,7 @@ import React from 'react'
 import { Type, FileText, Hash, Lock, ChevronDown, CheckSquare, Circle, ToggleLeft, Slash, Star, Calendar, Clock, UploadIcon, GitBranch, GridIcon } from '../components/icons'
 import { PaletteItem } from '.'
 import { FieldType, FormFieldSchema } from '../types'
+import { customComponentRegistry } from '../registry/customComponentRegistry'
 
 // 组件类型到图标的映射
 const iconMap: Record<string, React.ReactNode> = {
@@ -25,6 +26,36 @@ const iconMap: Record<string, React.ReactNode> = {
   'upload': <UploadIcon />,
   'cascader': <GitBranch />,
   'tree-select': <GridIcon />,
+}
+
+/** 默认图标（自定义组件使用） */
+function DefaultIcon() {
+  return <span style={{ fontSize: 14, color: '#999' }}>⬜</span>
+}
+
+/**
+ * 获取组件图标
+ * 优先从 iconMap 读取，其次读取自定义组件注册表中的 icon，最后使用默认图标
+ */
+function getIcon(item: PaletteItem): React.ReactNode {
+  // 1. 内置组件：从 iconMap 读取
+  if (iconMap[item.type]) {
+    return iconMap[item.type]
+  }
+  
+  // 2. 自定义组件：从注册表读取 icon
+  const customConfig = customComponentRegistry.get(item.type)
+  if (customConfig?.icon) {
+    // icon 可能是 ReactNode 或 string
+    if (typeof customConfig.icon === 'string') {
+      // 如果是字符串，当作 emoji 或文本图标
+      return <span style={{ fontSize: 14 }}>{customConfig.icon}</span>
+    }
+    return customConfig.icon
+  }
+  
+  // 3. 兜底：默认图标
+  return <DefaultIcon />
 }
 
 /**
@@ -85,6 +116,30 @@ export const defaultPaletteGroups: PaletteGroup[] = [
 ]
 
 /**
+ * 获取包含自定义组件的完整控件库（分组）
+ * 自动从 customComponentRegistry 读取已注册的自定义组件
+ */
+export function getFullPaletteGroups(): PaletteGroup[] {
+  const grouped = customComponentRegistry.getGrouped()
+  
+  if (Object.keys(grouped).length === 0) {
+    return defaultPaletteGroups
+  }
+  
+  // 将自定义组件按分类添加到控件库
+  const customGroups: PaletteGroup[] = Object.entries(grouped).map(([groupName, configs]) => ({
+    groupName,
+    items: configs.map(config => ({
+      type: config.type,
+      label: config.label,
+      defaultProps: config.defaultProps || {},
+    })),
+  }))
+  
+  return [...defaultPaletteGroups, ...customGroups]
+}
+
+/**
  * 生成字段 id
  */
 let _counter = 0
@@ -118,7 +173,9 @@ interface FieldListProps {
 /**
  * 左侧控件库面板（分组网格布局）
  */
-export const FieldList: React.FC<FieldListProps> = ({ groups = defaultPaletteGroups, onDragStart }) => {
+export const FieldList: React.FC<FieldListProps> = ({ groups, onDragStart }) => {
+  // 如果没有传入 groups，则使用包含自定义组件的完整控件库
+  const finalGroups = groups || getFullPaletteGroups()
   return (
     <div style={{
       width: 220,
@@ -128,7 +185,7 @@ export const FieldList: React.FC<FieldListProps> = ({ groups = defaultPaletteGro
       height: '100%',
       background: '#fafafa',
     }}>
-      {groups.map(group => (
+      {finalGroups.map(group => (
         <div key={group.groupName} style={{ marginBottom: 12 }}>
           <div style={{
             fontSize: 11,
@@ -185,7 +242,7 @@ export const FieldList: React.FC<FieldListProps> = ({ groups = defaultPaletteGro
                   width: 20,
                   height: 20,
                 }}>
-                  {iconMap[item.type]}
+                  {getIcon(item)}
                 </span>
                 <span style={{ lineHeight: 1.2, textAlign: 'center' }}>{item.label}</span>
               </div>

@@ -21,7 +21,7 @@ export {
 } from './hooks'
 
 // 导出工具和类型
-export { defaultPaletteGroups as defaultPalette, createFieldFromPalette, generateFieldId } from './FieldList'
+export { defaultPaletteGroups as defaultPalette, createFieldFromPalette, generateFieldId, getFullPaletteGroups } from './FieldList'
 
 // 导出类型定义
 export type {

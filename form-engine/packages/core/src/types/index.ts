@@ -1,3 +1,5 @@
 export * from './schema'
 export * from './render'
 export * from './designer'
+export * from './adapter'
+export * from './custom-component'

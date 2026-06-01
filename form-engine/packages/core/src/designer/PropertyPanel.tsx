@@ -4,6 +4,10 @@ import type { DesignerAction } from '../types/designer'
 import type { FieldType, FormConfig, FormFieldSchema, SubmitConfig } from '../types/schema'
 import type { FormEngineAdapter, DesignerWidgets } from '../types/adapter'
 import { defaultDesignerWidgets } from './widgets'
+import { customComponentRegistry } from '../registry/customComponentRegistry'
+import { PropertyEditor } from './PropertyEditor'
+import { getComponentPropertyConfig } from './componentPropertyConfigs'
+import type { PropertyConfigItem } from '../types/custom-component'
 
 interface PropertyPanelProps {
   field: FormFieldSchema | null
@@ -215,6 +219,17 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   // ---- 选中字段：编辑字段属性 ----
   const hasAdvanced = hasAdvancedConfig(field)
 
+  // 优先级：
+  // 1. 内置组件专用属性配置（componentPropertyConfigs.ts）
+  // 2. 自定义组件属性配置（customComponentRegistry）
+  // 3. 都没有 → null（不显示"组件属性"区域）
+  const builtInConfig = getComponentPropertyConfig(field.type)
+  const customConfig = customComponentRegistry.get(field.type)
+  const customPropertyConfig = customConfig?.propertyConfig || []
+
+  // 合并：优先使用内置配置，如果没有则使用自定义配置
+  const componentPropertyConfig = builtInConfig || (customPropertyConfig.length > 0 ? customPropertyConfig : null)
+
   return (
     <div style={{ width: 280, borderLeft: '1px solid #eee', padding: 12, overflow: 'auto', height: '100%' }}>
       <h4 style={{ margin: '0 0 12px 0', fontSize: 14 }}>字段属性</h4>
@@ -271,6 +286,25 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           />
         </FieldGroup>
       </CollapsibleSection>
+
+      {/* ========== 组件专用属性（如果有） ========== */}
+      {componentPropertyConfig && componentPropertyConfig.length > 0 && (
+        <CollapsibleSection title="组件属性" defaultCollapsed={false}>
+          <PropertyEditor
+            configs={componentPropertyConfig}
+            fieldProps={field}
+            fieldSchema={field as Record<string, unknown>}
+            onChange={(key, value) => {
+              dispatch({
+                type: 'UPDATE_FIELD',
+                fieldId: field.id!,
+                patch: { [key]: value }
+              })
+            }}
+            widgets={w}
+          />
+        </CollapsibleSection>
+      )}
 
       {/* ========== 高级属性 ========== */}
       <CollapsibleSection

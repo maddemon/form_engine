@@ -164,6 +164,33 @@ export {
 } from './registry/componentRegistry'
 
 // ============================
+// 自定义组件注册 API（新增）
+// ============================
+
+export {
+  registerSimpleCustomComponent,
+  registerCustomComponent,
+  unregisterCustomComponent,
+  type SimpleCustomComponentOptions,
+} from './registry/simpleCustomComponentRegistry'
+
+export {
+  customComponentRegistry,
+  customPropertyWidgetRegistry,
+  type CustomComponentRegistry,
+  type CustomPropertyWidgetRegistry,
+} from './registry/customComponentRegistry'
+
+// 导出自定义组件类型
+export type {
+  CustomComponentConfig,
+  PropertyConfigItem,
+  PropertyWidgetType,
+  PropertyWidgetProps,
+  PropertyWidgetComponentProps,
+} from './types/custom-component'
+
+// ============================
 // 渲染器
 // ============================
 
