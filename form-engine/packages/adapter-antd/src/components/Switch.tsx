@@ -1,6 +1,6 @@
 import React from 'react'
 import { Switch as AntdSwitch } from 'antd'
-import type { SwitchProps } from '../../../types/component-props'
+import type { SwitchProps } from '@form-engine/core'
 
 /**
  * Antd Switch 组件

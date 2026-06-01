@@ -36,3 +36,13 @@ export {
   unregisterCustomComponent,
   type SimpleCustomComponentOptions,
 } from './simpleCustomComponentRegistry'
+
+// Adapter 注册
+export {
+  registerAdapter,
+  getAdapter,
+  hasAdapter,
+  getAdapterComponents,
+  getAdapterPropertyPanel,
+  clearAdapter,
+} from './adapterRegistry'

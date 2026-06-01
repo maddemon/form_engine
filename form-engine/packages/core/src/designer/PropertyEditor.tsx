@@ -7,10 +7,10 @@ import React from 'react'
 import type {
   PropertyConfigItem,
   PropertyWidgetComponentProps,
-  OptionItem,
 } from '../types/custom-component'
 import { customPropertyWidgetRegistry } from '../registry/customComponentRegistry'
 import type { DesignerWidgets } from '../types/adapter'
+import { renderOptionsEditor } from './OptionsEditor'
 
 /**
  * PropertyEditor 组件 Props
@@ -45,73 +45,6 @@ function shouldShowProperty(config: PropertyConfigItem, fieldProps: Record<strin
   }
   
   return true
-}
-
-/**
- * 渲染 Options 编辑器（用于编辑 OptionItem[]）
- */
-function renderOptionsEditor(
-  value: unknown,
-  onChange: (value: unknown) => void,
-): React.ReactNode {
-  const options = (value as OptionItem[] || []).map((opt, idx) => ({
-    ...opt,
-    __idx: idx,
-  }))
-
-  const updateOptions = (newOptions: typeof options) => {
-    onChange(newOptions.map(({ __idx, ...rest }) => ({ ...rest })))
-  }
-
-  const handleAdd = () => {
-    updateOptions([
-      ...options,
-      { label: `选项${options.length + 1}`, value: `option_${options.length + 1}` },
-    ])
-  }
-
-  const handleRemove = (idx: number) => {
-    updateOptions(options.filter((_, i) => i !== idx))
-  }
-
-  const handleChange = (idx: number, key: 'label' | 'value', val: string) => {
-    const newOptions = [...options]
-    newOptions[idx] = { ...newOptions[idx], [key]: val }
-    updateOptions(newOptions)
-  }
-
-  return (
-    <div>
-      {options.map((opt, idx) => (
-        <div key={idx} style={{ display: 'flex', gap: 4, marginBottom: 4, alignItems: 'center' }}>
-          <input
-            value={opt.label}
-            onChange={(e) => handleChange(idx, 'label', e.target.value)}
-            placeholder="标签"
-            style={{ flex: 1, padding: '2px 6px', border: '1px solid #d9d9d9', borderRadius: 4, fontSize: 12 }}
-          />
-          <input
-            value={opt.value as string}
-            onChange={(e) => handleChange(idx, 'value', e.target.value)}
-            placeholder="值"
-            style={{ flex: 1, padding: '2px 6px', border: '1px solid #d9d9d9', borderRadius: 4, fontSize: 12 }}
-          />
-          <button
-            onClick={() => handleRemove(idx)}
-            style={{ padding: '2px 6px', border: '1px solid #ff4d4f', borderRadius: 4, background: '#fff', color: '#ff4d4f', cursor: 'pointer', fontSize: 12 }}
-          >
-            ✕
-          </button>
-        </div>
-      ))}
-      <button
-        onClick={handleAdd}
-        style={{ padding: '4px 8px', border: '1px dashed #d9d9d9', borderRadius: 4, background: '#fff', cursor: 'pointer', fontSize: 12, width: '100%' }}
-      >
-        + 添加选项
-      </button>
-    </div>
-  )
 }
 
 /**
@@ -169,12 +102,20 @@ export const PropertyEditor: React.FC<PropertyEditorProps> = ({
         )
       
       case 'textarea':
-        return (
+        return widgets.TextArea ? (
           <widgets.TextArea
             value={value as string ?? ''}
             onChange={(v: string) => onValueChange(v)}
             placeholder={widgetProps?.placeholder}
             rows={4}
+          />
+        ) : (
+          <textarea
+            value={value as string ?? ''}
+            onChange={(e) => onValueChange(e.target.value)}
+            placeholder={widgetProps?.placeholder}
+            rows={4}
+            style={{ width: '100%', padding: 4, border: '1px solid #d9d9d9', borderRadius: 4, fontSize: 12 }}
           />
         )
       

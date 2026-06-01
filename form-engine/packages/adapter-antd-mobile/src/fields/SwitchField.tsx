@@ -1,6 +1,5 @@
 import { Radio, Checkbox, Switch, Slider, Rate } from 'antd-mobile'
-import { OptionItem } from '@form-engine/core'
-import { FieldComponentProps, FieldRendererFn } from '@form-engine/core/types/adapter'
+import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 
 // ============================

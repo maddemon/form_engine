@@ -1,5 +1,5 @@
 import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
-import { DesignerWidgets, FieldRendererFn } from '@form-engine/core/types/adapter'
+import type { DesignerWidgets, FieldRendererFn } from '@form-engine/core'
 
 
 // 导入 antd-mobile 基础组件（用于 designerWidgets）

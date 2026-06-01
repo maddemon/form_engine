@@ -193,39 +193,4 @@ export interface AdapterTheme {
   styleOverrides?: Record<string, React.CSSProperties>
 }
 
-// ============================
-// Adapter 注册
-// ============================
 
-/** 已注册的 Adapter */
-let currentAdapter: FormEngineAdapter | null = null
-
-/** 注册 Adapter（设置当前使用的 adapter） */
-export function registerAdapter(adapter: FormEngineAdapter): void {
-  currentAdapter = adapter
-}
-
-/** 获取当前 Adapter */
-export function getAdapter(): FormEngineAdapter | null {
-  return currentAdapter
-}
-
-/** 检查是否已注册 Adapter */
-export function hasAdapter(): boolean {
-  return currentAdapter !== null
-}
-
-/** 获取 Adapter 的组件映射 */
-export function getAdapterComponents(): FormEngineAdapter['components'] {
-  return currentAdapter?.components || {}
-}
-
-/** 获取 Adapter 的属性面板渲染器 */
-export function getAdapterPropertyPanel() {
-  return currentAdapter?.propertyPanel
-}
-
-/** 清空 Adapter（用于测试） */
-export function clearAdapter(): void {
-  currentAdapter = null
-}

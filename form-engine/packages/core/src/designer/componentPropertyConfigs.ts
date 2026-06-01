@@ -33,7 +33,7 @@ import { UploadPropConfig } from '../components/upload/types'
  * 新格式示例：
  *   [{ key: 'placeholder', label: '占位文本', widget: 'input' }]
  */
-function convertOldConfig(oldConfig: Record<string, { type: string; label: string; default?: unknown; options?: { label: string; value: unknown }[] }>, groupName?: string): PropertyConfigItem[] {
+function convertOldConfig(oldConfig: Record<string, { type: string; label: string; default?: unknown; options?: readonly { readonly label: string; readonly value: unknown }[] }>, groupName?: string): PropertyConfigItem[] {
   const widgetMap: Record<string, PropertyConfigItem['widget']> = {
     string: 'input',
     textarea: 'textarea',

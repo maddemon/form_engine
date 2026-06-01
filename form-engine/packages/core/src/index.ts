@@ -88,6 +88,9 @@ export type {
   PropEditorConfig,
   PropertyPanelRenderProps,
   AdapterTheme,
+  DesignerWidgets,
+  FieldRendererFn,
+  FieldComponentProps,
 } from './types/adapter'
 
 // 渲染器类型
@@ -141,7 +144,7 @@ export {
   getAdapterComponents,
   getAdapterPropertyPanel,
   clearAdapter,
-} from './types/adapter'
+} from './registry/adapterRegistry'
 
 // ============================
 // 组件注册表 API（兼容旧代码，推荐使用 Adapter）
@@ -220,7 +223,8 @@ export { Designer } from './designer/Designer'
 export { Canvas } from './designer/Canvas'
 export { FieldList } from './designer/FieldList'
 export { PropertyPanel } from './designer/PropertyPanel'
-export { defaultPaletteGroups as defaultPalette, createFieldFromPalette, generateFieldId } from './designer/FieldList'
+export { defaultPaletteGroups as defaultPalette } from './designer/paletteData'
+export { createFieldFromPalette, generateFieldId } from './designer/FieldList'
 
 export { Designer as FormDesigner } from './designer/Designer'
 

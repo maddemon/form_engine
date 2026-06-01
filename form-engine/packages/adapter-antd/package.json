@@ -29,7 +29,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@ant-design/icons": "^6.2.5",
     "@form-engine/core": "workspace:*",
     "antd": "^6.4.3"
   },

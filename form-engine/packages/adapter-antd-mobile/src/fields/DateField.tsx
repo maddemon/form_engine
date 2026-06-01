@@ -1,37 +1,7 @@
-import { DatePicker } from 'antd-mobile'
-import { Button } from 'antd-mobile'
-import { Cascader } from 'antd-mobile'
-import { Picker } from 'antd-mobile'
-import { Stepper } from 'antd-mobile'
-import { ImageUploader } from 'antd-mobile'
+import { DatePicker, Button, Cascader, Picker, ImageUploader } from 'antd-mobile'
 import { SelectField } from './InputField'
-import { OptionItem } from '@form-engine/core'
-import { FieldComponentProps, FieldRendererFn } from '@form-engine/core/types/adapter'
-
-// ============================
-// 工具函数
-// ============================
-
-/** 将 OptionItem[] 转为 Picker columns 格式 */
-export function toPickerColumns(options?: OptionItem[]) {
-  if (!options) return [[]]
-  return [
-    options.map(opt => ({
-      label: opt.label,
-      value: String(opt.value),
-    })),
-  ]
-}
-
-/** 将 OptionItem[] 转为 Cascader options 格式 */
-export function toCascaderOptions(options?: OptionItem[]): { label: string; value: string; children?: ReturnType<typeof toCascaderOptions> }[] {
-  if (!options) return []
-  return options.map(opt => ({
-    label: opt.label,
-    value: String(opt.value),
-    children: opt.children ? toCascaderOptions(opt.children) : undefined,
-  }))
-}
+import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import { toCascaderOptions } from '../utils'
 
 // ============================
 // Date / Datetime

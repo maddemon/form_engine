@@ -1,6 +1,6 @@
 import React from 'react'
 import { Input as AntdInput } from 'antd'
-import type { TextAreaProps } from '../../../types/component-props'
+import type { TextAreaProps } from '@form-engine/core'
 
 const { TextArea: AntdTextArea } = AntdInput
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Select as AntdSelect } from 'antd'
-import type { SelectProps, OptionItem } from '../../../types/component-props'
+import type { SelectProps, OptionItem } from '@form-engine/core'
 
 /**
  * Antd Select 组件

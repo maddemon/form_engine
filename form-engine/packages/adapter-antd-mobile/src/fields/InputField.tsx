@@ -1,30 +1,7 @@
 import { Input, Picker, Radio, Checkbox, Switch, Slider, Rate, DatePicker, ImageUploader, Cascader, Stepper, Button, TextArea } from 'antd-mobile'
-import { OptionItem } from '@form-engine/core'
-import { FieldComponentProps, FieldRendererFn } from '@form-engine/core/types/adapter'
-
-
-// ============================
-// 工具函数
-// ============================
-
-function toPickerColumns(options?: OptionItem[]) {
-  if (!options) return [[]]
-  return [
-    options.map(opt => ({
-      label: opt.label,
-      value: String(opt.value),
-    })),
-  ]
-}
-
-function toCascaderOptions(options?: OptionItem[]): { label: string; value: string; children?: ReturnType<typeof toCascaderOptions> }[] {
-  if (!options) return []
-  return options.map(opt => ({
-    label: opt.label,
-    value: String(opt.value),
-    children: opt.children ? toCascaderOptions(opt.children) : undefined,
-  }))
-}
+import type { OptionItem } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import { toPickerColumns } from '../utils'
 
 // ============================
 // Input
