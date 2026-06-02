@@ -7,7 +7,7 @@ export const RateField: FieldRendererFn = (props: FieldComponentProps) => {
     <Rate
       value={(value as number) ?? 0}
       onChange={v => onChange?.(v)}
-      disabled={disabled}
+      readOnly={disabled}
     />
   )
 }

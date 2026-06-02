@@ -13,7 +13,6 @@ export const CascaderField: FieldRendererFn = (props: FieldComponentProps) => {
       options={cascaderOptions}
       value={valArr}
       onConfirm={vals => onChange?.(vals)}
-      disabled={disabled}
     >
       {(vals: any, actions: any) => (
         <Button

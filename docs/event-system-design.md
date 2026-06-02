@@ -613,4 +613,9 @@ EventContext 字段缺失抛错是因为这是 FormRender → FieldRenderer 的�
 - [x] v3 代码实施（新增 events 模块、types/events.ts、events/{resolver,actions,index}.ts、renderer/validate.ts、designer/EventHandlerEditor；修改 FieldRenderer 集成事件系统 / FormRender 构造 EventContext / 各组件 types.ts 声明事件 / PropertyPanel 添加事件折叠区 / 顶层 index.ts 导出事件 API）
   - 验证：core 包 type-check 通过、core 包 build 成功（dist 完整生成）、adapter-antd 和 adapter-antd-mobile build 成功
   - 已知非本任务错误：adapter-antd 的 type-check 报错（antd 5/6 类型不匹配、BaseComponentProps.id 与 antd 不兼容、tsconfig paths 软链 rootDir 配置问题），均为 baseline 已存在，与本次事件系统修改无关
+- [x] v4 补全（修复评审遗留问题）
+  - 删除 types/render.ts 中过时的 FormRenderProps（与 FormRender.tsx 本地定义重复且不一致）
+  - 实现异步事件处理（4.6 节）：resolveEvents 新增 eventDeclarations 参数，async=true 的事件保留回调返回值透传给组件，同步事件丢弃返回值；FieldRenderer 传入 getEventDeclarations(field.type)
+  - 补充事件解析器单元测试（events/__tests__/resolver.test.ts，覆盖 expression/action/callback 三种处理器、异步/同步事件区分、actions 注册表）
+  - 验证：core 包 type-check 通过、core 包 build 成功、adapter-antd build 成功
 - [ ] 待评审

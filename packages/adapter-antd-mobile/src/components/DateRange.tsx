@@ -18,7 +18,6 @@ export const DateRangeField: FieldRendererFn = (props: FieldComponentProps) => {
           const str = d ? formatDate(d) : ''
           onChange?.(str ? [str, vals[1] || ''] : [null, null])
         }}
-        disabled={disabled}
       >
         {(v: any, actions: any) => (
           <Button onClick={actions.open} disabled={disabled} size="small">
@@ -33,7 +32,6 @@ export const DateRangeField: FieldRendererFn = (props: FieldComponentProps) => {
           const str = d ? formatDate(d) : ''
           onChange?.(str ? [vals[0] || '', str] : [null, null])
         }}
-        disabled={disabled}
       >
         {(v: any, actions: any) => (
           <Button onClick={actions.open} disabled={disabled} size="small">

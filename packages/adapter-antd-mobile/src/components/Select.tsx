@@ -24,7 +24,6 @@ export const SelectField: FieldRendererFn = (props: FieldComponentProps) => {
           onChange?.(vals[0] || undefined)
         }
       }}
-      disabled={disabled}
     >
       {(vals, actions) => (
         <Button
@@ -33,7 +32,7 @@ export const SelectField: FieldRendererFn = (props: FieldComponentProps) => {
           style={{ width: '100%', textAlign: 'left', color: vals.length ? undefined : '#999' }}
         >
           {vals.length > 0
-            ? vals.map(v => opts.find(o => String(o.value) === v)?.label || v).join('，')
+            ? vals.map(v => opts.find(o => o.value === v?.value)?.label || v?.label || '').join('，')
             : placeholder}
         </Button>
       )}

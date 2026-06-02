@@ -21,7 +21,6 @@ export const DateField: FieldRendererFn = (props: FieldComponentProps) => {
         if (!d) return
         onChange?.(showTime ? formatDateTime(d) : formatDate(d))
       }}
-      disabled={disabled}
     >
       {(v: any, actions: any) => (
         <Button

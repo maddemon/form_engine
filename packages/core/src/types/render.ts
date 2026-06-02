@@ -41,15 +41,4 @@ export interface CustomComponentProps {
   [key: string]: unknown
 }
 
-/**
- * FormRender Props
- */
-export interface FormRenderProps {
-  schema: Record<string, unknown>
-  onSubmit?: (values: Record<string, unknown>) => void
-  onChange?: (values: Record<string, unknown>) => void
-  dataSourceResolver?: DataSourceResolver
-  components?: CustomComponents
-  initialValues?: Record<string, unknown>
-  loading?: boolean
-}
+

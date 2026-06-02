@@ -4,6 +4,7 @@ import type { FormEngineAdapter } from '../types/adapter'
 import type { $Self, ResolvedEventHandler } from '../types/events'
 import { matchVisibleWhen, evalExpr } from '../utils'
 import { resolveEvents, type EventContext } from '../events'
+import { getEventDeclarations } from '../components'
 
 export interface FieldRendererProps {
   field: FormFieldSchema
@@ -94,6 +95,7 @@ export function FieldRenderer({
         $self,
         eventContext.$form,
         eventContext.callbacks,
+        getEventDeclarations(field.type),
       )
     : {}
 

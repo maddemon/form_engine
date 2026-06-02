@@ -53,7 +53,6 @@ const designerWidgets: DesignerWidgets = {
       columns={[options || []]}
       value={value ? [String(value)] : []}
       onConfirm={vals => onChange?.(vals[0])}
-      disabled={disabled}
     >
       {(vals, actions) => (
         <Button

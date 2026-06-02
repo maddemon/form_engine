@@ -18,7 +18,6 @@ export const TimeField: FieldRendererFn = (props: FieldComponentProps) => {
       columns={[timeOptions]}
       value={value ? [String(value)] : []}
       onConfirm={vals => onChange?.(vals[0])}
-      disabled={disabled}
     >
       {(vals: any, actions: any) => (
         <Button

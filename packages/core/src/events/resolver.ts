@@ -12,6 +12,7 @@
 import { evalExpr } from '../utils'
 import type {
   EventHandler,
+  EventDeclaration,
   FormFieldEvents,
   $Form,
   $Self,
@@ -126,22 +127,37 @@ export function resolveEventHandler(
  * 解析 field.events 全部配置
  * 返回以事件名为 key 的回调表（未配置的事件不会出现在结果中）
  *
- * 注意：本函数仅做静态解析（基于 events 配置），
- * 不绑定 $event；$event 在事件实际触发时由调用方注入。
- * 为简化接口，expression 在此阶段不携带 $event，触发时再回填。
+ * eventDeclarations 用于判断异步事件：
+ * - async=true 的事件：保留回调返回值，透传给组件（如 beforeUpload）
+ * - 其他事件：丢弃返回值，不阻塞 UI
  */
 export function resolveEvents(
   events: FormFieldEvents | undefined,
   $self: $Self,
   $form: $Form,
   callbacks: Record<string, (...args: any[]) => void>,
+  eventDeclarations?: EventDeclaration[],
 ): Record<string, ResolvedEventHandler> {
   if (!events) return {}
+
+  const asyncEventNames = new Set<string>()
+  if (eventDeclarations) {
+    for (const decl of eventDeclarations) {
+      if (decl.async) asyncEventNames.add(decl.name)
+    }
+  }
 
   const result: Record<string, ResolvedEventHandler> = {}
   for (const [name, handler] of Object.entries(events)) {
     if (!handler) continue
-    result[name] = resolveEventHandler(handler, $self, $form, undefined, callbacks)
+    const resolved = resolveEventHandler(handler, $self, $form, undefined, callbacks)
+    if (asyncEventNames.has(name)) {
+      result[name] = resolved
+    } else {
+      result[name] = (...args: unknown[]) => {
+        resolved(...args)
+      }
+    }
   }
   return result
 }

@@ -14,7 +14,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": false,
+    "composite": true,
     "types": ["node"]
   },
   "include": ["src"],
