@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import type { FormFieldSchema, FormSchema, OptionItem } from '../types/schema'
 import type { FormEngineAdapter } from '../types/adapter'
 import type { DataSourceResolver, CustomComponents } from '../types/render'
+import type { $Form } from '../types/events'
 import { matchVisibleWhen, evalExpr } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import defaultAdapter from './defaultAdapter'
@@ -11,6 +12,8 @@ import {
   checkRequiredDeps,
   getDataSourceDeps,
 } from '../dataSource/resolver'
+import { validateForm } from './validate'
+import type { EventContext } from '../events'
 
 export interface FormRenderProps {
   schema: FormSchema
@@ -21,6 +24,11 @@ export interface FormRenderProps {
   adapter?: FormEngineAdapter
   initialValues?: Record<string, unknown>
   loading?: boolean
+  /**
+   * 事件回调（供 EventHandler.type='callback' 引用）
+   * key 为回调名，value 为函数；运行时会按 name 查表
+   */
+  callbacks?: Record<string, (...args: any[]) => void>
 }
 
 /**
@@ -38,6 +46,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
   adapter = defaultAdapter,
   initialValues = {},
   loading = false,
+  callbacks = {},
 }) => {
   const [formValues, setFormValues] = useState<Record<string, unknown>>(initialValues)
   const [fieldOptions, setFieldOptions] = useState<Record<string, OptionItem[]>>({})
@@ -75,6 +84,79 @@ export const FormRender: React.FC<FormRenderProps> = ({
       })
     },
     [onChange],
+  )
+
+  // 单字段设值（供事件系统 $form.setFieldValue 调用）
+  const setFieldValue = useCallback(
+    (name: string, value: unknown) => {
+      handleFieldChange(name, value)
+    },
+    [handleFieldChange],
+  )
+
+  // 批量设值
+  const setFieldsValue = useCallback(
+    (patch: Record<string, unknown>) => {
+      setFormValues(prev => {
+        const next = { ...prev, ...patch }
+        onChange?.(next)
+        return next
+      })
+    },
+    [onChange],
+  )
+
+  // 取单字段值
+  const getFieldValue = useCallback(
+    (name: string): unknown => formValues[name],
+    [formValues],
+  )
+
+  // 重置表单
+  const reset = useCallback(() => {
+    setFormValues(initialValues)
+    onChange?.(initialValues)
+  }, [initialValues, onChange])
+
+  // 提交表单
+  const submit = useCallback(() => {
+    onSubmit?.(formValues)
+  }, [onSubmit, formValues])
+
+  // 校验表单
+  const validate = useCallback(
+    async (name?: string): Promise<boolean> => {
+      const result = validateForm(formSchema.fields, formValues, name)
+      if (!result.valid) {
+        console.warn('[form-engine] 校验失败:', result.errors)
+      }
+      return result.valid
+    },
+    [formSchema.fields, formValues],
+  )
+
+  // $form API 实例
+  const $form: $Form = useMemo(
+    () => ({
+      get values(): Record<string, unknown> { return formValues },
+      setFieldValue,
+      setFieldsValue,
+      getFieldValue,
+      submit,
+      reset,
+      validate,
+    }),
+    [formValues, setFieldValue, setFieldsValue, getFieldValue, submit, reset, validate],
+  )
+
+  // 事件上下文（供 FieldRenderer 注入）
+  const eventContext: EventContext = useMemo(
+    () => ({
+      formValues,
+      $form,
+      callbacks,
+    }),
+    [formValues, $form, callbacks],
   )
 
   /**
@@ -178,10 +260,10 @@ export const FormRender: React.FC<FormRenderProps> = ({
     })
   }, [formValues, formSchema.fields, loadDataSource])
 
-  // 提交
+  // 提交（form onSubmit 调用）
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit?.(formValues)
+    submit()
   }
 
   function renderNestedField(field: FormFieldSchema): React.ReactNode {
@@ -203,6 +285,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
         disabled={loading || field.disabled === true}
         adapter={adapter}
         components={components}
+        eventContext={eventContext}
       />
     )
   }
@@ -228,10 +311,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
           {formSchema.submit?.showReset && (
             <button
               type="button"
-              onClick={() => {
-                setFormValues(initialValues)
-                onChange?.(initialValues)
-              }}
+              onClick={reset}
             >
               {formSchema.submit?.resetText || '重置'}
             </button>

@@ -1,5 +1,6 @@
 import type { FormRule, VisibleWhen } from '../../types/schema'
 import type { BaseFormComponentProps } from '../../types/component-props'
+import type { EventDeclaration } from '../../types/events'
 
 /** Upload */
 export interface UploadProps extends BaseFormComponentProps<string[] | undefined> {
@@ -23,5 +24,11 @@ export interface UploadFile {
   thumbUrl?: string
   percent?: number
 }
+
+/** Upload 支持的事件声明（供设计器使用） */
+export const uploadEventDeclarations: EventDeclaration[] = [
+  { name: 'onChange', label: '文件变化', description: '上传中/完成/失败时触发', async: true },
+  { name: 'beforeUpload', label: '上传前', description: '上传前校验，返回 false 阻止上传', async: true },
+]
 
 

@@ -49,6 +49,18 @@ export type {
   FieldType,
 } from './types/schema'
 
+// 事件类型
+export type {
+  EventHandler,
+  EventHandlerType,
+  EventDeclaration,
+  EventParamDeclaration,
+  FormFieldEvents,
+  ResolvedEventHandler,
+  $Self,
+  $Form,
+} from './types/events'
+
 // 组件 Props 类型
 export type {
   BaseComponentProps,
@@ -126,6 +138,9 @@ export {
   getContainerFieldTypes,
 } from './types/component-category'
 
+// 组件事件声明查询
+export { getEventDeclarations } from './components'
+
 // ============================
 // Adapter 注册 API
 // ============================
@@ -201,6 +216,21 @@ export {
 // ============================
 
 export * from './utils'
+
+// ============================
+// 事件系统
+// ============================
+
+export {
+  resolveEventHandler,
+  resolveEvents,
+  bindEventArgs,
+  getActionDef,
+  listActionNames,
+  invokeAction,
+  type EventContext,
+  type ActionDef,
+} from './events'
 
 // ============================
 // 数据源

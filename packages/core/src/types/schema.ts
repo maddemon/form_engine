@@ -3,6 +3,8 @@
  * 对应 schema-spec.md 规范 v0.1
  */
 
+import type { FormFieldEvents } from './events'
+
 // ============================
 // 数据源
 // ============================
@@ -147,6 +149,8 @@ export interface FormFieldSchema {
   dataSource?: FieldDataSource
   custom?: CustomComponent
   mock?: FieldMock
+  /** 事件配置 */
+  events?: FormFieldEvents
   /** 子字段（仅容器组件使用，如 grid/flex/container/collapse/tabs） */
   children?: FormFieldSchema[]
 }

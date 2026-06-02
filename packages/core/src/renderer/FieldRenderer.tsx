@@ -1,7 +1,9 @@
 import React from 'react'
 import type { FormFieldSchema, OptionItem } from '../types/schema'
 import type { FormEngineAdapter } from '../types/adapter'
+import type { $Self, ResolvedEventHandler } from '../types/events'
 import { matchVisibleWhen, evalExpr } from '../utils'
+import { resolveEvents, type EventContext } from '../events'
 
 export interface FieldRendererProps {
   field: FormFieldSchema
@@ -11,6 +13,11 @@ export interface FieldRendererProps {
   disabled: boolean
   adapter: FormEngineAdapter
   components?: Record<string, (props: any) => React.ReactNode>
+  /**
+   * 事件上下文（由 FormRender 注入）
+   * 不传时事件系统降级为无 events 配置（向后兼容）
+   */
+  eventContext?: EventContext
 }
 
 /**
@@ -21,9 +28,8 @@ export interface FieldRendererProps {
  * 2. components[componentId]     — 自定义组件注册表（schema.type='custom' 时按 componentId 查找）
  * 3. adapter['default']          — 兜底渲染（避免白屏）
  *
- * 扩展方式：
- *   const myAdapter = { ...antdAdapter, 'tree-select': MyTreeSelect }
- *   <FormRender adapter={myAdapter} />
+ * 事件合并优先级（后写覆盖前写）：
+ * 内置 props < componentProps < 事件处理器（events 解析结果）
  */
 export function FieldRenderer({
   field,
@@ -33,6 +39,7 @@ export function FieldRenderer({
   disabled,
   adapter,
   components = {},
+  eventContext,
 }: FieldRendererProps) {
 
   // 判断是否禁用
@@ -70,15 +77,44 @@ export function FieldRenderer({
     field.dataSource?.type === 'static' ? field.dataSource.static.options :
     []
 
+  // 解析事件处理器
+  const $self: $Self = {
+    name: field.name,
+    value,
+    schema: field,
+    props: {
+      disabled: isDisabled,
+      readOnly: !!field.readOnly,
+      placeholder: field.placeholder,
+    },
+  }
+  const eventHandlers: Record<string, ResolvedEventHandler> = eventContext
+    ? resolveEvents(
+        field.events,
+        $self,
+        eventContext.$form,
+        eventContext.callbacks,
+      )
+    : {}
+
+  // onChange 包装：先更新当前字段值，再执行用户事件
+  // 这样无论用户配置的是 expression / action / callback，
+  // 当前字段的 formValues 都会被同步更新
+  const handleChange = (newValue: unknown) => {
+    onChange(newValue)                          // ① 始终写入 formValues
+    eventHandlers.onChange?.(newValue)          // ② 再执行用户事件
+  }
+
   const fieldProps: Record<string, unknown> = {
     value,
-    onChange,
+    onChange: handleChange,
     disabled: isDisabled,
     readOnly: field.readOnly,
     placeholder: field.placeholder,
     options: resolvedOptions,
     fieldSchema: field,
-    ...field.componentProps,
+    ...field.componentProps,            // ③ 透传（优先级：内置 < componentProps）
+    ...eventHandlers,                   // ④ 事件处理器最后 spread，最高优先级
   }
 
   /**

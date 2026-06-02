@@ -4,6 +4,7 @@
  */
 
 import type * as React from 'react'
+import type { EventDeclaration } from './events'
 
 /**
  * 属性编辑器 Widget 类型
@@ -121,7 +122,14 @@ export interface CustomComponentConfig {
   
   /** 自定义属性编辑组件（可选，用于渲染复杂的属性编辑界面） */
   propertyWidgets?: Record<string, React.ComponentType<PropertyWidgetComponentProps>>
-  
+
+  /**
+   * 事件声明（自定义组件支持的事件）
+   * - 可选：未声明的 custom:xxx 组件在设计器中不显示任何事件配置项
+   * - 读取时使用 config?.events ?? [] 兜底
+   */
+  events?: EventDeclaration[]
+
   /** 组件描述 */
   description?: string
   

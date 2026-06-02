@@ -7,7 +7,10 @@ import type { DesignerWidgets, FormEngineAdapter } from '../types/adapter'
 import { getComponentCategory } from '../types/component-category'
 import type { DesignerAction } from '../types/designer'
 import type { FormFieldSchema } from '../types/schema'
+import type { EventDeclaration, FormFieldEvents } from '../types/events'
+import { getEventDeclarations } from '../components'
 import { CollapsibleSection } from './CollapsibleSection'
+import { EventHandlerEditor } from './EventHandlerEditor'
 import { FormConfigPanel } from './FormConfigPanel'
 import { defaultDesignerWidgets } from './widgets'
 
@@ -29,6 +32,18 @@ function useWidgets(designerWidgets?: DesignerWidgets) {
 
 function hasAdvancedConfig(field: FormFieldSchema): boolean {
   return !!((typeof field.hidden === 'boolean' && field.hidden) || (typeof field.hidden === 'string' && field.hidden) || field.disabled || field.readOnly || field.requiredIfExpr)
+}
+
+/**
+ * 获取字段的事件声明列表
+ * 优先级：customComponentRegistry（自定义组件） > getEventDeclarations（内置组件）
+ */
+function getFieldEventDeclarations(field: FormFieldSchema): EventDeclaration[] {
+  const customConfig = customComponentRegistry.get(field.type)
+  if (customConfig?.events?.length) {
+    return customConfig.events
+  }
+  return getEventDeclarations(field.type)
 }
 
 export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, submitConfig, dispatch, designerWidgets, scene = 'desktop', onSceneChange }) => {
@@ -129,6 +144,40 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
           <w.Input value={field.requiredIfExpr || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { requiredIfExpr: (v as string) || undefined } })} placeholder="如：form.type === 'admin'" style={{ fontSize: 11 } as React.CSSProperties} />
         </FieldGroup>
       </CollapsibleSection>
+
+      {(() => {
+        const eventDeclarations = getFieldEventDeclarations(field)
+        if (eventDeclarations.length === 0) return null
+        return (
+          <CollapsibleSection
+            title={`事件（${eventDeclarations.length}）`}
+            defaultCollapsed={!field.events || Object.keys(field.events).length === 0}
+            forceExpand={!!field.events && Object.keys(field.events).length > 0}
+          >
+            {eventDeclarations.map(decl => (
+              <EventHandlerEditor
+                key={decl.name}
+                eventName={decl.name}
+                value={field.events?.[decl.name]}
+                onChange={handler => {
+                  const next: FormFieldEvents = { ...(field.events || {}) }
+                  if (handler) {
+                    next[decl.name] = handler
+                  } else {
+                    delete next[decl.name]
+                  }
+                  const cleaned = Object.keys(next).length > 0 ? next : undefined
+                  dispatch({
+                    type: 'UPDATE_FIELD',
+                    fieldId: field.id!,
+                    patch: { events: cleaned },
+                  })
+                }}
+              />
+            ))}
+          </CollapsibleSection>
+        )
+      })()}
     </div>
   )
 }
