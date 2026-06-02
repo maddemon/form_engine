@@ -10,7 +10,7 @@
 
 import React, { useState } from 'react'
 import { listActionNames } from '../events'
-import { FieldGroup } from '../propRenders/shared'
+import { FieldGroup, RowField } from '../propRenders/shared'
 import { useStyle } from '../styles/useStyle'
 import type { DesignerWidgets } from '../types/adapter'
 import type { EventHandler, EventHandlerType } from '../types/events'
@@ -66,9 +66,9 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
 
   return (
     <div style={containerStyle}>
-      <FieldGroup label={`事件：${eventName}`}>
+      <RowField label={eventName}>
         <w.Select value={type} onChange={(v) => handleTypeChange(v as EventHandlerType | '')} options={HANDLER_TYPE_OPTIONS.map((opt) => ({ label: opt.label, value: opt.value }))} />
-      </FieldGroup>
+      </RowField>
 
       {type === 'expression' && value?.type === 'expression' && (
         <FieldGroup label="表达式">

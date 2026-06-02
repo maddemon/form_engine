@@ -270,6 +270,7 @@
 
   /* Widget 物理尺寸 */
   --fe-widget-palette-icon-box: 20px;
+  --fe-widget-palette-font-size: 11px;
   --fe-widget-field-handle-font-size: 12px;
   --fe-widget-canvas-dnd-shadow: 0 2px 8px rgba(22, 119, 255, 0.3);
 

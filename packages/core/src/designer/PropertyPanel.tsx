@@ -1,20 +1,19 @@
-import React, { useState, useCallback } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { getEventDeclarations } from '../components'
-import { FieldGroup, InlineField, PropsRenderMap, RowField } from '../propRenders'
+import { FieldGroup, PropsRenderMap, RowField } from '../propRenders'
 import CustomPropsRender from '../propRenders/CustomPropsRender'
-import type { DeviceScene } from '../registry/componentRegistry'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { useStyle } from '../styles'
-import type { DesignerWidgets, FormEngineAdapter } from '../types/adapter'
+import type { DesignerWidgets } from '../types/adapter'
 import { getComponentCategory } from '../types/component-category'
 import type { DesignerAction, PropertyPanelTab } from '../types/designer'
 import type { EventDeclaration, FormFieldEvents } from '../types/events'
 import type { FormFieldSchema } from '../types/schema'
+import { resolvePanelWidth } from '../utils'
 import { CollapsibleSection } from './CollapsibleSection'
 import { EventHandlerEditor } from './EventHandlerEditor'
 import { FormConfigPanel } from './FormConfigPanel'
 import { defaultDesignerWidgets } from './widgets'
-import { resolvePanelWidth } from '../utils'
 
 /**
  * 属性面板最小宽度（防呆）：再小 RowField / 控件就显示不全
@@ -25,12 +24,8 @@ const PROPERTIES_DEFAULT_TAB_KEY = '__default-props__'
 interface PropertyPanelProps {
   field: FormFieldSchema | null
   formConfig: any
-  submitConfig: any
   dispatch: React.Dispatch<DesignerAction>
-  adapter?: FormEngineAdapter
   designerWidgets?: DesignerWidgets
-  scene?: DeviceScene
-  onSceneChange?: (scene: DeviceScene) => void
   /**
    * 可选：面板宽度
    *  - `number`：px（小于 240 自动降级到 240）
@@ -40,6 +35,8 @@ interface PropertyPanelProps {
   width?: number | string
   /** 右侧属性面板扩展 Tab（有值时自动切换为 Segment Tab 布局） */
   propertyPanelTabs?: PropertyPanelTab[]
+  /** 所有表单项（用于校验字段名唯一性） */
+  allFields?: FormFieldSchema[]
 }
 
 function useWidgets(designerWidgets?: DesignerWidgets) {
@@ -72,29 +69,51 @@ interface DefaultContentProps {
   isButton: boolean
   ComponentPropsRender: React.ComponentType<any> | undefined
   customConfig: any
+  allFields: FormFieldSchema[]
 }
 
-function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isButton, ComponentPropsRender, customConfig }: DefaultContentProps) {
+function collectFieldNamesExcluding(fields: FormFieldSchema[], excludeId: string): Set<string> {
+  const names = new Set<string>()
+  const walk = (list: FormFieldSchema[]) => {
+    for (const f of list) {
+      if (f.id !== excludeId) names.add(f.name)
+      if (f.children) walk(f.children)
+    }
+  }
+  walk(fields)
+  return names
+}
+
+function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isButton, ComponentPropsRender, customConfig, allFields }: DefaultContentProps) {
   const { token } = useStyle()
   const hasAdvanced = hasAdvancedConfig(field)
+  const [nameDirty, setNameDirty] = useState(false)
+  const existingNames = useMemo(() => collectFieldNamesExcluding(allFields, field.id!), [allFields, field.id])
+  const nameError = nameDirty && field.name && existingNames.has(field.name) ? '该字段名已存在' : null
 
   return (
     <>
-      {isForm ? (
-        <>
-          <RowField label="字段名">
-            <w.Input value={field.name} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: String(v) } })} />
-          </RowField>
-          <RowField label="标签">
-            <w.Input value={field.label || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { label: String(v) || undefined } })} placeholder="字段标签" />
-          </RowField>
-          <RowField label="默认值">
-            <w.Input value={field.defaultValue != null ? String(field.defaultValue) : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { defaultValue: v || undefined } })} />
-          </RowField>
-        </>
-      ) : isButton ? null : (
-        <RowField label="字段名">
-          <w.Input value={field.name} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: String(v) } })} />
+      <RowField label="字段名">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+          <w.Input
+            value={field.name}
+            onChange={(v: string | number) => {
+              setNameDirty(true)
+              const newName = String(v)
+              if (newName && !existingNames.has(newName)) {
+                dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: newName } })
+              }
+            }}
+          />
+          {nameError && <span style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-error)' }}>{nameError}</span>}
+        </div>
+      </RowField>
+      <RowField label="标签">
+        <w.Input value={field.label || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { label: String(v) || undefined } })} placeholder="字段标签" />
+      </RowField>
+      {isForm && (
+        <RowField label="默认值">
+          <w.Input value={field.defaultValue != null ? String(field.defaultValue) : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { defaultValue: v || undefined } })} />
         </RowField>
       )}
 
@@ -133,19 +152,19 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
 
       <CollapsibleSection title="高级属性" defaultCollapsed={true} forceExpand={hasAdvanced}>
         {isForm && (
-          <RowField label="列宽（colSpan，24=满宽）">
+          <RowField label="列宽">
             <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
           </RowField>
         )}
-        <InlineField label="隐藏">
-          <w.Checkbox checked={!!field.hidden && typeof field.hidden === 'boolean'} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: v } })} />
-        </InlineField>
-        <InlineField label="禁用">
-          <w.Checkbox checked={!!field.disabled} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { disabled: v } })} />
-        </InlineField>
-        <InlineField label="只读">
-          <w.Checkbox checked={!!field.readOnly} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { readOnly: v } })} />
-        </InlineField>
+        <RowField label="隐藏">
+          <w.Switch checked={!!field.hidden && typeof field.hidden === 'boolean'} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: v } })} />
+        </RowField>
+        <RowField label="禁用">
+          <w.Switch checked={!!field.disabled} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { disabled: v } })} />
+        </RowField>
+        <RowField label="只读">
+          <w.Switch checked={!!field.readOnly} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { readOnly: v } })} />
+        </RowField>
 
         <FieldGroup label="隐藏表达式（hidden expr）">
           <w.Input value={typeof field.hidden === 'string' ? field.hidden : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } })} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
@@ -189,40 +208,33 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
   )
 }
 
-export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, submitConfig, dispatch, designerWidgets, scene = 'desktop', onSceneChange, width, propertyPanelTabs }) => {
-  const w = useWidgets(designerWidgets)
-  const { token } = useStyle()
-  const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
-  const hasTabs = propertyPanelTabs && propertyPanelTabs.length > 0
-  const [activeTab, setActiveTab] = useState(PROPERTIES_DEFAULT_TAB_KEY)
-
-  if (!field) {
-    return <FormConfigPanel formConfig={formConfig} submitConfig={submitConfig} dispatch={dispatch} scene={scene} onSceneChange={onSceneChange} widgets={w} width={width} />
-  }
-
+function PropertyPanelInner({ field, w, token, resolvedWidth, hasTabs, activeTab, setActiveTab, dispatch, propertyPanelTabs, allFields }: { field: FormFieldSchema; w: any; token: ReturnType<typeof useStyle>['token']; resolvedWidth: string | number; hasTabs: boolean; activeTab: string; setActiveTab: (v: string) => void; dispatch: React.Dispatch<DesignerAction>; propertyPanelTabs?: PropertyPanelTab[]; allFields: FormFieldSchema[] }) {
   const ComponentPropsRender = PropsRenderMap[field.type]
   const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
   const category = getComponentCategory(field.type)
   const isForm = category === 'form'
   const isContainer = category === 'container'
   const isButton = category === 'button'
-  const isDisplay = category === 'display'
 
-  const onUpdateProp = useCallback((key: string, value: unknown) => {
-    dispatch({
-      type: 'UPDATE_FIELD',
-      fieldId: field.id!,
-      patch: { componentProps: { ...field.componentProps, [key]: value } },
-    })
-  }, [dispatch, field.id, field.componentProps])
+  const onUpdateProp = useCallback(
+    (key: string, value: unknown) => {
+      dispatch({
+        type: 'UPDATE_FIELD',
+        fieldId: field.id!,
+        patch: { componentProps: { ...field.componentProps, [key]: value } },
+      })
+    },
+    [dispatch, field.id, field.componentProps],
+  )
 
-  const onUpdate = useCallback((patch: Partial<FormFieldSchema>) => {
-    dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch })
-  }, [dispatch, field.id])
+  const onUpdate = useCallback(
+    (patch: Partial<FormFieldSchema>) => {
+      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch })
+    },
+    [dispatch, field.id],
+  )
 
-  const allTabs = hasTabs
-    ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: '属性' }, ...propertyPanelTabs]
-    : []
+  const allTabs = hasTabs ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: '属性' }, ...(propertyPanelTabs || [])] : []
 
   return (
     <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', overflow: 'auto', height: '100%' }}>
@@ -267,33 +279,30 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
         </h4>
 
         {activeTab === PROPERTIES_DEFAULT_TAB_KEY ? (
-          <DefaultPropertyContent
-            field={field}
-            w={w}
-            dispatch={dispatch}
-            isForm={isForm}
-            isContainer={isContainer}
-            isButton={isButton}
-            ComponentPropsRender={ComponentPropsRender}
-            customConfig={customConfig}
-          />
+          <DefaultPropertyContent field={field} w={w} dispatch={dispatch} isForm={isForm} isContainer={isContainer} isButton={isButton} ComponentPropsRender={ComponentPropsRender} customConfig={customConfig} allFields={allFields} />
         ) : (
           (() => {
-            const tab = propertyPanelTabs?.find(t => t.key === activeTab)
+            const tab = propertyPanelTabs?.find((t) => t.key === activeTab)
             if (!tab) return null
             const TabContent = tab.content
-            return (
-              <TabContent
-                field={field}
-                onUpdate={onUpdate}
-                onUpdateProp={onUpdateProp}
-                widgets={w}
-                dispatch={dispatch}
-              />
-            )
+            return <TabContent field={field} onUpdate={onUpdate} onUpdateProp={onUpdateProp} widgets={w} dispatch={dispatch} />
           })()
         )}
       </div>
     </div>
   )
+}
+
+export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, dispatch, designerWidgets, width, propertyPanelTabs, allFields }) => {
+  const w = useWidgets(designerWidgets)
+  const { token } = useStyle()
+  const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
+  const hasTabs = propertyPanelTabs && propertyPanelTabs.length > 0
+  const [activeTab, setActiveTab] = useState(PROPERTIES_DEFAULT_TAB_KEY)
+
+  if (!field) {
+    return <FormConfigPanel formConfig={formConfig} dispatch={dispatch} widgets={w} width={width} />
+  }
+
+  return <PropertyPanelInner field={field} w={w} token={token} resolvedWidth={resolvedWidth} hasTabs={!!hasTabs} activeTab={activeTab} setActiveTab={setActiveTab} dispatch={dispatch} propertyPanelTabs={propertyPanelTabs} allFields={allFields || []} />
 }

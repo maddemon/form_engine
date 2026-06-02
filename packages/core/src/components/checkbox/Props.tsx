@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField, OptionRender, PropsRenderProps } from '../../propRenders'
+import { FieldGroup, OptionRender, PropsRenderProps, RowField } from '../../propRenders'
 
 export default function CheckboxPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
@@ -6,9 +6,9 @@ export default function CheckboxPropsRender({ widgets: w, values, onChange }: Pr
       <FieldGroup label="选项">
         <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
       </FieldGroup>
-      <InlineField label="半选状态">
-        <w.Checkbox checked={!!values.indeterminate} onChange={(v) => onChange('indeterminate', v)} />
-      </InlineField>
+      <RowField label="半选状态">
+        <w.Switch checked={!!values.indeterminate} onChange={(v) => onChange('indeterminate', v)} />
+      </RowField>
       <FieldGroup label="排列方向">
         <w.ButtonGroup
           value={(values.direction as string) ?? 'horizontal'}

@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField, PropsRenderProps } from '../../propRenders'
+import { FieldGroup, PropsRenderProps, RowField } from '../../propRenders'
 
 const LIST_TYPE_OPTIONS = [
   { label: '文本', value: 'text' },
@@ -28,15 +28,15 @@ export default function UploadPropsRender({ widgets: w, values, onChange }: Prop
           options={LIST_TYPE_OPTIONS}
         />
       </FieldGroup>
-      <InlineField label="多文件">
-        <w.Checkbox checked={!!values.multiple} onChange={(v) => onChange('multiple', v)} />
-      </InlineField>
-      <InlineField label="显示上传列表">
-        <w.Checkbox checked={values.showUploadList !== false} onChange={(v) => onChange('showUploadList', v)} />
-      </InlineField>
-      <InlineField label="文件夹上传">
-        <w.Checkbox checked={!!values.directory} onChange={(v) => onChange('directory', v)} />
-      </InlineField>
+      <RowField label="多文件">
+        <w.Switch checked={!!values.multiple} onChange={(v) => onChange('multiple', v)} />
+      </RowField>
+      <RowField label="显示上传列表">
+        <w.Switch checked={values.showUploadList !== false} onChange={(v) => onChange('showUploadList', v)} />
+      </RowField>
+      <RowField label="文件夹上传">
+        <w.Switch checked={!!values.directory} onChange={(v) => onChange('directory', v)} />
+      </RowField>
       <FieldGroup label="上传前置处理">
         <w.Input value={(values.beforeUpload as string) ?? ''} onChange={(v) => onChange('beforeUpload', v)} placeholder="函数体，如: return file.size < 1024" />
       </FieldGroup>

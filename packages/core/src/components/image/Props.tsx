@@ -1,4 +1,4 @@
-import { InlineField, RowField } from '../../propRenders/shared'
+import { RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function ImagePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -16,9 +16,9 @@ export default function ImagePropsRender({ widgets: w, values, onChange }: Props
       <RowField label="高度">
         <w.Input value={values.height != null ? String(values.height) : ''} onChange={(v) => onChange('height', v ? Number(v) : undefined)} placeholder="如：200 或 50%" />
       </RowField>
-      <InlineField label="可预览">
-        <w.Checkbox checked={values.preview !== false} onChange={(v) => onChange('preview', v)} />
-      </InlineField>
+      <RowField label="可预览">
+        <w.Switch checked={values.preview !== false} onChange={(v) => onChange('preview', v)} />
+      </RowField>
       <RowField label="圆角">
         <w.NumberInput value={(values.borderRadius as number) ?? 0} onChange={(v) => onChange('borderRadius', v)} min={0} max={50} />
       </RowField>

@@ -112,6 +112,20 @@ export function findInTree(fields: FormFieldSchema[], id: string): FormFieldSche
   return undefined
 }
 
+function collectFieldNames(fields: FormFieldSchema[], excludeFieldId: string): Set<string> {
+  const names = new Set<string>()
+  const walk = (list: FormFieldSchema[]) => {
+    for (const f of list) {
+      if (f.id !== excludeFieldId) {
+        names.add(f.name)
+      }
+      if (f.children) walk(f.children)
+    }
+  }
+  walk(fields)
+  return names
+}
+
 export function designerReducer(state: DesignerState, action: DesignerAction): DesignerState {
   switch (action.type) {
     case 'SELECT_FIELD':
@@ -181,6 +195,12 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
     }
 
     case 'UPDATE_FIELD': {
+      if (action.patch.name) {
+        const allNames = collectFieldNames(state.schema.fields, action.fieldId)
+        if (allNames.has(action.patch.name)) {
+          return state
+        }
+      }
       const fields = updateFieldInTree(state.schema.fields, action.fieldId, action.patch)
       return { ...state, schema: { ...state.schema, fields } }
     }

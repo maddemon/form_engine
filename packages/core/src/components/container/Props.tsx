@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField, RowField } from '../../propRenders/shared'
+import { FieldGroup, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function ContainerPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -14,9 +14,9 @@ export default function ContainerPropsRender({ widgets: w, values, onChange }: P
           ]}
         />
       </FieldGroup>
-      <InlineField label="自动换行">
-        <w.Checkbox checked={!!values.wrap} onChange={(v) => onChange('wrap', v)} />
-      </InlineField>
+      <RowField label="自动换行">
+        <w.Switch checked={!!values.wrap} onChange={(v) => onChange('wrap', v)} />
+      </RowField>
       <RowField label="背景色">
         <w.Input value={(values.background as string) ?? ''} onChange={(v) => onChange('background', v)} placeholder="如：#f5f5f5" />
       </RowField>

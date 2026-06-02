@@ -8,7 +8,7 @@ const DEFAULT_OPTIONS = [
 ]
 
 export const palette: ComponentPalette = {
-  label: '下拉',
+  label: '下拉框',
   category: 'form',
   icon: <ChevronDown />,
   defaultProps: { componentProps: { options: DEFAULT_OPTIONS } },

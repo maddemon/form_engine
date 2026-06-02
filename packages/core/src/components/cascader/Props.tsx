@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField } from '../../propRenders/shared'
+import { FieldGroup, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function CascaderPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -7,12 +7,12 @@ export default function CascaderPropsRender({ widgets: w, values, onChange }: Pr
       <FieldGroup label="占位文本">
         <w.Input value={(values.placeholder as string) ?? ''} onChange={(v) => onChange('placeholder', v)} placeholder="请选择" />
       </FieldGroup>
-      <InlineField label="允许清除">
-        <w.Checkbox checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
-      </InlineField>
-      <InlineField label="可搜索">
-        <w.Checkbox checked={!!values.showSearch} onChange={(v) => onChange('showSearch', v)} />
-      </InlineField>
+      <RowField label="允许清除">
+        <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
+      </RowField>
+      <RowField label="可搜索">
+        <w.Switch checked={!!values.showSearch} onChange={(v) => onChange('showSearch', v)} />
+      </RowField>
       <FieldGroup label="展开触发">
         <w.ButtonGroup
           value={(values.expandTrigger as string) ?? 'click'}

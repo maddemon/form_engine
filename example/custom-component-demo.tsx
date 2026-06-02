@@ -26,7 +26,7 @@ function MyButton(props: any) {
 }
 
 // 注册自定义按钮组件（简化方式）
-registerSimpleCustomComponent('my-button', MyButton, {
+registerSimpleCustomComponent('my-button' as any, MyButton, {
   label: '我的按钮',
   category: '自定义',
   defaultProps: {
@@ -63,7 +63,7 @@ function ColorPicker(props: any) {
 }
 
 // 注册自定义颜色选择器（完整方式）
-registerSimpleCustomComponent('color-picker', ColorPicker, {
+registerSimpleCustomComponent('color-picker' as any, ColorPicker, {
   label: '颜色选择器',
   category: '高级',
   defaultProps: {

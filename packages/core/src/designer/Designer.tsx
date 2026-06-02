@@ -459,7 +459,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       </DndContext>
 
       {/* 右侧属性面板 */}
-      <PropertyPanel field={selectedField} formConfig={state.schema.form || { layout: 'vertical', size: 'middle' }} submitConfig={state.schema.submit || { text: '提交', showReset: true, resetText: '重置' }} dispatch={dispatch} adapter={adapter} scene={scene} onSceneChange={setSceneState} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} />
+      <PropertyPanel field={selectedField} formConfig={state.schema.form || { layout: 'vertical', size: 'middle' }} dispatch={dispatch} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
     </div>
   )
 }

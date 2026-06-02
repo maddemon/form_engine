@@ -110,27 +110,26 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
       title={item.label}
       style={{
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'var(--fe-spacing-sm) var(--fe-spacing-xs)',
+        padding: 'var(--fe-spacing-xs) var(--fe-spacing-sm)',
         border: '1px solid var(--fe-border-primary)',
         borderRadius: token('borderRadiusSm'),
         cursor: 'grab',
-        fontSize: token('fontSizeSm'),
+        fontSize: token('widgetPaletteFontSize'),
         color: 'var(--fe-text-secondary)',
         background: isDragging ? 'var(--fe-primary-bg)' : 'var(--fe-bg-primary)',
         borderColor: isDragging ? 'var(--fe-primary-border)' : 'var(--fe-border-light)',
         userSelect: 'none',
         transition: 'all 0.2s',
-        gap: token('spacingXs'),
+        gap: token('spacingSm'),
         opacity: isDragging ? 0.5 : 1,
       }}
     >
-      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: token('widgetPaletteIconBox'), height: token('widgetPaletteIconBox') }}>
+      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
         {getIcon(item)}
       </span>
-      <span style={{ lineHeight: 1.2, textAlign: 'center' }}>{item.label}</span>
+      <span>{item.label}</span>
     </div>
   )
 }

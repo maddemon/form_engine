@@ -33,7 +33,7 @@ export default function DatePickerPropsRender({ widgets: w, values, onChange }: 
       <RowField label="最大值">
         <w.Select value={(values.maxDate as string) ?? ''} onChange={(v) => onChange('maxDate', v)} options={DATE_PRESET_OPTIONS} />
       </RowField>
-      <RowField label="不可选日期表达式">
+      <RowField label="是否可选">
         <w.Input value={(values.disabledDate as string) ?? ''} onChange={(v) => onChange('disabledDate', v)} placeholder="如：date < new Date()" />
       </RowField>
     </>

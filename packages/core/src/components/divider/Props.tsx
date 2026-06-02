@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField, RowField } from '../../propRenders/shared'
+import { FieldGroup, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function DividerPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -25,9 +25,9 @@ export default function DividerPropsRender({ widgets: w, values, onChange }: Pro
           ]}
         />
       </FieldGroup>
-      <InlineField label="简单模式">
-        <w.Checkbox checked={!!values.plain} onChange={(v) => onChange('plain', v)} />
-      </InlineField>
+      <RowField label="简单模式">
+        <w.Switch checked={!!values.plain} onChange={(v) => onChange('plain', v)} />
+      </RowField>
       <RowField label="文字内容">
         <w.Input value={(values.children as string) ?? ''} onChange={(v) => onChange('children', v)} placeholder="分割线中的文字" />
       </RowField>

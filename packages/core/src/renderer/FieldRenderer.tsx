@@ -6,6 +6,7 @@ import { matchVisibleWhen, evalExpr } from '../utils'
 import { resolveEvents, type EventContext } from '../events'
 import { getEventDeclarations } from '../components'
 import { useStyle } from '../styles'
+import { isFormComponent } from '../types/component-category'
 
 export interface FieldRendererProps {
   field: FormFieldSchema
@@ -62,8 +63,9 @@ export function FieldRenderer({
       : false) ||
     (field.requiredWhen ? matchVisibleWhen(field.requiredWhen, { [field.name]: value } as Record<string, unknown>) : false)
 
-  // label 渲染
-  const label = (
+  // label 渲染（仅表单组件显示 label）
+  const showLabel = isFormComponent(field.type) && field.label
+  const label = !showLabel ? null : (
     <label className="fe-field-label" style={{ display: 'block', marginBottom: 'var(--fe-spacing-xs, 4px)', fontWeight: isRequired ? 'var(--fe-font-weight-semibold, 600)' : 'var(--fe-font-weight-regular, 400)' }}>
       {isRequired && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
       {field.label}
@@ -117,7 +119,6 @@ export function FieldRenderer({
     placeholder: field.placeholder,
     options: resolvedOptions,
     fieldSchema: field,
-    adapter,
     ...field.componentProps,            // ③ 透传（优先级：内置 < componentProps）
     ...eventHandlers,                   // ④ 事件处理器最后 spread，最高优先级
   }

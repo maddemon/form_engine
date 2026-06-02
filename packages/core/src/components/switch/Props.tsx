@@ -1,11 +1,11 @@
-import { FieldGroup, InlineField, PropsRenderProps, RowField } from '../../propRenders'
+import { FieldGroup, PropsRenderProps, RowField } from '../../propRenders'
 
 export default function SwitchPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <InlineField label="默认选中">
-        <w.Checkbox checked={!!values.defaultValue} onChange={(v) => onChange('defaultValue', v)} />
-      </InlineField>
+      <RowField label="默认选中">
+        <w.Switch checked={!!values.defaultValue} onChange={(v) => onChange('defaultValue', v)} />
+      </RowField>
       <FieldGroup label="尺寸">
         <w.ButtonGroup
           value={(values.size as string) ?? 'default'}

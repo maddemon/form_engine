@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField, RowField } from '../../propRenders/shared'
+import { FieldGroup, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function DateRangePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -23,7 +23,7 @@ export default function DateRangePropsRender({ widgets: w, values, onChange }: P
         />
       </RowField>
       <RowField label="显示时间">
-        <w.Checkbox checked={!!values.showTime} onChange={(v) => onChange('showTime', v)} />
+        <w.Switch checked={!!values.showTime} onChange={(v) => onChange('showTime', v)} />
       </RowField>
       <FieldGroup label="开始占位文本">
         <w.Input value={((values.placeholder as string[])?.[0]) ?? ''} onChange={(v) => onChange('placeholder', [(v as string) || '开始日期', ((values.placeholder as string[])?.[1]) ?? '结束日期'])} placeholder="开始日期" />
@@ -31,9 +31,9 @@ export default function DateRangePropsRender({ widgets: w, values, onChange }: P
       <FieldGroup label="结束占位文本">
         <w.Input value={((values.placeholder as string[])?.[1]) ?? ''} onChange={(v) => onChange('placeholder', [((values.placeholder as string[])?.[0]) ?? '开始日期', (v as string) || '结束日期'])} placeholder="结束日期" />
       </FieldGroup>
-      <InlineField label="允许清除">
-        <w.Checkbox checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
-      </InlineField>
+      <RowField label="允许清除">
+        <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
+      </RowField>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { FieldGroup, RowField, PropsRenderProps } from '../../propRenders'
+import { PropsRenderProps, RowField } from '../../propRenders'
 
 export default function InputPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
@@ -21,7 +21,7 @@ export default function InputPropsRender({ widgets: w, values, onChange }: Props
       <RowField label="自动完成">
         <w.Input value={(values.autoComplete as string) ?? ''} onChange={(v) => onChange('autoComplete', v)} placeholder="如：off" />
       </RowField>
-      <FieldGroup label="输入类型">
+      <RowField label="类型">
         <w.ButtonGroup
           value={(values.type as string) ?? 'text'}
           onChange={(v) => onChange('type', v)}
@@ -32,7 +32,7 @@ export default function InputPropsRender({ widgets: w, values, onChange }: Props
             { label: 'URL', value: 'url' },
           ]}
         />
-      </FieldGroup>
+      </RowField>
     </>
   )
 }

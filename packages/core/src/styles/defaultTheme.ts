@@ -130,6 +130,7 @@ export interface ThemeTokens {
 
   // Widget 物理尺寸
   widgetPaletteIconBox: string
+  widgetPaletteFontSize: string
   widgetFieldHandleFontSize: string
   widgetCanvasDndShadow: string
 
@@ -273,6 +274,7 @@ export const defaultTheme: ThemeTokens = {
 
   // Widget 物理尺寸
   widgetPaletteIconBox: '20px',
+  widgetPaletteFontSize: '11px',
   widgetFieldHandleFontSize: '12px',
   widgetCanvasDndShadow: '0 2px 8px rgba(22, 119, 255, 0.3)',
 

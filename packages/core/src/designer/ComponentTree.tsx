@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useStyle } from '../styles'
 
 interface TreeItem {
@@ -46,16 +46,35 @@ const TreeNode: React.FC<{ item: TreeItem; selectedId: string | null; onSelect: 
 
 export const ComponentTree: React.FC<ComponentTreeProps> = ({ items, selectedId, onSelect, onClose }) => {
   const { token } = useStyle()
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onClose()
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [onClose])
+
   return (
     <div
+      ref={ref}
       style={{
-        position: 'relative',
+        position: 'absolute',
+        top: 36,
+        left: 0,
+        width: 220,
         padding: `${token('spacingSm')} ${token('spacingMd')}`,
-        background: 'var(--fe-bg-primary)',
-        borderBottom: '1px solid var(--fe-border-light)',
-        maxHeight: 200,
+        background: 'var(--fe-bg-elevated)',
+        border: '1px solid var(--fe-border-light)',
+        borderRadius: token('borderRadiusMd'),
+        boxShadow: 'var(--fe-shadow-lg)',
+        maxHeight: 300,
         overflow: 'auto',
         fontSize: token('fontSizeSm'),
+        zIndex: 100,
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: token('spacingSm') }}>

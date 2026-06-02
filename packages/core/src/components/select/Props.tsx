@@ -1,4 +1,4 @@
-import { FieldGroup, RowField, OptionRender, PropsRenderProps } from '../../propRenders'
+import { FieldGroup, OptionRender, PropsRenderProps, RowField } from '../../propRenders'
 
 const MODE_OPTIONS = [
   { label: '默认', value: '' },
@@ -12,13 +12,9 @@ export default function SelectPropsRender({ widgets: w, values, onChange }: Prop
       <FieldGroup label="选项">
         <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
       </FieldGroup>
-      <FieldGroup label="模式">
-        <w.Select
-          value={(values.mode as string) ?? ''}
-          onChange={(v) => onChange('mode', v)}
-          options={MODE_OPTIONS}
-        />
-      </FieldGroup>
+      <RowField label="模式">
+        <w.ButtonGroup options={MODE_OPTIONS} value={(values.mode as string) ?? ''} onChange={(v) => onChange('mode', v)} />
+      </RowField>
       {['multiple', 'tags'].includes(values.mode as string) && (
         <RowField label="最多标签数">
           <w.NumberInput value={(values.maxTagCount as number) ?? undefined} onChange={(v) => onChange('maxTagCount', v)} min={1} />

@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField, RowField } from '../../propRenders/shared'
+import { FieldGroup, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function TextPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -26,7 +26,7 @@ export default function TextPropsRender({ widgets: w, values, onChange }: PropsR
       <RowField label="颜色">
         <w.Input value={(values.color as string) ?? ''} onChange={(v) => onChange('color', v)} placeholder="如: #333" />
       </RowField>
-      <FieldGroup label="对齐方式">
+      <RowField label="对齐方式">
         <w.ButtonGroup
           value={(values.align as string) ?? 'left'}
           onChange={(v) => onChange('align', v)}
@@ -36,31 +36,31 @@ export default function TextPropsRender({ widgets: w, values, onChange }: PropsR
             { label: '右', value: 'right' },
           ]}
         />
-      </FieldGroup>
-      <InlineField label="键盘样式">
-        <w.Checkbox checked={!!values.keyboard} onChange={(v) => onChange('keyboard', v)} />
-      </InlineField>
-      <InlineField label="加粗">
-        <w.Checkbox checked={!!values.strong} onChange={(v) => onChange('strong', v)} />
-      </InlineField>
-      <InlineField label="斜体">
-        <w.Checkbox checked={!!values.italic} onChange={(v) => onChange('italic', v)} />
-      </InlineField>
-      <InlineField label="下划线">
-        <w.Checkbox checked={!!values.underline} onChange={(v) => onChange('underline', v)} />
-      </InlineField>
-      <InlineField label="删除线">
-        <w.Checkbox checked={!!values.delete} onChange={(v) => onChange('delete', v)} />
-      </InlineField>
-      <InlineField label="代码">
-        <w.Checkbox checked={!!values.code} onChange={(v) => onChange('code', v)} />
-      </InlineField>
-      <InlineField label="标记">
-        <w.Checkbox checked={!!values.mark} onChange={(v) => onChange('mark', v)} />
-      </InlineField>
-      <InlineField label="省略溢出">
-        <w.Checkbox checked={!!values.ellipsis} onChange={(v) => onChange('ellipsis', v)} />
-      </InlineField>
+      </RowField>
+      <RowField label="键盘样式">
+        <w.Switch checked={!!values.keyboard} onChange={(v) => onChange('keyboard', v)} />
+      </RowField>
+      <RowField label="加粗">
+        <w.Switch checked={!!values.strong} onChange={(v) => onChange('strong', v)} />
+      </RowField>
+      <RowField label="斜体">
+        <w.Switch checked={!!values.italic} onChange={(v) => onChange('italic', v)} />
+      </RowField>
+      <RowField label="下划线">
+        <w.Switch checked={!!values.underline} onChange={(v) => onChange('underline', v)} />
+      </RowField>
+      <RowField label="删除线">
+        <w.Switch checked={!!values.delete} onChange={(v) => onChange('delete', v)} />
+      </RowField>
+      <RowField label="代码">
+        <w.Switch checked={!!values.code} onChange={(v) => onChange('code', v)} />
+      </RowField>
+      <RowField label="标记">
+        <w.Switch checked={!!values.mark} onChange={(v) => onChange('mark', v)} />
+      </RowField>
+      <RowField label="省略溢出">
+        <w.Switch checked={!!values.ellipsis} onChange={(v) => onChange('ellipsis', v)} />
+      </RowField>
     </>
   )
 }

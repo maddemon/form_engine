@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField } from '../../propRenders/shared'
+import { FieldGroup, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function ButtonPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -34,15 +34,15 @@ export default function ButtonPropsRender({ widgets: w, values, onChange }: Prop
       <FieldGroup label="文字内容">
         <w.Input value={(values.children as string) ?? ''} onChange={(v) => onChange('children', v)} placeholder="按钮文字" />
       </FieldGroup>
-      <InlineField label="宽度铺满">
-        <w.Checkbox checked={!!values.block} onChange={(v) => onChange('block', v)} />
-      </InlineField>
-      <InlineField label="危险">
-        <w.Checkbox checked={!!values.danger} onChange={(v) => onChange('danger', v)} />
-      </InlineField>
-      <InlineField label="加载中">
-        <w.Checkbox checked={!!values.loading} onChange={(v) => onChange('loading', v)} />
-      </InlineField>
+      <RowField label="宽度铺满">
+        <w.Switch checked={!!values.block} onChange={(v) => onChange('block', v)} />
+      </RowField>
+      <RowField label="危险">
+        <w.Switch checked={!!values.danger} onChange={(v) => onChange('danger', v)} />
+      </RowField>
+      <RowField label="加载中">
+        <w.Switch checked={!!values.loading} onChange={(v) => onChange('loading', v)} />
+      </RowField>
     </>
   )
 }

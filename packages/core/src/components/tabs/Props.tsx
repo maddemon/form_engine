@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField } from '../../propRenders/shared'
+import { FieldGroup, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function TabsPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -38,9 +38,9 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
           ]}
         />
       </FieldGroup>
-      <InlineField label="居中展示">
-        <w.Checkbox checked={!!values.centered} onChange={(v) => onChange('centered', v)} />
-      </InlineField>
+      <RowField label="居中展示">
+        <w.Switch checked={!!values.centered} onChange={(v) => onChange('centered', v)} />
+      </RowField>
     </>
   )
 }
