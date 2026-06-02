@@ -21,6 +21,8 @@ export interface FieldRendererProps {
    * 不传时事件系统降级为无 events 配置（向后兼容）
    */
   eventContext?: EventContext
+  /** 校验错误信息（由 FormRender 的 fieldErrors 注入） */
+  errors?: string[]
 }
 
 /**
@@ -43,6 +45,7 @@ export function FieldRenderer({
   adapter,
   components = {},
   eventContext,
+  errors,
 }: FieldRendererProps) {
   const { token } = useStyle()
 
@@ -111,6 +114,8 @@ export function FieldRenderer({
     eventHandlers.onChange?.(newValue)          // ② 再执行用户事件
   }
 
+  const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
+
   const fieldProps: Record<string, unknown> = {
     value,
     onChange: handleChange,
@@ -119,6 +124,10 @@ export function FieldRenderer({
     placeholder: field.placeholder,
     options: resolvedOptions,
     fieldSchema: field,
+    required: isRequired,
+    rules: field.rules,
+    validateStatus: errorMsg ? 'error' : undefined,
+    help: errorMsg,
     ...field.componentProps,            // ③ 透传（优先级：内置 < componentProps）
     ...eventHandlers,                   // ④ 事件处理器最后 spread，最高优先级
   }
@@ -149,6 +158,11 @@ export function FieldRenderer({
     <div className="fe-field">
       {label}
       {renderFn(fieldProps)}
+      {errorMsg && (
+        <div style={{ color: token('error') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>
+          {errorMsg}
+        </div>
+      )}
     </div>
   )
 }

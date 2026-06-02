@@ -4,6 +4,17 @@ import type { PropsRenderProps } from '../../propRenders/types'
 export default function ButtonPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
+      <FieldGroup label="尺寸">
+        <w.ButtonGroup
+          value={(values.size as string) ?? 'middle'}
+          onChange={(v) => onChange('size', v)}
+          options={[
+            { label: '小', value: 'small' },
+            { label: '中', value: 'middle' },
+            { label: '大', value: 'large' },
+          ]}
+        />
+      </FieldGroup>
       <FieldGroup label="按钮类型">
         <w.ButtonGroup
           value={(values.type as string) ?? 'default'}

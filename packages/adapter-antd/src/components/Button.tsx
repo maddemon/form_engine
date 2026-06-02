@@ -13,6 +13,7 @@ import type { ButtonProps } from '@form-engine/core'
 export const Button: React.FC<ButtonProps> = ({
   children,
   type = 'default',
+  size = 'middle',
   htmlType = 'button',
   loading,
   danger,
@@ -25,10 +26,11 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   // 映射 type
   const antType = type === 'default' ? 'default' : type
-  
+
   return (
     <AntButton
       type={antType as any}
+      size={size}
       htmlType={htmlType}
       loading={loading}
       danger={danger}

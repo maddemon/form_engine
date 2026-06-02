@@ -55,6 +55,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
   const [fieldOptions, setFieldOptions] = useState<Record<string, OptionItem[]>>({})
   // 记录每个 field 当前请求的依赖快照，避免过期响应覆盖
   const [fieldDepsSnapshot, setFieldDepsSnapshot] = useState<Record<string, string>>({})
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
   const formSchema = useMemo(() => schema, [schema])
 
@@ -83,6 +84,12 @@ export const FormRender: React.FC<FormRenderProps> = ({
       setFormValues(prev => {
         const next = { ...prev, [name]: value }
         onChange?.(next)
+        return next
+      })
+      setFieldErrors(prev => {
+        if (!prev[name]) return prev
+        const next = { ...prev }
+        delete next[name]
         return next
       })
     },
@@ -118,6 +125,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
   // 重置表单
   const reset = useCallback(() => {
     setFormValues(initialValues)
+    setFieldErrors({})
     onChange?.(initialValues)
   }, [initialValues, onChange])
 
@@ -263,9 +271,15 @@ export const FormRender: React.FC<FormRenderProps> = ({
     })
   }, [formValues, formSchema.fields, loadDataSource])
 
-  // 提交（form onSubmit 调用）
+  // 提交（form onSubmit 调用），先校验后提交
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    const result = validateForm(visibleFields, formValues)
+    if (!result.valid) {
+      setFieldErrors(result.errors)
+      return
+    }
+    setFieldErrors({})
     submit()
   }
 
@@ -289,6 +303,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
         adapter={adapter}
         components={components}
         eventContext={eventContext}
+        errors={fieldErrors[field.name]}
       />
     )
   }

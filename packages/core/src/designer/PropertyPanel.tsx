@@ -13,6 +13,7 @@ import { resolvePanelWidth } from '../utils'
 import { CollapsibleSection } from './CollapsibleSection'
 import { EventHandlerEditor } from './EventHandlerEditor'
 import { FormConfigPanel } from './FormConfigPanel'
+import { RulesEditor } from './RulesEditor'
 import { defaultDesignerWidgets } from './widgets'
 
 /**
@@ -45,7 +46,7 @@ function useWidgets(designerWidgets?: DesignerWidgets) {
 }
 
 function hasAdvancedConfig(field: FormFieldSchema): boolean {
-  return !!((typeof field.hidden === 'boolean' && field.hidden) || (typeof field.hidden === 'string' && field.hidden) || field.disabled || field.readOnly || field.requiredIfExpr)
+  return !!((typeof field.hidden === 'boolean' && field.hidden) || (typeof field.hidden === 'string' && field.hidden) || field.disabled || field.readOnly || field.requiredIfExpr || (field.rules && field.rules.length > 0))
 }
 
 /**
@@ -94,7 +95,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
   return (
     <>
       <RowField label="字段名">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingXs'), flex: 1 }}>
           <w.Input
             value={field.name}
             onChange={(v: string | number) => {
@@ -155,6 +156,9 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
           <RowField label="列宽">
             <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
           </RowField>
+        )}
+        {isForm && (
+          <RulesEditor field={field} widgets={w} dispatch={dispatch} />
         )}
         <RowField label="隐藏">
           <w.Switch checked={!!field.hidden && typeof field.hidden === 'boolean'} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: v } })} />

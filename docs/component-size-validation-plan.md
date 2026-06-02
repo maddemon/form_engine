@@ -64,6 +64,8 @@ interface FormRule {
 - **错误提示**：`<w.Input>` 输入自定义错误消息，placeholder 显示默认提示（如"此字段为必填"）
 - **正则验证**：`<w.Input>` 输入正则表达式 `rules[0].pattern`
 - **常用正则预设**：`<w.Select>` 下拉选择，选项：
+
+> **注意**：当前仅编辑 `rules[0]`（单条规则）。`FormRule[]` 支持多条规则，但 v1 编辑器暂不提供多规则管理 UI。`validate.ts` 仍会校验所有规则。
   - 手机号（中国）：`^1[3-9]\d{9}$`
   - 身份证号（18位）：`^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$`
   - 邮箱：`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
@@ -91,23 +93,32 @@ interface FormRule {
 
 ## 步骤 4：提交时校验
 
-### 4.1 校验逻辑 — 新建 `packages/core/src/renderer/validation.ts`
-- 实现 `validateField(field, value): { valid: boolean; message?: string }` 
-- 支持：required 检查、pattern 正则匹配、type 类型校验（email/url/phone）
-- `validateForm(fields, values): Record<string, string>` 返回 `{ fieldName: errorMessage }`
+### 4.1 校验逻辑 — 复用已有 `packages/core/src/renderer/validate.ts`
+
+已有实现：
+- `checkRule(value, rule): string | null` — 单条规则检查
+- `validateForm(fields, values, name?): { valid: boolean; errors: Record<string, string[]> }` — 按字段名索引的错误数组
+- 支持：required / min / max / len / pattern / type（string/number/boolean/email/url/phone）
+- 本期新增函数 `getFieldError(errors, name): string | undefined` 用于从 errors 中提取首条错误
+
+**⚠️ 类型说明**：`errors` 为 `Record<string, string[]>`（冲突值存数组），FieldRenderer 只展示首条。
+**`validateForm` 已在 `FormRender.tsx:15` 导入**，无需新建文件。
 
 ### 4.2 FormRender 状态管理 — `packages/core/src/renderer/FormRender.tsx`
-- 新增状态：`const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})`
+- 新增状态：`const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})`
+- `handleFieldChange` 增加清空动作：值变化时清除该字段的错误 `setFieldErrors(prev => ({ ...prev, [name]: undefined }))`（跳过 setState 中的 undefined key 即可）
 - 修改 `handleSubmit`：
   - 先调用 `validateForm(visibleFields, formValues)` 获取所有字段的错误
-  - 有错误时：`setFieldErrors(errors)`，**不调用** `onSubmit`
-  - 无错误时：清空 `fieldErrors`，调用 `onSubmit?.(formValues)`
-- 字段值变化时清除对应字段的错误
+  - 有错误时：`setFieldErrors(errors)`，**不调用** `submit()`
+  - 无错误时：清空 `fieldErrors = {}`，调用 `submit()`
+- 修改 `renderNestedField`：从 `fieldErrors` 取出当前字段错误数组传给 `FieldRenderer`
 
 ### 4.3 FieldRenderer 展示校验错误 — `packages/core/src/renderer/FieldRenderer.tsx`
-- 新增 prop `error?: string`
-- 有错误时在组件下方展示红色错误文字（模拟 antd Form.Item 的 `help` 样式）
-- 将 `validateStatus`（`'error'` 或 `undefined`）传递给 adapter 组件
+- 新增 prop `errors?: string[]`（来自 validate.ts 的 `Record<string, string[]>`）
+- 有错误时取 `errors[0]` 作为展示文案
+- 在组件下方展示红色错误文字（模拟 antd Form.Item 的 `help` 样式）
+- 将 `validateStatus={'error'}` 和 `help={errors[0]}` 传递给 adapter 组件（通过 fieldProps）
+- 同时增加 `required: true` 到 fieldProps（已由 isRequired 判断）
 
 ### 4.4 Adapter 组件支持校验状态
 以 Input 为例 — `packages/adapter-antd/src/components/Input.tsx`：
@@ -117,7 +128,7 @@ interface FormRule {
 若 adapter 组件不处理 `validateStatus`/`help`，则 FieldRenderer 的红色文字兜底生效。
 
 ### 4.5 FormRender 传递 errors — `packages/core/src/renderer/FormRender.tsx`
-- 修改 `renderNestedField`，从 `fieldErrors` 中取出当前字段 error 传给 `FieldRenderer`
+- 修改 `renderNestedField`，从 `fieldErrors[field.name]` 取出错误数组传给 `FieldRenderer` 的 `errors` prop
 
 ---
 
@@ -152,8 +163,8 @@ interface FormRule {
 ### 步骤 4（提交时校验）
 | 文件 | 改动 |
 |------|------|
-| `packages/core/src/renderer/validation.ts` | **新建** — 校验函数 |
-| `packages/core/src/renderer/FieldRenderer.tsx` | 增加 error/validateStatus props |
-| `packages/core/src/renderer/FormRender.tsx` | fieldErrors 状态、提交校验、传递 errors 给 FieldRenderer |
+| `packages/core/src/renderer/validate.ts` | 已有，无需新建；新增 `getFieldError` 工具函数 |
+| `packages/core/src/renderer/FieldRenderer.tsx` | 增加 `errors` prop + `validateStatus`/`help` 透传 |
+| `packages/core/src/renderer/FormRender.tsx` | fieldErrors 状态、handleFieldChange 清错、handleSubmit 校验、传递 errors |
 
 ## 状态：📋 规划中
