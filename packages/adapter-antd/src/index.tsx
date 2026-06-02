@@ -46,6 +46,7 @@ export { Flex } from './components/Flex'
 export { Container } from './components/Container'
 export { Collapse, CollapsePanel } from './components/Collapse'
 export { Tabs, TabPane } from './components/Tabs'
+export { Table } from './components/Table'
 
 // 展示组件
 export { Text } from './components/Text'
@@ -98,6 +99,7 @@ export const antdComponents = {
   'Container': React.lazy(() => import('./components/Container').then(m => ({ default: m.Container }))),
   'Collapse': React.lazy(() => import('./components/Collapse').then(m => ({ default: m.Collapse }))),
   'Tabs': React.lazy(() => import('./components/Tabs').then(m => ({ default: m.Tabs }))),
+  'Table': React.lazy(() => import('./components/Table').then(m => ({ default: m.Table }))),
   
   // 展示组件
   'Text': React.lazy(() => import('./components/Text').then(m => ({ default: m.Text }))),
@@ -199,6 +201,7 @@ export const antdAdapter = {
   'flex': createFieldRenderer(antdComponents['Flex']),
   'collapse': createFieldRenderer(antdComponents['Collapse']),
   'tabs': createFieldRenderer(antdComponents['Tabs']),
+  'table': createFieldRenderer(antdComponents['Table']),
   'text': createFieldRenderer(antdComponents['Text']),
   'image': createFieldRenderer(antdComponents['Image']),
   'divider': createFieldRenderer(antdComponents['Divider']),

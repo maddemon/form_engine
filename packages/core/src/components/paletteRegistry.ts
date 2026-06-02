@@ -20,6 +20,7 @@ import { palette as ratePalette } from './rate/palette'
 import { palette as selectPalette } from './select/palette'
 import { palette as sliderPalette } from './slider/palette'
 import { palette as switchPalette } from './switch/palette'
+import { palette as tablePalette } from './table/palette'
 import { palette as tabsPalette } from './tabs/palette'
 import { palette as textPalette } from './text/palette'
 import { palette as textareaPalette } from './textarea/palette'
@@ -48,6 +49,7 @@ export const componentPalettes: Record<string, ComponentPalette> = {
   flex: flexPalette,
   container: containerPalette,
   collapse: collapsePalette,
+  table: tablePalette,
   tabs: tabsPalette,
   text: textPalette,
   image: imagePalette,

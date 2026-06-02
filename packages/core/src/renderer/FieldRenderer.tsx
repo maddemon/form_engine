@@ -117,6 +117,7 @@ export function FieldRenderer({
     placeholder: field.placeholder,
     options: resolvedOptions,
     fieldSchema: field,
+    adapter,
     ...field.componentProps,            // ③ 透传（优先级：内置 < componentProps）
     ...eventHandlers,                   // ④ 事件处理器最后 spread，最高优先级
   }

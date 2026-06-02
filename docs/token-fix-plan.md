@@ -21,7 +21,7 @@
 | 简单静态数值 | `gap: 4` → `token('spacingXs')` 或 `var(--fe-spacing-xs)` | 走 token，未来可主题化 |
 | 复合值 `1px solid #xxx` | `` `1px solid ${t.borderPrimary}` `` | 拼接场景必走 token() |
 | 条件逻辑样式（selected/isOver） | 工厂函数返回动态对象 | 已有 `createDesignerStyles(t)` 样板 |
-| 第三方/外部固定值 | 加 `// check-tokens-disable-line` 兜底 | 仅在无法 token 化时使用 |
+
 
 **禁止**：
 - 引入 CSS-in-JS 库（emotion/styled-components）—— 扩大改动面
@@ -50,7 +50,7 @@
 | `#f5f5f5` | `var(--fe-bg-secondary)` |
 | `#fafafa` | `var(--fe-bg-tertiary)` |
 | `#f0f5ff` | `var(--fe-primary-hover-bg)` |
-| `#f0f8ff` | **例外保留硬编码**（DnD 高亮，业务反馈色，`check-tokens-disable-line` + 注释） |
+| `#f0f8ff` | **例外保留硬编码**（DnD 高亮，业务反馈色） |
 | `#ff4d4f` | `var(--fe-error)` / `token('error')` |
 | `#52c41a` 等其他 antd 业务色 | 对应 token |
 
@@ -65,10 +65,8 @@
 | `fontSize: 10 / 11 / 12` | `fontSizeXs` 或 `0.857em`（小标签专用） |
 | `fontSize: 14` | `fontSizeMd` |
 | `fontSize: 16` | `fontSizeLg` |
-| `width/height: 16/20/36` | 保留为 switch 物理尺寸（必要例外，`check-tokens-disable-line`） |
 | `borderRadius: 2/3/4/6/8` | `borderRadiusXs/Sm/Md/Lg` |
 
-> 任何无法映射的特殊值（switch 物理尺寸 36/20/16）使用 `// check-tokens-disable-line` 兜底，注释说明。
 
 ## 文件清单（共 20 个）
 
@@ -121,7 +119,7 @@
 **修复策略**：直接去掉 fallback，保留 `var(--fe-xxx)`。StyleProvider 通过 [StyleProvider.tsx](file:///d:/Repos/form_engine/packages/core/src/styles/StyleProvider.tsx) 在 `<head>` 注入 `:root { --fe-xxx: ... }`，构建产物里一定存在。
 
 ### 物理尺寸豁免
-- [Switch.tsx](file:///d:/Repos/form_engine/packages/core/src/widgets/Switch.tsx) 的 `width: 36 / height: 20 / borderRadius: 10 / top: 2 / left: 18` 是 switch 组件的物理尺寸，**不属于主题 token**。使用 `// check-tokens-disable-line` 标注 + 注释。
+- [Switch.tsx](file:///d:/Repos/form_engine/packages/core/src/widgets/Switch.tsx) 的 `width: 36 / height: 20 / borderRadius: 10 / top: 2 / left: 18` 是 switch 组件的物理尺寸，**不属于主题 token**。
 - [ContainerPreview.tsx](file:///d:/Repos/form_engine/packages/core/src/designer/ContainerPreview.tsx) 的 `minHeight: 60` 是容器最小高度，同上。
 - [Canvas.tsx](file:///d:/Repos/form_engine/packages/core/src/designer/Canvas.tsx) 和 [ContainerPreview.tsx](file:///d:/Repos/form_engine/packages/core/src/designer/ContainerPreview.tsx) 的 `#f0f8ff` 是 DnD 高亮业务反馈色，按 [theme-tokens.md](./../.agents/rules/theme-tokens.md) 例外条款保留 + 注释。
 - [ButtonGroup.tsx](file:///d:/Repos/form_engine/packages/core/src/widgets/ButtonGroup.tsx) 的 `gap: 0` 是 ButtonGroup 内嵌默认行为（按钮紧贴），disable-line 兜底。

@@ -1,6 +1,7 @@
-import React from 'react'
-import type { PaletteItem, PaletteGroup } from '../types/designer'
+import React, { useState } from 'react'
+import type { PaletteItem, PaletteGroup, SidePanelTab, SidePanelTabContentProps } from '../types/designer'
 import type { FormFieldSchema, FieldType } from '../types'
+import type { DesignerAction } from '../types/designer'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { defaultPaletteGroups } from './paletteData'
 import { useDraggable } from '@dnd-kit/core'
@@ -8,10 +9,9 @@ import { getComponentIcon } from '../components/paletteRegistry'
 import { useStyle } from '../styles'
 import { resolvePanelWidth } from '../utils'
 
-/**
- * 调色板最小宽度（防呆）：再小就显示不下 2 列 grid
- */
 const MIN_PALETTE_WIDTH = 160
+// Matches the component library icon used elsewhere
+const COMPONENT_LIB_TAB_KEY = '__component-lib__'
 
 function DefaultIcon() {
   const { token } = useStyle()
@@ -76,13 +76,17 @@ export function generateFieldId(type: FieldType): string {
 
 export function createFieldFromPalette(item: PaletteItem): FormFieldSchema {
   const randomSuffix = Math.random().toString(36).substring(2, 8)
-  return {
+  const base = {
     id: generateFieldId(item.type),
     name: `${item.type}_${randomSuffix}`,
     type: item.type,
     label: item.label,
     ...(item.defaultProps || {}),
+  } as FormFieldSchema
+  if (item.extraData) {
+    base.componentProps = { ...(base.componentProps || {}), ...item.extraData }
   }
+  return base
 }
 
 const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
@@ -93,6 +97,7 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
       fieldType: item.type,
       label: item.label,
       defaultProps: item.defaultProps || {},
+      extraData: item.extraData || {},
     },
   })
   const { token } = useStyle()
@@ -130,25 +135,11 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
   )
 }
 
-interface FieldListProps {
-  groups?: PaletteGroup[]
-  excludeTypes?: string[]
-  /**
-   * 可选：面板宽度
-   *  - `number`：px（小于 160 自动降级到 160）
-   *  - `string`：透传 CSS 宽度（如 '20%'、'min(220px, 18vw)'）
-   *  - 缺省：token 默认（`--fe-panel-field-list-width`）
-   */
-  width?: number | string
-}
-
-export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, width }) => {
-  const finalGroups = groups || getFullPaletteGroups(excludeTypes)
+function ComponentLibContent({ groups }: { groups: PaletteGroup[] }) {
   const { token } = useStyle()
-  const resolvedWidth = resolvePanelWidth(width, token('panelFieldListWidth') as string, MIN_PALETTE_WIDTH)
   return (
-    <div style={{ width: resolvedWidth, borderRight: '1px solid var(--fe-border-light)', padding: `${token('spacingSm')} ${token('spacingMd')}`, overflow: 'auto', height: '100%', background: 'var(--fe-bg-tertiary)' }}>
-      {finalGroups.map(group => (
+    <>
+      {groups.map(group => (
         <div key={group.groupName} style={{ marginBottom: 'var(--fe-spacing-md)' }}>
           <div style={{ fontSize: 'var(--fe-font-size-xs)', color: 'var(--fe-text-muted)', fontWeight: 500, padding: 'var(--fe-spacing-xs) var(--fe-spacing-xs) var(--fe-spacing-sm)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
             {group.groupName}
@@ -160,6 +151,80 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, widt
           </div>
         </div>
       ))}
+    </>
+  )
+}
+
+interface FieldListProps {
+  groups?: PaletteGroup[]
+  excludeTypes?: string[]
+  width?: number | string
+  sidePanelTabs?: SidePanelTab[]
+  fields?: FormFieldSchema[]
+  selectedFieldId?: string | null
+  dispatch?: React.Dispatch<DesignerAction>
+}
+
+export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, width, sidePanelTabs, fields = [], selectedFieldId = null, dispatch }) => {
+  const finalGroups = groups || getFullPaletteGroups(excludeTypes)
+  const { token } = useStyle()
+  const resolvedWidth = resolvePanelWidth(width, token('panelFieldListWidth') as string, MIN_PALETTE_WIDTH)
+  const hasTabs = sidePanelTabs && sidePanelTabs.length > 0
+  const [activeTab, setActiveTab] = useState(COMPONENT_LIB_TAB_KEY)
+
+  const allTabs = hasTabs
+    ? [{ key: COMPONENT_LIB_TAB_KEY, title: '组件库', icon: getComponentIcon('input') || <DefaultIcon /> }, ...sidePanelTabs]
+    : []
+
+  const tabContentProps: SidePanelTabContentProps = { fields, selectedFieldId, dispatch: dispatch || (() => {}) }
+
+  if (!hasTabs) {
+    return (
+      <div style={{ width: resolvedWidth, borderRight: '1px solid var(--fe-border-light)', padding: `${token('spacingSm')} ${token('spacingMd')}`, overflow: 'auto', height: '100%', background: 'var(--fe-bg-tertiary)' }}>
+        <ComponentLibContent groups={finalGroups} />
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ width: resolvedWidth, borderRight: '1px solid var(--fe-border-light)', display: 'flex', height: '100%', background: 'var(--fe-bg-tertiary)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--fe-border-light)', padding: `${token('spacingXs')} 0`, gap: token('spacingXs'), flexShrink: 0 }}>
+        {allTabs.map(tab => (
+          <button
+            key={tab.key}
+            title={tab.title}
+            onClick={() => setActiveTab(tab.key)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: token('spacing2xl') as string,
+              height: token('spacing2xl') as string,
+              border: 'none',
+              background: activeTab === tab.key ? 'var(--fe-primary-bg)' : 'transparent',
+              color: activeTab === tab.key ? 'var(--fe-primary)' : 'var(--fe-text-muted)',
+              cursor: 'pointer',
+              borderRadius: token('borderRadiusSm'),
+              fontSize: token('fontSizeMd'),
+              margin: `0 ${token('spacingXs')}`,
+            }}
+          >
+            {tab.icon}
+          </button>
+        ))}
+      </div>
+      <div style={{ flex: 1, overflow: 'auto', padding: `${token('spacingSm')} ${token('spacingMd')}` }}>
+        {activeTab === COMPONENT_LIB_TAB_KEY ? (
+          <ComponentLibContent groups={finalGroups} />
+        ) : (
+          (() => {
+            const tab = sidePanelTabs?.find(t => t.key === activeTab)
+            if (!tab) return null
+            const TabContent = tab.content
+            return <TabContent {...tabContentProps} />
+          })()
+        )}
+      </div>
     </div>
   )
 }

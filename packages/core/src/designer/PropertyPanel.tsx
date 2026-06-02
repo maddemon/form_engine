@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { getEventDeclarations } from '../components'
 import { FieldGroup, InlineField, PropsRenderMap, RowField } from '../propRenders'
 import CustomPropsRender from '../propRenders/CustomPropsRender'
@@ -7,7 +7,7 @@ import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { useStyle } from '../styles'
 import type { DesignerWidgets, FormEngineAdapter } from '../types/adapter'
 import { getComponentCategory } from '../types/component-category'
-import type { DesignerAction } from '../types/designer'
+import type { DesignerAction, PropertyPanelTab } from '../types/designer'
 import type { EventDeclaration, FormFieldEvents } from '../types/events'
 import type { FormFieldSchema } from '../types/schema'
 import { CollapsibleSection } from './CollapsibleSection'
@@ -20,6 +20,7 @@ import { resolvePanelWidth } from '../utils'
  * 属性面板最小宽度（防呆）：再小 RowField / 控件就显示不全
  */
 const MIN_PROPERTIES_WIDTH = 240
+const PROPERTIES_DEFAULT_TAB_KEY = '__default-props__'
 
 interface PropertyPanelProps {
   field: FormFieldSchema | null
@@ -37,6 +38,8 @@ interface PropertyPanelProps {
    *  - 缺省：token 默认（`--fe-panel-config-width`）
    */
   width?: number | string
+  /** 右侧属性面板扩展 Tab（有值时自动切换为 Segment Tab 布局） */
+  propertyPanelTabs?: PropertyPanelTab[]
 }
 
 function useWidgets(designerWidgets?: DesignerWidgets) {
@@ -60,32 +63,23 @@ function getFieldEventDeclarations(field: FormFieldSchema): EventDeclaration[] {
   return getEventDeclarations(field.type)
 }
 
-export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, submitConfig, dispatch, designerWidgets, scene = 'desktop', onSceneChange, width }) => {
-  const w = useWidgets(designerWidgets)
+interface DefaultContentProps {
+  field: FormFieldSchema
+  w: any
+  dispatch: React.Dispatch<DesignerAction>
+  isForm: boolean
+  isContainer: boolean
+  isButton: boolean
+  ComponentPropsRender: React.ComponentType<any> | undefined
+  customConfig: any
+}
+
+function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isButton, ComponentPropsRender, customConfig }: DefaultContentProps) {
   const { token } = useStyle()
-  const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
-
-  if (!field) {
-    return <FormConfigPanel formConfig={formConfig} submitConfig={submitConfig} dispatch={dispatch} scene={scene} onSceneChange={onSceneChange} widgets={w} width={width} />
-  }
-
   const hasAdvanced = hasAdvancedConfig(field)
 
-  const ComponentPropsRender = PropsRenderMap[field.type]
-  const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
-  const category = getComponentCategory(field.type)
-  const isForm = category === 'form'
-  const isContainer = category === 'container'
-  const isButton = category === 'button'
-  const isDisplay = category === 'display'
-
   return (
-    <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', padding: token('spacingMd'), overflow: 'auto', height: '100%' }}>
-      <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500 }}>
-        {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
-        <span style={{ marginLeft: token('spacingXs'), color: 'var(--fe-text-muted)', fontWeight: 400 }}>({field.type})</span>
-      </h4>
-
+    <>
       {isForm ? (
         <>
           <RowField label="字段名">
@@ -112,7 +106,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
             <ComponentPropsRender
               widgets={w}
               values={field.componentProps || {}}
-              onChange={(key, value) => {
+              onChange={(key: string, value: unknown) => {
                 dispatch({
                   type: 'UPDATE_FIELD',
                   fieldId: field.id!,
@@ -191,6 +185,115 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
           </CollapsibleSection>
         )
       })()}
+    </>
+  )
+}
+
+export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, submitConfig, dispatch, designerWidgets, scene = 'desktop', onSceneChange, width, propertyPanelTabs }) => {
+  const w = useWidgets(designerWidgets)
+  const { token } = useStyle()
+  const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
+  const hasTabs = propertyPanelTabs && propertyPanelTabs.length > 0
+  const [activeTab, setActiveTab] = useState(PROPERTIES_DEFAULT_TAB_KEY)
+
+  if (!field) {
+    return <FormConfigPanel formConfig={formConfig} submitConfig={submitConfig} dispatch={dispatch} scene={scene} onSceneChange={onSceneChange} widgets={w} width={width} />
+  }
+
+  const ComponentPropsRender = PropsRenderMap[field.type]
+  const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
+  const category = getComponentCategory(field.type)
+  const isForm = category === 'form'
+  const isContainer = category === 'container'
+  const isButton = category === 'button'
+  const isDisplay = category === 'display'
+
+  const onUpdateProp = useCallback((key: string, value: unknown) => {
+    dispatch({
+      type: 'UPDATE_FIELD',
+      fieldId: field.id!,
+      patch: { componentProps: { ...field.componentProps, [key]: value } },
+    })
+  }, [dispatch, field.id, field.componentProps])
+
+  const onUpdate = useCallback((patch: Partial<FormFieldSchema>) => {
+    dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch })
+  }, [dispatch, field.id])
+
+  const allTabs = hasTabs
+    ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: '属性' }, ...propertyPanelTabs]
+    : []
+
+  return (
+    <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', overflow: 'auto', height: '100%' }}>
+      {hasTabs && (
+        <div style={{ display: 'flex', padding: token('spacingSm'), borderBottom: '1px solid var(--fe-border-light)', background: 'var(--fe-bg-tertiary)', position: 'sticky', top: 0, zIndex: 1 }}>
+          {allTabs.map((tab, idx) => {
+            const isFirst = idx === 0
+            const isLast = idx === allTabs.length - 1
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                style={{
+                  flex: 1,
+                  border: '1px solid var(--fe-border-primary)',
+                  borderRight: isLast ? '1px solid var(--fe-border-primary)' : 'none',
+                  background: activeTab === tab.key ? 'var(--fe-bg-primary)' : 'var(--fe-bg-tertiary)',
+                  color: activeTab === tab.key ? 'var(--fe-primary)' : 'var(--fe-text-secondary)',
+                  cursor: 'pointer',
+                  padding: `${token('spacingXs')} ${token('spacingSm')}`,
+                  fontSize: token('fontSizeXs'),
+                  fontWeight: activeTab === tab.key ? 500 : 400,
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                  borderTopLeftRadius: isFirst ? token('borderRadiusSm') : 0,
+                  borderBottomLeftRadius: isFirst ? token('borderRadiusSm') : 0,
+                  borderTopRightRadius: isLast ? token('borderRadiusSm') : 0,
+                  borderBottomRightRadius: isLast ? token('borderRadiusSm') : 0,
+                }}
+              >
+                {tab.title}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
+      <div style={{ padding: token('spacingMd') }}>
+        <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500 }}>
+          {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
+          <span style={{ marginLeft: token('spacingXs'), color: 'var(--fe-text-muted)', fontWeight: 400 }}>({field.type})</span>
+        </h4>
+
+        {activeTab === PROPERTIES_DEFAULT_TAB_KEY ? (
+          <DefaultPropertyContent
+            field={field}
+            w={w}
+            dispatch={dispatch}
+            isForm={isForm}
+            isContainer={isContainer}
+            isButton={isButton}
+            ComponentPropsRender={ComponentPropsRender}
+            customConfig={customConfig}
+          />
+        ) : (
+          (() => {
+            const tab = propertyPanelTabs?.find(t => t.key === activeTab)
+            if (!tab) return null
+            const TabContent = tab.content
+            return (
+              <TabContent
+                field={field}
+                onUpdate={onUpdate}
+                onUpdateProp={onUpdateProp}
+                widgets={w}
+                dispatch={dispatch}
+              />
+            )
+          })()
+        )}
+      </div>
     </div>
   )
 }

@@ -7,7 +7,7 @@ import { setScene } from '../registry/componentRegistry'
 import { useEnsureDefaultTheme, useStyle } from '../styles'
 import type { FormEngineAdapter } from '../types/adapter'
 import { isContainerComponent } from '../types/component-category'
-import type { PaletteGroup, PanelWidths } from '../types/designer'
+import type { PaletteGroup, PanelWidths, SidePanelTab, PropertyPanelTab } from '../types/designer'
 import { isPaletteDrag, toPaletteItem, type DesignerDragData } from '../types/designer-drag'
 import type { FormFieldSchema, FormSchema } from '../types/schema'
 import { Canvas, CANVAS_ROOT_ID, CANVAS_ROOT_HEAD_ID } from './Canvas'
@@ -17,20 +17,20 @@ import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
 import { designerReducerWithHistory, findInTree } from './reducer'
 
-function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number } | null {
-  const idx = fields.findIndex((f) => f.id === fieldId)
-  if (idx >= 0) return { parentId, index: idx }
+function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number; columnIndex?: number } | null {
+  const field = fields.find(f => f.id === fieldId)
+  if (field) return { parentId, index: fields.indexOf(field), columnIndex: field.columnIndex }
 
-  for (const field of fields) {
-    if (!field.children) continue
-    const result = findFieldPosition(field.children, fieldId, field.id)
+  for (const f of fields) {
+    if (!f.children) continue
+    const result = findFieldPosition(f.children, fieldId, f.id)
     if (result) return result
   }
 
   return null
 }
 
-function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentId?: string; index: number } {
+function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentId?: string; index: number; columnIndex?: number } {
   if (overId === CANVAS_ROOT_HEAD_ID) return { parentId: undefined, index: 0 }
   if (overId === CANVAS_ROOT_ID) return { parentId: undefined, index: fields.length }
 
@@ -39,6 +39,16 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentI
     const container = findInTree(fields, containerId)
     if (container) {
       return { parentId: containerId, index: container.children?.length || 0 }
+    }
+  }
+
+  const colMatch = overId.match(/^(.+)__col_(\d+)$/)
+  if (colMatch) {
+    const containerId = colMatch[1]
+    const columnIndex = parseInt(colMatch[2], 10)
+    const container = findInTree(fields, containerId)
+    if (container) {
+      return { parentId: containerId, index: container.children?.length || 0, columnIndex }
     }
   }
 
@@ -84,9 +94,11 @@ interface DesignerProps {
   readOnly?: boolean
   adapter?: FormEngineAdapter
   panelWidths?: PanelWidths
+  sidePanelTabs?: SidePanelTab[]
+  propertyPanelTabs?: PropertyPanelTab[]
 }
 
-export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, adapter, panelWidths }) => {
+export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, adapter, panelWidths, sidePanelTabs, propertyPanelTabs }) => {
   useEnsureDefaultTheme()
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
 
@@ -259,8 +271,19 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
       let targetParentId: string | undefined
       let targetIndex: number
+      let targetColumnIndex: number | undefined
 
-      if (overId.endsWith('__container')) {
+      const colMatch = overId.match(/^(.+)__col_(\d+)$/)
+      if (colMatch) {
+        const containerId = colMatch[1]
+        targetColumnIndex = parseInt(colMatch[2], 10)
+        if (sourcePos.parentId === containerId) return
+        if (isAncestorOf(fields, activeId, containerId)) return
+        const container = findInTree(fields, containerId)
+        if (!container) return
+        targetParentId = containerId
+        targetIndex = (container.children?.length || 0)
+      } else if (overId.endsWith('__container')) {
         const containerId = overId.replace(/__container$/, '')
         if (sourcePos.parentId === containerId) return
         if (isAncestorOf(fields, activeId, containerId)) return
@@ -286,6 +309,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         toIndex: targetIndex,
         fromParentId: sourcePos.parentId,
         toParentId: targetParentId,
+        columnIndex: targetColumnIndex,
       })
     },
     [state.schema.fields, dispatch],
@@ -306,18 +330,43 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       const fields = state.schema.fields
 
       if (isPaletteDrag(activeData)) {
-        const isValidCanvasTarget = over.id === CANVAS_ROOT_ID || over.id === CANVAS_ROOT_HEAD_ID || String(over.id).endsWith('__container') || fields.some((f) => f.id === over.id) || fields.some((f) => f.children?.some((c) => c.id === over.id))
+        const overStr = String(over.id)
+        const isValidCanvasTarget = overStr === CANVAS_ROOT_ID || overStr === CANVAS_ROOT_HEAD_ID || overStr.endsWith('__container') || overStr.includes('__col_') || fields.some((f) => f.id === overStr) || fields.some((f) => f.children?.some((c) => c.id === overStr))
         if (!isValidCanvasTarget) return
 
         const target = resolveDropTarget(String(over.id), fields)
         const newField = createFieldFromPalette(toPaletteItem(activeData))
-        dispatch({ type: 'ADD_FIELD', field: newField, index: target.index, parentId: target.parentId })
+        dispatch({ type: 'ADD_FIELD', field: newField, index: target.index, parentId: target.parentId, columnIndex: target.columnIndex })
         return
       }
 
       const activeId = String(active.id)
       const overId = String(over.id)
       if (activeId === overId) return
+
+      const colMatch = overId.match(/^(.+)__col_(\d+)$/)
+      if (colMatch) {
+        const containerId = colMatch[1]
+        const targetColumnIndex = parseInt(colMatch[2], 10)
+        const sourcePos = findFieldPosition(fields, activeId)
+        if (!sourcePos) return
+        if (isAncestorOf(fields, activeId, containerId)) return
+        if (sourcePos.parentId === containerId && sourcePos.columnIndex === targetColumnIndex) return
+
+        const container = findInTree(fields, containerId)
+        if (!container) return
+        const targetIndex = container.children?.length || 0
+
+        dispatch({
+          type: 'MOVE_FIELD',
+          fromIndex: sourcePos.index,
+          toIndex: targetIndex,
+          fromParentId: sourcePos.parentId,
+          toParentId: containerId,
+          columnIndex: targetColumnIndex,
+        })
+        return
+      }
 
       if (overId.endsWith('__container')) {
         const containerId = overId.replace(/__container$/, '')
@@ -376,7 +425,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         `}</style>
       <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
         {/* 左侧控件库 */}
-        {!readOnly && <FieldList groups={finalGroups} width={panelWidths?.palette} />}
+        {!readOnly && <FieldList groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />}
 
         {/* 中间画布 */}
         <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
@@ -410,7 +459,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       </DndContext>
 
       {/* 右侧属性面板 */}
-      <PropertyPanel field={selectedField} formConfig={state.schema.form || { layout: 'vertical', size: 'middle' }} submitConfig={state.schema.submit || { text: '提交', showReset: true, resetText: '重置' }} dispatch={dispatch} adapter={adapter} scene={scene} onSceneChange={setSceneState} width={panelWidths?.properties} />
+      <PropertyPanel field={selectedField} formConfig={state.schema.form || { layout: 'vertical', size: 'middle' }} submitConfig={state.schema.submit || { text: '提交', showReset: true, resetText: '重置' }} dispatch={dispatch} adapter={adapter} scene={scene} onSceneChange={setSceneState} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} />
     </div>
   )
 }

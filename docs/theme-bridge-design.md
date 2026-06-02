@@ -1,7 +1,7 @@
 # 主题适配方案：让 Form Engine 界面跟随开发者 UI 库的主题色
 
 > **实施状态**：✅ Phase 1（Core 基础变更）+ Phase 2（Adapter 桥接）+ Phase 3（全量硬编码样式消除）全部完成。
-> 
+>
 > 最后更新：2026-06-02
 
 ## 问题分析
@@ -604,25 +604,25 @@ function App() {
 
 #### 7.1 单元测试（vitest + @testing-library/react）
 
-| 用例 | 覆盖点 |
-|------|--------|
-| `AntdBridgeProvider` 注入 `--fe-*` 数量 | 验证挂载后 `<style data-fe-bridge="antd">` 含至少 N 个 token（按当前 TOKEN_MAP 数量） |
-| `AntdBridgeProvider` 卸载清理 | 验证 unmount 后该 `<style>` 标签被移除，StyleProvider 写入的变量未受影响 |
-| `AntdBridgeProvider` 在无 `ConfigProvider` 环境下 | 验证 `console.warn` 触发，DOM 不残留任何 `--fe-*` |
-| `AntdBridgeProvider` SSR（`typeof document === 'undefined'`） | 验证不抛错、不执行注入 |
-| `useStyle().token('primary')` 返回值在 `StyleProvider themeMode="dark"` 切换时更新 | 验证重渲后的 token 是 darkTheme 值 |
-| `createDesignerStyles(t).toolbar.background` 在切到 dark 时变化 | 工厂函数跟随主题 |
-| `toKebabCase` 三处引用一致性 | 跨 StyleProvider/injectCss/applyStyles 行为一致 |
-| `renderer/defaultAdapter.ts` 兜底渲染颜色 | 替换后 `style.color` 等于 `token('error')` 值 |
+| 用例                                                                               | 覆盖点                                                                                |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `AntdBridgeProvider` 注入 `--fe-*` 数量                                            | 验证挂载后 `<style data-fe-bridge="antd">` 含至少 N 个 token（按当前 TOKEN_MAP 数量） |
+| `AntdBridgeProvider` 卸载清理                                                      | 验证 unmount 后该 `<style>` 标签被移除，StyleProvider 写入的变量未受影响              |
+| `AntdBridgeProvider` 在无 `ConfigProvider` 环境下                                  | 验证 `console.warn` 触发，DOM 不残留任何 `--fe-*`                                     |
+| `AntdBridgeProvider` SSR（`typeof document === 'undefined'`）                      | 验证不抛错、不执行注入                                                                |
+| `useStyle().token('primary')` 返回值在 `StyleProvider themeMode="dark"` 切换时更新 | 验证重渲后的 token 是 darkTheme 值                                                    |
+| `createDesignerStyles(t).toolbar.background` 在切到 dark 时变化                    | 工厂函数跟随主题                                                                      |
+| `toKebabCase` 三处引用一致性                                                       | 跨 StyleProvider/injectCss/applyStyles 行为一致                                       |
+| `renderer/defaultAdapter.ts` 兜底渲染颜色                                          | 替换后 `style.color` 等于 `token('error')` 值                                         |
 
 #### 7.2 快照测试
 
-| 组件 | 快照内容 |
-|------|----------|
-| `designer/Designer.tsx` | light/dark/compact 三种模式下的根容器 + 关键子组件 HTML 结构 |
-| `widgets/Button.tsx` | `type=primary` / `danger` / `disabled` 三态 |
-| `renderer/FieldRenderer.tsx` | 必填星号颜色、tooltip 颜色、未知类型错误提示 |
-| `tokens.css` | 文件内容快照（防止 token 命名/值意外改动） |
+| 组件                         | 快照内容                                                     |
+| ---------------------------- | ------------------------------------------------------------ |
+| `designer/Designer.tsx`      | light/dark/compact 三种模式下的根容器 + 关键子组件 HTML 结构 |
+| `widgets/Button.tsx`         | `type=primary` / `danger` / `disabled` 三态                  |
+| `renderer/FieldRenderer.tsx` | 必填星号颜色、tooltip 颜色、未知类型错误提示                 |
+| `tokens.css`                 | 文件内容快照（防止 token 命名/值意外改动）                   |
 
 #### 7.3 手工验证（开发自检清单）
 
@@ -647,43 +647,43 @@ function App() {
 
 > ✅ = 已完成 · ⬜ = 待实施
 
-| 文件                                                  | 变更类型 | 状态 | 说明                                                                                                       |
-| ----------------------------------------------------- | -------- | ---- | ---------------------------------------------------------------------------------------------------------- |
-| `packages/core/package.json`                          | 修改     | ✅    | `peerDependencies.react` 由 `>=18.0.0` 改为 `>=19.0.0`（与 antd v6/antd-mobile v5 对齐）                  |
-| `packages/core/src/styles/defaultTheme.ts`            | 修改     | ✅    | 补充 Designer 所需 token（primaryHoverBg, textMuted, borderLight），**补全 darkTheme/compactOverrides** |
-| `packages/core/src/styles/tokens.css`                 | 修改     | ✅    | 同步新增 token 的 CSS 变量定义                                                                             |
-| `packages/core/src/styles/themeBridge.ts`             | 新增     | ✅    | ThemeBridge 配置类型和 BridgeProviderProps 接口定义                                                        |
-| `packages/core/src/styles/utils.ts`                   | 新增     | ✅    | 提取 `toKebabCase` 公共工具函数                                                                            |
-| `packages/core/src/styles/applyStyles.ts`             | 修改     | ✅    | 改为 `import { toKebabCase } from './utils'`                                                              |
-| `packages/core/src/styles/injectCss.ts`               | 修改     | ✅    | `createStyleTag` 接受 `Record<string, string>`；toKebabCase import                                        |
-| `packages/core/src/styles/StyleProvider.tsx`          | 修改     | ✅    | toKebabCase import                                                                                         |
-| `packages/core/src/styles/index.ts`                   | 修改     | ✅    | 导出 ThemeBridge 相关类型                                                                                  |
-| `packages/core/src/index.ts`                          | 修改     | ✅    | 从主入口导出 Bridge 类型                                                                                   |
-| `packages/core/src/designer/styles.ts`                | 重构     | ✅    | 清理旧常量，仅保留工厂函数                                                                                 |
-| `packages/adapter-antd/src/themeBridge.tsx`            | 新增     | ✅    | antd v6 CSS 变量 → FE token 映射 + AntdBridgeProvider                                                     |
-| `packages/adapter-antd/src/index.tsx`                 | 修改     | ✅    | 导出 AntdBridgeProvider；version `5.0.0` → `6.x`                                                          |
-| `packages/adapter-antd-mobile/src/themeBridge.tsx`     | 新增     | ✅    | antd-mobile CSS 变量 → FE token 映射 + AntdMobileBridgeProvider                                           |
-| `packages/adapter-antd-mobile/src/index.tsx`          | 修改     | ✅    | 导出 AntdMobileBridgeProvider                                                                              |
-| `packages/core/src/widgets/Button.tsx`                | 修改     | ✅    | 用 useStyle().token() 替换硬编码颜色                                                                       |
-| `packages/core/src/widgets/ButtonGroup.tsx`           | 修改     | ✅    | 用 useStyle().token() 替换硬编码颜色（含 onMouseEnter/Leave 中的 DOM 操作）                                |
-| `packages/core/src/widgets/Switch.tsx`                | 修改     | ✅    | 用 useStyle().token() 替换硬编码颜色                                                                       |
-| `packages/core/src/widgets/OptionsEditor.tsx`         | 修改     | ✅    | 用 useStyle().token() + var(--fe-*) 替换硬编码颜色                                                         |
-| `packages/core/src/widgets/shared.ts`                 | 修改     | ✅    | BASE_STYLE/FOCUS_STYLE 使用 CSS 变量                                                                       |
-| `packages/core/src/renderer/FieldRenderer.tsx`        | 修改     | ✅    | 用 useStyle().token() 替换硬编码颜色（必填星号、tooltip、错误提示）                                        |
-| `packages/core/src/renderer/defaultAdapter.ts`        | 修改     | ✅    | var(--fe-*) 替换 `#ff4d4f` 边框/文字                                                                      |
-| `packages/core/src/propRenders/shared.tsx`            | 修改     | ✅    | var(--fe-*) 替换硬编码颜色和尺寸                                                                           |
-| `packages/core/src/propRenders/CustomPropsRender.tsx` | 修改     | ✅    | var(--fe-*) 替换硬编码颜色                                                                                 |
-| `packages/core/src/designer/Designer.tsx`             | 修改     | ✅    | var(--fe-*) 替换 bg-secondary / drag overlay                                                               |
-| `packages/core/src/designer/Canvas.tsx`               | 修改     | ✅    | var(--fe-*) 替换硬编码颜色和尺寸                                                                           |
-| `packages/core/src/designer/CanvasToolbar.tsx`        | 修改     | ✅    | var(--fe-*) 替换硬编码颜色和尺寸                                                                           |
-| `packages/core/src/designer/FieldList.tsx`             | 修改     | ✅    | var(--fe-*) 替换硬编码颜色和尺寸                                                                           |
-| `packages/core/src/designer/PropertyPanel.tsx`         | 修改     | ✅    | var(--fe-*) 替换硬编码颜色和尺寸                                                                           |
-| `packages/core/src/designer/FormConfigPanel.tsx`       | 修改     | ✅    | var(--fe-*) 替换硬编码颜色和尺寸                                                                           |
-| `packages/core/src/designer/ComponentTree.tsx`         | 修改     | ✅    | var(--fe-*) 替换硬编码颜色和尺寸                                                                           |
-| `packages/core/src/designer/ContainerPreview.tsx`      | 修改     | ✅    | var(--fe-*) 替换硬编码颜色                                                                                 |
-| `packages/core/src/designer/CollapsibleSection.tsx`    | 修改     | ✅    | var(--fe-*) 替换硬编码颜色                                                                                 |
-| `packages/core/src/designer/FieldItem.tsx`             | 修改     | ✅    | var(--fe-*) 替换硬编码颜色（不再导入旧常量）                                                               |
-| `packages/core/src/styles/__tests__/*`                 | 新增     | ⬜    | BridgeProvider / StyleProvider 测试用例（留给后续）                                                         |
+| 文件                                                  | 变更类型 | 状态 | 说明                                                                                                    |
+| ----------------------------------------------------- | -------- | ---- | ------------------------------------------------------------------------------------------------------- |
+| `packages/core/package.json`                          | 修改     | ✅   | `peerDependencies.react` 由 `>=18.0.0` 改为 `>=19.0.0`（与 antd v6/antd-mobile v5 对齐）                |
+| `packages/core/src/styles/defaultTheme.ts`            | 修改     | ✅   | 补充 Designer 所需 token（primaryHoverBg, textMuted, borderLight），**补全 darkTheme/compactOverrides** |
+| `packages/core/src/styles/tokens.css`                 | 修改     | ✅   | 同步新增 token 的 CSS 变量定义                                                                          |
+| `packages/core/src/styles/themeBridge.ts`             | 新增     | ✅   | ThemeBridge 配置类型和 BridgeProviderProps 接口定义                                                     |
+| `packages/core/src/styles/utils.ts`                   | 新增     | ✅   | 提取 `toKebabCase` 公共工具函数                                                                         |
+| `packages/core/src/styles/applyStyles.ts`             | 修改     | ✅   | 改为 `import { toKebabCase } from './utils'`                                                            |
+| `packages/core/src/styles/injectCss.ts`               | 修改     | ✅   | `createStyleTag` 接受 `Record<string, string>`；toKebabCase import                                      |
+| `packages/core/src/styles/StyleProvider.tsx`          | 修改     | ✅   | toKebabCase import                                                                                      |
+| `packages/core/src/styles/index.ts`                   | 修改     | ✅   | 导出 ThemeBridge 相关类型                                                                               |
+| `packages/core/src/index.ts`                          | 修改     | ✅   | 从主入口导出 Bridge 类型                                                                                |
+| `packages/core/src/designer/styles.ts`                | 重构     | ✅   | 清理旧常量，仅保留工厂函数                                                                              |
+| `packages/adapter-antd/src/themeBridge.tsx`           | 新增     | ✅   | antd v6 CSS 变量 → FE token 映射 + AntdBridgeProvider                                                   |
+| `packages/adapter-antd/src/index.tsx`                 | 修改     | ✅   | 导出 AntdBridgeProvider；version `5.0.0` → `6.x`                                                        |
+| `packages/adapter-antd-mobile/src/themeBridge.tsx`    | 新增     | ✅   | antd-mobile CSS 变量 → FE token 映射 + AntdMobileBridgeProvider                                         |
+| `packages/adapter-antd-mobile/src/index.tsx`          | 修改     | ✅   | 导出 AntdMobileBridgeProvider                                                                           |
+| `packages/core/src/widgets/Button.tsx`                | 修改     | ✅   | 用 useStyle().token() 替换硬编码颜色                                                                    |
+| `packages/core/src/widgets/ButtonGroup.tsx`           | 修改     | ✅   | 用 useStyle().token() 替换硬编码颜色（含 onMouseEnter/Leave 中的 DOM 操作）                             |
+| `packages/core/src/widgets/Switch.tsx`                | 修改     | ✅   | 用 useStyle().token() 替换硬编码颜色                                                                    |
+| `packages/core/src/widgets/OptionsEditor.tsx`         | 修改     | ✅   | 用 useStyle().token() + var(--fe-\*) 替换硬编码颜色                                                     |
+| `packages/core/src/widgets/shared.ts`                 | 修改     | ✅   | BASE_STYLE/FOCUS_STYLE 使用 CSS 变量                                                                    |
+| `packages/core/src/renderer/FieldRenderer.tsx`        | 修改     | ✅   | 用 useStyle().token() 替换硬编码颜色（必填星号、tooltip、错误提示）                                     |
+| `packages/core/src/renderer/defaultAdapter.ts`        | 修改     | ✅   | var(--fe-\*) 替换 `#ff4d4f` 边框/文字                                                                   |
+| `packages/core/src/propRenders/shared.tsx`            | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色和尺寸                                                                       |
+| `packages/core/src/propRenders/CustomPropsRender.tsx` | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色                                                                             |
+| `packages/core/src/designer/Designer.tsx`             | 修改     | ✅   | var(--fe-\*) 替换 bg-secondary / drag overlay                                                           |
+| `packages/core/src/designer/Canvas.tsx`               | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色和尺寸                                                                       |
+| `packages/core/src/designer/CanvasToolbar.tsx`        | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色和尺寸                                                                       |
+| `packages/core/src/designer/FieldList.tsx`            | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色和尺寸                                                                       |
+| `packages/core/src/designer/PropertyPanel.tsx`        | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色和尺寸                                                                       |
+| `packages/core/src/designer/FormConfigPanel.tsx`      | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色和尺寸                                                                       |
+| `packages/core/src/designer/ComponentTree.tsx`        | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色和尺寸                                                                       |
+| `packages/core/src/designer/ContainerPreview.tsx`     | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色                                                                             |
+| `packages/core/src/designer/CollapsibleSection.tsx`   | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色                                                                             |
+| `packages/core/src/designer/FieldItem.tsx`            | 修改     | ✅   | var(--fe-\*) 替换硬编码颜色（不再导入旧常量）                                                           |
+| `packages/core/src/styles/__tests__/*`                | 新增     | ⬜   | BridgeProvider / StyleProvider 测试用例（留给后续）                                                     |
 
 ## 风险与注意事项
 
@@ -810,7 +810,6 @@ function App() {
 
 [`scripts/check-tokens.mjs`](../scripts/check-tokens.mjs) 是 ESLint 的补充，覆盖 ESLint 不便表达的场景：
 
-- 行级禁用：`// check-tokens-disable-line`
 - 文件级禁用：文件顶部 `/* check-tokens-disable */`
 - 跳过 `placeholder="如: #333"` 形式的字符串
 - 跳过 `__tests__/` 目录
@@ -818,12 +817,12 @@ function App() {
 
 集成位置：
 
-| 触发点 | 命令 |
-|--------|------|
-| `pnpm build` | 自动 `pnpm check:tokens && pnpm build` |
-| `pnpm test` | 自动 `pnpm check:tokens && pnpm test` |
-| `pnpm check:tokens` | 单独跑 |
-| pre-commit hook | 通过 lint-staged 在改动的文件上跑 |
+| 触发点              | 命令                                   |
+| ------------------- | -------------------------------------- |
+| `pnpm build`        | 自动 `pnpm check:tokens && pnpm build` |
+| `pnpm test`         | 自动 `pnpm check:tokens && pnpm test`  |
+| `pnpm check:tokens` | 单独跑                                 |
+| pre-commit hook     | 通过 lint-staged 在改动的文件上跑      |
 
 > 效果：build/test 必跑，CI 上接 `pnpm test` 即自动拦截。
 
@@ -861,5 +860,4 @@ function App() {
    - `eslint.config.mjs` 的 `files` glob
    - `scripts/check-tokens.mjs` 的 `TARGET_DIRS`
    - AGENTS.md「主题 Token 强制约定」的目录列表
-2. **暂时跳过** 某行硬编码（如确认的合法例外）：在该行末尾加 `// check-tokens-disable-line`，并在 PR 描述里说明原因
-3. **调整规则粒度**（如需放行 `box-shadow` 字符串）：改 `eslint.config.mjs` 中的 `COLOR_PROPS` / `LAYOUT_PROPS`，同步改 `scripts/check-tokens.mjs` 的 `NAMED_COLOR_PATTERN` / `NUMERIC_PATTERN`
+2. **调整规则粒度**（如需放行 `box-shadow` 字符串）：改 `eslint.config.mjs` 中的 `COLOR_PROPS` / `LAYOUT_PROPS`，同步改 `scripts/check-tokens.mjs` 的 `NAMED_COLOR_PATTERN` / `NUMERIC_PATTERN`

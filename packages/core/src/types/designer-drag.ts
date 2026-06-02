@@ -5,6 +5,7 @@ export type PaletteDragData = {
   fieldType: string
   label: string
   defaultProps: Record<string, unknown>
+  extraData?: Record<string, unknown>
 }
 
 export type CanvasDragData = {
@@ -27,5 +28,6 @@ export function toPaletteItem(data: PaletteDragData): PaletteItem {
     type: data.fieldType as any,
     label: data.label,
     defaultProps: data.defaultProps,
+    extraData: data.extraData,
   }
 }

@@ -1,5 +1,6 @@
 import type { FormFieldSchema, FormSchema, FormConfig, SubmitConfig } from './schema'
-import type { FormEngineAdapter } from './adapter'
+import type { FormEngineAdapter, DesignerWidgets } from './adapter'
+import type React from 'react'
 
 /**
  * 设计器内部状态：被选中字段的 id
@@ -27,6 +28,8 @@ export interface PaletteItem {
   label: string
   icon?: string           // lucide icon name 或 emoji
   defaultProps?: Partial<FormFieldSchema>
+  /** 拖入画布时合并到 field.componentProps 的额外数据 */
+  extraData?: Record<string, unknown>
 }
 
 /**
@@ -35,6 +38,39 @@ export interface PaletteItem {
 export interface PaletteGroup {
   groupName: string
   items: PaletteItem[]
+}
+
+/**
+ * 左侧面板扩展 Tab
+ */
+export interface SidePanelTab {
+  key: string
+  title: string
+  icon: React.ReactNode
+  content: React.ComponentType<SidePanelTabContentProps>
+}
+
+export interface SidePanelTabContentProps {
+  fields: FormFieldSchema[]
+  selectedFieldId: string | null
+  dispatch: React.Dispatch<DesignerAction>
+}
+
+/**
+ * 右侧属性面板扩展 Tab（只能配置当前选中组件的属性）
+ */
+export interface PropertyPanelTab {
+  key: string
+  title: string
+  content: React.ComponentType<PropertyPanelTabContentProps>
+}
+
+export interface PropertyPanelTabContentProps {
+  field: FormFieldSchema | null
+  onUpdate: (patch: Partial<FormFieldSchema>) => void
+  onUpdateProp: (key: string, value: unknown) => void
+  widgets: DesignerWidgets & Required<Pick<DesignerWidgets, 'ButtonGroup' | 'TextArea'>>
+  dispatch: React.Dispatch<DesignerAction>
 }
 
 /**
@@ -72,6 +108,16 @@ export interface DesignerProps {
   /** 可选：当前平台适配器，用于设计器属性面板风格统一 */
   adapter?: FormEngineAdapter
   /**
+   * 可选：左侧面板扩展 Tab（有值时自动切换为 Tabs 布局）
+   * 竖向 icon-only Tabs，第一个 Tab 固定为组件库
+   */
+  sidePanelTabs?: SidePanelTab[]
+  /**
+   * 可选：右侧属性面板扩展 Tab（有值时自动切换为 Segment Tab 布局）
+   * 只能配置当前选中组件的属性
+   */
+  propertyPanelTabs?: PropertyPanelTab[]
+  /**
    * 可选：调色板 / 属性面板宽度
    * - 数字：px；小于最小值时按最小值兜底
    * - 字符串：透传 CSS 宽度（如 '20%'、'18rem'）
@@ -85,9 +131,9 @@ export interface DesignerProps {
  */
 export type DesignerAction =
   | { type: 'SELECT_FIELD'; fieldId: string | null }
-  | { type: 'ADD_FIELD'; field: FormFieldSchema; index: number; parentId?: string }
+  | { type: 'ADD_FIELD'; field: FormFieldSchema; index: number; parentId?: string; columnIndex?: number }
   | { type: 'REMOVE_FIELD'; fieldId: string }
-  | { type: 'MOVE_FIELD'; fromIndex: number; toIndex: number; parentId?: string; fromParentId?: string; toParentId?: string }
+  | { type: 'MOVE_FIELD'; fromIndex: number; toIndex: number; parentId?: string; fromParentId?: string; toParentId?: string; columnIndex?: number }
   | { type: 'UPDATE_FIELD'; fieldId: string; patch: Partial<FormFieldSchema> }
   | { type: 'UPDATE_FORM_CONFIG'; patch: Partial<FormConfig> }
   | { type: 'UPDATE_SUBMIT_CONFIG'; patch: Partial<SubmitConfig> }

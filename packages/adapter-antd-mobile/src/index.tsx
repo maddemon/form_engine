@@ -28,6 +28,7 @@ import { TextField } from './components/Text'
 import { ImageField } from './components/Image'
 import { DividerField } from './components/Divider'
 import { TitleField } from './components/Title'
+import { TableField } from './components/Table'
 
 // Theme Bridge
 export { AntdMobileBridgeProvider } from './themeBridge'
@@ -116,6 +117,7 @@ export const antdMobileComponents = {
   'Image': ImageField,
   'Divider': DividerField,
   'Title': TitleField,
+  'Table': TableField,
 }
 
 export const antdMobileAdapter = {
@@ -150,6 +152,7 @@ export const antdMobileAdapter = {
   'image': ImageField,
   'divider': DividerField,
   'title': TitleField,
+  'table': TableField,
 
   _designerWidgets: designerWidgets,
 }

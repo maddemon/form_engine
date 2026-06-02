@@ -118,10 +118,13 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
       return { ...state, selectedFieldId: action.fieldId }
 
     case 'ADD_FIELD': {
+      const fieldToAdd = action.columnIndex !== undefined
+        ? { ...action.field, columnIndex: action.columnIndex }
+        : action.field
       if (action.parentId) {
         const addToParent = (nodes: FormFieldSchema[]): FormFieldSchema[] =>
           nodes.map(n => {
-            if (n.id === action.parentId) return { ...n, children: [...(n.children || []), action.field] }
+            if (n.id === action.parentId) return { ...n, children: [...(n.children || []), fieldToAdd] }
             return n.children ? { ...n, children: addToParent(n.children) } : n
           })
         return {
@@ -131,7 +134,7 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
         }
       }
       const fields = [...state.schema.fields]
-      fields.splice(action.index, 0, action.field)
+      fields.splice(action.index, 0, fieldToAdd)
       return {
         ...state,
         selectedFieldId: action.field.id!,
@@ -155,11 +158,17 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
         action.fromIndex,
       )
       if (!removed) return state
-      // 如果源索引小于目标索引，移除后目标索引需要减1（因为数组缩短了）
       const adjustedToIndex = action.fromIndex < action.toIndex
         ? action.toIndex - 1
         : action.toIndex
-      const fields = insertIntoTree(afterRemove, action.toParentId, adjustedToIndex, removed)
+      let movedField = removed
+      if (action.columnIndex !== undefined) {
+        movedField = { ...movedField, columnIndex: action.columnIndex }
+      }
+      if (!action.toParentId && movedField.columnIndex !== undefined) {
+        movedField = { ...movedField, columnIndex: undefined }
+      }
+      const fields = insertIntoTree(afterRemove, action.toParentId, adjustedToIndex, movedField)
       return { ...state, schema: { ...state.schema, fields } }
     }
 

@@ -6,6 +6,8 @@ export interface GridProps extends BaseLayoutComponentProps {
   variant?: 'grid' | 'flex'
   /** 列数（grid 模式） */
   columns?: number
+  /** 各列宽度百分比，如 [50, 50]，默认均分 */
+  colWidths?: number[]
   /** 间距 */
   gap?: number | [number, number]
   /** 行配置（可选，用于精细控制） */

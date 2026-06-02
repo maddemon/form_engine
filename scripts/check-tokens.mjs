@@ -25,7 +25,6 @@ const RGB_PATTERN = /\brgba?\s*\(/gi
 const NAMED_COLOR_PATTERN = /\b(?:color|background(?:-color)?|border(?:-(?:top|right|bottom|left))?(?:-color)?|fill|stroke|outline(?:-color)?|box-shadow|caret-color|column-rule(?:-color)?|text-decoration-color|text-emphasis-color|accent-color)\s*:\s*['"]?(red|blue|green|yellow|orange|purple|pink|black|white|gray|grey|cyan|magenta|brown|navy|teal|lime|maroon|olive|silver|gold|aqua|fuchsia|indigo|violet|crimson|salmon|tomato|coral|khaki|plum|orchid|turquoise|chocolate|firebrick)\b/gi
 const NUMERIC_PATTERN = /(?:padding|margin|borderRadius|border-radius|gap|fontSize|font-size|width|height)\s*:\s*['"]?\s*\d+\s*(?:px)?['"]?\s*[;,}\n]/g
 
-const ALLOW_LINE_SUFFIX = /\/\/\s*check-tokens-disable-line\b/
 const ALLOW_FILE_HEADER = /^\s*\/\*\s*check-tokens-disable\s*\*\//m
 const PLACEHOLDER_PATTERN = /placeholder\s*=\s*["'][^"']*#/
 
@@ -72,7 +71,6 @@ function checkFile(filePath, source) {
   const lines = source.split('\n')
   lines.forEach((lineText, idx) => {
     const lineNo = idx + 1
-    if (ALLOW_LINE_SUFFIX.test(lineText)) return
     if (PLACEHOLDER_PATTERN.test(lineText)) return
 
     let lineOffset = 0
@@ -147,9 +145,6 @@ async function main() {
   }
   console.error(
     `\nFix: use ${bold}token('xxx')${reset} or ${bold}var(--fe-xxx)${reset}. See AGENTS.md.`,
-  )
-  console.error(
-    `If truly needed, add ${bold}// check-tokens-disable-line${reset} at end of line.\n`,
   )
   process.exit(1)
 }

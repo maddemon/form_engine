@@ -124,6 +124,7 @@ export type FieldType =
   | 'title'
   | 'custom'
   | `custom:${string}`
+  | 'table'
 
 export interface FormFieldSchema {
   id?: string
@@ -153,6 +154,8 @@ export interface FormFieldSchema {
   events?: FormFieldEvents
   /** 子字段（仅容器组件使用，如 grid/flex/container/collapse/tabs） */
   children?: FormFieldSchema[]
+  /** 所属列索引（仅 grid/table 子节点使用） */
+  columnIndex?: number
 }
 
 // ============================

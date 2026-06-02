@@ -31,6 +31,7 @@ import type { GridProps, GridRowConfig, GridColConfig } from '../components/grid
 import type { FlexProps } from '../components/flex/types'
 import type { CollapseProps } from '../components/collapse/types'
 import type { TabsProps } from '../components/tabs/types'
+import type { TableProps } from '../components/table/types'
 import type { CascaderProps } from '../components/cascader/types'
 import type { TreeSelectProps } from '../components/tree-select/types'
 
@@ -64,6 +65,7 @@ export type {
   FlexProps,
   CollapseProps,
   TabsProps,
+  TableProps,
   CascaderProps,
   TreeSelectProps,
 }
@@ -126,6 +128,7 @@ export interface ComponentPropsMap {
   'Flex': FlexProps
   'Collapse': CollapseProps
   'Tabs': TabsProps
+  'Table': TableProps
   'Button': ButtonProps
 }
 

@@ -153,6 +153,12 @@ export const Bold = createIcon(
   '0 0 24 24'
 )
 
+// 新增图标：表格
+export const TableIcon = createIcon(
+  <><path d="M3 3h18v18H3z" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="3" y1="15" x2="21" y2="15" /><line x1="9" y1="3" x2="9" y2="21" /><line x1="15" y1="3" x2="15" y2="21" /></>,
+  '0 0 24 24'
+)
+
 // 图标名称到组件的映射（用于动态获取图标）
 export const iconMap: Record<string, React.FC<IconProps>> = {
   Type,
@@ -172,6 +178,7 @@ export const iconMap: Record<string, React.FC<IconProps>> = {
   Grid: GridIcon,
   Monitor,
   Smartphone,
+  Table: TableIcon,
 }
 
 export default iconMap

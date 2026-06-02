@@ -29,7 +29,7 @@ const CanvasDroppable: React.FC<{ children: React.ReactNode; onClick: () => void
 
 const CanvasRootHead: React.FC = () => {
   const { setNodeRef } = useDroppable({ id: CANVAS_ROOT_HEAD_ID })
-  return <div ref={setNodeRef} style={{ height: 0, overflow: 'hidden' }} /> // check-tokens-disable-line
+  return <div ref={setNodeRef} style={{ overflow: 'hidden', width: '100%' }} />
 }
 
 interface CanvasProps {

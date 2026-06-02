@@ -122,6 +122,12 @@ export type {
 // 设计器类型
 export type {
   DesignerProps,
+  SidePanelTab,
+  SidePanelTabContentProps,
+  PropertyPanelTab,
+  PropertyPanelTabContentProps,
+  PaletteGroup,
+  PaletteItem,
 } from './types/designer'
 
 // 组件分类
@@ -246,6 +252,7 @@ export { Designer } from './designer/Designer'
 export { Canvas } from './designer/Canvas'
 export { FieldList } from './designer/FieldList'
 export { PropertyPanel } from './designer/PropertyPanel'
+export { DraggablePaletteItem, type DraggablePaletteItemProps } from './designer/DraggablePaletteItem'
 export { defaultPaletteGroups as defaultPalette } from './designer/paletteData'
 export { createFieldFromPalette, generateFieldId } from './designer/FieldList'
 
