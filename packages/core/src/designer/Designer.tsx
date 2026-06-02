@@ -15,6 +15,7 @@ import { getComponentIcon } from '../components/paletteRegistry'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
 import { designerReducerWithHistory, findInTree } from './reducer'
+import { useStyle, useEnsureDefaultTheme } from '../styles'
 
 export const CANVAS_ROOT_ID = 'canvas-root'
 const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
@@ -69,6 +70,7 @@ interface DesignerProps {
 }
 
 export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, adapter }) => {
+  useEnsureDefaultTheme()
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
 
   const [state, dispatch] = useReducer(designerReducerWithHistory, {
@@ -308,13 +310,14 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
     setActiveDragType('')
   }, [])
 
+  const { token } = useStyle()
   return (
-    <div className="designer-scroll-container" style={{ display: 'flex', height: '100%', fontFamily: '-apple-system, sans-serif', background: '#f5f5f5', overflow: 'hidden' }}>
+    <div className="designer-scroll-container" style={{ display: 'flex', height: '100%', fontFamily: '-apple-system, sans-serif', background: 'var(--fe-bg-secondary)', overflow: 'hidden' }}>
       <style>{`
-          .designer-scroll-container ::-webkit-scrollbar { width: 5px; height: 5px; }
+          .designer-scroll-container ::-webkit-scrollbar { width: var(--fe-spacing-xs); height: var(--fe-spacing-xs); }
           .designer-scroll-container ::-webkit-scrollbar-track { background: transparent; }
-          .designer-scroll-container ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 3px; }
-          .designer-scroll-container ::-webkit-scrollbar-thumb:hover { background: #ccc; }
+          .designer-scroll-container ::-webkit-scrollbar-thumb { background: var(--fe-border-primary); border-radius: var(--fe-border-radius-sm); }
+          .designer-scroll-container ::-webkit-scrollbar-thumb:hover { background: var(--fe-text-tertiary); }
         `}</style>
       <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
         {/* 左侧控件库 */}
@@ -333,15 +336,15 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 'var(--fe-spacing-xs)',
                 padding: '4px 10px',
-                background: '#1890ff',
-                color: '#fff',
-                borderRadius: 4,
-                fontSize: 12,
+                background: 'var(--fe-primary)',
+                color: 'var(--fe-bg-primary)',
+                borderRadius: 'var(--fe-border-radius-sm)',
+                fontSize: 'var(--fe-font-size-sm)',
                 pointerEvents: 'none',
                 whiteSpace: 'nowrap',
-                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                boxShadow: token('widgetCanvasDndShadow') as React.CSSProperties['boxShadow'],
               }}
             >
               <span style={{ display: 'inline-flex', alignItems: 'center' }}>{getComponentIcon(activeDragType) || null}</span>

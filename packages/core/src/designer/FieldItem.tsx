@@ -1,8 +1,8 @@
 import React from 'react'
 import type { FormFieldSchema } from '../types'
 import { isContainerComponent } from '../types/component-category'
+import { useStyle } from '../styles'
 import { useDesignerContext } from './DesignerContext'
-import { colors, borders, radii, spacing, toolbar, dragHandle, iconBtn, fieldItem } from './styles'
 
 const fieldTypeLabels: Record<string, string> = {
   'input': '单行文本', 'textarea': '多行文本', 'password': '密码',
@@ -38,11 +38,12 @@ export const FieldItem: React.FC<FieldItemProps> = ({
 }) => {
   const { dispatch, onSelectField } = useDesignerContext()
   const isContainer = isContainerComponent(field.type)
+  const { token } = useStyle()
 
   const getBorder = () => {
-    if (isSelected) return borders.selected
-    if (isContainer) return borders.container
-    return borders.transparent
+    if (isSelected) return '1px solid var(--fe-primary)'
+    if (isContainer) return '1px dashed var(--fe-border-primary)'
+    return '1px solid transparent'
   }
 
   return (
@@ -50,39 +51,63 @@ export const FieldItem: React.FC<FieldItemProps> = ({
       ref={dragNodeRef}
       {...dragAttributes}
       style={{
-        ...fieldItem,
+        position: 'relative',
+        padding: token('spacingSm'),
+        marginBottom: token('spacingSm'),
+        borderRadius: 'var(--fe-border-radius-md)',
         border: getBorder(),
-        background: isSelected ? colors.primaryBg : colors.transparent,
+        background: isSelected ? 'var(--fe-primary-bg)' : 'transparent',
+        transition: 'border-color 0.2s',
+        cursor: 'pointer',
         ...dragStyle,
       }}
       onClick={(e) => { if (!isSelected) { e.stopPropagation(); onSelectField(field.id || null) } }}
     >
       {isSelected && (
-        <div style={toolbar}>
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          zIndex: 30,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--fe-spacing-xs)',
+          background: 'var(--fe-primary)',
+          borderRadius: '0 var(--fe-border-radius-sm) 0 var(--fe-border-radius-sm)',
+          padding: '2px var(--fe-spacing-xs)',
+          lineHeight: 1,
+        }}>
           <span
             ref={dragActivatorRef}
             {...dragListeners}
-            style={dragHandle}
+            style={{
+              color: 'var(--fe-bg-primary)',
+              fontSize: 'var(--fe-font-size-xs)',
+              cursor: 'grab',
+              padding: '2px var(--fe-spacing-xs)',
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
+            }}
             title="拖拽排序"
           >
             ↕ {fieldTypeLabels[field.type] || field.type}
           </span>
           <span
-            style={iconBtn}
+            style={{ color: 'var(--fe-bg-primary)', fontSize: token('widgetFieldHandleFontSize'), cursor: 'pointer', padding: '2px var(--fe-spacing-xs)', userSelect: 'none' }}
             title="复制"
             onClick={e => { e.stopPropagation(); dispatch({ type: 'COPY_FIELD', fieldId: field.id! }) }}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
             </svg>
           </span>
           <span
-            style={iconBtn}
+            style={{ color: 'var(--fe-bg-primary)', fontSize: token('widgetFieldHandleFontSize'), cursor: 'pointer', padding: '2px var(--fe-spacing-xs)', userSelect: 'none' }}
             title="删除"
             onClick={e => { e.stopPropagation(); dispatch({ type: 'REMOVE_FIELD', fieldId: field.id! }) }}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="3 6 5 6 21 6" />
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
             </svg>

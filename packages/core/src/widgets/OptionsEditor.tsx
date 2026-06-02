@@ -1,4 +1,5 @@
 import React from 'react'
+import { useStyle } from '../styles'
 import { BASE_STYLE } from './shared'
 
 export const WidgetOptionsEditor: React.FC<{
@@ -7,6 +8,7 @@ export const WidgetOptionsEditor: React.FC<{
   disabled?: boolean
   style?: React.CSSProperties
 }> = ({ value, onChange, disabled, style }) => {
+  const { token } = useStyle()
   const options = value || []
 
   const update = (idx: number, patch: Partial<{ label: string; value: string }>) => {
@@ -26,13 +28,13 @@ export const WidgetOptionsEditor: React.FC<{
   return (
     <div style={{ ...style }}>
       {options.map((opt, idx) => (
-        <div key={idx} style={{ display: 'flex', gap: 4, marginBottom: 4, alignItems: 'center' }}>
+        <div key={idx} style={{ display: 'flex', gap: token('spacingXs'), marginBottom: token('spacingXs'), alignItems: 'center' }}>
           <input type="text" value={opt.label} placeholder="标签" onChange={e => update(idx, { label: e.target.value })} disabled={disabled} style={{ ...BASE_STYLE, flex: 1 }} />
           <input type="text" value={opt.value} placeholder="值" onChange={e => update(idx, { value: e.target.value })} disabled={disabled} style={{ ...BASE_STYLE, flex: 1 }} />
-          <button onClick={() => remove(idx)} disabled={disabled} style={{ border: 'none', background: 'none', color: '#ff4d4f', cursor: disabled ? 'not-allowed' : 'pointer', fontSize: 16, padding: '0 4px' }}>×</button>
+          <button onClick={() => remove(idx)} disabled={disabled} style={{ border: 'none', background: 'none', color: token('error') as string, cursor: disabled ? 'not-allowed' : 'pointer', fontSize: token('fontSizeLg'), padding: `0 ${token('spacingXs')}` }}>×</button>
         </div>
       ))}
-      <button onClick={add} disabled={disabled} style={{ ...BASE_STYLE, background: 'none', color: '#1677ff', borderStyle: 'dashed', cursor: disabled ? 'not-allowed' : 'pointer' }}>
+      <button onClick={add} disabled={disabled} style={{ ...BASE_STYLE, background: 'none', color: token('primary') as string, borderStyle: 'dashed', cursor: disabled ? 'not-allowed' : 'pointer' }}>
         + 添加选项
       </button>
     </div>

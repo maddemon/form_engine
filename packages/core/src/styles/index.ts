@@ -59,6 +59,12 @@ export type { ThemeTokens, PartialThemeTokens } from './types'
 export { defaultTheme, darkTheme, compactOverrides } from './defaultTheme'
 
 // ============================
+// Theme Bridge
+// ============================
+
+export type { CssVarMapping, ThemeBridgeConfig, BridgeProviderProps } from './themeBridge'
+
+// ============================
 // Style Provider
 // ============================
 
@@ -97,6 +103,10 @@ export {
 // CSS Injection
 // ============================
 
+// ============================
+// CSS Injection
+// ============================
+
 export {
   injectCssVariables,
   removeCssVariables,
@@ -104,6 +114,15 @@ export {
   injectIntoShadowDom,
   themeToCssVariables,
 } from './injectCss'
+
+// ============================
+// Fallback 默认主题注入（开箱即用）
+// ============================
+
+export {
+  ensureDefaultThemeInjected,
+  useEnsureDefaultTheme,
+} from './useStyle'
 
 // ============================
 // CSS Variables File

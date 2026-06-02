@@ -53,6 +53,9 @@ export { Image } from './components/Image'
 export { Divider } from './components/Divider'
 export { Title } from './components/Title'
 
+// Theme Bridge
+export { AntdBridgeProvider } from './themeBridge'
+
 // ============================
 // 组件映射（用于注册）
 // ============================
@@ -163,7 +166,7 @@ export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidg
 
 export const antdAdapter = {
   name: 'antd',
-  version: '5.0.0',
+  version: '6.x',
 
   // 组件映射
   components: antdComponents,

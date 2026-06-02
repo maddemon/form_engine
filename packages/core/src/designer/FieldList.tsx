@@ -5,9 +5,11 @@ import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { defaultPaletteGroups } from './paletteData'
 import { useDraggable } from '@dnd-kit/core'
 import { getComponentIcon } from '../components/paletteRegistry'
+import { useStyle } from '../styles'
 
 function DefaultIcon() {
-  return <span style={{ fontSize: 14, color: '#999' }}>⬜</span>
+  const { token } = useStyle()
+  return <span style={{ fontSize: token('fontSizeSm'), color: 'var(--fe-text-muted)' }}>⬜</span>
 }
 
 function getIcon(item: PaletteItem): React.ReactNode {
@@ -17,7 +19,8 @@ function getIcon(item: PaletteItem): React.ReactNode {
   const customConfig = customComponentRegistry.get(item.type)
   if (customConfig?.icon) {
     if (typeof customConfig.icon === 'string') {
-      return <span style={{ fontSize: 14 }}>{customConfig.icon}</span>
+      const { token } = useStyle()
+      return <span style={{ fontSize: token('fontSizeSm') as string }}>{customConfig.icon}</span>
     }
     return customConfig.icon
   }
@@ -86,6 +89,7 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
       defaultProps: item.defaultProps || {},
     },
   })
+  const { token } = useStyle()
 
   return (
     <div
@@ -98,21 +102,21 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '8px 4px',
-        border: '1px solid #eee',
-        borderRadius: 6,
+        padding: 'var(--fe-spacing-sm) var(--fe-spacing-xs)',
+        border: '1px solid var(--fe-border-primary)',
+        borderRadius: token('borderRadiusSm'),
         cursor: 'grab',
-        fontSize: 11,
-        color: '#595959',
-        background: isDragging ? '#e6f4ff' : '#fff',
-        borderColor: isDragging ? '#91caff' : '#eee',
+        fontSize: token('fontSizeSm'),
+        color: 'var(--fe-text-secondary)',
+        background: isDragging ? 'var(--fe-primary-bg)' : 'var(--fe-bg-primary)',
+        borderColor: isDragging ? 'var(--fe-primary-border)' : 'var(--fe-border-light)',
         userSelect: 'none',
         transition: 'all 0.2s',
-        gap: 4,
+        gap: token('spacingXs'),
         opacity: isDragging ? 0.5 : 1,
       }}
     >
-      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20 }}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: token('widgetPaletteIconBox'), height: token('widgetPaletteIconBox') }}>
         {getIcon(item)}
       </span>
       <span style={{ lineHeight: 1.2, textAlign: 'center' }}>{item.label}</span>
@@ -127,14 +131,15 @@ interface FieldListProps {
 
 export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes }) => {
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
+  const { token } = useStyle()
   return (
-    <div style={{ width: 220, borderRight: '1px solid #eee', padding: '8px 10px', overflow: 'auto', height: '100%', background: '#fafafa' }}>
+    <div style={{ width: token('panelFieldListWidth'), borderRight: '1px solid var(--fe-border-light)', padding: `${token('spacingSm')} ${token('spacingMd')}`, overflow: 'auto', height: '100%', background: 'var(--fe-bg-tertiary)' }}>
       {finalGroups.map(group => (
-        <div key={group.groupName} style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, color: '#999', fontWeight: 500, padding: '4px 4px 6px', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        <div key={group.groupName} style={{ marginBottom: 'var(--fe-spacing-md)' }}>
+          <div style={{ fontSize: 'var(--fe-font-size-xs)', color: 'var(--fe-text-muted)', fontWeight: 500, padding: 'var(--fe-spacing-xs) var(--fe-spacing-xs) var(--fe-spacing-sm)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
             {group.groupName}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--fe-spacing-xs)' }}>
             {group.items.map(item => (
               <PaletteItemCard key={item.type} item={item} />
             ))}

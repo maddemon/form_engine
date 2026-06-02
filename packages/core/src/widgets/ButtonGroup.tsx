@@ -1,5 +1,5 @@
 import React from 'react'
-import { BASE_STYLE } from './shared'
+import { useStyle } from '../styles'
 
 export const WidgetButtonGroup: React.FC<{
   value?: string
@@ -8,8 +8,10 @@ export const WidgetButtonGroup: React.FC<{
   disabled?: boolean
   style?: React.CSSProperties
 }> = ({ value, onChange, options, disabled, style }) => {
+  const { token } = useStyle()
+
   return (
-    <div style={{ display: 'flex', gap: 0, ...style }}>
+    <div style={{ display: 'flex', gap: token('widgetCheckboxMargin') as unknown as number, ...style }}>
       {options.map((opt, idx) => {
         const isFirst = idx === 0
         const isLast = idx === options.length - 1
@@ -22,31 +24,31 @@ export const WidgetButtonGroup: React.FC<{
             style={{
               flex: 1,
               padding: '3px 8px',
-              fontSize: 12,
+              fontSize: token('fontSizeSm') as string,
               lineHeight: '20px',
-              border: `1px solid ${isActive ? '#1677ff' : '#d9d9d9'}`,
-              borderRight: isLast ? `1px solid ${isActive ? '#1677ff' : '#d9d9d9'}` : 'none',
-              background: isActive ? '#1677ff' : '#fff',
-              color: isActive ? '#fff' : '#333',
+              border: `1px solid ${isActive ? token('primary') as string : token('borderPrimary') as string}`,
+              borderRight: isLast ? `1px solid ${isActive ? token('primary') as string : token('borderPrimary') as string}` : 'none',
+              background: isActive ? token('primary') as string : token('bgPrimary') as string,
+              color: isActive ? token('bgPrimary') as string : token('textPrimary') as string,
               cursor: disabled ? 'not-allowed' : 'pointer',
               opacity: disabled ? 0.5 : 1,
-              borderRadius: isFirst ? 4 : 0,
-              borderTopRightRadius: isLast ? 4 : 0,
-              borderBottomRightRadius: isLast ? 4 : 0,
+              borderRadius: isFirst ? token('borderRadiusSm') as string : 0,
+              borderTopRightRadius: isLast ? token('borderRadiusSm') as string : 0,
+              borderBottomRightRadius: isLast ? token('borderRadiusSm') as string : 0,
               outline: 'none',
-              transition: 'all 0.2s',
+              transition: token('transitionAll') as string,
               boxSizing: 'border-box',
             }}
             onMouseEnter={(e) => {
               if (!isActive && !disabled) {
-                e.currentTarget.style.borderColor = '#1677ff'
-                e.currentTarget.style.color = '#1677ff'
+                e.currentTarget.style.borderColor = token('primary') as string
+                e.currentTarget.style.color = token('primary') as string
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive && !disabled) {
-                e.currentTarget.style.borderColor = '#d9d9d9'
-                e.currentTarget.style.color = '#333'
+                e.currentTarget.style.borderColor = token('borderPrimary') as string
+                e.currentTarget.style.color = token('textPrimary') as string
               }
             }}
           >

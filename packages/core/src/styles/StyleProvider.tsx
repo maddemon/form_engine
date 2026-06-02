@@ -40,6 +40,7 @@ import React, { createContext, useContext, useMemo, useEffect } from 'react'
 import type { ThemeTokens, PartialThemeTokens } from './types'
 import { defaultTheme, darkTheme, compactOverrides } from './defaultTheme'
 import { injectCssVariables } from './injectCss'
+import { toKebabCase } from './utils'
 
 // ============================
 // Types
@@ -103,7 +104,15 @@ export interface StyleContextValue {
   getToken: (tokenName: keyof ThemeTokens) => string | number
 }
 
-const StyleContext = createContext<StyleContextValue | null>(null)
+export const StyleContext = createContext<StyleContextValue | null>(null)
+
+/**
+ * 检测当前组件树是否被 StyleProvider 包裹
+ * 用于在未包裹时启用 fallback 默认主题注入
+ */
+export function useHasStyleProvider(): boolean {
+  return useContext(StyleContext) !== null
+}
 
 // ============================
 // Provider Component
@@ -218,9 +227,5 @@ function createDefaultContext(): StyleContextValue {
     getCssVar: (tokenName) => `var(--fe-${toKebabCase(tokenName)})`,
     getToken: (tokenName) => defaultTheme[tokenName],
   }
-}
-
-function toKebabCase(str: string): string {
-  return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 }
 

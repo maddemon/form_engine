@@ -309,4 +309,8 @@ export {
   type PartialThemeTokens,
   type ThemeMode,
   type SizeMode,
+  // Theme Bridge 类型（用于 adapter 实现）
+  type CssVarMapping,
+  type ThemeBridgeConfig,
+  type BridgeProviderProps,
 } from './styles'

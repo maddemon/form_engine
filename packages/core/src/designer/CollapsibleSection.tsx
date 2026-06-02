@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useStyle } from '../styles'
 
 interface CollapsibleSectionProps {
   title: string
@@ -11,35 +12,47 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   title,
   children,
   defaultCollapsed = false,
-  forceExpand = false
+  forceExpand = false,
 }) => {
-  const [collapsed, setCollapsed] = React.useState(defaultCollapsed && !forceExpand)
-
-  React.useEffect(() => {
-    setCollapsed(defaultCollapsed && !forceExpand)
-  }, [forceExpand, defaultCollapsed])
+  const [collapsed, setCollapsed] = useState(defaultCollapsed)
+  const isExpanded = forceExpand || !collapsed
+  const { token } = useStyle()
 
   return (
-    <div style={{ marginBottom: 12 }}>
+    <div style={{ marginTop: token('spacingMd') }}>
       <div
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={() => !forceExpand && setCollapsed(!collapsed)}
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
-          cursor: 'pointer',
-          padding: '6px 0',
-          borderBottom: '1px solid #eee',
-          marginBottom: 8,
-          userSelect: 'none'
+          justifyContent: 'space-between',
+          padding: `${token('spacingXs')} 0`,
+          cursor: forceExpand ? 'default' : 'pointer',
+          borderBottom: '1px solid var(--fe-border-light)',
+          fontSize: token('fontSizeSm'),
+          fontWeight: 500,
+          color: 'var(--fe-text-secondary)',
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 500 }}>{title}</span>
-        <span style={{ fontSize: 12, color: '#999' }}>
-          {collapsed ? '▸ 展开' : '▾ 折叠'}
-        </span>
+        <span>{title}</span>
+        {!forceExpand && (
+          <span
+            style={{
+              fontSize: token('widgetInputFontSizeXxs'),
+              color: 'var(--fe-text-muted)',
+              transition: 'transform 0.2s',
+              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          >
+            ▲
+          </span>
+        )}
       </div>
-      {!collapsed && children}
+      {isExpanded && (
+        <div style={{ paddingTop: token('spacingSm'), fontSize: token('fontSizeSm') }}>
+          {children}
+        </div>
+      )}
     </div>
   )
 }

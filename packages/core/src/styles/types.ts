@@ -46,12 +46,12 @@ export interface ComponentStyleUtils {
    * 获取 CSS 变量引用（返回 `var(--fe-xxx)` 字符串）
    */
   cssVar: (tokenName: keyof ThemeTokens) => string
-  
+
   /**
-   * 获取主题 Token 值
+   * 获取主题 Token 值（泛型精确类型）
    */
-  token: (tokenName: keyof ThemeTokens) => string | number
-  
+  token: <K extends keyof ThemeTokens>(tokenName: K) => ThemeTokens[K]
+
   /**
    * 合并样式（处理 CSS 变量）
    */

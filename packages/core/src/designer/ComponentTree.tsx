@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { useStyle } from '../styles'
 
 interface TreeItem {
   id: string
@@ -14,91 +15,68 @@ interface ComponentTreeProps {
   onClose: () => void
 }
 
-const TreeNode: React.FC<{ node: TreeItem; selectedId: string | null; onSelect: (id: string) => void; depth: number }> = ({ node, selectedId, onSelect, depth }) => {
-  const hasChildren = node.children && node.children.length > 0
-  const [expanded, setExpanded] = useState(true)
-
+const TreeNode: React.FC<{ item: TreeItem; selectedId: string | null; onSelect: (id: string) => void; depth: number }> = ({ item, selectedId, onSelect, depth }) => {
+  const { token } = useStyle()
   return (
-    <>
+    <div>
       <div
+        onClick={() => onSelect(item.id)}
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
-          padding: '3px 8px',
-          paddingLeft: 8 + depth * 16,
+          gap: token('spacingXs'),
+          padding: '2px 4px',
           cursor: 'pointer',
-          color: selectedId === node.id ? '#1677ff' : '#333',
-          background: selectedId === node.id ? '#e6f4ff' : 'transparent',
-          borderRadius: 4,
-          marginBottom: 1,
-          fontSize: 11,
-          userSelect: 'none',
+          fontSize: token('fontSizeSm'),
+          background: selectedId === item.id ? 'var(--fe-primary-bg)' : 'transparent',
+          color: selectedId === item.id ? 'var(--fe-primary)' : 'var(--fe-text-primary)',
+          borderRadius: 'var(--fe-border-radius-xs)',
+          marginLeft: depth * parseInt(token('spacingMd') as string),
         }}
-        onClick={(e) => { e.stopPropagation(); onSelect(node.id); }}
       >
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 14,
-            height: 14,
-            fontSize: 10,
-            color: '#999',
-            flexShrink: 0,
-          }}
-          onClick={(e) => { if (hasChildren) { e.stopPropagation(); setExpanded(!expanded) } }}
-        >
-          {hasChildren ? (expanded ? '▾' : '▸') : '·'}
-        </span>
-        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {node.label}
-        </span>
-        <span style={{ color: '#999', flexShrink: 0 }}>[{node.type}]</span>
+        {item.children ? '📁' : '📄'} {item.label}
+        <span style={{ color: 'var(--fe-text-muted)', fontSize: token('widgetInputFontSizeXxs') }}>({item.type})</span>
       </div>
-      {hasChildren && expanded && (
-        node.children!.map(child => (
-          <TreeNode key={child.id} node={child} selectedId={selectedId} onSelect={onSelect} depth={depth + 1} />
-        ))
-      )}
-    </>
+      {item.children?.map(child => (
+        <TreeNode key={child.id} item={child} selectedId={selectedId} onSelect={onSelect} depth={depth + 1} />
+      ))}
+    </div>
   )
 }
 
-export const ComponentTree: React.FC<ComponentTreeProps> = ({
-  items,
-  selectedId,
-  onSelect,
-  onClose,
-}) => (
-  <>
-    <div
-      style={{ position: 'fixed', inset: 0, zIndex: 999 }}
-      onClick={onClose}
-    />
+export const ComponentTree: React.FC<ComponentTreeProps> = ({ items, selectedId, onSelect, onClose }) => {
+  const { token } = useStyle()
+  return (
     <div
       style={{
-        position: 'absolute',
-        top: 44,
-        left: 0,
-        zIndex: 1000,
-        background: '#fff',
-        border: '1px solid #eee',
-        borderRadius: 6,
-        padding: 8,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-        width: 220,
-        maxHeight: 320,
+        position: 'relative',
+        padding: `${token('spacingSm')} ${token('spacingMd')}`,
+        background: 'var(--fe-bg-primary)',
+        borderBottom: '1px solid var(--fe-border-light)',
+        maxHeight: 200,
         overflow: 'auto',
+        fontSize: token('fontSizeSm'),
       }}
-      onClick={e => e.stopPropagation()}
     >
-      <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 6 }}>组件树</div>
-      {items.length === 0 && <div style={{ color: '#999', padding: '4px 0', fontSize: 11 }}>暂无组件</div>}
-      {items.map(node => (
-        <TreeNode key={node.id} node={node} selectedId={selectedId} onSelect={onSelect} depth={0} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: token('spacingSm') }}>
+        <strong style={{ fontSize: token('fontSizeSm') }}>组件树</strong>
+        <button
+          onClick={onClose}
+          style={{
+            border: 'none',
+            background: 'none',
+            cursor: 'pointer',
+            color: 'var(--fe-text-muted)',
+            fontSize: token('fontSizeMd'),
+            padding: '0 2px',
+          }}
+        >
+          ✕
+        </button>
+      </div>
+      {items.map(item => (
+        <TreeNode key={item.id} item={item} selectedId={selectedId} onSelect={onSelect} depth={0} />
       ))}
     </div>
-  </>
-)
+  )
+}

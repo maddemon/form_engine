@@ -7,16 +7,32 @@
   "scripts": {
     "dev": "pnpm --filter @form-engine/* dev",
     "dev:example": "pnpm --filter example dev",
-    "build": "pnpm --filter @form-engine/core --filter @form-engine/adapter-antd --filter @form-engine/adapter-antd-mobile build",
+    "build": "pnpm check:tokens && pnpm --filter @form-engine/core --filter @form-engine/adapter-antd --filter @form-engine/adapter-antd-mobile build",
     "clean": "pnpm -r clean",
-    "test": "pnpm --filter @form-engine/* test",
+    "test": "pnpm check:tokens && pnpm --filter @form-engine/* test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "prepare": "simple-git-hooks || true",
     "publish:core": "pnpm --filter @form-engine/core publish",
     "publish:adapter-antd": "pnpm --filter @form-engine/adapter-antd publish",
     "publish:adapter-antd-mobile": "pnpm --filter @form-engine/adapter-antd-mobile publish",
     "publish:all": "pnpm --filter @form-engine/core --filter @form-engine/adapter-antd --filter @form-engine/adapter-antd-mobile publish"
   },
   "devDependencies": {
-    "pnpm": "^8.0.0"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "lint-staged": "^17.0.7",
+    "pnpm": "^8.0.0",
+    "simple-git-hooks": "^2.13.1",
+    "typescript-eslint": "^8.60.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "simple-git-hooks"
+    ]
   },
   "engines": {
     "node": ">=16",

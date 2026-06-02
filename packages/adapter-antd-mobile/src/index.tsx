@@ -29,6 +29,9 @@ import { ImageField } from './components/Image'
 import { DividerField } from './components/Divider'
 import { TitleField } from './components/Title'
 
+// Theme Bridge
+export { AntdMobileBridgeProvider } from './themeBridge'
+
 const DefaultField: FieldRendererFn = (props: any) => {
   const { fieldSchema } = props
   return (

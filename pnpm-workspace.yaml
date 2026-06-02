@@ -1,3 +1,7 @@
 packages:
   - 'packages/*'
   - 'example'
+allowBuilds:
+  '[': true
+  \: true
+enablePrePostScripts: true

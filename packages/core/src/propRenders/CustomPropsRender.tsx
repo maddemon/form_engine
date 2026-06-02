@@ -2,6 +2,7 @@ import React from 'react'
 import { customPropertyWidgetRegistry } from '../registry/customComponentRegistry'
 import type { DesignerWidgets } from '../types/adapter'
 import type { PropertyConfigItem } from '../types/custom-component'
+import { useStyle } from '../styles'
 import { FieldGroup } from './shared'
 
 interface CustomPropsRenderProps {
@@ -12,6 +13,7 @@ interface CustomPropsRenderProps {
 }
 
 export default function CustomPropsRender({ configs, widgets: w, values, onChange }: CustomPropsRenderProps) {
+  const { token } = useStyle()
   return (
     <>
       {configs.map((config) => {
@@ -25,7 +27,7 @@ export default function CustomPropsRender({ configs, widgets: w, values, onChang
 
         if (isToggle) {
           return (
-            <label key={config.key} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4, fontSize: 12, cursor: 'pointer' }}>
+            <label key={config.key} style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs'), marginBottom: token('spacingXs'), fontSize: token('fontSizeXs'), cursor: 'pointer' }}>
               {renderWidget(config, value, handleChange, w)}
               <span>{config.label}</span>
             </label>
@@ -43,6 +45,7 @@ export default function CustomPropsRender({ configs, widgets: w, values, onChang
 }
 
 function renderWidget(config: PropertyConfigItem, value: unknown, onValueChange: (value: unknown) => void, w: DesignerWidgets): React.ReactNode {
+  const { token } = useStyle()
   const { widget, widgetProps } = config
 
   switch (widget) {
@@ -50,7 +53,23 @@ function renderWidget(config: PropertyConfigItem, value: unknown, onValueChange:
       return <w.Input value={(value as string) ?? ''} onChange={(v) => onValueChange(v)} placeholder={widgetProps?.placeholder} />
 
     case 'textarea':
-      return w.TextArea ? <w.TextArea value={(value as string) ?? ''} onChange={(v) => onValueChange(v)} placeholder={widgetProps?.placeholder} rows={4} /> : <textarea value={(value as string) ?? ''} onChange={(e) => onValueChange(e.target.value)} placeholder={widgetProps?.placeholder} rows={4} style={{ width: '100%', padding: 4, border: '1px solid #d9d9d9', borderRadius: 4, fontSize: 12 }} />
+      return w.TextArea ? (
+        <w.TextArea value={(value as string) ?? ''} onChange={(v) => onValueChange(v)} placeholder={widgetProps?.placeholder} rows={4} />
+      ) : (
+        <textarea
+          value={(value as string) ?? ''}
+          onChange={(e) => onValueChange(e.target.value)}
+          placeholder={widgetProps?.placeholder}
+          rows={4}
+          style={{
+            width: '100%',
+            padding: token('spacingXs'),
+            border: '1px solid var(--fe-border-primary)',
+            borderRadius: 'var(--fe-border-radius-sm)',
+            fontSize: token('fontSizeXs'),
+          }}
+        />
+      );
 
     case 'number':
       return <w.NumberInput value={(value as number) ?? 0} onChange={(v) => onValueChange(v)} min={widgetProps?.min} max={widgetProps?.max} />
@@ -77,16 +96,23 @@ function renderWidget(config: PropertyConfigItem, value: unknown, onValueChange:
           }}
           placeholder={widgetProps?.placeholder}
           rows={6}
-          style={{ width: '100%', padding: 4, border: '1px solid #d9d9d9', borderRadius: 4, fontFamily: 'monospace', fontSize: 12 }}
+          style={{
+            width: '100%',
+            padding: token('spacingXs'),
+            border: '1px solid var(--fe-border-primary)',
+            borderRadius: 'var(--fe-border-radius-sm)',
+            fontFamily: 'monospace',
+            fontSize: token('fontSizeXs'),
+          }}
         />
       )
 
     case 'custom': {
       const customWidgetName = widgetProps?.customWidget
-      if (!customWidgetName) return <span style={{ color: '#999' }}>未配置自定义 Widget</span>
+      if (!customWidgetName) return <span style={{ color: 'var(--fe-text-muted)' }}>未配置自定义 Widget</span>
 
       const CustomWidget = customPropertyWidgetRegistry.get(customWidgetName)
-      if (!CustomWidget) return <span style={{ color: '#999' }}>Widget "{customWidgetName}" 未注册</span>
+      if (!CustomWidget) return <span style={{ color: 'var(--fe-text-muted)' }}>Widget "{customWidgetName}" 未注册</span>
 
       return <CustomWidget value={value} onChange={onValueChange} widgetProps={widgetProps} />
     }

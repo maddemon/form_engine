@@ -14,6 +14,7 @@ import {
 } from '../dataSource/resolver'
 import { validateForm } from './validate'
 import type { EventContext } from '../events'
+import { useStyle, useEnsureDefaultTheme } from '../styles'
 
 export interface FormRenderProps {
   schema: FormSchema
@@ -48,6 +49,8 @@ export const FormRender: React.FC<FormRenderProps> = ({
   loading = false,
   callbacks = {},
 }) => {
+  useEnsureDefaultTheme()
+  const { token } = useStyle()
   const [formValues, setFormValues] = useState<Record<string, unknown>>(initialValues)
   const [fieldOptions, setFieldOptions] = useState<Record<string, OptionItem[]>>({})
   // 记录每个 field 当前请求的依赖快照，避免过期响应覆盖
@@ -292,7 +295,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="fe-form" style={{ maxWidth: 640 }}>
-      <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
         {visibleFields.map(field => (
           <div
             key={field.id || field.name}
@@ -304,7 +307,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
       </div>
 
       {formSchema.submit?.showReset !== false && (
-        <div className="fe-form-actions" style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+        <div className="fe-form-actions" style={{ marginTop: token('spacingLg'), display: 'flex', gap: token('spacingSm') }}>
           <button type="submit" disabled={loading}>
             {formSchema.submit?.text || '提交'}
           </button>

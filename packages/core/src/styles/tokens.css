@@ -27,6 +27,9 @@
   --fe-primary-bg: rgba(22, 119, 255, 0.06);
   --fe-primary-border: rgba(22, 119, 255, 0.3);
 
+  /* Designer 专用 */
+  --fe-primary-hover-bg: #f0f5ff;
+
   /* Success - 成功色 */
   --fe-success: #52c41a;
   --fe-success-hover: #73d13d;
@@ -58,6 +61,8 @@
   --fe-text-quaternary: rgba(0, 0, 0, 0.25);
   --fe-text-placeholder: rgba(0, 0, 0, 0.25);
 
+  --fe-text-muted: #bbb;
+
   --fe-bg-primary: #ffffff;
   --fe-bg-secondary: #f5f5f5;
   --fe-bg-tertiary: #fafafa;
@@ -69,6 +74,8 @@
   --fe-border-secondary: #e8e8e8;
   --fe-border-tertiary: #f0f0f0;
   --fe-border-color-split: rgba(0, 0, 0, 0.06);
+
+  --fe-border-light: #eee;
 
   /* Disabled - 禁用状态 */
   --fe-disabled-bg: rgba(0, 0, 0, 0.04);
@@ -254,6 +261,32 @@
   --fe-canvas-toolbar-bg: var(--fe-bg-elevated);
   --fe-canvas-toolbar-shadow: var(--fe-shadow-md);
 
+  /* Designer Panel Sizes - 面板宽度（物理尺寸，业务独有） */
+  --fe-panel-field-list-width: 220px;
+  --fe-panel-config-width: 280px;
+
+  /* Container - 容器物理高度 */
+  --fe-container-min-height: 60px;
+
+  /* Widget 物理尺寸 */
+  --fe-widget-palette-icon-box: 20px;
+  --fe-widget-field-handle-font-size: 12px;
+  --fe-widget-canvas-dnd-shadow: 0 2px 8px rgba(22, 119, 255, 0.3);
+
+  /* Widget Switch - Widget 物理尺寸 */
+  --fe-widget-switch-track-width: 36px;
+  --fe-widget-switch-track-height: 20px;
+  --fe-widget-switch-track-radius: 10px;
+  --fe-widget-switch-thumb-size: 16px;
+  --fe-widget-switch-thumb-offset: 2px;
+  --fe-widget-switch-thumb-active-offset: 18px;
+  --fe-widget-switch-shadow: 0 1px 2px var(--fe-bg-mask);
+
+  /* Widget 微调 - 物理特殊值 */
+  --fe-widget-checkbox-margin: 0;
+  --fe-widget-input-font-size-xs: 11px;
+  --fe-widget-input-font-size-xxs: 10px;
+
   /* ============================
      Dark Mode - 暗黑模式
      ============================ */
@@ -267,11 +300,15 @@
   --fe-primary-bg: rgba(22, 104, 220, 0.15);
   --fe-primary-border: rgba(22, 104, 220, 0.3);
 
+  --fe-primary-hover-bg: rgba(22, 104, 220, 0.2);
+
   --fe-text-primary: rgba(255, 255, 255, 0.85);
   --fe-text-secondary: rgba(255, 255, 255, 0.65);
   --fe-text-tertiary: rgba(255, 255, 255, 0.45);
   --fe-text-quaternary: rgba(255, 255, 255, 0.25);
   --fe-text-placeholder: rgba(255, 255, 255, 0.25);
+
+  --fe-text-muted: rgba(255, 255, 255, 0.25);
 
   --fe-bg-primary: #141414;
   --fe-bg-secondary: #1f1f1f;
@@ -284,6 +321,8 @@
   --fe-border-secondary: #303030;
   --fe-border-tertiary: #1f1f1f;
   --fe-border-color-split: rgba(255, 255, 255, 0.06);
+
+  --fe-border-light: #303030;
 
   --fe-disabled-bg: rgba(255, 255, 255, 0.04);
   --fe-disabled-color: rgba(255, 255, 255, 0.25);

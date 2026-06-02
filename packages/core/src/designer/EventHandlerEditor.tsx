@@ -9,9 +9,16 @@
  */
 
 import React, { useState } from 'react'
-import type { EventHandler, EventHandlerType } from '../types/events'
 import { listActionNames } from '../events'
-import { FieldGroup, InlineField } from '../propRenders/shared'
+import { FieldGroup } from '../propRenders/shared'
+import { useStyle } from '../styles/useStyle'
+import type { DesignerWidgets } from '../types/adapter'
+import type { EventHandler, EventHandlerType } from '../types/events'
+
+/** EventHandlerEditor 所需的 widgets 子集（TextArea 为必选） */
+type RequiredWidgets = Omit<DesignerWidgets, 'TextArea'> & {
+  TextArea: NonNullable<DesignerWidgets['TextArea']>
+}
 
 export interface EventHandlerEditorProps {
   /** 当前事件处理器（未配置时为 undefined） */
@@ -20,6 +27,8 @@ export interface EventHandlerEditorProps {
   onChange: (handler: EventHandler | undefined) => void
   /** 事件名（用于日志/调试） */
   eventName: string
+  /** 设计器小组件（由 PropertyPanel 注入，必须包含 TextArea） */
+  widgets: RequiredWidgets
 }
 
 const HANDLER_TYPE_OPTIONS: { label: string; value: EventHandlerType | '' }[] = [
@@ -29,12 +38,17 @@ const HANDLER_TYPE_OPTIONS: { label: string; value: EventHandlerType | '' }[] = 
   { label: '回调（callback）', value: 'callback' },
 ]
 
-export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
-  value,
-  onChange,
-  eventName,
-}) => {
+export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, onChange, eventName, widgets: w }) => {
+  const { token } = useStyle()
   const [type, setType] = useState<EventHandlerType | ''>(value?.type ?? '')
+
+  const containerStyle: React.CSSProperties = {
+    marginBottom: token('spacingSm') as string,
+    padding: token('spacingXs') as string,
+    background: token('bgTertiary'),
+    border: `1px solid ${token('borderColorSplit')}`,
+    borderRadius: token('borderRadiusSm') as string,
+  }
 
   const handleTypeChange = (newType: EventHandlerType | '') => {
     setType(newType)
@@ -51,51 +65,28 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
   }
 
   return (
-    <div style={{ marginBottom: 8, padding: 6, background: '#fafafa', border: '1px solid #eee', borderRadius: 4 }}>
+    <div style={containerStyle}>
       <FieldGroup label={`事件：${eventName}`}>
-        <select
-          value={type}
-          onChange={e => handleTypeChange(e.target.value as EventHandlerType | '')}
-          style={{ width: '100%', padding: '2px 6px', fontSize: 12 }}
-        >
-          {HANDLER_TYPE_OPTIONS.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+        <w.Select value={type} onChange={(v) => handleTypeChange(v as EventHandlerType | '')} options={HANDLER_TYPE_OPTIONS.map((opt) => ({ label: opt.label, value: opt.value }))} />
       </FieldGroup>
 
       {type === 'expression' && value?.type === 'expression' && (
         <FieldGroup label="表达式">
-          <textarea
-            value={value.expression || ''}
-            onChange={e => onChange({ ...value, expression: e.target.value })}
-            placeholder={`如：$form.setFieldValue('other', $event)`}
-            style={{ width: '100%', minHeight: 60, padding: 4, fontSize: 12, fontFamily: 'monospace' }}
-          />
-          <div style={{ fontSize: 10, color: '#999', marginTop: 2 }}>
-            可用变量：$self（当前字段）、$form（表单 API）、$event（事件对象）
-          </div>
+          <w.TextArea value={value.expression || ''} onChange={(v) => onChange({ ...value, expression: v })} placeholder={`如：$form.setFieldValue('other', $event)`} rows={3} />
+          <div style={{ fontSize: token('fontSizeXs') as string, color: token('textTertiary') as React.CSSProperties['color'], marginTop: 2 }}>可用变量：$self（当前字段）、$form（表单 API）、$event（事件对象）</div>
         </FieldGroup>
       )}
 
       {type === 'action' && value?.type === 'action' && (
         <>
           <FieldGroup label="动作">
-            <select
-              value={value.action || ''}
-              onChange={e => onChange({ ...value, action: e.target.value })}
-              style={{ width: '100%', padding: '2px 6px', fontSize: 12 }}
-            >
-              {listActionNames().map(name => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>
+            <w.Select value={value.action || ''} onChange={(v) => onChange({ ...value, action: v })} options={listActionNames().map((name) => ({ label: name, value: name }))} />
           </FieldGroup>
           <FieldGroup label="参数（JSON）">
-            <textarea
+            <w.TextArea
               value={value.params ? JSON.stringify(value.params, null, 2) : ''}
-              onChange={e => {
-                const text = e.target.value.trim()
+              onChange={(v) => {
+                const text = (v || '').trim()
                 if (!text) {
                   onChange({ ...value, params: undefined })
                   return
@@ -107,7 +98,7 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
                 }
               }}
               placeholder='如：{ "name": "other", "value": "x" }'
-              style={{ width: '100%', minHeight: 50, padding: 4, fontSize: 12, fontFamily: 'monospace' }}
+              rows={3}
             />
           </FieldGroup>
         </>
@@ -115,12 +106,7 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
 
       {type === 'callback' && value?.type === 'callback' && (
         <FieldGroup label="回调名（FormRenderProps.callbacks 中的 key）">
-          <input
-            value={value.callback || ''}
-            onChange={e => onChange({ ...value, callback: e.target.value })}
-            placeholder="如：onCustomClick"
-            style={{ width: '100%', padding: '2px 6px', fontSize: 12 }}
-          />
+          <w.Input value={value.callback || ''} onChange={(v) => onChange({ ...value, callback: String(v) })} placeholder="如：onCustomClick" />
         </FieldGroup>
       )}
     </div>

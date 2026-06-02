@@ -5,6 +5,7 @@ import type { $Self, ResolvedEventHandler } from '../types/events'
 import { matchVisibleWhen, evalExpr } from '../utils'
 import { resolveEvents, type EventContext } from '../events'
 import { getEventDeclarations } from '../components'
+import { useStyle } from '../styles'
 
 export interface FieldRendererProps {
   field: FormFieldSchema
@@ -42,6 +43,7 @@ export function FieldRenderer({
   components = {},
   eventContext,
 }: FieldRendererProps) {
+  const { token } = useStyle()
 
   // 判断是否禁用
   const isDisabled = disabled ||
@@ -62,11 +64,11 @@ export function FieldRenderer({
 
   // label 渲染
   const label = (
-    <label className="fe-field-label" style={{ display: 'block', marginBottom: 4, fontWeight: isRequired ? 600 : 400 }}>
-      {isRequired && <span style={{ color: '#ff4d4f', marginRight: 4 }}>*</span>}
+    <label className="fe-field-label" style={{ display: 'block', marginBottom: 'var(--fe-spacing-xs, 4px)', fontWeight: isRequired ? 'var(--fe-font-weight-semibold, 600)' : 'var(--fe-font-weight-regular, 400)' }}>
+      {isRequired && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
       {field.label}
       {field.tooltip && (
-        <span title={field.tooltip} style={{ marginLeft: 4, cursor: 'help', color: '#999' }}>?</span>
+        <span title={field.tooltip} style={{ marginLeft: 'var(--fe-spacing-xs, 4px)', cursor: 'help', color: token('textTertiary') as string }}>?</span>
       )}
     </label>
   )
@@ -132,9 +134,9 @@ export function FieldRenderer({
 
   if (!renderFn) {
     return (
-      <div className="fe-field" style={{ padding: '8px 0', color: '#999' }}>
+      <div className="fe-field" style={{ padding: `${token('spacingSm')} 0`, color: token('textTertiary') as string }}>
         {label}
-        <div style={{ fontSize: 12, color: '#ff4d4f' }}>
+        <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>
           未知字段类型: {field.type}
         </div>
       </div>

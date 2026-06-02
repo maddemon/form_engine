@@ -1,14 +1,15 @@
 import React from 'react'
+import { getEventDeclarations } from '../components'
 import { FieldGroup, InlineField, PropsRenderMap, RowField } from '../propRenders'
 import CustomPropsRender from '../propRenders/CustomPropsRender'
 import type { DeviceScene } from '../registry/componentRegistry'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
+import { useStyle } from '../styles'
 import type { DesignerWidgets, FormEngineAdapter } from '../types/adapter'
 import { getComponentCategory } from '../types/component-category'
 import type { DesignerAction } from '../types/designer'
-import type { FormFieldSchema } from '../types/schema'
 import type { EventDeclaration, FormFieldEvents } from '../types/events'
-import { getEventDeclarations } from '../components'
+import type { FormFieldSchema } from '../types/schema'
 import { CollapsibleSection } from './CollapsibleSection'
 import { EventHandlerEditor } from './EventHandlerEditor'
 import { FormConfigPanel } from './FormConfigPanel'
@@ -48,6 +49,7 @@ function getFieldEventDeclarations(field: FormFieldSchema): EventDeclaration[] {
 
 export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, submitConfig, dispatch, designerWidgets, scene = 'desktop', onSceneChange }) => {
   const w = useWidgets(designerWidgets)
+  const { token } = useStyle()
 
   if (!field) {
     return <FormConfigPanel formConfig={formConfig} submitConfig={submitConfig} dispatch={dispatch} scene={scene} onSceneChange={onSceneChange} widgets={w} />
@@ -64,10 +66,10 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
   const isDisplay = category === 'display'
 
   return (
-    <div style={{ width: 280, borderLeft: '1px solid #eee', padding: 12, overflow: 'auto', height: '100%' }}>
-      <h4 style={{ margin: '0 0 12px 0', fontSize: 14, fontWeight: 500 }}>
+    <div style={{ width: token('panelConfigWidth'), borderLeft: '1px solid var(--fe-border-light)', padding: token('spacingMd'), overflow: 'auto', height: '100%' }}>
+      <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500 }}>
         {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
-        <span style={{ marginLeft: 6, color: '#999', fontWeight: 400 }}>({field.type})</span>
+        <span style={{ marginLeft: token('spacingXs'), color: 'var(--fe-text-muted)', fontWeight: 400 }}>({field.type})</span>
       </h4>
 
       {isForm ? (
@@ -88,10 +90,10 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
         </RowField>
       )}
 
-      {isContainer && <div style={{ fontSize: 12, color: '#999', padding: '4px 0', marginBottom: 8 }}>容器组件支持拖入子组件</div>}
+      {isContainer && <div style={{ fontSize: token('fontSizeSm'), color: 'var(--fe-text-muted)', padding: `${token('spacingXs')} 0`, marginBottom: token('spacingSm') }}>容器组件支持拖入子组件</div>}
 
       {(ComponentPropsRender || customConfig?.propertyConfig?.length) && (
-        <div style={{ borderTop: '1px solid #eee', paddingTop: 8, marginTop: 8 }}>
+        <div style={{ borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm'), marginTop: token('spacingSm') }}>
           {ComponentPropsRender ? (
             <ComponentPropsRender
               widgets={w}
@@ -138,10 +140,10 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
         </InlineField>
 
         <FieldGroup label="隐藏表达式（hidden expr）">
-          <w.Input value={typeof field.hidden === 'string' ? field.hidden : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } })} placeholder="如：form.type !== 'admin'" style={{ fontSize: 11 } as React.CSSProperties} />
+          <w.Input value={typeof field.hidden === 'string' ? field.hidden : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } })} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
         </FieldGroup>
         <FieldGroup label="必填表达式（requiredIfExpr）">
-          <w.Input value={field.requiredIfExpr || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { requiredIfExpr: (v as string) || undefined } })} placeholder="如：form.type === 'admin'" style={{ fontSize: 11 } as React.CSSProperties} />
+          <w.Input value={field.requiredIfExpr || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { requiredIfExpr: (v as string) || undefined } })} placeholder="如：form.type === 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
         </FieldGroup>
       </CollapsibleSection>
 
@@ -149,17 +151,14 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
         const eventDeclarations = getFieldEventDeclarations(field)
         if (eventDeclarations.length === 0) return null
         return (
-          <CollapsibleSection
-            title={`事件（${eventDeclarations.length}）`}
-            defaultCollapsed={!field.events || Object.keys(field.events).length === 0}
-            forceExpand={!!field.events && Object.keys(field.events).length > 0}
-          >
-            {eventDeclarations.map(decl => (
+          <CollapsibleSection title={`事件（${eventDeclarations.length}）`} defaultCollapsed={!field.events || Object.keys(field.events).length === 0} forceExpand={!!field.events && Object.keys(field.events).length > 0}>
+            {eventDeclarations.map((decl) => (
               <EventHandlerEditor
                 key={decl.name}
                 eventName={decl.name}
                 value={field.events?.[decl.name]}
-                onChange={handler => {
+                widgets={w}
+                onChange={(handler) => {
                   const next: FormFieldEvents = { ...(field.events || {}) }
                   if (handler) {
                     next[decl.name] = handler

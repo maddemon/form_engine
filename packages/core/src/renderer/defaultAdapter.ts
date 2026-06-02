@@ -35,7 +35,15 @@ function createRenderFn(Component: React.ComponentType<any>): FieldRendererFn {
 const defaultRenderFn = ((props: FieldComponentProps) => {
   return React.createElement(
     'div',
-    { style: { padding: 8, border: '1px dashed #ff4d4f', borderRadius: 4, color: '#ff4d4f', fontSize: 12 } },
+    {
+      style: {
+        padding: 'var(--fe-spacing-sm)',
+        border: '1px dashed var(--fe-error)',
+        borderRadius: 'var(--fe-border-radius-sm)',
+        color: 'var(--fe-error)',
+        fontSize: 'var(--fe-font-size-sm)',
+      } as React.CSSProperties,
+    },
     `未知字段类型: ${(props as any).fieldSchema?.type || 'unknown'}`
   )
 }) as FieldRendererFn

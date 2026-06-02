@@ -1,4 +1,5 @@
 import React from 'react'
+import { useStyle } from '../styles'
 
 export const WidgetButton: React.FC<{
   children?: React.ReactNode
@@ -7,25 +8,27 @@ export const WidgetButton: React.FC<{
   disabled?: boolean
   style?: React.CSSProperties
 }> = ({ children, onClick, type = 'default', disabled, style }) => {
+  const { token } = useStyle()
+
   const base: React.CSSProperties = {
     padding: '3px 12px',
-    borderRadius: 4,
-    border: '1px solid #d9d9d9',
-    fontSize: 12,
+    borderRadius: token('borderRadiusSm') as string,
+    border: `1px solid ${token('borderPrimary') as string}`,
+    fontSize: token('fontSizeSm') as string,
     lineHeight: '20px',
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.5 : 1,
-    background: '#fff',
+    background: token('bgPrimary') as string,
     ...style,
   }
 
   if (type === 'primary') {
-    base.background = '#1677ff'
-    base.color = '#fff'
-    base.borderColor = '#1677ff'
+    base.background = token('primary') as string
+    base.color = token('bgPrimary') as string
+    base.borderColor = token('primary') as string
   } else if (type === 'danger') {
-    base.color = '#ff4d4f'
-    base.borderColor = '#ff4d4f'
+    base.color = token('error') as string
+    base.borderColor = token('error') as string
   } else if (type === 'dashed') {
     base.borderStyle = 'dashed'
   }

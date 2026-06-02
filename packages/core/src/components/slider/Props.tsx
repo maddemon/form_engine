@@ -1,4 +1,4 @@
-import { FieldGroup, RowField, PropsRenderProps } from '../../propRenders'
+import { PropsRenderProps, RowField } from '../../propRenders'
 
 export default function SliderPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
@@ -15,8 +15,8 @@ export default function SliderPropsRender({ widgets: w, values, onChange }: Prop
       <RowField label="步长">
         <w.NumberInput value={(values.step as number) ?? 1} onChange={(v) => onChange('step', v)} min={0} />
       </RowField>
-      <RowField label="Tooltip 格式化">
-        <w.Input value={(values.tooltip as any)?.formatter as string ?? ''} onChange={(v) => onChange('tooltip', v ? { formatter: v } : undefined)} placeholder="如: {value}%" />
+      <RowField label="格式化">
+        <w.Input value={((values.tooltip as any)?.formatter as string) ?? ''} onChange={(v) => onChange('tooltip', v ? { formatter: v } : undefined)} placeholder="如: {value}%" />
       </RowField>
     </>
   )

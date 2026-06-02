@@ -12,6 +12,20 @@ dist
 dist-ssr
 *.local
 
+# Temporary build/test logs (root only) — never commit
+/build*.txt
+/build_log*.txt
+/*_log.txt
+/*_test.txt
+/*_violations.txt
+/typecheck.txt
+/check_*.txt
+/final_*.txt
+/current_*.txt
+# Local scratch directory
+/tmp/
+/.tmp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
