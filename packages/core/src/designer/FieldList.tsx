@@ -6,6 +6,12 @@ import { defaultPaletteGroups } from './paletteData'
 import { useDraggable } from '@dnd-kit/core'
 import { getComponentIcon } from '../components/paletteRegistry'
 import { useStyle } from '../styles'
+import { resolvePanelWidth } from '../utils'
+
+/**
+ * 调色板最小宽度（防呆）：再小就显示不下 2 列 grid
+ */
+const MIN_PALETTE_WIDTH = 160
 
 function DefaultIcon() {
   const { token } = useStyle()
@@ -127,13 +133,21 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
 interface FieldListProps {
   groups?: PaletteGroup[]
   excludeTypes?: string[]
+  /**
+   * 可选：面板宽度
+   *  - `number`：px（小于 160 自动降级到 160）
+   *  - `string`：透传 CSS 宽度（如 '20%'、'min(220px, 18vw)'）
+   *  - 缺省：token 默认（`--fe-panel-field-list-width`）
+   */
+  width?: number | string
 }
 
-export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes }) => {
+export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, width }) => {
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
   const { token } = useStyle()
+  const resolvedWidth = resolvePanelWidth(width, token('panelFieldListWidth') as string, MIN_PALETTE_WIDTH)
   return (
-    <div style={{ width: token('panelFieldListWidth'), borderRight: '1px solid var(--fe-border-light)', padding: `${token('spacingSm')} ${token('spacingMd')}`, overflow: 'auto', height: '100%', background: 'var(--fe-bg-tertiary)' }}>
+    <div style={{ width: resolvedWidth, borderRight: '1px solid var(--fe-border-light)', padding: `${token('spacingSm')} ${token('spacingMd')}`, overflow: 'auto', height: '100%', background: 'var(--fe-bg-tertiary)' }}>
       {finalGroups.map(group => (
         <div key={group.groupName} style={{ marginBottom: 'var(--fe-spacing-md)' }}>
           <div style={{ fontSize: 'var(--fe-font-size-xs)', color: 'var(--fe-text-muted)', fontWeight: 500, padding: 'var(--fe-spacing-xs) var(--fe-spacing-xs) var(--fe-spacing-sm)', textTransform: 'uppercase', letterSpacing: 0.5 }}>

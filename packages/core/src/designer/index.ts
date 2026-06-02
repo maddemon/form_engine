@@ -29,5 +29,7 @@ export type {
   DesignerProps,
   DesignerAction,
   PaletteItem,
+  PaletteGroup,
+  PanelWidths,
   SelectedFieldId,
 } from '../types/designer'

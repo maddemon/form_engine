@@ -14,7 +14,7 @@ import type { GridProps, GridColConfig } from '@form-engine/core'
  */
 export const Grid: React.FC<GridProps> = ({
   children,
-  columns = 24,
+  columns = 2,
   gap = 8,
   rows,
   cols,
@@ -23,9 +23,10 @@ export const Grid: React.FC<GridProps> = ({
   id,
   ...rest
 }) => {
-  // 如果有 cols 配置，使用 Col 包裹子元素
   const childrenArray = React.Children.toArray(children)
-  
+  const childCount = childrenArray.length || 1
+  const colSpan = Math.floor(24 / columns)
+
   if (cols && cols.length > 0) {
     return (
       <Row
@@ -40,7 +41,7 @@ export const Grid: React.FC<GridProps> = ({
           return (
             <Col
               key={index}
-              span={colConfig.span || Math.floor(columns / childrenArray.length)}
+              span={colConfig.span || colSpan}
               offset={colConfig.offset}
               order={colConfig.order}
               xs={colConfig.xs}
@@ -57,9 +58,7 @@ export const Grid: React.FC<GridProps> = ({
       </Row>
     )
   }
-  
-  // 否则使用均匀分配
-  const span = Math.floor(columns / childrenArray.length)
+
   return (
     <Row
       gutter={gap}
@@ -69,9 +68,7 @@ export const Grid: React.FC<GridProps> = ({
       {...rest}
     >
       {childrenArray.map((child, index) => (
-        <Col key={index} span={span}>
-          {child}
-        </Col>
+        <Col key={index} span={colSpan}>{child}</Col>
       ))}
     </Row>
   )

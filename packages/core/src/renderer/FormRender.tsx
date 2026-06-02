@@ -299,7 +299,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
         {visibleFields.map(field => (
           <div
             key={field.id || field.name}
-            style={{ width: `${(field.colSpan || 24) / 24 * 100}%` }}
+            style={{ width: `${(isContainerComponent(field.type) ? 24 : (field.colSpan || 24)) / 24 * 100}%` }}
           >
             {renderNestedField(field)}
           </div>

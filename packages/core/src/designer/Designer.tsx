@@ -1,33 +1,30 @@
 import { closestCorners, DndContext, DragOverlay, PointerSensor, pointerWithin, TouchSensor, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragOverEvent, type DragStartEvent, type UniqueIdentifier } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
-import { useEffect, useCallback, useReducer, useState } from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { getComponentIcon } from '../components/paletteRegistry'
 import type { DeviceScene } from '../registry/componentRegistry'
 import { setScene } from '../registry/componentRegistry'
+import { useEnsureDefaultTheme, useStyle } from '../styles'
 import type { FormEngineAdapter } from '../types/adapter'
 import { isContainerComponent } from '../types/component-category'
-import type { PaletteGroup } from '../types/designer'
+import type { PaletteGroup, PanelWidths } from '../types/designer'
 import { isPaletteDrag, toPaletteItem, type DesignerDragData } from '../types/designer-drag'
 import type { FormFieldSchema, FormSchema } from '../types/schema'
-import { Canvas } from './Canvas'
+import { Canvas, CANVAS_ROOT_ID, CANVAS_ROOT_HEAD_ID } from './Canvas'
 import { DesignerContext } from './DesignerContext'
 import { createFieldFromPalette, FieldList, getFullPaletteGroups } from './FieldList'
-import { getComponentIcon } from '../components/paletteRegistry'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
 import { designerReducerWithHistory, findInTree } from './reducer'
-import { useStyle, useEnsureDefaultTheme } from '../styles'
 
-export const CANVAS_ROOT_ID = 'canvas-root'
-const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
+function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number } | null {
+  const idx = fields.findIndex((f) => f.id === fieldId)
+  if (idx >= 0) return { parentId, index: idx }
 
-function findFieldPosition(fields: FormFieldSchema[], fieldId: string): { parentId?: string; index: number } | null {
-  const rootIdx = fields.findIndex((f) => f.id === fieldId)
-  if (rootIdx >= 0) return { parentId: undefined, index: rootIdx }
-
-  for (const container of fields) {
-    if (!container.children) continue
-    const childIdx = container.children.findIndex((c) => c.id === fieldId)
-    if (childIdx >= 0) return { parentId: container.id, index: childIdx }
+  for (const field of fields) {
+    if (!field.children) continue
+    const result = findFieldPosition(field.children, fieldId, field.id)
+    if (result) return result
   }
 
   return null
@@ -37,7 +34,6 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentI
   if (overId === CANVAS_ROOT_HEAD_ID) return { parentId: undefined, index: 0 }
   if (overId === CANVAS_ROOT_ID) return { parentId: undefined, index: fields.length }
 
-  // Container inner droppable (ID format: fieldId__container)
   if (overId.endsWith('__container')) {
     const containerId = overId.replace(/__container$/, '')
     const container = findInTree(fields, containerId)
@@ -46,17 +42,37 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentI
     }
   }
 
-  // Sortable field: insert after it within its parent
-  const rootIdx = fields.findIndex((f) => f.id === overId)
-  if (rootIdx >= 0) return { parentId: undefined, index: rootIdx + 1 }
-
-  for (const container of fields) {
-    if (!container.children) continue
-    const childIdx = container.children.findIndex((c) => c.id === overId)
-    if (childIdx >= 0) return { parentId: container.id, index: childIdx + 1 }
-  }
+  const pos = findFieldPosition(fields, overId)
+  if (pos) return { parentId: pos.parentId, index: pos.index + 1 }
 
   return { parentId: undefined, index: fields.length }
+}
+
+function reorderFieldsInContainer(fields: FormFieldSchema[], containerId: string | undefined, fromIdx: number, toIdx: number): FormFieldSchema[] {
+  if (!containerId) return arrayMove(fields, fromIdx, toIdx)
+  return fields.map(f => {
+    if (f.id === containerId && f.children) {
+      return { ...f, children: arrayMove(f.children, fromIdx, toIdx) }
+    }
+    if (f.children) {
+      return { ...f, children: reorderFieldsInContainer(f.children, containerId, fromIdx, toIdx) }
+    }
+    return f
+  })
+}
+
+function isAncestorOf(fields: FormFieldSchema[], ancestorId: string, descendantId: string): boolean {
+  if (ancestorId === descendantId) return true
+  for (const f of fields) {
+    if (f.id === ancestorId && f.children) {
+      return findInTree(f.children, descendantId) !== undefined
+    }
+    if (f.children) {
+      const result = isAncestorOf(f.children, ancestorId, descendantId)
+      if (result) return true
+    }
+  }
+  return false
 }
 
 interface DesignerProps {
@@ -67,9 +83,10 @@ interface DesignerProps {
   excludeTypes?: string[]
   readOnly?: boolean
   adapter?: FormEngineAdapter
+  panelWidths?: PanelWidths
 }
 
-export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, adapter }) => {
+export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, adapter, panelWidths }) => {
   useEnsureDefaultTheme()
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
 
@@ -128,73 +145,68 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
   const collisionDetection = useCallback<CollisionDetection>(
     (args) => {
+      const pointerCoords = args.pointerCoordinates
+      const fields = state.schema.fields
+
+      const activeId = args.active.id
       const activeData = args.active.data.current as DesignerDragData | undefined
-      if (activeData && isPaletteDrag(activeData)) {
-        const pointerCoords = args.pointerCoordinates
-        const fields = state.schema.fields
+      const isFromPalette = activeData ? isPaletteDrag(activeData) : false
+      const activeSourcePos = !isFromPalette ? findFieldPosition(fields, String(activeId)) : null
 
-        // Detect container edge zones to allow root-level insertion
-        // Only redirect to container inner droppable when pointer is explicitly over the container's inner area
-        if (pointerCoords && fields.length > 0) {
-          for (const field of fields) {
-            if (!isContainerComponent(field.type)) continue
-            const containerRect = args.droppableRects.get(field.id!)
-            if (!containerRect) continue
+      if (activeSourcePos && activeSourcePos.parentId) {
+        const insideDroppables = pointerWithin(args)
+        if (insideDroppables.length > 0) return insideDroppables
+        return closestCorners(args)
+      }
 
-            const { top, bottom, left, right } = containerRect
-            if (pointerCoords.y >= top && pointerCoords.y <= bottom && pointerCoords.x >= left && pointerCoords.x <= right) {
-              const height = bottom - top
-              const relY = pointerCoords.y - top
-              const edgeZone = height * 0.2
+      if (pointerCoords && fields.length > 0) {
+        for (const field of fields) {
+          if (!isContainerComponent(field.type)) continue
+          const containerRect = args.droppableRects.get(field.id!)
+          if (!containerRect) continue
 
-              const containerIndex = fields.findIndex((f) => f.id === field.id)
-              // containerIndex is always >= 0 here since we're iterating root-level fields
+          const { top, bottom, left, right } = containerRect
+          if (pointerCoords.y >= top && pointerCoords.y <= bottom && pointerCoords.x >= left && pointerCoords.x <= right) {
+            const height = bottom - top
+            const relY = pointerCoords.y - top
+            const edgeZone = height * 0.2
 
-              if (relY < edgeZone) {
-                // Near top edge → insert before the container at root level
-                if (containerIndex > 0 && fields[containerIndex - 1]?.id) {
-                  return [{ id: fields[containerIndex - 1].id! }]
-                }
-                return [{ id: CANVAS_ROOT_HEAD_ID }]
+            const containerIndex = fields.findIndex((f) => f.id === field.id)
+
+            if (relY < edgeZone) {
+              if (containerIndex > 0 && fields[containerIndex - 1]?.id) {
+                return [{ id: fields[containerIndex - 1].id! }]
               }
-              if (relY > height - edgeZone) {
-                // Near bottom edge → insert after the container at root level
-                return [{ id: field.id! }]
-              }
-
-              // Middle area: check if pointer is over the container's inner droppable area
-              const innerDropId = `${field.id}__container`
-              const innerRect = args.droppableRects.get(innerDropId)
-              if (innerRect) {
-                const { top: it, bottom: ib, left: il, right: ir } = innerRect
-                // Pointer is inside the inner droppable area → drop into container
-                if (pointerCoords.y >= it && pointerCoords.y <= ib && pointerCoords.x >= il && pointerCoords.x <= ir) {
-                  return [{ id: innerDropId }]
-                }
-              }
-
-              // Pointer is NOT in the inner droppable → use pointerWithin to find root-level drop target
-              // Filter out container inner droppables from the result
-              const pointerCollisions = pointerWithin(args)
-              const rootOnly = pointerCollisions.filter((c) => {
-                const idStr = String(c.id)
-                if (idStr === CANVAS_ROOT_ID || idStr === CANVAS_ROOT_HEAD_ID) return true
-                if (idStr.endsWith('__container')) return false
-                return fields.some((f) => f.id === c.id)
-              })
-              return rootOnly.length > 0 ? rootOnly : [{ id: CANVAS_ROOT_ID }]
+              return [{ id: CANVAS_ROOT_HEAD_ID }]
             }
+            if (relY > height - edgeZone) {
+              return [{ id: field.id! }]
+            }
+
+            const innerDropId = `${field.id}__container`
+            const innerRect = args.droppableRects.get(innerDropId)
+            if (innerRect) {
+              const { top: it, bottom: ib, left: il, right: ir } = innerRect
+              if (pointerCoords.y >= it && pointerCoords.y <= ib && pointerCoords.x >= il && pointerCoords.x <= ir) {
+                return [{ id: innerDropId }]
+              }
+            }
+
+            const pointerCollisions = pointerWithin(args)
+            const rootOnly = pointerCollisions.filter((c) => {
+              const idStr = String(c.id)
+              if (idStr === CANVAS_ROOT_ID || idStr === CANVAS_ROOT_HEAD_ID) return true
+              if (idStr.endsWith('__container')) return false
+              return fields.some((f) => f.id === c.id)
+            })
+            return rootOnly.length > 0 ? rootOnly : [{ id: CANVAS_ROOT_ID }]
           }
         }
-
-        // Fallback: use pointerWithin first, then closestCorners
-        const insideDroppables = pointerWithin(args)
-        if (insideDroppables.length === 0) return closestCorners(args)
-        return insideDroppables
       }
-      const pointerCollisions = pointerWithin(args)
-      if (pointerCollisions.length > 0) return pointerCollisions
-      return closestCorners(args)
+
+      const insideDroppables = pointerWithin(args)
+      if (insideDroppables.length === 0) return closestCorners(args)
+      return insideDroppables
     },
     [state.schema.fields],
   )
@@ -226,39 +238,62 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
     [state.schema.fields],
   )
 
-  // 画布内拖拽：在 onDragOver 时实时更新排序
-  // 使用 arrayMove 让 dnd-kit 的 sortable 策略自动计算正确位置
+  const lastDragOverMoveRef = useRef<string | null>(null)
+
   const handleDragOver = useCallback(
     (event: DragOverEvent) => {
       const { active, over } = event
       if (!over) return
 
       const activeData = active.data.current as DesignerDragData | undefined
-      // 只处理画布内拖拽（非 palette 拖拽）
       if (activeData && isPaletteDrag(activeData)) return
 
       const activeId = String(active.id)
       const overId = String(over.id)
 
-      // 忽略特殊 ID 和容器内部 droppable
-      if (overId === CANVAS_ROOT_ID || overId === CANVAS_ROOT_HEAD_ID || overId.endsWith('__container')) return
+      if (overId === CANVAS_ROOT_ID || overId === CANVAS_ROOT_HEAD_ID) return
 
       const fields = state.schema.fields
+      const sourcePos = findFieldPosition(fields, activeId)
+      if (!sourcePos) return
 
-      // 查找源和目标的位置（只处理根级别）
-      const sourceIdx = fields.findIndex(f => f.id === activeId)
-      const targetIdx = fields.findIndex(f => f.id === overId)
-      if (sourceIdx < 0 || targetIdx < 0) return
+      let targetParentId: string | undefined
+      let targetIndex: number
 
-      // 用 arrayMove 计算新顺序并 dispatch
-      const newFields = arrayMove(fields, sourceIdx, targetIdx)
-      dispatch({ type: 'REORDER_FIELDS', fields: newFields })
+      if (overId.endsWith('__container')) {
+        const containerId = overId.replace(/__container$/, '')
+        if (sourcePos.parentId === containerId) return
+        if (isAncestorOf(fields, activeId, containerId)) return
+        const container = findInTree(fields, containerId)
+        if (!container) return
+        targetParentId = containerId
+        targetIndex = container.children?.length || 0
+      } else {
+        const targetPos = findFieldPosition(fields, overId)
+        if (!targetPos) return
+        if (sourcePos.parentId === targetPos.parentId) return
+        targetParentId = targetPos.parentId
+        targetIndex = targetPos.index
+      }
+
+      const moveKey = `${activeId}->${targetParentId || 'root'}:${targetIndex}`
+      if (lastDragOverMoveRef.current === moveKey) return
+      lastDragOverMoveRef.current = moveKey
+
+      dispatch({
+        type: 'MOVE_FIELD',
+        fromIndex: sourcePos.index,
+        toIndex: targetIndex,
+        fromParentId: sourcePos.parentId,
+        toParentId: targetParentId,
+      })
     },
     [state.schema.fields, dispatch],
   )
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
+      lastDragOverMoveRef.current = null
       setActiveDragId(null)
       setActiveDragLabel('')
       setActiveDragType('')
@@ -271,7 +306,6 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       const fields = state.schema.fields
 
       if (isPaletteDrag(activeData)) {
-        // Only allow dropping on valid canvas droppables
         const isValidCanvasTarget = over.id === CANVAS_ROOT_ID || over.id === CANVAS_ROOT_HEAD_ID || String(over.id).endsWith('__container') || fields.some((f) => f.id === over.id) || fields.some((f) => f.children?.some((c) => c.id === over.id))
         if (!isValidCanvasTarget) return
 
@@ -281,17 +315,37 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         return
       }
 
-      // 画布内拖拽：排序已在 onDragOver 时完成，这里只需清除拖拽状态
-      // 跨容器拖拽：交给 MOVE_FIELD 处理
-      if (active.id === over.id) return
+      const activeId = String(active.id)
+      const overId = String(over.id)
+      if (activeId === overId) return
 
-      const sourcePos = findFieldPosition(fields, String(active.id))
+      if (overId.endsWith('__container')) {
+        const containerId = overId.replace(/__container$/, '')
+        const sourcePos = findFieldPosition(fields, activeId)
+        if (!sourcePos) return
+        if (sourcePos.parentId === containerId) return
+        if (isAncestorOf(fields, activeId, containerId)) return
+        const container = findInTree(fields, containerId)
+        if (!container) return
+        dispatch({
+          type: 'MOVE_FIELD',
+          fromIndex: sourcePos.index,
+          toIndex: container.children?.length || 0,
+          fromParentId: sourcePos.parentId,
+          toParentId: containerId,
+        })
+        return
+      }
+
+      const sourcePos = findFieldPosition(fields, activeId)
       if (!sourcePos) return
-      const targetPos = findFieldPosition(fields, String(over.id))
+      const targetPos = findFieldPosition(fields, overId)
       if (!targetPos) return
 
-      // 跨容器拖拽
-      if (sourcePos.parentId !== targetPos.parentId) {
+      if (sourcePos.parentId === targetPos.parentId) {
+        const newFields = reorderFieldsInContainer(fields, sourcePos.parentId, sourcePos.index, targetPos.index)
+        dispatch({ type: 'REORDER_FIELDS', fields: newFields })
+      } else {
         dispatch({
           type: 'MOVE_FIELD',
           fromIndex: sourcePos.index,
@@ -305,6 +359,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
   )
 
   const handleDragCancel = useCallback(() => {
+    lastDragOverMoveRef.current = null
     setActiveDragId(null)
     setActiveDragLabel('')
     setActiveDragType('')
@@ -321,7 +376,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         `}</style>
       <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
         {/* 左侧控件库 */}
-        {!readOnly && <FieldList groups={finalGroups} />}
+        {!readOnly && <FieldList groups={finalGroups} width={panelWidths?.palette} />}
 
         {/* 中间画布 */}
         <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
@@ -355,7 +410,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       </DndContext>
 
       {/* 右侧属性面板 */}
-      <PropertyPanel field={selectedField} formConfig={state.schema.form || { layout: 'vertical', size: 'middle' }} submitConfig={state.schema.submit || { text: '提交', showReset: true, resetText: '重置' }} dispatch={dispatch} adapter={adapter} scene={scene} onSceneChange={setSceneState} />
+      <PropertyPanel field={selectedField} formConfig={state.schema.form || { layout: 'vertical', size: 'middle' }} submitConfig={state.schema.submit || { text: '提交', showReset: true, resetText: '重置' }} dispatch={dispatch} adapter={adapter} scene={scene} onSceneChange={setSceneState} width={panelWidths?.properties} />
     </div>
   )
 }

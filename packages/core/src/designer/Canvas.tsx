@@ -9,6 +9,7 @@ import { useDesignerContext } from './DesignerContext'
 import { RootFields } from './RootFields'
 
 export const CANVAS_ROOT_ID = 'canvas-root'
+export const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
 
 const CanvasDroppable: React.FC<{ children: React.ReactNode; onClick: () => void; style: React.CSSProperties }> = ({ children, onClick, style }) => {
   const { setNodeRef, isOver } = useDroppable({ id: CANVAS_ROOT_ID })
@@ -24,6 +25,11 @@ const CanvasDroppable: React.FC<{ children: React.ReactNode; onClick: () => void
       {children}
     </div>
   )
+}
+
+const CanvasRootHead: React.FC = () => {
+  const { setNodeRef } = useDroppable({ id: CANVAS_ROOT_HEAD_ID })
+  return <div ref={setNodeRef} style={{ height: 0, overflow: 'hidden' }} /> // check-tokens-disable-line
 }
 
 interface CanvasProps {
@@ -107,6 +113,7 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
             </div>
           )}
 
+          <CanvasRootHead />
           <RootFields fields={fields} />
         </CanvasDroppable>
       </div>

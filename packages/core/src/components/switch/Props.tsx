@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField, PropsRenderProps } from '../../propRenders'
+import { FieldGroup, InlineField, PropsRenderProps, RowField } from '../../propRenders'
 
 export default function SwitchPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
@@ -16,12 +16,12 @@ export default function SwitchPropsRender({ widgets: w, values, onChange }: Prop
           ]}
         />
       </FieldGroup>
-      <FieldGroup label="选中时文字">
+      <RowField label="选中时文字">
         <w.Input value={(values.checkedChildren as string) ?? ''} onChange={(v) => onChange('checkedChildren', v)} placeholder="如：开" />
-      </FieldGroup>
-      <FieldGroup label="未选中时文字">
+      </RowField>
+      <RowField label="未选中时文字">
         <w.Input value={(values.unCheckedChildren as string) ?? ''} onChange={(v) => onChange('unCheckedChildren', v)} placeholder="如：关" />
-      </FieldGroup>
+      </RowField>
     </>
   )
 }

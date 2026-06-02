@@ -1,4 +1,4 @@
-import { FieldGroup, RowField } from '../../propRenders/shared'
+import { RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 const GRID_VARIANT_OPTIONS = [
@@ -9,13 +9,9 @@ const GRID_VARIANT_OPTIONS = [
 export default function GridPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="布局模式">
-        <w.Select
-          value={(values.variant as string) ?? 'grid'}
-          onChange={(v) => onChange('variant', v)}
-          options={GRID_VARIANT_OPTIONS}
-        />
-      </FieldGroup>
+      <RowField label="布局模式">
+        <w.Select value={(values.variant as string) ?? 'grid'} onChange={(v) => onChange('variant', v)} options={GRID_VARIANT_OPTIONS} />
+      </RowField>
       <RowField label="列数">
         <w.NumberInput value={(values.columns as number) ?? 24} onChange={(v) => onChange('columns', v)} min={1} max={48} />
       </RowField>

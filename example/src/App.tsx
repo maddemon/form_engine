@@ -105,6 +105,7 @@ const App: React.FC = () => {
             onSchemaChange={setSchema}
             onSceneChange={(s) => setSceneState(s)}
             adapter={defaultAdapter}
+            panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }}
           />
         ) : (
           <div

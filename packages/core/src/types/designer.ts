@@ -38,6 +38,24 @@ export interface PaletteGroup {
 }
 
 /**
+ * 设计器三栏面板宽度配置
+ *
+ * 设计动机：用户场景下容器总宽差异很大（PC 1440+ vs 笔记本 1280 vs 平板 1024），
+ * 固定 px 宽度会"挤死"或"留白过多"。开放给用户指定是必要的。
+ *
+ * 取值规则：
+ *  - `number`  → `${n}px`，但小于 `min` 时会被覆盖到 `min`
+ *  - `string`  → 透传（支持 `'20%'`、`'18rem'`、`'min(280px, 22vw)'` 等合法 CSS 宽度）
+ *  - 缺省     → 使用 token 默认值（`--fe-panel-field-list-width` / `--fe-panel-config-width`）
+ */
+export interface PanelWidths {
+  /** 左侧调色板宽度（默认 token 220px，最小 160px） */
+  palette?: number | string
+  /** 右侧属性面板宽度（默认 token 280px，最小 240px） */
+  properties?: number | string
+}
+
+/**
  * 设计器 Props
  */
 export interface DesignerProps {
@@ -53,6 +71,13 @@ export interface DesignerProps {
   readOnly?: boolean
   /** 可选：当前平台适配器，用于设计器属性面板风格统一 */
   adapter?: FormEngineAdapter
+  /**
+   * 可选：调色板 / 属性面板宽度
+   * - 数字：px；小于最小值时按最小值兜底
+   * - 字符串：透传 CSS 宽度（如 '20%'、'18rem'）
+   * - 缺省：按 token 默认值 + 容器尺寸自动收敛
+   */
+  panelWidths?: PanelWidths
 }
 
 /**

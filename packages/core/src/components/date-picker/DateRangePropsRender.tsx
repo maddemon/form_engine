@@ -1,4 +1,4 @@
-import { FieldGroup, InlineField } from '../../propRenders/shared'
+import { FieldGroup, InlineField, RowField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function DateRangePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -10,7 +10,7 @@ export default function DateRangePropsRender({ widgets: w, values, onChange }: P
       <FieldGroup label="格式">
         <w.Input value={(values.format as string) ?? 'YYYY-MM-DD'} onChange={(v) => onChange('format', v)} />
       </FieldGroup>
-      <FieldGroup label="选择器类型">
+      <RowField label="选择器类型">
         <w.ButtonGroup
           value={(values.picker as string) ?? 'date'}
           onChange={(v) => onChange('picker', v)}
@@ -21,10 +21,10 @@ export default function DateRangePropsRender({ widgets: w, values, onChange }: P
             { label: '年', value: 'year' },
           ]}
         />
-      </FieldGroup>
-      <InlineField label="显示时间">
+      </RowField>
+      <RowField label="显示时间">
         <w.Checkbox checked={!!values.showTime} onChange={(v) => onChange('showTime', v)} />
-      </InlineField>
+      </RowField>
       <FieldGroup label="开始占位文本">
         <w.Input value={((values.placeholder as string[])?.[0]) ?? ''} onChange={(v) => onChange('placeholder', [(v as string) || '开始日期', ((values.placeholder as string[])?.[1]) ?? '结束日期'])} placeholder="开始日期" />
       </FieldGroup>

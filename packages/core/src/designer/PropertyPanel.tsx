@@ -14,6 +14,12 @@ import { CollapsibleSection } from './CollapsibleSection'
 import { EventHandlerEditor } from './EventHandlerEditor'
 import { FormConfigPanel } from './FormConfigPanel'
 import { defaultDesignerWidgets } from './widgets'
+import { resolvePanelWidth } from '../utils'
+
+/**
+ * 属性面板最小宽度（防呆）：再小 RowField / 控件就显示不全
+ */
+const MIN_PROPERTIES_WIDTH = 240
 
 interface PropertyPanelProps {
   field: FormFieldSchema | null
@@ -24,6 +30,13 @@ interface PropertyPanelProps {
   designerWidgets?: DesignerWidgets
   scene?: DeviceScene
   onSceneChange?: (scene: DeviceScene) => void
+  /**
+   * 可选：面板宽度
+   *  - `number`：px（小于 240 自动降级到 240）
+   *  - `string`：透传 CSS 宽度（如 '24%'、'min(280px, 22vw)'）
+   *  - 缺省：token 默认（`--fe-panel-config-width`）
+   */
+  width?: number | string
 }
 
 function useWidgets(designerWidgets?: DesignerWidgets) {
@@ -47,12 +60,13 @@ function getFieldEventDeclarations(field: FormFieldSchema): EventDeclaration[] {
   return getEventDeclarations(field.type)
 }
 
-export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, submitConfig, dispatch, designerWidgets, scene = 'desktop', onSceneChange }) => {
+export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, submitConfig, dispatch, designerWidgets, scene = 'desktop', onSceneChange, width }) => {
   const w = useWidgets(designerWidgets)
   const { token } = useStyle()
+  const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
 
   if (!field) {
-    return <FormConfigPanel formConfig={formConfig} submitConfig={submitConfig} dispatch={dispatch} scene={scene} onSceneChange={onSceneChange} widgets={w} />
+    return <FormConfigPanel formConfig={formConfig} submitConfig={submitConfig} dispatch={dispatch} scene={scene} onSceneChange={onSceneChange} widgets={w} width={width} />
   }
 
   const hasAdvanced = hasAdvancedConfig(field)
@@ -66,7 +80,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
   const isDisplay = category === 'display'
 
   return (
-    <div style={{ width: token('panelConfigWidth'), borderLeft: '1px solid var(--fe-border-light)', padding: token('spacingMd'), overflow: 'auto', height: '100%' }}>
+    <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', padding: token('spacingMd'), overflow: 'auto', height: '100%' }}>
       <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500 }}>
         {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
         <span style={{ marginLeft: token('spacingXs'), color: 'var(--fe-text-muted)', fontWeight: 400 }}>({field.type})</span>

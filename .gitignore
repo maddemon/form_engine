@@ -37,3 +37,8 @@ dist-ssr
 *.sln
 *.sw?
 .codegraph/daemon.pid
+packages/core/tmp/test-20260602_140002.txt
+packages/core/tmp/test-20260602_140016.txt
+packages/core/tmp/test-20260602_140037.txt
+packages/core/tmp/test-20260602_140111.txt
+packages/core/tmp/vitest-20260602_134645.txt

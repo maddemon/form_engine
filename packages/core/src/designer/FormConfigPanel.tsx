@@ -6,6 +6,7 @@ import type { DesignerAction } from '../types/designer'
 import type { FormConfig, SubmitConfig } from '../types/schema'
 import type { DesignerWidgets } from '../types/adapter'
 import { useStyle } from '../styles'
+import { resolvePanelWidth } from '../utils'
 
 const LAYOUT_OPTIONS = [
   { label: '水平', value: 'horizontal' },
@@ -46,6 +47,13 @@ interface FormConfigPanelProps {
   scene: DeviceScene
   onSceneChange?: (scene: DeviceScene) => void
   widgets: DesignerWidgets
+  /**
+   * 可选：面板宽度
+   *  - `number`：px（小于 240 自动降级到 240）
+   *  - `string`：透传 CSS 宽度（如 '24%'、'min(280px, 22vw)'）
+   *  - 缺省：token 默认（`--fe-panel-config-width`）
+   */
+  width?: number | string
 }
 
 export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({
@@ -55,10 +63,12 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({
   scene,
   onSceneChange,
   widgets: w,
+  width,
 }) => {
   const { token } = useStyle()
+  const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, 240)
   return (
-    <div style={{ width: token('panelConfigWidth'), borderLeft: '1px solid var(--fe-border-light)', padding: token('spacingMd'), overflow: 'auto', height: '100%' }}>
+    <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', padding: token('spacingMd'), overflow: 'auto', height: '100%' }}>
       <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd') }}>表单配置</h4>
 
       <FieldGroup label="设计场景">
