@@ -1,12 +1,12 @@
-import { FieldGroup, OptionRender, PropsRenderProps } from '../../propRenders'
+import { FieldItem, OptionRender, PropsRenderProps } from '../../propRenders'
 
 export default function RadioPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="选项">
+      <FieldItem label="选项">
         <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
-      </FieldGroup>
-      <FieldGroup label="选项类型">
+      </FieldItem>
+      <FieldItem label="选项类型">
         <w.ButtonGroup
           value={(values.optionType as string) ?? 'default'}
           onChange={(v) => onChange('optionType', v)}
@@ -15,9 +15,9 @@ export default function RadioPropsRender({ widgets: w, values, onChange }: Props
             { label: '按钮', value: 'button' },
           ]}
         />
-      </FieldGroup>
+      </FieldItem>
       {values.optionType === 'button' && (
-        <FieldGroup label="按钮样式">
+        <FieldItem label="按钮样式">
           <w.ButtonGroup
             value={(values.buttonStyle as string) ?? 'outline'}
             onChange={(v) => onChange('buttonStyle', v)}
@@ -26,9 +26,9 @@ export default function RadioPropsRender({ widgets: w, values, onChange }: Props
               { label: '实心', value: 'solid' },
             ]}
           />
-        </FieldGroup>
+        </FieldItem>
       )}
-      <FieldGroup label="排列方向">
+      <FieldItem label="排列方向">
         <w.ButtonGroup
           value={(values.direction as string) ?? 'horizontal'}
           onChange={(v) => onChange('direction', v)}
@@ -37,7 +37,7 @@ export default function RadioPropsRender({ widgets: w, values, onChange }: Props
             { label: '竖向', value: 'vertical' },
           ]}
         />
-      </FieldGroup>
+      </FieldItem>
     </>
   )
 }

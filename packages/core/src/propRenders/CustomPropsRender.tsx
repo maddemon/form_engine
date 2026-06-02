@@ -1,9 +1,9 @@
 import React from 'react'
 import { customPropertyWidgetRegistry } from '../registry/customComponentRegistry'
+import { useStyle } from '../styles'
 import type { DesignerWidgets } from '../types/adapter'
 import type { PropertyConfigItem } from '../types/custom-component'
-import { useStyle } from '../styles'
-import { FieldGroup } from './shared'
+import { FieldItem } from './shared'
 
 interface CustomPropsRenderProps {
   configs: PropertyConfigItem[]
@@ -35,9 +35,9 @@ export default function CustomPropsRender({ configs, widgets: w, values, onChang
         }
 
         return (
-          <FieldGroup key={config.key} label={config.label}>
+          <FieldItem key={config.key} label={config.label}>
             {renderWidget(config, value, handleChange, w)}
-          </FieldGroup>
+          </FieldItem>
         )
       })}
     </>
@@ -69,7 +69,7 @@ function renderWidget(config: PropertyConfigItem, value: unknown, onValueChange:
             fontSize: token('fontSizeXs'),
           }}
         />
-      );
+      )
 
     case 'number':
       return <w.NumberInput value={(value as number) ?? 0} onChange={(v) => onValueChange(v)} min={widgetProps?.min} max={widgetProps?.max} />

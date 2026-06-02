@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { getEventDeclarations } from '../components'
-import { FieldGroup, PropsRenderMap, RowField } from '../propRenders'
+import { FieldItem, PropsRenderMap } from '../propRenders'
 import CustomPropsRender from '../propRenders/CustomPropsRender'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { useStyle } from '../styles'
@@ -17,7 +17,7 @@ import { RulesEditor } from './RulesEditor'
 import { defaultDesignerWidgets } from './widgets'
 
 /**
- * 属性面板最小宽度（防呆）：再小 RowField / 控件就显示不全
+ * 属性面板最小宽度（防呆）：再小 FieldItem / 控件就显示不全
  */
 const MIN_PROPERTIES_WIDTH = 240
 const PROPERTIES_DEFAULT_TAB_KEY = '__default-props__'
@@ -94,7 +94,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
 
   return (
     <>
-      <RowField label="字段名">
+      <FieldItem label="字段名">
         <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingXs'), flex: 1 }}>
           <w.Input
             value={field.name}
@@ -108,14 +108,14 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
           />
           {nameError && <span style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-error)' }}>{nameError}</span>}
         </div>
-      </RowField>
-      <RowField label="标签">
+      </FieldItem>
+      <FieldItem label="标签">
         <w.Input value={field.label || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { label: String(v) || undefined } })} placeholder="字段标签" />
-      </RowField>
+      </FieldItem>
       {isForm && (
-        <RowField label="默认值">
+        <FieldItem label="默认值">
           <w.Input value={field.defaultValue != null ? String(field.defaultValue) : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { defaultValue: v || undefined } })} />
-        </RowField>
+        </FieldItem>
       )}
 
       {isContainer && <div style={{ fontSize: token('fontSizeSm'), color: 'var(--fe-text-muted)', padding: `${token('spacingXs')} 0`, marginBottom: token('spacingSm') }}>容器组件支持拖入子组件</div>}
@@ -153,29 +153,21 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
 
       <CollapsibleSection title="高级属性" defaultCollapsed={true} forceExpand={hasAdvanced}>
         {isForm && (
-          <RowField label="列宽">
+          <FieldItem label="列宽">
             <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
-          </RowField>
+          </FieldItem>
         )}
-        {isForm && (
-          <RulesEditor field={field} widgets={w} dispatch={dispatch} />
-        )}
-        <RowField label="隐藏">
-          <w.Switch checked={!!field.hidden && typeof field.hidden === 'boolean'} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: v } })} />
-        </RowField>
-        <RowField label="禁用">
+        {isForm && <RulesEditor field={field} widgets={w} dispatch={dispatch} />}
+        <FieldItem label="禁用">
           <w.Switch checked={!!field.disabled} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { disabled: v } })} />
-        </RowField>
-        <RowField label="只读">
+        </FieldItem>
+        <FieldItem label="只读">
           <w.Switch checked={!!field.readOnly} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { readOnly: v } })} />
-        </RowField>
+        </FieldItem>
 
-        <FieldGroup label="隐藏表达式（hidden expr）">
+        <FieldItem label="是否隐藏">
           <w.Input value={typeof field.hidden === 'string' ? field.hidden : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } })} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
-        </FieldGroup>
-        <FieldGroup label="必填表达式（requiredIfExpr）">
-          <w.Input value={field.requiredIfExpr || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { requiredIfExpr: (v as string) || undefined } })} placeholder="如：form.type === 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
-        </FieldGroup>
+        </FieldItem>
       </CollapsibleSection>
 
       {(() => {

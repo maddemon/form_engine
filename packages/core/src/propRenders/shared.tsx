@@ -2,31 +2,38 @@ import React from 'react'
 import { useStyle } from '../styles'
 import type { OptionItem } from '../types/schema'
 
-export const FieldGroup: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => {
+interface FieldItemProps {
+  label: string
+  children: React.ReactNode
+  variant?: 'row' | 'group'
+  tooltip?: string
+  style?: React.CSSProperties
+}
+
+export const FieldItem: React.FC<FieldItemProps> = ({ label, children, variant = 'row', tooltip, style }) => {
   const { token } = useStyle()
-  return (
-    <label style={{ display: 'block', marginBottom: token('spacingSm'), fontSize: token('fontSizeSm') }}>
+
+  const labelNode = (
+    <>
       {label}
-      <div style={{ marginTop: token('spacingXs') }}>{children}</div>
-    </label>
+      {tooltip && (
+        <span title={tooltip} style={{ marginLeft: 'var(--fe-spacing-xs, 4px)', cursor: 'help', color: token('textTertiary') as string }}>?</span>
+      )}
+    </>
   )
-}
 
-export const InlineField: React.FC<{ label: string; children: React.ReactNode; style?: React.CSSProperties }> = ({ label, children, style }) => {
-  const { token } = useStyle()
-  return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs'), marginBottom: token('spacingXs'), fontSize: token('fontSizeSm'), ...style }}>
-      {children}
-      <span style={{ minWidth: 80 }}>{label}</span>
-    </label>
-  )
-}
+  if (variant === 'group') {
+    return (
+      <label style={{ display: 'block', marginBottom: token('spacingSm'), fontSize: token('fontSizeSm') }}>
+        {labelNode}
+        <div style={{ marginTop: token('spacingXs') }}>{children}</div>
+      </label>
+    )
+  }
 
-export const RowField: React.FC<{ label: string; children: React.ReactNode; style?: React.CSSProperties }> = ({ label, children, style }) => {
-  const { token } = useStyle()
   return (
     <label style={{ display: 'flex', alignItems: 'center', gap: token('spacingSm'), marginBottom: token('spacingSm'), fontSize: token('fontSizeSm'), ...style }}>
-      <span style={{ whiteSpace: 'nowrap', flexShrink: 0, minWidth: 80 }}>{label}</span>
+      <span style={{ whiteSpace: 'nowrap', flexShrink: 0, minWidth: 80 }}>{labelNode}</span>
       <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
     </label>
   )

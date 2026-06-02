@@ -1,10 +1,10 @@
-import { FieldGroup, RowField } from '../../propRenders/shared'
+import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function TabsPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="样式类型">
+      <FieldItem label="样式类型">
         <w.ButtonGroup
           value={(values.type as string) ?? 'line'}
           onChange={(v) => onChange('type', v)}
@@ -14,8 +14,8 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
             { label: '可编辑卡片', value: 'editable-card' },
           ]}
         />
-      </FieldGroup>
-      <FieldGroup label="尺寸">
+      </FieldItem>
+      <FieldItem label="尺寸">
         <w.ButtonGroup
           value={(values.size as string) ?? 'middle'}
           onChange={(v) => onChange('size', v)}
@@ -25,8 +25,8 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
             { label: '小', value: 'small' },
           ]}
         />
-      </FieldGroup>
-      <FieldGroup label="标签位置">
+      </FieldItem>
+      <FieldItem label="标签位置">
         <w.ButtonGroup
           value={(values.tabPosition as string) ?? 'top'}
           onChange={(v) => onChange('tabPosition', v)}
@@ -37,10 +37,10 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
             { label: '左侧', value: 'left' },
           ]}
         />
-      </FieldGroup>
-      <RowField label="居中展示">
+      </FieldItem>
+      <FieldItem label="居中展示">
         <w.Switch checked={!!values.centered} onChange={(v) => onChange('centered', v)} />
-      </RowField>
+      </FieldItem>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { FieldGroup, PropsRenderProps, RowField } from '../../propRenders'
+import { FieldItem, PropsRenderProps } from '../../propRenders'
 
 const LIST_TYPE_OPTIONS = [
   { label: '文本', value: 'text' },
@@ -9,37 +9,33 @@ const LIST_TYPE_OPTIONS = [
 export default function UploadPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="上传地址">
+      <FieldItem label="上传地址">
         <w.Input value={(values.action as string) ?? ''} onChange={(v) => onChange('action', v)} placeholder="如: https://api.example.com/upload" />
-      </FieldGroup>
-      <FieldGroup label="默认值">
+      </FieldItem>
+      <FieldItem label="默认值">
         <w.Input value={(values.defaultValue as string) ?? ''} onChange={(v) => onChange('defaultValue', v)} />
-      </FieldGroup>
-      <FieldGroup label="接受文件类型">
+      </FieldItem>
+      <FieldItem label="接受文件类型">
         <w.Input value={(values.accept as string) ?? ''} onChange={(v) => onChange('accept', v)} />
-      </FieldGroup>
-      <FieldGroup label="最大数量">
+      </FieldItem>
+      <FieldItem label="最大数量">
         <w.NumberInput value={(values.maxCount as number) ?? 1} onChange={(v) => onChange('maxCount', v)} min={1} />
-      </FieldGroup>
-      <FieldGroup label="列表类型">
-        <w.Select
-          value={(values.listType as string) ?? 'text'}
-          onChange={(v) => onChange('listType', v)}
-          options={LIST_TYPE_OPTIONS}
-        />
-      </FieldGroup>
-      <RowField label="多文件">
+      </FieldItem>
+      <FieldItem label="列表类型">
+        <w.ButtonGroup value={(values.listType as string) ?? 'text'} onChange={(v) => onChange('listType', v)} options={LIST_TYPE_OPTIONS} />
+      </FieldItem>
+      <FieldItem label="多文件">
         <w.Switch checked={!!values.multiple} onChange={(v) => onChange('multiple', v)} />
-      </RowField>
-      <RowField label="显示上传列表">
+      </FieldItem>
+      <FieldItem label="显示上传列表">
         <w.Switch checked={values.showUploadList !== false} onChange={(v) => onChange('showUploadList', v)} />
-      </RowField>
-      <RowField label="文件夹上传">
+      </FieldItem>
+      <FieldItem label="文件夹上传">
         <w.Switch checked={!!values.directory} onChange={(v) => onChange('directory', v)} />
-      </RowField>
-      <FieldGroup label="上传前置处理">
+      </FieldItem>
+      <FieldItem label="上传前置处理">
         <w.Input value={(values.beforeUpload as string) ?? ''} onChange={(v) => onChange('beforeUpload', v)} placeholder="函数体，如: return file.size < 1024" />
-      </FieldGroup>
+      </FieldItem>
     </>
   )
 }

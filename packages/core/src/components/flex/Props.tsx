@@ -1,4 +1,4 @@
-import { FieldGroup, RowField } from '../../propRenders/shared'
+import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 const WRAP_OPTIONS = [
@@ -25,7 +25,7 @@ const ALIGN_OPTIONS = [
 export default function FlexPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="方向">
+      <FieldItem label="方向">
         <w.ButtonGroup
           value={(values.direction as string) ?? 'row'}
           onChange={(v) => onChange('direction', v)}
@@ -36,37 +36,25 @@ export default function FlexPropsRender({ widgets: w, values, onChange }: PropsR
             { label: '垂直反序', value: 'column-reverse' },
           ]}
         />
-      </FieldGroup>
-      <FieldGroup label="主轴对齐">
-        <w.Select
-          value={(values.justify as string) ?? 'flex-start'}
-          onChange={(v) => onChange('justify', v)}
-          options={JUSTIFY_OPTIONS}
-        />
-      </FieldGroup>
-      <FieldGroup label="交叉轴对齐">
-        <w.Select
-          value={(values.align as string) ?? 'stretch'}
-          onChange={(v) => onChange('align', v)}
-          options={ALIGN_OPTIONS}
-        />
-      </FieldGroup>
-      <RowField label="间距">
+      </FieldItem>
+      <FieldItem label="主轴对齐">
+        <w.Select value={(values.justify as string) ?? 'flex-start'} onChange={(v) => onChange('justify', v)} options={JUSTIFY_OPTIONS} />
+      </FieldItem>
+      <FieldItem label="交叉轴对齐">
+        <w.Select value={(values.align as string) ?? 'stretch'} onChange={(v) => onChange('align', v)} options={ALIGN_OPTIONS} />
+      </FieldItem>
+      <FieldItem label="间距">
         <w.NumberInput value={(values.gap as number) ?? 0} onChange={(v) => onChange('gap', v)} min={0} max={100} />
-      </RowField>
-      <FieldGroup label="换行">
-        <w.Select
-          value={(values.wrap as string) ?? 'nowrap'}
-          onChange={(v) => onChange('wrap', v)}
-          options={WRAP_OPTIONS}
-        />
-      </FieldGroup>
-      <RowField label="内边距(px)">
+      </FieldItem>
+      <FieldItem label="换行">
+        <w.Select value={(values.wrap as string) ?? 'nowrap'} onChange={(v) => onChange('wrap', v)} options={WRAP_OPTIONS} />
+      </FieldItem>
+      <FieldItem label="内边距(px)">
         <w.NumberInput value={(values.padding as number) ?? 0} onChange={(v) => onChange('padding', v)} min={0} max={200} />
-      </RowField>
-      <RowField label="外边距(px)">
+      </FieldItem>
+      <FieldItem label="外边距(px)">
         <w.NumberInput value={(values.margin as number) ?? 0} onChange={(v) => onChange('margin', v)} min={0} max={200} />
-      </RowField>
+      </FieldItem>
     </>
   )
 }

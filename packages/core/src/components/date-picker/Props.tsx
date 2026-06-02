@@ -1,4 +1,4 @@
-import { PropsRenderProps, RowField } from '../../propRenders'
+import { FieldItem, PropsRenderProps } from '../../propRenders'
 
 const DATE_PRESET_OPTIONS = [
   { label: '不限', value: '' },
@@ -21,21 +21,21 @@ const PICKER_OPTIONS = [
 export default function DatePickerPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <RowField label="格式">
+      <FieldItem label="格式">
         <w.Input value={(values.format as string) ?? 'YYYY-MM-DD'} onChange={(v) => onChange('format', v)} />
-      </RowField>
-      <RowField label="选择器类型">
+      </FieldItem>
+      <FieldItem label="选择器类型">
         <w.Select value={(values.picker as string) ?? 'date'} onChange={(v) => onChange('picker', v)} options={PICKER_OPTIONS} />
-      </RowField>
-      <RowField label="最小值">
+      </FieldItem>
+      <FieldItem label="最小值">
         <w.Select value={(values.minDate as string) ?? ''} onChange={(v) => onChange('minDate', v)} options={DATE_PRESET_OPTIONS} />
-      </RowField>
-      <RowField label="最大值">
+      </FieldItem>
+      <FieldItem label="最大值">
         <w.Select value={(values.maxDate as string) ?? ''} onChange={(v) => onChange('maxDate', v)} options={DATE_PRESET_OPTIONS} />
-      </RowField>
-      <RowField label="是否可选">
+      </FieldItem>
+      <FieldItem label="是否可选">
         <w.Input value={(values.disabledDate as string) ?? ''} onChange={(v) => onChange('disabledDate', v)} placeholder="如：date < new Date()" />
-      </RowField>
+      </FieldItem>
     </>
   )
 }

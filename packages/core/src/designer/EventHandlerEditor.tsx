@@ -10,7 +10,7 @@
 
 import React, { useState } from 'react'
 import { listActionNames } from '../events'
-import { FieldGroup, RowField } from '../propRenders/shared'
+import { FieldItem } from '../propRenders/shared'
 import { useStyle } from '../styles/useStyle'
 import type { DesignerWidgets } from '../types/adapter'
 import type { EventHandler, EventHandlerType } from '../types/events'
@@ -66,23 +66,23 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
 
   return (
     <div style={containerStyle}>
-      <RowField label={eventName}>
+      <FieldItem label={eventName}>
         <w.Select value={type} onChange={(v) => handleTypeChange(v as EventHandlerType | '')} options={HANDLER_TYPE_OPTIONS.map((opt) => ({ label: opt.label, value: opt.value }))} />
-      </RowField>
+      </FieldItem>
 
       {type === 'expression' && value?.type === 'expression' && (
-        <FieldGroup label="表达式">
+        <FieldItem label="表达式" variant="group">
           <w.TextArea value={value.expression || ''} onChange={(v) => onChange({ ...value, expression: v })} placeholder={`如：$form.setFieldValue('other', $event)`} rows={3} />
           <div style={{ fontSize: token('fontSizeXs') as string, color: token('textTertiary') as React.CSSProperties['color'], marginTop: 2 }}>可用变量：$self（当前字段）、$form（表单 API）、$event（事件对象）</div>
-        </FieldGroup>
+        </FieldItem>
       )}
 
       {type === 'action' && value?.type === 'action' && (
         <>
-          <FieldGroup label="动作">
+          <FieldItem label="动作" variant="group">
             <w.Select value={value.action || ''} onChange={(v) => onChange({ ...value, action: v })} options={listActionNames().map((name) => ({ label: name, value: name }))} />
-          </FieldGroup>
-          <FieldGroup label="参数（JSON）">
+          </FieldItem>
+          <FieldItem label="参数（JSON）">
             <w.TextArea
               value={value.params ? JSON.stringify(value.params, null, 2) : ''}
               onChange={(v) => {
@@ -100,14 +100,14 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
               placeholder='如：{ "name": "other", "value": "x" }'
               rows={3}
             />
-          </FieldGroup>
+          </FieldItem>
         </>
       )}
 
       {type === 'callback' && value?.type === 'callback' && (
-        <FieldGroup label="回调名（FormRenderProps.callbacks 中的 key）">
+        <FieldItem variant="group" label="回调名（FormRenderProps.callbacks 中的 key）">
           <w.Input value={value.callback || ''} onChange={(v) => onChange({ ...value, callback: String(v) })} placeholder="如：onCustomClick" />
-        </FieldGroup>
+        </FieldItem>
       )}
     </div>
   )

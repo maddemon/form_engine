@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
-import type { FormFieldSchema, FormRule } from '../types/schema'
-import { FieldGroup, RowField } from '../propRenders/shared'
+import { FieldItem } from '../propRenders/shared'
 import { useStyle } from '../styles'
+import type { FormFieldSchema, FormRule } from '../types/schema'
 
 export const COMMON_PATTERNS: { label: string; value: string }[] = [
   { label: '自定义', value: '' },
@@ -44,31 +44,18 @@ export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
   return (
     <div style={{ borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm'), marginTop: token('spacingSm') }}>
       <div style={{ fontSize: token('fontSizeSm'), fontWeight: 500, marginBottom: token('spacingSm') }}>校验规则</div>
-      <RowField label="必填">
+      <FieldItem label="必填">
         <w.Switch checked={!!rule.required} onChange={(v: boolean) => updateRule({ required: v || undefined })} />
-      </RowField>
-      <RowField label="错误提示">
-        <w.Input
-          value={rule.message || ''}
-          onChange={(v: string | number) => updateRule({ message: String(v) || undefined })}
-          placeholder="此字段为必填"
-        />
-      </RowField>
-      <FieldGroup label="正则验证">
-        <w.Input
-          value={rule.pattern || ''}
-          onChange={(v: string | number) => updateRule({ pattern: String(v) || undefined })}
-          placeholder="输入正则表达式"
-          style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties}
-        />
-      </FieldGroup>
-      <FieldGroup label="常用正则预设">
-        <w.Select
-          value={COMMON_PATTERNS.some(p => p.value === rule.pattern) ? (rule.pattern || '') : ''}
-          onChange={handlePatternSelect}
-          options={COMMON_PATTERNS}
-        />
-      </FieldGroup>
+      </FieldItem>
+      <FieldItem label="错误提示">
+        <w.Input value={rule.message || ''} onChange={(v: string | number) => updateRule({ message: String(v) || undefined })} placeholder="此字段为必填" />
+      </FieldItem>
+      <FieldItem label="正则验证">
+        <w.Input value={rule.pattern || ''} onChange={(v: string | number) => updateRule({ pattern: String(v) || undefined })} placeholder="输入正则表达式" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
+      </FieldItem>
+      <FieldItem label="常用正则预设">
+        <w.Select value={COMMON_PATTERNS.some((p) => p.value === rule.pattern) ? rule.pattern || '' : ''} onChange={handlePatternSelect} options={COMMON_PATTERNS} />
+      </FieldItem>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { FieldGroup, OptionRender, PropsRenderProps, RowField } from '../../propRenders'
+import { FieldItem, OptionRender, PropsRenderProps } from '../../propRenders'
 
 const MODE_OPTIONS = [
   { label: '默认', value: '' },
@@ -9,20 +9,20 @@ const MODE_OPTIONS = [
 export default function SelectPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="选项">
+      <FieldItem label="选项" variant="group">
         <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
-      </FieldGroup>
-      <RowField label="模式">
+      </FieldItem>
+      <FieldItem label="模式">
         <w.ButtonGroup options={MODE_OPTIONS} value={(values.mode as string) ?? ''} onChange={(v) => onChange('mode', v)} />
-      </RowField>
+      </FieldItem>
       {['multiple', 'tags'].includes(values.mode as string) && (
-        <RowField label="最多标签数">
+        <FieldItem label="最多标签数">
           <w.NumberInput value={(values.maxTagCount as number) ?? undefined} onChange={(v) => onChange('maxTagCount', v)} min={1} />
-        </RowField>
+        </FieldItem>
       )}
-      <RowField label="无匹配时文本">
+      <FieldItem label="无匹配时文本">
         <w.Input value={(values.notFoundContent as string) ?? ''} onChange={(v) => onChange('notFoundContent', v)} placeholder="无匹配时的提示文字" />
-      </RowField>
+      </FieldItem>
     </>
   )
 }

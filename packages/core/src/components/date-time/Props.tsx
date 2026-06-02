@@ -1,13 +1,13 @@
-import { RowField } from '../../propRenders/shared'
+import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function DateTimePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <RowField label="格式">
+      <FieldItem label="格式">
         <w.Input value={(values.format as string) ?? 'YYYY-MM-DD HH:mm'} onChange={(v) => onChange('format', v)} placeholder="如：YYYY-MM-DD HH:mm" />
-      </RowField>
-      <RowField label="选择器类型">
+      </FieldItem>
+      <FieldItem label="选择器类型">
         <w.ButtonGroup
           value={(values.picker as string) ?? 'date'}
           onChange={(v) => onChange('picker', v)}
@@ -18,7 +18,7 @@ export default function DateTimePropsRender({ widgets: w, values, onChange }: Pr
             { label: '年', value: 'year' },
           ]}
         />
-      </RowField>
+      </FieldItem>
     </>
   )
 }

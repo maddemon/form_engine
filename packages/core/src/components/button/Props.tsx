@@ -1,10 +1,10 @@
-import { FieldGroup, RowField } from '../../propRenders/shared'
+import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function ButtonPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldGroup label="尺寸">
+      <FieldItem label="尺寸">
         <w.ButtonGroup
           value={(values.size as string) ?? 'middle'}
           onChange={(v) => onChange('size', v)}
@@ -14,9 +14,9 @@ export default function ButtonPropsRender({ widgets: w, values, onChange }: Prop
             { label: '大', value: 'large' },
           ]}
         />
-      </FieldGroup>
-      <FieldGroup label="按钮类型">
-        <w.ButtonGroup
+      </FieldItem>
+      <FieldItem label="按钮类型">
+        <w.Select
           value={(values.type as string) ?? 'default'}
           onChange={(v) => onChange('type', v)}
           options={[
@@ -27,8 +27,8 @@ export default function ButtonPropsRender({ widgets: w, values, onChange }: Prop
             { label: '文本', value: 'text' },
           ]}
         />
-      </FieldGroup>
-      <FieldGroup label="HTML 类型">
+      </FieldItem>
+      <FieldItem label="HTML 类型">
         <w.ButtonGroup
           value={(values.htmlType as string) ?? 'button'}
           onChange={(v) => onChange('htmlType', v)}
@@ -38,22 +38,22 @@ export default function ButtonPropsRender({ widgets: w, values, onChange }: Prop
             { label: '重置', value: 'reset' },
           ]}
         />
-      </FieldGroup>
-      <FieldGroup label="图标">
+      </FieldItem>
+      <FieldItem label="图标">
         <w.Input value={(values.icon as string) ?? ''} onChange={(v) => onChange('icon', v)} placeholder="如: SearchOutlined" />
-      </FieldGroup>
-      <FieldGroup label="文字内容">
+      </FieldItem>
+      <FieldItem label="文字内容">
         <w.Input value={(values.children as string) ?? ''} onChange={(v) => onChange('children', v)} placeholder="按钮文字" />
-      </FieldGroup>
-      <RowField label="宽度铺满">
+      </FieldItem>
+      <FieldItem label="宽度铺满">
         <w.Switch checked={!!values.block} onChange={(v) => onChange('block', v)} />
-      </RowField>
-      <RowField label="危险">
+      </FieldItem>
+      <FieldItem label="危险">
         <w.Switch checked={!!values.danger} onChange={(v) => onChange('danger', v)} />
-      </RowField>
-      <RowField label="加载中">
+      </FieldItem>
+      <FieldItem label="加载中">
         <w.Switch checked={!!values.loading} onChange={(v) => onChange('loading', v)} />
-      </RowField>
+      </FieldItem>
     </>
   )
 }

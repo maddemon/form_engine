@@ -28,7 +28,7 @@ import TreeSelectPropsRender from '../components/tree-select/Props'
 import UploadPropsRender from '../components/upload/UploadPropsRender'
 import type { PropsRenderProps } from './types'
 
-export { FieldGroup, InlineField, RowField, OptionRender } from './shared'
+export { FieldItem, OptionRender } from './shared'
 export type { PropsRenderProps } from './types'
 
 export const PropsRenderMap: Record<string, ComponentType<PropsRenderProps>> = {
