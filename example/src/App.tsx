@@ -1,8 +1,9 @@
-import { antdAdapter } from '@form-engine/adapter-antd'
-import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+import { antdAdapter, AntdBridgeProvider } from '@form-engine/adapter-antd'
+import { antdMobileAdapter, AntdMobileBridgeProvider } from '@form-engine/adapter-antd-mobile'
 import type { FormEngineAdapter, FormFieldSchema, FormSchema, PropertyPanelTab, PropertyPanelTabContentProps, SidePanelTab, SidePanelTabContentProps } from '@form-engine/core'
-import { Designer, FormRender, defaultAdapter, registerSimpleCustomComponent, type DeviceScene } from '@form-engine/core'
-import React, { useCallback, useMemo, useState } from 'react'
+import { defaultAdapter, Designer, FormRender, registerSimpleCustomComponent, StyleProvider, type DeviceScene, type ThemeMode } from '@form-engine/core'
+import { theme as antdTheme, ConfigProvider } from 'antd'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 // 注册自定义组件示例
 import '../custom-component-demo'
@@ -116,6 +117,7 @@ type Tab = 'design' | 'preview'
 const App: React.FC = () => {
   const [tab, setTab] = useState<Tab>('design')
   const [previewScene, setPreviewScene] = useState<DeviceScene>('desktop')
+  const [themeMode, setThemeMode] = useState<ThemeMode>('system')
   const [schema, setSchema] = useState<FormSchema>({
     version: '0.1',
     name: '未命名表单',
@@ -133,121 +135,154 @@ const App: React.FC = () => {
     console.log('变化:', values)
   }, [])
 
+  // 是否暗色模式（用于 App 自己的 header/背景色）
+  const isDark = useMemo(() => {
+    if (themeMode === 'dark') return true
+    if (themeMode === 'light') return false
+    if (typeof window === 'undefined' || !window.matchMedia) return false
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  }, [themeMode])
+
+  // 同步到 antd-mobile 的 data-prefers-color-scheme（暗色模式入口）
+  useEffect(() => {
+    document.documentElement.setAttribute('data-prefers-color-scheme', isDark ? 'dark' : 'light')
+  }, [isDark])
+
   return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        fontFamily: '-apple-system, sans-serif',
-        overflow: 'hidden',
-      }}
-    >
-      <header
+    <StyleProvider themeMode={themeMode}>
+      <div
         style={{
+          height: '100vh',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 24px',
-          height: 56,
-          borderBottom: '1px solid #e8e8e8',
-          background: '#fff',
-          flexShrink: 0,
+          flexDirection: 'column',
+          fontFamily: '-apple-system, sans-serif',
+          overflow: 'hidden',
+          background: isDark ? '#141414' : '#fff',
+          color: isDark ? '#e6e6e6' : '#333',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>Form Engine</h1>
+        <header
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 24px',
+            height: 56,
+            borderBottom: `1px solid ${isDark ? '#303030' : '#e8e8e8'}`,
+            background: isDark ? '#1f1f1f' : '#fff',
+            flexShrink: 0,
+          }}
+        >
+          <h1 style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>Form Engine</h1>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {/* 设计 / 预览 + 桌面 / 手机（合并为一段） */}
-          <div style={{ display: 'flex', gap: 2, background: '#f5f5f5', borderRadius: 6, padding: 2, alignItems: 'center' }}>
-            {(
-              [
-                { key: 'design' as const, label: '设计' },
-                { key: 'preview' as const, label: '预览' },
-              ] as { key: Tab; label: string }[]
-            ).map((tabItem) => (
-              <button
-                key={tabItem.key}
-                onClick={() => setTab(tabItem.key)}
-                style={{
-                  padding: '4px 16px',
-                  border: 'none',
-                  borderRadius: 4,
-                  cursor: 'pointer',
-                  background: tab === tabItem.key ? '#fff' : 'transparent',
-                  boxShadow: tab === tabItem.key ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-                  fontWeight: tab === tabItem.key ? 500 : 400,
-                  fontSize: 14,
-                  color: '#333',
-                }}
-              >
-                {tabItem.label}
-              </button>
-            ))}
-
-            {/* 分隔条：仅在 preview tab 时显示桌面/手机图标 */}
-            {tab === 'preview' && (
-              <>
-                <div style={{ width: 1, height: 18, background: '#d9d9d9', margin: '0 4px' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {/* 设计 / 预览 + 桌面 / 手机（合并为一段） */}
+            <div style={{ display: 'flex', gap: 2, background: isDark ? '#2a2a2a' : '#f5f5f5', borderRadius: 6, padding: 2, alignItems: 'center' }}>
+              {(
+                [
+                  { key: 'design' as const, label: '设计' },
+                  { key: 'preview' as const, label: '预览' },
+                ] as { key: Tab; label: string }[]
+              ).map((tabItem) => (
                 <button
-                  onClick={() => setPreviewScene('desktop')}
-                  title="预览桌面"
-                  aria-label="预览桌面"
+                  key={tabItem.key}
+                  onClick={() => setTab(tabItem.key)}
                   style={{
-                    width: 28,
-                    height: 28,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    padding: '4px 16px',
                     border: 'none',
                     borderRadius: 4,
                     cursor: 'pointer',
-                    background: previewScene === 'desktop' ? '#fff' : 'transparent',
-                    boxShadow: previewScene === 'desktop' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-                    color: previewScene === 'desktop' ? '#1677ff' : '#666',
+                    background: tab === tabItem.key ? (isDark ? '#1677ff' : '#fff') : 'transparent',
+                    boxShadow: tab === tabItem.key ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
+                    fontWeight: tab === tabItem.key ? 500 : 400,
+                    fontSize: 14,
+                    color: tab === tabItem.key ? (isDark ? '#fff' : '#1677ff') : isDark ? '#bbb' : '#666',
                   }}
                 >
-                  <DesktopIcon />
+                  {tabItem.label}
                 </button>
-                <button
-                  onClick={() => setPreviewScene('mobile')}
-                  title="预览手机"
-                  aria-label="预览手机"
-                  style={{
-                    width: 28,
-                    height: 28,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: 'none',
-                    borderRadius: 4,
-                    cursor: 'pointer',
-                    background: previewScene === 'mobile' ? '#fff' : 'transparent',
-                    boxShadow: previewScene === 'mobile' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-                    color: previewScene === 'mobile' ? '#1677ff' : '#666',
-                  }}
-                >
-                  <MobileIcon />
-                </button>
-              </>
-            )}
+              ))}
+
+              {/* 分隔条：仅在 preview tab 时显示桌面/手机图标 */}
+              {tab === 'preview' && (
+                <>
+                  <div style={{ width: 1, height: 18, background: isDark ? '#444' : '#d9d9d9', margin: '0 4px' }} />
+                  <button
+                    onClick={() => setPreviewScene('desktop')}
+                    title="预览桌面"
+                    aria-label="预览桌面"
+                    style={{
+                      width: 28,
+                      height: 28,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: 'none',
+                      borderRadius: 4,
+                      cursor: 'pointer',
+                      background: previewScene === 'desktop' ? (isDark ? '#1677ff' : '#fff') : 'transparent',
+                      boxShadow: previewScene === 'desktop' ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
+                      color: previewScene === 'desktop' ? '#fff' : isDark ? '#bbb' : '#666',
+                    }}
+                  >
+                    <DesktopIcon />
+                  </button>
+                  <button
+                    onClick={() => setPreviewScene('mobile')}
+                    title="预览手机"
+                    aria-label="预览手机"
+                    style={{
+                      width: 28,
+                      height: 28,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: 'none',
+                      borderRadius: 4,
+                      cursor: 'pointer',
+                      background: previewScene === 'mobile' ? (isDark ? '#1677ff' : '#fff') : 'transparent',
+                      boxShadow: previewScene === 'mobile' ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
+                      color: previewScene === 'mobile' ? (isDark ? '#fff' : '#1677ff') : isDark ? '#bbb' : '#666',
+                    }}
+                  >
+                    <MobileIcon />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
+
+          {/* 主题切换：跟随系统 / 亮色 / 暗色 */}
+          <ThemeSwitcher value={themeMode} onChange={setThemeMode} isDark={isDark} />
+        </header>
+
+        <div style={{ flex: 1, overflow: 'hidden', background: isDark ? '#1f1f1f' : 'transparent' }}>
+          <ConfigProvider
+            theme={{
+              algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+            }}
+          >
+            <AntdBridgeProvider>
+              {tab === 'design' ? (
+                <Designer schema={schema} onSchemaChange={setSchema} adapter={defaultAdapter} panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }} excludeTypes={['date-range']} sidePanelTabs={sidePanelTabs} propertyPanelTabs={propertyPanelTabs} />
+              ) : (
+                <div style={{ height: '100%', overflow: 'auto', padding: 32, background: isDark ? '#1f1f1f' : '#f5f5f5' }}>
+                  <PreviewFrame scene={previewScene} isDark={isDark}>
+                    {schema.fields.length === 0 ? (
+                      <div style={{ textAlign: 'center', color: isDark ? '#888' : '#999', padding: 64 }}>暂无字段，请切换到「设计」Tab 添加字段</div>
+                    ) : (
+                      <AntdMobileBridgeProvider key="mobile">
+                        <FormRender schema={schema} onSubmit={handleSubmit} onChange={handleChange} adapter={(previewScene === 'mobile' ? antdMobileAdapter : antdAdapter) as unknown as FormEngineAdapter} />
+                      </AntdMobileBridgeProvider>
+                    )}
+                  </PreviewFrame>
+                </div>
+              )}
+            </AntdBridgeProvider>
+          </ConfigProvider>
         </div>
-
-        {/* 右侧留空，保留头部布局对称 */}
-        <div style={{ width: 1 }} />
-      </header>
-
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        {tab === 'design' ? (
-          <Designer schema={schema} onSchemaChange={setSchema} adapter={defaultAdapter} panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }} excludeTypes={['date-range']} sidePanelTabs={sidePanelTabs} propertyPanelTabs={propertyPanelTabs} />
-        ) : (
-          <div style={{ height: '100%', overflow: 'auto', padding: 32, background: '#f5f5f5' }}>
-            <PreviewFrame scene={previewScene}>{schema.fields.length === 0 ? <div style={{ textAlign: 'center', color: '#999', padding: 64 }}>暂无字段，请切换到「设计」Tab 添加字段</div> : <FormRender schema={schema} onSubmit={handleSubmit} onChange={handleChange} adapter={(previewScene === 'mobile' ? antdMobileAdapter : antdAdapter) as unknown as FormEngineAdapter} />}</PreviewFrame>
-          </div>
-        )}
       </div>
-    </div>
+    </StyleProvider>
   )
 }
 
@@ -267,8 +302,51 @@ const MobileIcon: React.FC = () => (
   </svg>
 )
 
+/** 主题切换器：跟随系统 / 亮色 / 暗色 */
+const ThemeSwitcher: React.FC<{ value: ThemeMode; onChange: (m: ThemeMode) => void; isDark: boolean }> = ({ value, onChange, isDark }) => {
+  const options: { key: ThemeMode; label: string; title: string }[] = [
+    { key: 'system', label: '系统', title: '跟随系统' },
+    { key: 'light', label: '亮色', title: '亮色' },
+    { key: 'dark', label: '暗色', title: '暗色' },
+  ]
+  return (
+    <div
+      title="切换主题"
+      style={{
+        display: 'flex',
+        gap: 2,
+        background: isDark ? '#2a2a2a' : '#f5f5f5',
+        borderRadius: 6,
+        padding: 2,
+      }}
+    >
+      {options.map((opt) => (
+        <button
+          key={opt.key}
+          onClick={() => onChange(opt.key)}
+          title={opt.title}
+          aria-label={opt.title}
+          style={{
+            padding: '4px 10px',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            background: value === opt.key ? (isDark ? '#1677ff' : '#fff') : 'transparent',
+            boxShadow: value === opt.key ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
+            fontWeight: value === opt.key ? 500 : 400,
+            fontSize: 12,
+            color: value === opt.key ? (isDark ? '#fff' : '#1677ff') : isDark ? '#bbb' : '#666',
+          }}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 /** 预览框：mobile 场景下显示手机外框，desktop 场景下显示常规卡片 */
-const PreviewFrame: React.FC<{ scene: DeviceScene; children: React.ReactNode }> = ({ scene, children }) => {
+const PreviewFrame: React.FC<{ scene: DeviceScene; isDark: boolean; children: React.ReactNode }> = ({ scene, isDark, children }) => {
   if (scene === 'mobile') {
     return (
       <div
@@ -276,7 +354,7 @@ const PreviewFrame: React.FC<{ scene: DeviceScene; children: React.ReactNode }> 
           width: 375,
           maxWidth: '100%',
           margin: '0 auto',
-          background: '#fff',
+          background: isDark ? '#141414' : '#fff',
           borderRadius: 24,
           border: '8px solid #222',
           boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
@@ -288,7 +366,7 @@ const PreviewFrame: React.FC<{ scene: DeviceScene; children: React.ReactNode }> 
       </div>
     )
   }
-  return <div style={{ maxWidth: 640, margin: '0 auto', background: '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>{children}</div>
+  return <div style={{ maxWidth: 640, margin: '0 auto', background: isDark ? '#141414' : '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>{children}</div>
 }
 
 export default App

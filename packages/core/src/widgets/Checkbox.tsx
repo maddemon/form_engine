@@ -9,7 +9,7 @@ export const WidgetCheckbox: React.FC<{
 }> = ({ checked, onChange, disabled, style }) => {
   const { token } = useStyle()
   return (
-    <label style={{ display: 'inline-flex', alignItems: 'center', gap: token('spacingXs'), cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, fontSize: token('fontSizeXs'), ...style }}>
+    <label style={{ display: 'inline-flex', alignItems: 'center', gap: token('spacingXs'), cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, fontSize: token('fontSizeXs'), color: token('textPrimary') as string, ...style }}>
       <input
         type="checkbox"
         checked={!!checked}

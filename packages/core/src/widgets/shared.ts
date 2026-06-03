@@ -13,6 +13,7 @@ export const BASE_STYLE: React.CSSProperties = {
   outline: 'none',
   boxSizing: 'border-box',
   background: 'var(--fe-bg-primary)',
+  color: 'var(--fe-text-primary)',
 }
 
 export const FOCUS_STYLE: React.CSSProperties = {

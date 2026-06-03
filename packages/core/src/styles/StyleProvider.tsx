@@ -36,7 +36,7 @@
  * ```
  */
 
-import React, { createContext, useContext, useMemo, useEffect } from 'react'
+import React, { createContext, useContext, useMemo, useEffect, useState } from 'react'
 import type { ThemeTokens, PartialThemeTokens } from './types'
 import { defaultTheme, darkTheme, compactOverrides } from './defaultTheme'
 import { injectCssVariables } from './injectCss'
@@ -46,7 +46,7 @@ import { toKebabCase } from './utils'
 // Types
 // ============================
 
-export type ThemeMode = 'light' | 'dark'
+export type ThemeMode = 'light' | 'dark' | 'system'
 export type SizeMode = 'default' | 'compact'
 
 export interface StyleProviderProps {
@@ -126,12 +126,33 @@ export const StyleProvider: React.FC<StyleProviderProps> = ({
   autoInject = true,
   children,
 }) => {
+  // system 模式：解析为实际 light/dark，并跟随系统变化
+  const [systemPref, setSystemPref] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return 'light'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  })
+
+  useEffect(() => {
+    if (themeMode !== 'system' || typeof window === 'undefined' || !window.matchMedia) return
+    const mql = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = (e: MediaQueryListEvent) => setSystemPref(e.matches ? 'dark' : 'light')
+    // 兼容老 Safari
+    if (mql.addEventListener) mql.addEventListener('change', handler)
+    else mql.addListener(handler)
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener('change', handler)
+      else mql.removeListener(handler)
+    }
+  }, [themeMode])
+
+  const effectiveThemeMode: 'light' | 'dark' = themeMode === 'system' ? systemPref : themeMode
+
   // 合并主题
   const mergedTheme = useMemo(() => {
     let base = { ...defaultTheme }
-    
+
     // 应用暗黑模式
-    if (themeMode === 'dark') {
+    if (effectiveThemeMode === 'dark') {
       base = { ...base, ...darkTheme }
     }
     
@@ -146,24 +167,24 @@ export const StyleProvider: React.FC<StyleProviderProps> = ({
     }
     
     return base
-  }, [themeMode, sizeMode, themeOverrides])
+  }, [effectiveThemeMode, sizeMode, themeOverrides])
 
   // 注入 CSS 变量
   useEffect(() => {
     if (!autoInject) return
-    
+
     // 注入 CSS 变量到 :root
     injectCssVariables(mergedTheme, prefix)
-    
-    // 设置 data 属性
-    document.documentElement.setAttribute('data-fe-theme', themeMode)
+
+    // 设置 data 属性（写入解析后的实际主题，便于外部 CSS 适配）
+    document.documentElement.setAttribute('data-fe-theme', effectiveThemeMode)
     document.documentElement.setAttribute('data-fe-size', sizeMode)
-    
+
     return () => {
       // 清理（可选）
       // removeCssVariables(prefix)
     }
-  }, [mergedTheme, themeMode, sizeMode, prefix, autoInject])
+  }, [mergedTheme, effectiveThemeMode, sizeMode, prefix, autoInject])
 
   // Context 值
   const contextValue = useMemo<StyleContextValue>(() => ({

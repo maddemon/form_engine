@@ -120,6 +120,7 @@ export interface ThemeTokens {
   // Designer Canvas
   canvasEmptyPadding: string
   canvasEmptyBorderRadius: string
+  canvasFieldHoverBorder: string
 
   // Designer Panel Sizes
   panelFieldListWidth: string
@@ -264,6 +265,7 @@ export const defaultTheme: ThemeTokens = {
   // Designer Canvas
   canvasEmptyPadding: '24px',
   canvasEmptyBorderRadius: 'var(--fe-border-radius-sm)',
+  canvasFieldHoverBorder: 'rgba(22, 119, 255, 0.3)',
 
   // Designer Panel Sizes
   panelFieldListWidth: '220px',
@@ -391,6 +393,8 @@ export const darkTheme: Partial<ThemeTokens> = {
   inputFocusBoxShadow: '0 0 0 2px rgba(22, 104, 220, 0.3)',
   inputPlaceholderColor: 'rgba(255, 255, 255, 0.25)',
   inputHoverBorderColor: '#1668dc',
+
+  canvasFieldHoverBorder: 'rgba(22, 104, 220, 0.3)',
 }
 
 /**

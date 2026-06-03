@@ -1,21 +1,17 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { FormFieldSchema, FormSchema, OptionItem } from '../types/schema'
 
+import { checkRequiredDeps, getDataSourceDeps, resolveDataSource } from '../dataSource/resolver'
+import type { EventContext } from '../events'
+import { useEnsureDefaultTheme, useStyle } from '../styles'
 import type { FormEngineAdapter } from '../types/adapter'
-import type { DataSourceResolver, CustomComponents } from '../types/render'
+import { isContainerComponent } from '../types/component-category'
 import type { $Form } from '../types/events'
-import { matchVisibleWhen, evalExpr } from '../utils'
+import type { DataSourceResolver } from '../types/render'
+import { evalExpr, matchVisibleWhen } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import defaultAdapter from './defaultAdapter'
-import { isContainerComponent } from '../types/component-category'
-import {
-  resolveDataSource,
-  checkRequiredDeps,
-  getDataSourceDeps,
-} from '../dataSource/resolver'
 import { validateForm } from './validate'
-import type { EventContext } from '../events'
-import { useStyle, useEnsureDefaultTheme } from '../styles'
 
 export interface FormRenderProps {
   schema: FormSchema
@@ -39,17 +35,7 @@ export interface FormRenderProps {
  */
 const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-export const FormRender: React.FC<FormRenderProps> = ({
-  schema,
-  onSubmit,
-  onChange,
-  dataSourceResolver,
-  components = {},
-  adapter = defaultAdapter,
-  initialValues = {},
-  loading = false,
-  callbacks = {},
-}) => {
+export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChange, dataSourceResolver, components = {}, adapter = defaultAdapter, initialValues = {}, loading = false, callbacks = {} }) => {
   useEnsureDefaultTheme()
   const { token } = useStyle()
   const [formValues, setFormValues] = useState<Record<string, unknown>>(initialValues)
@@ -63,7 +49,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
   // 过滤可见字段
   const visibleFields = useMemo(
     () =>
-      formSchema.fields.filter(field => {
+      formSchema.fields.filter((field) => {
         if (field.hidden === true) return false
         if (typeof field.hidden === 'string') {
           return !evalExpr(field.hidden, formValues)
@@ -80,21 +66,47 @@ export const FormRender: React.FC<FormRenderProps> = ({
   )
 
   // 字段值变化
+  // setFormValues 立即更新（保证受控输入正确渲染），onChange 回调做防抖
+  const onChangeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const formValuesRef = useRef(formValues)
+  const onChangeRef = useRef(onChange)
+
+  // 用 effect 同步 ref 以避免 render 中写 ref 的 ESLint 报错
+  useEffect(() => {
+    formValuesRef.current = formValues
+  })
+  useEffect(() => {
+    onChangeRef.current = onChange
+  })
+
+  const debouncedOnChange = useCallback(() => {
+    if (onChangeTimerRef.current) clearTimeout(onChangeTimerRef.current)
+    onChangeTimerRef.current = setTimeout(() => {
+      onChangeRef.current?.(formValuesRef.current)
+    }, 300)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (onChangeTimerRef.current) clearTimeout(onChangeTimerRef.current)
+    }
+  }, [])
+
   const handleFieldChange = useCallback(
     (name: string, value: unknown) => {
-      setFormValues(prev => {
+      setFormValues((prev) => {
         const next = { ...prev, [name]: value }
-        onChange?.(next)
         return next
       })
-      setFieldErrors(prev => {
+      setFieldErrors((prev) => {
         if (!prev[name]) return prev
         const next = { ...prev }
         delete next[name]
         return next
       })
+      debouncedOnChange()
     },
-    [onChange],
+    [debouncedOnChange],
   )
 
   // 单字段设值（供事件系统 $form.setFieldValue 调用）
@@ -108,7 +120,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
   // 批量设值
   const setFieldsValue = useCallback(
     (patch: Record<string, unknown>) => {
-      setFormValues(prev => {
+      setFormValues((prev) => {
         const next = { ...prev, ...patch }
         onChange?.(next)
         return next
@@ -118,10 +130,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
   )
 
   // 取单字段值
-  const getFieldValue = useCallback(
-    (name: string): unknown => formValues[name],
-    [formValues],
-  )
+  const getFieldValue = useCallback((name: string): unknown => formValues[name], [formValues])
 
   // 重置表单
   const reset = useCallback(() => {
@@ -150,7 +159,9 @@ export const FormRender: React.FC<FormRenderProps> = ({
   // $form API 实例
   const $form: $Form = useMemo(
     () => ({
-      get values(): Record<string, unknown> { return formValues },
+      get values(): Record<string, unknown> {
+        return formValues
+      },
       setFieldValue,
       setFieldsValue,
       getFieldValue,
@@ -183,7 +194,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
 
       // static：直接写入
       if (ds.type === 'static') {
-        setFieldOptions(prev => ({
+        setFieldOptions((prev) => ({
           ...prev,
           [field.name]: ds.static.options || [],
         }))
@@ -203,10 +214,8 @@ export const FormRender: React.FC<FormRenderProps> = ({
           try {
             // 记录当前依赖快照
             const deps = getDataSourceDeps(ds)
-            const snapshot = deps
-              .map(d => `${d}=${(formValues as Record<string, unknown>)[d]}`)
-              .join(',')
-            setFieldDepsSnapshot(prev => ({ ...prev, [field.name]: snapshot }))
+            const snapshot = deps.map((d) => `${d}=${(formValues as Record<string, unknown>)[d]}`).join(',')
+            setFieldDepsSnapshot((prev) => ({ ...prev, [field.name]: snapshot }))
 
             const options = await resolveDataSource(
               ds,
@@ -220,15 +229,13 @@ export const FormRender: React.FC<FormRenderProps> = ({
             )
 
             // 校验快照：如果依赖在请求期间发生了变化，丢弃本次结果
-            const currentSnapshot = deps
-              .map(d => `${d}=${(formValues as Record<string, unknown>)[d]}`)
-              .join(',')
+            const currentSnapshot = deps.map((d) => `${d}=${(formValues as Record<string, unknown>)[d]}`).join(',')
             if (snapshot !== currentSnapshot) {
               console.warn(`[form-engine] 数据源 ${field.name} 依赖已变化，丢弃过期响应`)
               return
             }
 
-            setFieldOptions(prev => ({ ...prev, [field.name]: options }))
+            setFieldOptions((prev) => ({ ...prev, [field.name]: options }))
           } catch (err) {
             console.warn(`[form-engine] 数据源加载失败: ${field.name}`, err)
           }
@@ -245,7 +252,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
    * static 立即加载，remote 检查 deps 后加载
    */
   useEffect(() => {
-    formSchema.fields.forEach(field => {
+    formSchema.fields.forEach((field) => {
       if (!field.dataSource) return
       if (field.dataSource.type === 'static') {
         loadDataSource(field, 0)
@@ -262,7 +269,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
    * 依赖变化时重新加载 remote dataSource
    */
   useEffect(() => {
-    formSchema.fields.forEach(field => {
+    formSchema.fields.forEach((field) => {
       if (!field.dataSource || field.dataSource.type !== 'remote') return
       const deps = getDataSourceDeps(field.dataSource)
       if (deps.length === 0) return
@@ -286,38 +293,18 @@ export const FormRender: React.FC<FormRenderProps> = ({
 
   function renderNestedField(field: FormFieldSchema): React.ReactNode {
     const isContainer = isContainerComponent(field.type)
-    const childNodes = isContainer && field.children?.length
-      ? field.children.map(renderNestedField)
-      : undefined
+    const childNodes = isContainer && field.children?.length ? field.children.map(renderNestedField) : undefined
 
-    const enhancedField: FormFieldSchema = childNodes
-      ? { ...field, componentProps: { ...field.componentProps, children: childNodes } }
-      : field
+    const enhancedField: FormFieldSchema = childNodes ? { ...field, componentProps: { ...field.componentProps, children: childNodes } } : field
 
-    return (
-      <FieldRenderer
-        field={enhancedField}
-        value={formValues[field.name]}
-        onChange={val => handleFieldChange(field.name, val)}
-        options={fieldOptions[field.name] || []}
-        disabled={loading || field.disabled === true}
-        adapter={adapter}
-        components={components}
-        eventContext={eventContext}
-        errors={fieldErrors[field.name]}
-        formConfig={schema.form}
-      />
-    )
+    return <FieldRenderer field={enhancedField} value={formValues[field.name]} onChange={(val) => handleFieldChange(field.name, val)} options={fieldOptions[field.name] || []} disabled={loading || field.disabled === true} adapter={adapter} components={components} eventContext={eventContext} errors={fieldErrors[field.name]} formConfig={schema.form} />
   }
 
   return (
     <form onSubmit={handleSubmit} className="fe-form" style={{ maxWidth: 640 }}>
       <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
-        {visibleFields.map(field => (
-          <div
-            key={field.id || field.name}
-            style={{ width: `${(isContainerComponent(field.type) ? 24 : (field.colSpan || 24)) / 24 * 100}%` }}
-          >
+        {visibleFields.map((field) => (
+          <div key={field.id || field.name} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
             {renderNestedField(field)}
           </div>
         ))}
@@ -329,10 +316,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
             {formSchema.submit?.text || '提交'}
           </button>
           {formSchema.submit?.showReset && (
-            <button
-              type="button"
-              onClick={reset}
-            >
+            <button type="button" onClick={reset}>
               {formSchema.submit?.resetText || '重置'}
             </button>
           )}

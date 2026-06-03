@@ -256,6 +256,7 @@
   /* Canvas/Designer */
   --fe-canvas-bg: var(--fe-bg-secondary);
   --fe-canvas-field-hover-bg: var(--fe-primary-bg);
+  --fe-canvas-field-hover-border: var(--fe-primary-border);
   --fe-canvas-field-selected-border: var(--fe-primary);
   --fe-canvas-field-selected-shadow: 0 0 0 2px var(--fe-primary-border);
   --fe-canvas-toolbar-bg: var(--fe-bg-elevated);

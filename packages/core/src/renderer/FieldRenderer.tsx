@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { getEventDeclarations } from '../components'
 import { resolveEvents, type EventContext } from '../events'
 import { useStyle } from '../styles'
@@ -83,7 +83,25 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
   // onChange 包装：先更新当前字段值，再执行用户事件
   // 这样无论用户配置的是 expression / action / callback，
   // 当前字段的 formValues 都会被同步更新
+  //
+  // IME 组合输入检测：通过 onCompositionStart/onCompositionEnd 跟踪组合输入状态，
+  // 在组合输入期间（如中文拼音输入）跳过 onChange 调用，避免中间值触发校验/联动。
+  const composingRef = useRef(false)
+
+  const handleCompositionStart = () => {
+    composingRef.current = true
+  }
+
+  const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    composingRef.current = false
+    // 组合输入结束后，用最终值触发 onChange
+    const target = e.target as HTMLInputElement
+    onChange(target.value)
+    eventHandlers.onChange?.(target.value)
+  }
+
   const handleChange = (newValue: unknown) => {
+    if (composingRef.current) return // 组合输入中，跳过
     onChange(newValue) // ① 始终写入 formValues
     eventHandlers.onChange?.(newValue) // ② 再执行用户事件
   }
@@ -93,6 +111,8 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
   const fieldProps: Record<string, unknown> = {
     value,
     onChange: handleChange,
+    onCompositionStart: handleCompositionStart,
+    onCompositionEnd: handleCompositionEnd,
     disabled: isDisabled,
     readOnly: field.readOnly,
     placeholder: field.placeholder,
@@ -126,6 +146,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
     <>
       {!renderFn ? <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>未知字段类型: {field.type}</div> : (
         <FieldSchemaContext.Provider value={field}>
+          {/* eslint-disable-next-line react-hooks/refs -- composingRef 仅在事件回调中读取，此处为传参非 render 中访问 */}
           {renderFn(fieldProps)}
         </FieldSchemaContext.Provider>
       )}
