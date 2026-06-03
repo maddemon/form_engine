@@ -28,8 +28,8 @@ export default function TextPropsRender({ widgets: w, values, onChange }: PropsR
       </FieldItem>
       <FieldItem label="对齐方式">
         <w.ButtonGroup
-          value={(values.align as string) ?? 'left'}
-          onChange={(v) => onChange('align', v)}
+          value={(values.textAlign as string) ?? 'left'}
+          onChange={(v) => onChange('textAlign', v)}
           options={[
             { label: '左', value: 'left' },
             { label: '中', value: 'center' },

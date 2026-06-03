@@ -232,11 +232,12 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, widt
 function isValidFieldType(type: string): type is FieldType {
   const validTypes: FieldType[] = [
     'input', 'input-number', 'textarea', 'password', 'select',
+    'multi-select', 'cascader', 'tree-select',
     'radio', 'checkbox', 'switch', 'slider',
     'date', 'date-range', 'time', 'datetime', 'upload',
     'rate', 'custom',
     'button', 'grid', 'flex', 'container', 'collapse', 'tabs',
-    'text', 'image', 'divider', 'title',
+    'text', 'image', 'divider', 'title', 'table',
   ]
   return (validTypes as string[]).includes(type) || type.startsWith('custom:')
 }

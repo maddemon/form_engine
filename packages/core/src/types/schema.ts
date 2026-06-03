@@ -99,7 +99,7 @@ export type FieldType =
   | 'textarea'
   | 'password'
   | 'select'
-  | 'multi-select'      // 已从调色板移除，保留类型兼容
+  | 'multi-select'      // 保留类型兼容
   | 'radio'
   | 'checkbox'
   | 'switch'
@@ -110,8 +110,8 @@ export type FieldType =
   | 'datetime'
   | 'upload'
   | 'rate'
-  | 'cascader'          // 已从调色板移除，保留类型兼容
-  | 'tree-select'       // 已从调色板移除，保留类型兼容
+  | 'cascader'
+  | 'tree-select'
   | 'button'
   | 'grid'
   | 'flex'

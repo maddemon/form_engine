@@ -24,6 +24,7 @@ export const Container: React.FC<ContainerProps> = ({
   justify = 'start',
   align = 'stretch',
   wrap = false,
+  gap,
   style,
   className,
   id,
@@ -51,6 +52,7 @@ export const Container: React.FC<ContainerProps> = ({
     borderRadius: borderRadius === 0 ? undefined : `${borderRadius}px`,
     border,
     minHeight: minHeight ? `${minHeight}px` : undefined,
+    gap: gap ? `${gap}px` : undefined,
     boxSizing: 'border-box',
     ...style,
   }

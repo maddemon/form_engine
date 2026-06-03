@@ -33,7 +33,8 @@
   "dependencies": {
     "@ant-design/icons": "^6.2.3",
     "@form-engine/core": "workspace:*",
-    "antd": "^6.4.3"
+    "antd": "^6.4.3",
+    "dayjs": "^1.11.21"
   },
   "peerDependencies": {
     "antd": ">=6.0.0",

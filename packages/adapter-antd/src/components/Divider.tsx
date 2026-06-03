@@ -16,17 +16,24 @@ export const Divider: React.FC<DividerProps> = ({
   type = 'horizontal',
   orientation = 'center',
   plain = false,
+  color,
+  thickness,
   style,
   className,
   id,
   ...rest
 }) => {
+  const mergedStyle: React.CSSProperties = {
+    ...(color ? { borderColor: color } : {}),
+    ...(thickness ? { borderTopWidth: thickness } : {}),
+    ...style,
+  }
   return (
     <AntDivider
       type={type}
       orientation={orientation}
       plain={plain}
-      style={style}
+      style={mergedStyle}
       className={className}
       id={id}
       {...rest}

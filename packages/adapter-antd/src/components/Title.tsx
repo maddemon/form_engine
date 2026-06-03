@@ -18,11 +18,18 @@ export const Title: React.FC<TitleProps> = ({
   type,
   disabled = false,
   ellipsis = false,
+  textAlign,
+  color,
   style,
   className,
   id,
   ...rest
 }) => {
+  const mergedStyle: React.CSSProperties = {
+    ...(textAlign ? { textAlign } : {}),
+    ...(color ? { color } : {}),
+    ...style,
+  }
   const titleProps: any = {
     level,
     type,
@@ -35,7 +42,7 @@ export const Title: React.FC<TitleProps> = ({
     keyboard,
     disabled,
     ellipsis,
-    style,
+    style: mergedStyle,
     className,
     id,
     ...rest,

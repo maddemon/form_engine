@@ -3,6 +3,7 @@ import type { ComponentPalette } from '../types/palette'
 import type { ComponentCategory } from '../types/component-category'
 import type { FormFieldSchema } from '../types/schema'
 import { palette as buttonPalette } from './button/palette'
+import { palette as cascaderPalette } from './cascader/palette'
 import { palette as checkboxPalette } from './checkbox/palette'
 import { palette as collapsePalette } from './collapse/palette'
 import { palette as containerPalette } from './container/palette'
@@ -26,6 +27,7 @@ import { palette as textPalette } from './text/palette'
 import { palette as textareaPalette } from './textarea/palette'
 import { palette as timePalette } from './time-picker/palette'
 import { palette as titlePalette } from './title/palette'
+import { palette as treeSelectPalette } from './tree-select/palette'
 import { palette as uploadPalette } from './upload/palette'
 
 export const componentPalettes: Record<string, ComponentPalette> = {
@@ -51,6 +53,8 @@ export const componentPalettes: Record<string, ComponentPalette> = {
   collapse: collapsePalette,
   table: tablePalette,
   tabs: tabsPalette,
+  cascader: cascaderPalette,
+  'tree-select': treeSelectPalette,
   text: textPalette,
   image: imagePalette,
   divider: dividerPalette,

@@ -84,6 +84,8 @@ export const antdComponents = {
   'DatePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker }))),
   'DateRangePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DateRangePicker }))),
   'TimePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.TimePicker }))),
+  'Cascader': React.lazy(() => import('./components/Cascader').then(m => ({ default: m.Cascader }))),
+  'TreeSelect': React.lazy(() => import('./components/TreeSelect').then(m => ({ default: m.TreeSelect }))),
   
   // 日期类型别名（兼容 field.type 小写命名）
   'date': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker }))),
@@ -196,6 +198,24 @@ export const antdAdapter = {
   _designerWidgets: antdWidgets,
 
   // 小写字段类型映射（兼容 FieldRenderer 按 field.type 查找）
+  'input': createFieldRenderer(antdComponents['Input']),
+  'password': createFieldRenderer(antdComponents['Password']),
+  'textarea': createFieldRenderer(antdComponents['TextArea']),
+  'input-number': createFieldRenderer(antdComponents['InputNumber']),
+  'select': createFieldRenderer(antdComponents['Select']),
+  'multi-select': createFieldRenderer(antdComponents['Select']),
+  'switch': createFieldRenderer(antdComponents['Switch']),
+  'radio': createFieldRenderer(antdComponents['Radio']),
+  'checkbox': createFieldRenderer(antdComponents['Checkbox']),
+  'slider': createFieldRenderer(antdComponents['Slider']),
+  'rate': createFieldRenderer(antdComponents['Rate']),
+  'date': createFieldRenderer(antdComponents['DatePicker']),
+  'datetime': createFieldRenderer(antdComponents['DatePicker']),
+  'date-range': createFieldRenderer(antdComponents['DateRangePicker']),
+  'time': createFieldRenderer(antdComponents['TimePicker']),
+  'upload': createFieldRenderer(antdComponents['Upload']),
+  'cascader': createFieldRenderer(antdComponents['Cascader']),
+  'tree-select': createFieldRenderer(antdComponents['TreeSelect']),
   'container': createFieldRenderer(antdComponents['Container']),
   'grid': createFieldRenderer(antdComponents['Grid']),
   'flex': createFieldRenderer(antdComponents['Flex']),

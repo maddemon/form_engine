@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getEventDeclarations } from '../components'
 import { FieldItem, PropsRenderMap } from '../propRenders'
 import CustomPropsRender from '../propRenders/CustomPropsRender'
@@ -14,6 +14,7 @@ import { CollapsibleSection } from './CollapsibleSection'
 import { EventHandlerEditor } from './EventHandlerEditor'
 import { FormConfigPanel } from './FormConfigPanel'
 import { RulesEditor } from './RulesEditor'
+import { useDebouncedInput } from './useDebouncedInput'
 import { defaultDesignerWidgets } from './widgets'
 
 /**
@@ -92,29 +93,94 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
   const existingNames = useMemo(() => collectFieldNamesExcluding(allFields, field.id!), [allFields, field.id])
   const nameError = nameDirty && field.name && existingNames.has(field.name) ? '该字段名已存在' : null
 
+  // ===== 防抖输入 =====
+
+  const [labelValue, handleLabelChange] = useDebouncedInput<string | number>(
+    field.label || '',
+    (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { label: String(v) || undefined } }),
+  )
+
+  const [defaultValueValue, handleDefaultValueChange] = useDebouncedInput<string | number>(
+    field.defaultValue != null ? String(field.defaultValue) : '',
+    (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { defaultValue: v || undefined } }),
+  )
+
+  const [hiddenValue, handleHiddenChange] = useDebouncedInput<string | number>(
+    typeof field.hidden === 'string' ? field.hidden : '',
+    (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } }),
+  )
+
+  const [colSpanValue, handleColSpanChange] = useDebouncedInput<number>(
+    field.colSpan || 24,
+    (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } }),
+  )
+
+  // 字段名防抖（含重复校验，setNameDirty 立即执行）
+  const [nameValue, handleNameChangeRaw] = useDebouncedInput<string | number>(
+    field.name,
+    (v) => {
+      const newName = String(v)
+      if (newName && !existingNames.has(newName)) {
+        dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: newName } })
+      }
+    },
+  )
+  const handleNameChange = useCallback((v: string | number) => {
+    setNameDirty(true)
+    handleNameChangeRaw(v)
+  }, [setNameDirty, handleNameChangeRaw])
+
+  // componentProps 防抖：维护本地状态实现即时视觉反馈
+  const [localComponentProps, setLocalComponentProps] = useState<Record<string, unknown>>(field.componentProps || {})
+  const componentPropsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isEditingComponentPropsRef = useRef(false)
+
+  useEffect(() => {
+    if (!isEditingComponentPropsRef.current) {
+      setLocalComponentProps(field.componentProps || {})
+    }
+  }, [field.componentProps])
+
+  const handleComponentPropsChange = useCallback((key: string, value: unknown) => {
+    isEditingComponentPropsRef.current = true
+    setLocalComponentProps(prev => {
+      const next = { ...prev, [key]: value }
+      if (componentPropsTimerRef.current) clearTimeout(componentPropsTimerRef.current)
+      componentPropsTimerRef.current = setTimeout(() => {
+        isEditingComponentPropsRef.current = false
+        dispatch({
+          type: 'UPDATE_FIELD',
+          fieldId: field.id!,
+          patch: { componentProps: next },
+        })
+      }, 300)
+      return next
+    })
+  }, [dispatch, field.id])
+
+  useEffect(() => {
+    return () => {
+      if (componentPropsTimerRef.current) clearTimeout(componentPropsTimerRef.current)
+    }
+  }, [])
+
   return (
     <>
       <FieldItem label="字段名">
         <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingXs'), flex: 1 }}>
           <w.Input
-            value={field.name}
-            onChange={(v: string | number) => {
-              setNameDirty(true)
-              const newName = String(v)
-              if (newName && !existingNames.has(newName)) {
-                dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: newName } })
-              }
-            }}
+            value={nameValue}
+            onChange={handleNameChange}
           />
           {nameError && <span style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-error)' }}>{nameError}</span>}
         </div>
       </FieldItem>
       <FieldItem label="标签">
-        <w.Input value={field.label || ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { label: String(v) || undefined } })} placeholder="字段标签" />
+        <w.Input value={labelValue} onChange={handleLabelChange} placeholder="字段标签" />
       </FieldItem>
       {isForm && (
         <FieldItem label="默认值">
-          <w.Input value={field.defaultValue != null ? String(field.defaultValue) : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { defaultValue: v || undefined } })} />
+          <w.Input value={defaultValueValue} onChange={handleDefaultValueChange} />
         </FieldItem>
       )}
 
@@ -125,27 +191,15 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
           {ComponentPropsRender ? (
             <ComponentPropsRender
               widgets={w}
-              values={field.componentProps || {}}
-              onChange={(key: string, value: unknown) => {
-                dispatch({
-                  type: 'UPDATE_FIELD',
-                  fieldId: field.id!,
-                  patch: { componentProps: { ...field.componentProps, [key]: value } },
-                })
-              }}
+              values={localComponentProps}
+              onChange={handleComponentPropsChange}
             />
           ) : customConfig?.propertyConfig ? (
             <CustomPropsRender
               configs={customConfig.propertyConfig}
               widgets={w}
-              values={field.componentProps || {}}
-              onChange={(key, value) => {
-                dispatch({
-                  type: 'UPDATE_FIELD',
-                  fieldId: field.id!,
-                  patch: { componentProps: { ...field.componentProps, [key]: value } },
-                })
-              }}
+              values={localComponentProps}
+              onChange={handleComponentPropsChange}
             />
           ) : null}
         </div>
@@ -155,7 +209,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
         {isForm && (
           <>
             <FieldItem label="列宽">
-              <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
+              <w.NumberInput value={colSpanValue} onChange={handleColSpanChange} min={1} max={24} />
             </FieldItem>
             <RulesEditor field={field} widgets={w} dispatch={dispatch} />
             <FieldItem label="禁用">
@@ -168,7 +222,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
         )}
 
         <FieldItem label="是否隐藏">
-          <w.Input value={typeof field.hidden === 'string' ? field.hidden : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } })} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
+          <w.Input value={hiddenValue} onChange={handleHiddenChange} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
         </FieldItem>
       </CollapsibleSection>
 

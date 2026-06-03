@@ -20,6 +20,46 @@ function isHorizontalLayout(field: FormFieldSchema): boolean {
   return false
 }
 
+/** 从 Flex 组件的 componentProps 映射为 CSS flexbox 样式 */
+function getFlexStyle(field: FormFieldSchema): React.CSSProperties {
+  const props = field.componentProps || {}
+  const directionMap: Record<string, React.CSSProperties['flexDirection']> = {
+    row: 'row',
+    'row-reverse': 'row-reverse',
+    column: 'column',
+    'column-reverse': 'column-reverse',
+  }
+  const justifyMap: Record<string, React.CSSProperties['justifyContent']> = {
+    'flex-start': 'flex-start',
+    'flex-end': 'flex-end',
+    center: 'center',
+    'space-between': 'space-between',
+    'space-around': 'space-around',
+    'space-evenly': 'space-evenly',
+  }
+  const alignMap: Record<string, React.CSSProperties['alignItems']> = {
+    'flex-start': 'flex-start',
+    'flex-end': 'flex-end',
+    center: 'center',
+    baseline: 'baseline',
+    stretch: 'stretch',
+  }
+  const wrapMap: Record<string, React.CSSProperties['flexWrap']> = {
+    nowrap: 'nowrap',
+    wrap: 'wrap',
+    'wrap-reverse': 'wrap-reverse',
+  }
+
+  return {
+    display: 'flex',
+    flexDirection: directionMap[props.direction as string] ?? 'row',
+    justifyContent: justifyMap[props.justify as string] ?? 'flex-start',
+    alignItems: alignMap[props.align as string] ?? 'stretch',
+    flexWrap: wrapMap[props.wrap as string] ?? 'nowrap',
+    gap: props.gap ?? 0,
+  }
+}
+
 function getGridColumns(field: FormFieldSchema): number {
   const columns = field.componentProps?.columns
   return typeof columns === 'number' ? columns : 2
@@ -192,7 +232,18 @@ export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field }) => 
     return (
       <div ref={setNodeRef} style={containerStyle}>
         <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
-          {horizontal ? (
+          {field.type === 'flex' ? (
+            <div style={getFlexStyle(field)}>
+              {field.children.map((child, index) => (
+                <NestedField
+                  key={child.id}
+                  field={child}
+                  parentContainerId={field.id!}
+                  childIndex={index}
+                />
+              ))}
+            </div>
+          ) : horizontal ? (
             <div style={{
               display: 'grid',
               gridTemplateColumns: gridColumns > 0 ? `repeat(${gridColumns}, 1fr)` : 'repeat(auto-fill, minmax(120px, 1fr))',
@@ -208,14 +259,16 @@ export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field }) => 
               ))}
             </div>
           ) : (
-            field.children.map((child, index) => (
-              <NestedField
-                key={child.id}
-                field={child}
-                parentContainerId={field.id!}
-                childIndex={index}
-              />
-            ))
+            <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingSm') }}>
+              {field.children.map((child, index) => (
+                <NestedField
+                  key={child.id}
+                  field={child}
+                  parentContainerId={field.id!}
+                  childIndex={index}
+                />
+              ))}
+            </div>
           )}
         </SortableContext>
       </div>
