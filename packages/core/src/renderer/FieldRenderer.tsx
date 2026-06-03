@@ -150,8 +150,10 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
       {!renderFn ? <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>未知字段类型: {field.type}</div> : (
         <FieldSchemaContext.Provider value={field}>
           <AdapterContext.Provider value={adapter}>
+          {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
+              其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误 */}
           {/* eslint-disable-next-line react-hooks/refs -- composingRef 仅在事件回调中读取，此处为传参非 render 中访问 */}
-          {renderFn(fieldProps)}
+          {React.createElement(renderFn, fieldProps)}
           </AdapterContext.Provider>
         </FieldSchemaContext.Provider>
       )}

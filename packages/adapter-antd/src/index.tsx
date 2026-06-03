@@ -18,40 +18,40 @@
  * ```
  */
 
-import React from 'react'
-import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
 import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
-import { Input as AntdInput, Select as AntdSelect, Checkbox as AntdCheckbox, InputNumber as AntdInputNumber } from 'antd'
+import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
+import { Checkbox as AntdCheckbox, Input as AntdInput, InputNumber as AntdInputNumber, Select as AntdSelect } from 'antd'
+import React from 'react'
 
 // ============================
 // 导入所有 antd 组件实现
 // ============================
 
-export { Input, Password } from './components/Input'
-export { TextArea } from './components/TextArea'
-export { Select } from './components/Select'
-export { Switch } from './components/Switch'
-export { Radio, RadioGroup } from './components/Radio'
-export { Checkbox, CheckboxGroup } from './components/Checkbox'
-export { InputNumber } from './components/InputNumber'
-export { Slider } from './components/Slider'
-export { Rate } from './components/Rate'
-export { DatePicker, DateRangePicker, TimePicker } from './components/DatePicker'
-export { Upload } from './components/Upload'
 export { Button } from './components/Button'
+export { Checkbox, CheckboxGroup } from './components/Checkbox'
+export { DatePicker, DateRangePicker, TimePicker } from './components/DatePicker'
+export { Input, Password } from './components/Input'
+export { InputNumber } from './components/InputNumber'
+export { Radio, RadioGroup } from './components/Radio'
+export { Rate } from './components/Rate'
+export { Select } from './components/Select'
+export { Slider } from './components/Slider'
+export { Switch } from './components/Switch'
+export { TextArea } from './components/TextArea'
+export { Upload } from './components/Upload'
 
 // 布局组件（使用 antd 的实现）
-export { Grid } from './components/Grid'
-export { Flex } from './components/Flex'
-export { Container } from './components/Container'
 export { Collapse, CollapsePanel } from './components/Collapse'
-export { Tabs, TabPane } from './components/Tabs'
+export { Container } from './components/Container'
+export { Flex } from './components/Flex'
+export { Grid } from './components/Grid'
 export { Table } from './components/Table'
+export { TabPane, Tabs } from './components/Tabs'
 
 // 展示组件
-export { Text } from './components/Text'
-export { Image } from './components/Image'
 export { Divider } from './components/Divider'
+export { Image } from './components/Image'
+export { Text } from './components/Text'
 export { Title } from './components/Title'
 
 // Theme Bridge
@@ -124,7 +124,7 @@ export const antdComponents = {
 
 function createFieldRenderer(Component: React.ComponentType<any>): FieldRendererFn {
   return (props: FieldComponentProps) => {
-    const { value, onChange, fieldSchema: _fs, validateStatus, help, rules, ...rest } = props
+    const { value, onChange, ...rest } = props
     return React.createElement(Component, { ...rest, value, onChange })
   }
 }

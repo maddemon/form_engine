@@ -40,39 +40,37 @@ export const TableField: FieldRendererFn = (props: any) => {
     <div>
       {rows.map((row, rowIndex) => (
         <Card key={rowIndex} style={{ marginBottom: 12 }}>
-          <Card.Body>
-            {columnChildren.map((colChildren: any[], colIdx: number) => (
-              <div key={colIdx}>
-                {columns[colIdx] && <div style={{ fontSize: 13, fontWeight: 600, color: '#333', marginBottom: 6 }}>{columns[colIdx].label}</div>}
-                {colChildren.map((child: any) => {
-                  const cellValue = row[child.name]
-                  const renderFn = adp?.[child.type]
-                  return (
-                    <div key={child.name} style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>{child.label}</div>
-                      {renderFn ? (
-                        React.createElement(renderFn, {
-                          value: cellValue,
-                          onChange: (v: any) => handleCellChange(rowIndex, child.name, v),
-                          fieldSchema: child,
-                          disabled,
-                        })
-                      ) : (
-                        <div style={{ color: '#ccc', fontSize: 12, padding: '6px 0' }}>未知类型: {child.type}</div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            ))}
-            {rowMode === 'dynamic' && !disabled && (
-              <div style={{ textAlign: 'right', marginTop: 4 }}>
-                <Button size="mini" color="danger" fill="none" onClick={() => handleDeleteRow(rowIndex)}>
-                  删除
-                </Button>
-              </div>
-            )}
-          </Card.Body>
+          {columnChildren.map((colChildren: any[], colIdx: number) => (
+            <div key={colIdx}>
+              {columns[colIdx] && <div style={{ fontSize: 13, fontWeight: 600, color: '#333', marginBottom: 6 }}>{columns[colIdx].label}</div>}
+              {colChildren.map((child: any) => {
+                const cellValue = row[child.name]
+                const renderFn = adp?.[child.type]
+                return (
+                  <div key={child.name} style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>{child.label}</div>
+                    {renderFn ? (
+                      React.createElement(renderFn, {
+                        value: cellValue,
+                        onChange: (v: any) => handleCellChange(rowIndex, child.name, v),
+                        fieldSchema: child,
+                        disabled,
+                      })
+                    ) : (
+                      <div style={{ color: '#ccc', fontSize: 12, padding: '6px 0' }}>未知类型: {child.type}</div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          ))}
+          {rowMode === 'dynamic' && !disabled && (
+            <div style={{ textAlign: 'right', marginTop: 4 }}>
+              <Button size="mini" color="danger" fill="none" onClick={() => handleDeleteRow(rowIndex)}>
+                删除
+              </Button>
+            </div>
+          )}
         </Card>
       ))}
       {rowMode === 'dynamic' && !disabled && (

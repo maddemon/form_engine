@@ -45,7 +45,7 @@ export const Table: React.FC<{
         </span>
       )
     }
-    return renderFn({
+    return React.createElement(renderFn, {
       value: row[child.name as string],
       onChange: (newValue: unknown) => {
         const newRows = [...value]

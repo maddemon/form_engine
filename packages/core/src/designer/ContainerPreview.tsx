@@ -9,9 +9,11 @@ import { NestedField } from './NestedField'
 import { RegionPreview } from './RegionPreview'
 import type { CollapsePanelConfig } from '../components/collapse/types'
 import type { TabPaneConfig } from '../components/tabs/types'
+import { useDesignerContext } from './DesignerContext'
 
 function ContainerContent({ field }: { field: FormFieldSchema }) {
   const { token } = useStyle()
+  const { scene } = useDesignerContext()
 
   // 通用容器
   if (!['grid', 'table', 'tabs', 'collapse'].includes(field.type)) {
@@ -117,7 +119,7 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
     )
   }
 
-  // Table：按 columns 分列
+  // Table：按 columns 分列（desktop 横向分列，mobile 纵向卡片）
   if (field.type === 'table') {
     const columns = ((field.componentProps?.columns as Array<{ id: string; label: string; width: number }>) ?? []).filter(Boolean)
     if (columns.length === 0) {
@@ -145,6 +147,29 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
       )
     }
 
+    // Mobile：卡片模式，每列纵向堆叠
+    if (scene === 'mobile') {
+      return (
+        <div style={{ padding: token('spacingXs') }}>
+          {columns.map((col, idx) => {
+            const colItems = field.children?.filter(c => (c.columnIndex ?? c.regionKey ? Number(c.regionKey ?? c.columnIndex) : idx) === idx) ?? []
+            return (
+              <RegionPreview
+                key={col.id}
+                parent={field}
+                regionKey={String(idx)}
+                items={colItems}
+                regionWidth="100%"
+                regionLabel={col.label}
+                labelBg="var(--fe-bg-tertiary)"
+              />
+            )
+          })}
+        </div>
+      )
+    }
+
+    // Desktop：横向分列
     return (
       <div style={{ display: 'flex', padding: token('spacingXs') }}>
         {columns.map((col, idx) => {
