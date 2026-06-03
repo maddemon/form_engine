@@ -235,9 +235,10 @@ export interface PropertyPanelTabContentProps {
 
 - **无扩展时**（`propertyPanelTabs` prop 为空或未传）：保持现有渲染
 - **有扩展时**：
-  - 未选中字段：显示 FormConfigPanel（不显示 Tabs）
-  - 选中字段：顶部 Segment Tab 栏 + 内容区
-  - 第一个 Tab 固定为【属性】（渲染现有 PropertyPanel 内容）
+  - 顶部固定渲染 Segment Tab 栏（属性 Tab + 扩展 Tab），无论是否选中字段都显示，与有选中组件时的体验一致
+  - 未选中字段时，"属性" Tab 内容 = `FormConfigPanel`；扩展 Tab 收到的 `field` 为 `null`（`onUpdate` / `onUpdateProp` 退化为 no-op，扩展 Tab 内部应自行处理"未选中"提示）
+  - 选中字段时，"属性" Tab 内容 = 原属性内容；扩展 Tab 收到对应 `field` 及 `dispatch` 回调
+  - 第一个 Tab 固定为【属性】
   - 后续 Tab 从 `propertyPanelTabs` prop 获取
 
 Segment Tab 栏样式参考 example 项目的 header 设计/预览切换器。

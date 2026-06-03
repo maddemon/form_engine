@@ -1,13 +1,18 @@
-export interface TabsProps {
-  activeKey?: string
+import type { BaseLayoutComponentProps } from '../../types/component-props'
+
+export interface TabPaneConfig {
+  id: string
+  /** antd TabPane 的 key */
+  key: string
+  title: string
+  disabled?: boolean
+}
+
+export interface TabsProps extends BaseLayoutComponentProps {
+  tabs: TabPaneConfig[]
   defaultActiveKey?: string
-  onChange?: (key: string) => void
   type?: 'line' | 'card' | 'editable-card'
   size?: 'small' | 'middle' | 'large'
   tabPosition?: 'top' | 'right' | 'bottom' | 'left'
   centered?: boolean
-  style?: React.CSSProperties
-  className?: string
-  id?: string
-  children?: React.ReactNode
 }

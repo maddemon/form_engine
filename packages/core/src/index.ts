@@ -86,11 +86,13 @@ export type {
   TitleProps,
   ContainerProps,
   GridProps,
-  GridRowConfig,
-  GridColConfig,
   FlexProps,
   CollapseProps,
+  CollapsePanelConfig,
   TabsProps,
+  TabPaneConfig,
+  TableProps,
+  TableColumnConfig,
   CascaderProps,
   TreeSelectProps,
   TimePickerProps,
@@ -217,6 +219,8 @@ export {
   defaultAdapter,
   FieldSchemaContext,
   useFieldSchema,
+  AdapterContext,
+  useAdapter,
 } from './renderer'
 
 // ============================

@@ -5,7 +5,6 @@ import { useDesignerContext } from './DesignerContext'
 import type { DesignerWidgets } from '../types/adapter'
 import type { DesignerAction } from '../types/designer'
 import type { FormConfig } from '../types/schema'
-import { resolvePanelWidth } from '../utils'
 
 const COL_SPAN_OPTIONS = Array.from({ length: 24 }, (_, i) => ({ label: `${i + 1}`, value: String(i + 1) }))
 
@@ -18,19 +17,15 @@ interface FormConfigPanelProps {
   formConfig: FormConfig
   dispatch: React.Dispatch<DesignerAction>
   widgets: DesignerWidgets
-  /**
-   * 可选：面板宽度
-   *  - `number`：px（小于 240 自动降级到 240）
-   *  - `string`：透传 CSS 宽度（如 '24%'、'min(280px, 22vw)'）
-   *  - 缺省：token 默认（`--fe-panel-config-width`）
-   */
-  width?: number | string
 }
 
-export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, dispatch, widgets: w, width }) => {
+/**
+ * 表单配置面板内容（不包含外层宽度/边框容器）
+ * 容器由 PropertyPanel 统一管理，便于在有 propertyPanelTabs 时把 Tabs 与该内容并入同一布局
+ */
+export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, dispatch, widgets: w }) => {
   const { token } = useStyle()
   const { scene } = useDesignerContext()
-  const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, 240)
   const isMobile = scene === 'mobile'
 
   const handleColChange = (key: 'labelCol' | 'wrapperCol', v: string) => {
@@ -61,7 +56,7 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
     : (formConfig.wrapperCol?.span ?? 15)
 
   return (
-    <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', padding: token('spacingMd'), overflow: 'auto', height: '100%' }}>
+    <>
       <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd') }}>表单配置</h4>
 
       <FieldItem label="显示冒号">
@@ -95,6 +90,6 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
           />
         </FieldItem>
       </div>
-    </div>
+    </>
   )
 }

@@ -148,6 +148,12 @@ export interface ThemeTokens {
   widgetCheckboxMargin: string
   widgetInputFontSizeXs: string
   widgetInputFontSizeXxs: string
+
+  // ItemListEditor 物理尺寸
+  itemListDragHandleWidth: string
+  itemListDragHandleHeight: string
+  itemListRemoveButtonSize: string
+  itemListRemoveButtonPadding: string
 }
 
 export const defaultTheme: ThemeTokens = {
@@ -293,6 +299,12 @@ export const defaultTheme: ThemeTokens = {
   widgetCheckboxMargin: '0',
   widgetInputFontSizeXs: '11px',
   widgetInputFontSizeXxs: '10px',
+
+  // ItemListEditor 物理尺寸
+  itemListDragHandleWidth: '16px',
+  itemListDragHandleHeight: '24px',
+  itemListRemoveButtonSize: '18px',
+  itemListRemoveButtonPadding: '0',
 }
 
 /**

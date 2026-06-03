@@ -5,9 +5,11 @@ export const palette: ComponentPalette = {
   category: 'container',
   icon: <Minus />,
   defaultProps: {
-    children: [
-      { name: 'tab_1', type: 'tabs', label: '标签页一' },
-      { name: 'tab_2', type: 'tabs', label: '标签页二' },
-    ],
+    componentProps: {
+      tabs: [
+        { id: 'tab_1', key: 'tab_1', title: '标签页一' },
+        { id: 'tab_2', key: 'tab_2', title: '标签页二' },
+      ],
+    },
   },
 }

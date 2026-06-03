@@ -156,6 +156,8 @@ export interface FormFieldSchema {
   children?: FormFieldSchema[]
   /** 所属列索引（仅 grid/table 子节点使用） */
   columnIndex?: number
+  /** 所属区域 key（仅在 region 容器内有效：collapse/tabs）。children 用此字段关联到具体面板/标签页 */
+  regionKey?: string
 }
 
 // ============================

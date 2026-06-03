@@ -90,6 +90,7 @@ export function createFieldFromPalette(item: PaletteItem): FormFieldSchema {
 }
 
 const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
+  const [hovered, setHovered] = useState(false)
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `palette-${item.type}`,
     data: {
@@ -108,6 +109,8 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
       {...listeners}
       {...attributes}
       title={item.label}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         display: 'flex',
         flexDirection: 'row',
@@ -119,8 +122,8 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
         cursor: 'grab',
         fontSize: token('widgetPaletteFontSize'),
         color: 'var(--fe-text-secondary)',
-        background: isDragging ? 'var(--fe-primary-bg)' : 'var(--fe-bg-primary)',
-        borderColor: isDragging ? 'var(--fe-primary-border)' : 'var(--fe-border-light)',
+        background: isDragging ? 'var(--fe-primary-bg)' : hovered ? 'var(--fe-canvas-field-hover-bg)' : 'var(--fe-bg-primary)',
+        borderColor: isDragging ? 'var(--fe-primary-border)' : hovered ? 'var(--fe-canvas-field-hover-border)' : 'var(--fe-border-light)',
         userSelect: 'none',
         transition: 'all 0.2s',
         gap: token('spacingSm'),

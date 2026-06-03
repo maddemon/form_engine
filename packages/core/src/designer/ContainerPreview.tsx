@@ -1,290 +1,280 @@
-import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import type { FormFieldSchema } from '../types/schema'
 import { useStyle } from '../styles'
+import { isContainerComponent } from '../types/component-category'
+import { CanvasField } from './CanvasField'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { useDroppable } from '@dnd-kit/core'
 import { NestedField } from './NestedField'
-import { useDesignerContext } from './DesignerContext'
-import { ColumnDropZone, useColumnResize } from './ColumnDropZone'
+import { RegionPreview } from './RegionPreview'
+import type { CollapsePanelConfig } from '../components/collapse/types'
+import type { TabPaneConfig } from '../components/tabs/types'
 
-interface ContainerPreviewProps {
-  field: FormFieldSchema
-}
-
-function isHorizontalLayout(field: FormFieldSchema): boolean {
-  if (field.type === 'grid' || field.type === 'flex') return true
-  if (field.type === 'container') {
-    const layout = field.componentProps?.layout as string | undefined
-    return layout === 'horizontal'
-  }
-  return false
-}
-
-/** 从 Flex 组件的 componentProps 映射为 CSS flexbox 样式 */
-function getFlexStyle(field: FormFieldSchema): React.CSSProperties {
-  const props = field.componentProps || {}
-  const directionMap: Record<string, React.CSSProperties['flexDirection']> = {
-    row: 'row',
-    'row-reverse': 'row-reverse',
-    column: 'column',
-    'column-reverse': 'column-reverse',
-  }
-  const justifyMap: Record<string, React.CSSProperties['justifyContent']> = {
-    'flex-start': 'flex-start',
-    'flex-end': 'flex-end',
-    center: 'center',
-    'space-between': 'space-between',
-    'space-around': 'space-around',
-    'space-evenly': 'space-evenly',
-  }
-  const alignMap: Record<string, React.CSSProperties['alignItems']> = {
-    'flex-start': 'flex-start',
-    'flex-end': 'flex-end',
-    center: 'center',
-    baseline: 'baseline',
-    stretch: 'stretch',
-  }
-  const wrapMap: Record<string, React.CSSProperties['flexWrap']> = {
-    nowrap: 'nowrap',
-    wrap: 'wrap',
-    'wrap-reverse': 'wrap-reverse',
-  }
-
-  return {
-    display: 'flex',
-    flexDirection: directionMap[props.direction as string] ?? 'row',
-    justifyContent: justifyMap[props.justify as string] ?? 'flex-start',
-    alignItems: alignMap[props.align as string] ?? 'stretch',
-    flexWrap: wrapMap[props.wrap as string] ?? 'nowrap',
-    gap: props.gap ?? 0,
-  }
-}
-
-function getGridColumns(field: FormFieldSchema): number {
-  const columns = field.componentProps?.columns
-  return typeof columns === 'number' ? columns : 2
-}
-
-function getGridColWidths(field: FormFieldSchema): number[] {
-  const colWidths = field.componentProps?.colWidths as number[] | undefined
-  const columns = getGridColumns(field)
-  if (colWidths && colWidths.length === columns) return colWidths
-  return Array.from({ length: columns }, () => Math.floor(100 / columns))
-}
-
-export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field }) => {
-  const { dispatch } = useDesignerContext()
-  const { setNodeRef, isOver } = useDroppable({
-    id: `${field.id}__container`,
-    data: { parentId: field.id },
-  })
+function ContainerContent({ field }: { field: FormFieldSchema }) {
   const { token } = useStyle()
-  const childIds = useMemo(() => (field.children || []).map(c => c.id!), [field.children])
-  const horizontal = isHorizontalLayout(field)
-  const gridColumns = field.type === 'grid' ? getGridColumns(field) : 0
 
-  const colWidths = field.type === 'grid' ? getGridColWidths(field) : []
-  const handleWidthsChange = useCallback((widths: number[]) => {
-    dispatch({
-      type: 'UPDATE_FIELD',
-      fieldId: field.id!,
-      patch: { componentProps: { ...field.componentProps, colWidths: widths } },
+  // 通用容器
+  if (!['grid', 'table', 'tabs', 'collapse'].includes(field.type)) {
+    const { setNodeRef, isOver } = useDroppable({
+      id: `${field.id}__container`,
+      data: { parentId: field.id },
     })
-  }, [dispatch, field.id, field.componentProps])
-  const { handleResizeStart } = useColumnResize(gridColumns, colWidths, handleWidthsChange)
-
-  const getTableColWidths = (): number[] => {
-    const cols = (field.componentProps?.columns || []) as { width?: number; minWidth?: number }[]
-    if (cols.length === 0) return []
-    return cols.map(c => c.width ?? Math.floor(100 / cols.length))
-  }
-
-  const tableColWidths = field.type === 'table' ? getTableColWidths() : []
-  const tableColumnsCount = field.type === 'table' ? (field.componentProps?.columns as any[] | undefined)?.length || 0 : 0
-  const handleTableWidthsChange = useCallback((widths: number[]) => {
-    const cols = ((field.componentProps?.columns || []) as any[]).map((c, i) => ({
-      ...c,
-      width: widths[i] ?? c.width,
-    }))
-    dispatch({
-      type: 'UPDATE_FIELD',
-      fieldId: field.id!,
-      patch: { componentProps: { ...field.componentProps, columns: cols } },
-    })
-  }, [dispatch, field.id, field.componentProps])
-  const { handleResizeStart: handleTableResizeStart } = useColumnResize(tableColumnsCount, tableColWidths, handleTableWidthsChange)
-
-  const containerStyle: React.CSSProperties = {
-    position: 'relative',
-    minHeight: token('containerMinHeight'),
-    padding: token('spacingSm'),
-    border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-primary)',
-    borderRadius: 'var(--fe-border-radius-sm)',
-    background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
-  }
-
-  if (field.children && field.children.length > 0) {
-    if (field.type === 'grid' && gridColumns > 0) {
-      const grouped: FormFieldSchema[][] = Array.from({ length: gridColumns }, () => [])
-      for (const child of field.children) {
-        const idx = child.columnIndex ?? 0
-        if (idx >= 0 && idx < gridColumns) {
-          grouped[idx].push(child)
-        } else {
-          grouped[0].push(child)
-        }
-      }
-
+    const childIds = useMemo(() => field.children?.map(c => c.id!) ?? [], [field.children])
+    if (!field.children || field.children.length === 0) {
       return (
-        <div ref={setNodeRef} style={containerStyle} data-grid-container>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: token('spacingSm'),
+        <div
+          ref={setNodeRef}
+          style={{
             minHeight: token('containerMinHeight'),
-          }}>
-            {grouped.map((columnItems, colIdx) => (
-              <ColumnDropZone
-                key={colIdx}
-                parentId={field.id!}
-                columnIndex={colIdx}
-                children={columnItems}
-                colWidth={colWidths[colIdx] || Math.floor(100 / gridColumns)}
-                showResizeHandle={colIdx < gridColumns - 1}
-                onResizeStart={handleResizeStart}
-              />
-            ))}
-          </div>
-        </div>
-      )
-    }
-
-    if (field.type === 'table' && tableColumnsCount > 0) {
-      const grouped: FormFieldSchema[][] = Array.from({ length: tableColumnsCount }, () => [])
-      for (const child of field.children) {
-        const idx = child.columnIndex ?? 0
-        if (idx >= 0 && idx < tableColumnsCount) {
-          grouped[idx].push(child)
-        } else {
-          grouped[0].push(child)
-        }
-      }
-
-      const columns = (field.componentProps?.columns || []) as { label: string; width: number }[]
-      const rowMode = (field.componentProps?.rowMode as string) || 'dynamic'
-
-      return (
-        <div ref={setNodeRef} style={containerStyle}>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            fontSize: token('fontSizeSm'),
-          }}>
-            <thead>
-              <tr>
-                {columns.map((col, colIdx) => (
-                  <th key={colIdx} style={{
-                    padding: token('spacingXs'),
-                    textAlign: 'left',
-                    borderBottom: '1px solid var(--fe-border-primary)',
-                    fontWeight: 600,
-                    color: 'var(--fe-text-primary)',
-                    width: `${col.width}%`,
-                  }}>
-                    {col.label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {grouped.map((columnItems, colIdx) => (
-                  <td key={colIdx} style={{
-                    padding: token('spacingXs'),
-                    verticalAlign: 'top',
-                  }}>
-                    <ColumnDropZone
-                      parentId={field.id!}
-                      columnIndex={colIdx}
-                      children={columnItems}
-                      colWidth={100}
-                      showResizeHandle={false}
-                      onResizeStart={handleTableResizeStart}
-                    />
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-          <div style={{
-            padding: token('spacingXs'),
-            borderTop: '1px solid var(--fe-border-light)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+            borderRadius: 'var(--fe-border-radius-sm)',
+            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
             color: 'var(--fe-text-muted)',
-            fontSize: token('fontSizeXs'),
-            textAlign: 'center',
-          }}>
-            {rowMode === 'dynamic' ? '可动态增减行' : `固定 ${(field.componentProps?.fixedRowCount as number) || 3} 行`}
-          </div>
+            fontSize: token('fontSizeSm'),
+            transition: 'border-color 0.2s, background 0.2s',
+          }}
+        >
+          <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
+            {field.children?.map((child, index) => (
+              <NestedField key={child.id} field={child} parentContainerId={field.id!} childIndex={index} />
+            ))}
+            <span>拖入组件</span>
+          </SortableContext>
         </div>
       )
     }
-
     return (
-      <div ref={setNodeRef} style={containerStyle}>
+      <div
+        ref={setNodeRef}
+        style={{
+          minHeight: token('containerMinHeight'),
+          border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+          borderRadius: 'var(--fe-border-radius-sm)',
+          background: isOver ? 'var(--fe-primary-hover-bg)' : 'transparent',
+          transition: 'border-color 0.2s, background 0.2s',
+          padding: token('spacingXs'),
+        }}
+      >
         <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
-          {field.type === 'flex' ? (
-            <div style={getFlexStyle(field)}>
-              {field.children.map((child, index) => (
-                <NestedField
-                  key={child.id}
-                  field={child}
-                  parentContainerId={field.id!}
-                  childIndex={index}
-                />
-              ))}
-            </div>
-          ) : horizontal ? (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: gridColumns > 0 ? `repeat(${gridColumns}, 1fr)` : 'repeat(auto-fill, minmax(120px, 1fr))',
-              gap: token('spacingSm'),
-            }}>
-              {field.children.map((child, index) => (
-                <NestedField
-                  key={child.id}
-                  field={child}
-                  parentContainerId={field.id!}
-                  childIndex={index}
-                />
-              ))}
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingSm') }}>
-              {field.children.map((child, index) => (
-                <NestedField
-                  key={child.id}
-                  field={child}
-                  parentContainerId={field.id!}
-                  childIndex={index}
-                />
-              ))}
-            </div>
-          )}
+          {field.children.map((child, index) => (
+            <NestedField key={child.id} field={child} parentContainerId={field.id!} childIndex={index} />
+          ))}
         </SortableContext>
       </div>
     )
   }
 
-  return (
-    <div ref={setNodeRef} style={containerStyle}>
-      <div style={{
-        color: 'var(--fe-text-muted)',
-        fontSize: token('fontSizeSm'),
-        textAlign: 'center',
-        padding: token('spacingSm'),
-      }}>
-        拖拽组件到此处
+  // Grid：按 colSpans 分列
+  if (field.type === 'grid') {
+    const colSpans = ((field.componentProps?.colSpans as Array<{ id: string; span: number }>) ?? []).filter(Boolean)
+    if (colSpans.length === 0) {
+      const { setNodeRef, isOver } = useDroppable({
+        id: `${field.id}__container`,
+        data: { parentId: field.id },
+      })
+      return (
+        <div
+          ref={setNodeRef}
+          style={{
+            minHeight: token('containerMinHeight'),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+            borderRadius: 'var(--fe-border-radius-sm)',
+            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
+            color: 'var(--fe-text-muted)',
+            fontSize: token('fontSizeSm'),
+          }}
+        >
+          拖入组件
+        </div>
+      )
+    }
+
+    const gap = (field.componentProps?.gap as number) ?? 0
+    const colCount = colSpans.length
+    const totalGap = gap > 0 ? gap * (colCount - 1) : 0
+    const gapOffset = totalGap / colCount
+    return (
+      <div style={{ display: 'flex', gap, padding: token('spacingXs') }}>
+        {colSpans.map((col, idx) => {
+          const colItems = (field.children ?? []).filter(c => (c.columnIndex ?? c.regionKey ? Number(c.regionKey ?? c.columnIndex) : idx) === idx)
+          return (
+            <RegionPreview
+              key={col.id}
+              parent={field}
+              regionKey={String(idx)}
+              items={colItems}
+              regionWidth={`0 0 calc(${(col.span / 24) * 100}% - ${gapOffset}px)`}
+            />
+          )
+        })}
       </div>
+    )
+  }
+
+  // Table：按 columns 分列
+  if (field.type === 'table') {
+    const columns = ((field.componentProps?.columns as Array<{ id: string; label: string; width: number }>) ?? []).filter(Boolean)
+    if (columns.length === 0) {
+      const { setNodeRef, isOver } = useDroppable({
+        id: `${field.id}__container`,
+        data: { parentId: field.id },
+      })
+      return (
+        <div
+          ref={setNodeRef}
+          style={{
+            minHeight: token('containerMinHeight'),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+            borderRadius: 'var(--fe-border-radius-sm)',
+            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
+            color: 'var(--fe-text-muted)',
+            fontSize: token('fontSizeSm'),
+          }}
+        >
+          拖入组件
+        </div>
+      )
+    }
+
+    return (
+      <div style={{ display: 'flex', padding: token('spacingXs') }}>
+        {columns.map((col, idx) => {
+          const colItems = field.children?.filter(c => (c.columnIndex ?? c.regionKey ? Number(c.regionKey ?? c.columnIndex) : idx) === idx) ?? []
+          return (
+            <RegionPreview
+              key={col.id}
+              parent={field}
+              regionKey={String(idx)}
+              items={colItems}
+              regionWidth={col.width != null ? `0 0 ${col.width}px` : undefined}
+              regionLabel={col.label}
+              labelBg="var(--fe-bg-tertiary)"
+            />
+          )
+        })}
+      </div>
+    )
+  }
+
+  // Collapse：按 panels 分面板
+  if (field.type === 'collapse') {
+    const panels = ((field.componentProps?.panels as CollapsePanelConfig[]) ?? []).filter(Boolean)
+    if (panels.length === 0) {
+      const { setNodeRef, isOver } = useDroppable({
+        id: `${field.id}__container`,
+        data: { parentId: field.id },
+      })
+      return (
+        <div
+          ref={setNodeRef}
+          style={{
+            minHeight: token('containerMinHeight'),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+            borderRadius: 'var(--fe-border-radius-sm)',
+            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
+            color: 'var(--fe-text-muted)',
+            fontSize: token('fontSizeSm'),
+          }}
+        >
+          拖入组件
+        </div>
+      )
+    }
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--fe-spacing-xs)', padding: token('spacingXs') }}>{/* Collapse panels */}
+        {panels.map((panel, idx) => {
+          const panelItems = field.children?.filter(c => c.regionKey === panel.key) ?? []
+          return (
+            <RegionPreview
+              key={panel.id}
+              parent={field}
+              regionKey={panel.key}
+              items={panelItems}
+              regionWidth="100%"
+              regionLabel={panel.header}
+              labelBg="var(--fe-bg-tertiary)"
+            />
+          )
+        })}
+      </div>
+    )
+  }
+
+  // Tabs：按 tabs 分标签页
+  if (field.type === 'tabs') {
+    const tabs = ((field.componentProps?.tabs as TabPaneConfig[]) ?? []).filter(Boolean)
+    if (tabs.length === 0) {
+      const { setNodeRef, isOver } = useDroppable({
+        id: `${field.id}__container`,
+        data: { parentId: field.id },
+      })
+      return (
+        <div
+          ref={setNodeRef}
+          style={{
+            minHeight: token('containerMinHeight'),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+            borderRadius: 'var(--fe-border-radius-sm)',
+            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
+            color: 'var(--fe-text-muted)',
+            fontSize: token('fontSizeSm'),
+          }}
+        >
+          拖入组件
+        </div>
+      )
+    }
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--fe-spacing-xs)', padding: token('spacingXs') }}>{/* Tabs */}
+        {tabs.map((tab, idx) => {
+          const tabItems = field.children?.filter(c => c.regionKey === tab.key) ?? []
+          return (
+            <RegionPreview
+              key={tab.id}
+              parent={field}
+              regionKey={tab.key}
+              items={tabItems}
+              regionWidth="100%"
+              regionLabel={tab.title}
+              labelBg="var(--fe-bg-tertiary)"
+            />
+          )
+        })}
+      </div>
+    )
+  }
+
+  return null
+}
+
+interface ContainerPreviewProps {
+  field: FormFieldSchema
+  childIndex?: number
+}
+
+export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field, childIndex }) => {
+  return (
+    <div style={{ width: '100%' }}>
+      <ContainerContent field={field} />
     </div>
   )
 }
+
+export default ContainerPreview

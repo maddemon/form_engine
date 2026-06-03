@@ -20,6 +20,7 @@ import SelectPropsRender from '../components/select/Props'
 import SliderPropsRender from '../components/slider/Props'
 import SwitchPropsRender from '../components/switch/Props'
 import TabsPropsRender from '../components/tabs/Props'
+import TablePropsRender from '../components/table/Props'
 import TextPropsRender from '../components/text/Props'
 import TextAreaPropsRender from '../components/textarea/Props'
 import TimePickerPropsRender from '../components/time-picker/Props'
@@ -29,7 +30,10 @@ import UploadPropsRender from '../components/upload/UploadPropsRender'
 import type { PropsRenderProps } from './types'
 
 export { FieldItem, OptionRender } from './shared'
+export { ItemListEditor } from './ItemListEditor'
+export type { ItemListEditorProps, ItemListField } from './ItemListEditor'
 export type { PropsRenderProps } from './types'
+export { genId } from '../utils/id'
 
 export const PropsRenderMap: Record<string, ComponentType<PropsRenderProps>> = {
   input: InputPropsRender,
@@ -54,6 +58,7 @@ export const PropsRenderMap: Record<string, ComponentType<PropsRenderProps>> = {
   container: ContainerPropsRender,
   collapse: CollapsePropsRender,
   tabs: TabsPropsRender,
+  table: TablePropsRender,
   text: TextPropsRender,
   image: ImagePropsRender,
   divider: DividerPropsRender,

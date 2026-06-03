@@ -289,6 +289,12 @@
   --fe-widget-input-font-size-xs: 11px;
   --fe-widget-input-font-size-xxs: 10px;
 
+  /* ItemListEditor 物理尺寸 */
+  --fe-item-list-drag-handle-width: 16px;
+  --fe-item-list-drag-handle-height: 24px;
+  --fe-item-list-remove-button-size: 18px;
+  --fe-item-list-remove-button-padding: 0;
+
   /* ============================
      Dark Mode - 暗黑模式
      ============================ */

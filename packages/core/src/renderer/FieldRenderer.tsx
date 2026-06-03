@@ -7,6 +7,7 @@ import { isFormComponent } from '../types/component-category'
 import type { $Self, ResolvedEventHandler } from '../types/events'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
 import { evalExpr, matchVisibleWhen } from '../utils'
+import { AdapterContext } from './AdapterContext'
 import { FieldSchemaContext } from './FieldSchemaContext'
 
 export interface FieldRendererProps {
@@ -122,6 +123,8 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
     rules: field.rules,
     validateStatus: errorMsg ? 'error' : undefined,
     help: errorMsg,
+    // 注意：adapter 不放在这里，容器类组件用 useContext(AdapterContext) 拿。
+    // 原因：adapter 会被 spread 到所有 renderFn 的 props，污染 antd 内部 RcSelect 等
     ...field.componentProps, // ③ 透传（优先级：内置 < componentProps）
     ...eventHandlers, // ④ 事件处理器最后 spread，最高优先级
   }
@@ -146,8 +149,10 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
     <>
       {!renderFn ? <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>未知字段类型: {field.type}</div> : (
         <FieldSchemaContext.Provider value={field}>
+          <AdapterContext.Provider value={adapter}>
           {/* eslint-disable-next-line react-hooks/refs -- composingRef 仅在事件回调中读取，此处为传参非 render 中访问 */}
           {renderFn(fieldProps)}
+          </AdapterContext.Provider>
         </FieldSchemaContext.Provider>
       )}
       {errorMsg && <div style={{ color: token('error') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{errorMsg}</div>}

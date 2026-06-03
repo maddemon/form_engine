@@ -1,4 +1,4 @@
-import { closestCorners, DndContext, DragOverlay, PointerSensor, pointerWithin, TouchSensor, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragOverEvent, type DragStartEvent, type UniqueIdentifier } from '@dnd-kit/core'
+import { DndContext, DragOverlay, PointerSensor, pointerWithin, TouchSensor, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragOverEvent, type DragStartEvent, type UniqueIdentifier } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { getComponentIcon } from '../components/paletteRegistry'
@@ -6,7 +6,6 @@ import type { DeviceScene } from '../registry/componentRegistry'
 import { setScene } from '../registry/componentRegistry'
 import { useEnsureDefaultTheme, useStyle } from '../styles'
 import type { FormEngineAdapter } from '../types/adapter'
-import { isContainerComponent } from '../types/component-category'
 import type { PaletteGroup, PanelWidths, SidePanelTab, PropertyPanelTab } from '../types/designer'
 import { isPaletteDrag, toPaletteItem, type DesignerDragData } from '../types/designer-drag'
 import { DEFAULT_FORM_CONFIG, type FormFieldSchema, type FormSchema } from '../types/schema'
@@ -17,9 +16,9 @@ import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
 import { designerReducerWithHistory, findInTree } from './reducer'
 
-function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number; columnIndex?: number } | null {
+function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number; regionKey?: string } | null {
   const field = fields.find(f => f.id === fieldId)
-  if (field) return { parentId, index: fields.indexOf(field), columnIndex: field.columnIndex }
+  if (field) return { parentId, index: fields.indexOf(field), regionKey: field.regionKey }
 
   for (const f of fields) {
     if (!f.children) continue
@@ -30,7 +29,7 @@ function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?
   return null
 }
 
-function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentId?: string; index: number; columnIndex?: number } {
+function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentId?: string; index: number; regionKey?: string } {
   if (overId === CANVAS_ROOT_HEAD_ID) return { parentId: undefined, index: 0 }
   if (overId === CANVAS_ROOT_ID) return { parentId: undefined, index: fields.length }
 
@@ -42,18 +41,18 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentI
     }
   }
 
-  const colMatch = overId.match(/^(.+)__col_(\d+)$/)
-  if (colMatch) {
-    const containerId = colMatch[1]
-    const columnIndex = parseInt(colMatch[2], 10)
+  const regionMatch = overId.match(/^(.+)__region_(\w+)$/)
+  if (regionMatch) {
+    const containerId = regionMatch[1]
+    const regionKey = regionMatch[2]
     const container = findInTree(fields, containerId)
     if (container) {
-      return { parentId: containerId, index: container.children?.length || 0, columnIndex }
+      return { parentId: containerId, index: container.children?.length || 0, regionKey }
     }
   }
 
   const pos = findFieldPosition(fields, overId)
-  if (pos) return { parentId: pos.parentId, index: pos.index + 1 }
+  if (pos) return { parentId: pos.parentId, index: pos.index + 1, regionKey: pos.regionKey }
 
   return { parentId: undefined, index: fields.length }
 }
@@ -157,70 +156,24 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
   const collisionDetection = useCallback<CollisionDetection>(
     (args) => {
-      const pointerCoords = args.pointerCoordinates
-      const fields = state.schema.fields
+      const pointerCollisions = pointerWithin(args)
 
-      const activeId = args.active.id
-      const activeData = args.active.data.current as DesignerDragData | undefined
-      const isFromPalette = activeData ? isPaletteDrag(activeData) : false
-      const activeSourcePos = !isFromPalette ? findFieldPosition(fields, String(activeId)) : null
-
-      if (activeSourcePos && activeSourcePos.parentId) {
-        const insideDroppables = pointerWithin(args)
-        if (insideDroppables.length > 0) return insideDroppables
-        return closestCorners(args)
-      }
-
-      if (pointerCoords && fields.length > 0) {
-        for (const field of fields) {
-          if (!isContainerComponent(field.type)) continue
-          const containerRect = args.droppableRects.get(field.id!)
-          if (!containerRect) continue
-
-          const { top, bottom, left, right } = containerRect
-          if (pointerCoords.y >= top && pointerCoords.y <= bottom && pointerCoords.x >= left && pointerCoords.x <= right) {
-            const height = bottom - top
-            const relY = pointerCoords.y - top
-            const edgeZone = height * 0.2
-
-            const containerIndex = fields.findIndex((f) => f.id === field.id)
-
-            if (relY < edgeZone) {
-              if (containerIndex > 0 && fields[containerIndex - 1]?.id) {
-                return [{ id: fields[containerIndex - 1].id! }]
-              }
-              return [{ id: CANVAS_ROOT_HEAD_ID }]
-            }
-            if (relY > height - edgeZone) {
-              return [{ id: field.id! }]
-            }
-
-            const innerDropId = `${field.id}__container`
-            const innerRect = args.droppableRects.get(innerDropId)
-            if (innerRect) {
-              const { top: it, bottom: ib, left: il, right: ir } = innerRect
-              if (pointerCoords.y >= it && pointerCoords.y <= ib && pointerCoords.x >= il && pointerCoords.x <= ir) {
-                return [{ id: innerDropId }]
-              }
-            }
-
-            const pointerCollisions = pointerWithin(args)
-            const rootOnly = pointerCollisions.filter((c) => {
-              const idStr = String(c.id)
-              if (idStr === CANVAS_ROOT_ID || idStr === CANVAS_ROOT_HEAD_ID) return true
-              if (idStr.endsWith('__container')) return false
-              return fields.some((f) => f.id === c.id)
-            })
-            return rootOnly.length > 0 ? rootOnly : [{ id: CANVAS_ROOT_ID }]
+      if (pointerCollisions.length > 0) {
+        // 按布局面积排序：更小的区域 = 更具体（如字段 > region > container > 根级）
+        return [...pointerCollisions].sort((a, b) => {
+          const rectA = args.droppableRects.get(a.id)
+          const rectB = args.droppableRects.get(b.id)
+          if (rectA && rectB) {
+            return (rectA.width * rectA.height) - (rectB.width * rectB.height)
           }
-        }
+          return 0
+        })
       }
 
-      const insideDroppables = pointerWithin(args)
-      if (insideDroppables.length === 0) return closestCorners(args)
-      return insideDroppables
+      // 指针不在任何 droppable 内时不返回碰撞，避免从控件库拖拽时自动高亮
+      return []
     },
-    [state.schema.fields],
+    [],
   )
 
   const handleDragStart = useCallback(
@@ -271,12 +224,12 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
       let targetParentId: string | undefined
       let targetIndex: number
-      let targetColumnIndex: number | undefined
+      let targetRegionKey: string | undefined
 
-      const colMatch = overId.match(/^(.+)__col_(\d+)$/)
-      if (colMatch) {
-        const containerId = colMatch[1]
-        targetColumnIndex = parseInt(colMatch[2], 10)
+      const regionMatch = overId.match(/^(.+)__region_(\w+)$/)
+      if (regionMatch) {
+        const containerId = regionMatch[1]
+        targetRegionKey = regionMatch[2]
         if (sourcePos.parentId === containerId) return
         if (isAncestorOf(fields, activeId, containerId)) return
         const container = findInTree(fields, containerId)
@@ -297,6 +250,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         if (sourcePos.parentId === targetPos.parentId) return
         targetParentId = targetPos.parentId
         targetIndex = targetPos.index
+        targetRegionKey = targetPos.regionKey
       }
 
       const moveKey = `${activeId}->${targetParentId || 'root'}:${targetIndex}`
@@ -309,7 +263,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         toIndex: targetIndex,
         fromParentId: sourcePos.parentId,
         toParentId: targetParentId,
-        columnIndex: targetColumnIndex,
+        regionKey: targetRegionKey,
       })
     },
     [state.schema.fields, dispatch],
@@ -331,12 +285,12 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
       if (isPaletteDrag(activeData)) {
         const overStr = String(over.id)
-        const isValidCanvasTarget = overStr === CANVAS_ROOT_ID || overStr === CANVAS_ROOT_HEAD_ID || overStr.endsWith('__container') || overStr.includes('__col_') || fields.some((f) => f.id === overStr) || fields.some((f) => f.children?.some((c) => c.id === overStr))
+        const isValidCanvasTarget = overStr === CANVAS_ROOT_ID || overStr === CANVAS_ROOT_HEAD_ID || overStr.endsWith('__container') || overStr.includes('__region_') || fields.some((f) => f.id === overStr) || fields.some((f) => f.children?.some((c) => c.id === overStr))
         if (!isValidCanvasTarget) return
 
         const target = resolveDropTarget(String(over.id), fields)
         const newField = createFieldFromPalette(toPaletteItem(activeData))
-        dispatch({ type: 'ADD_FIELD', field: newField, index: target.index, parentId: target.parentId, columnIndex: target.columnIndex })
+        dispatch({ type: 'ADD_FIELD', field: newField, index: target.index, parentId: target.parentId, regionKey: target.regionKey })
         return
       }
 
@@ -344,14 +298,14 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       const overId = String(over.id)
       if (activeId === overId) return
 
-      const colMatch = overId.match(/^(.+)__col_(\d+)$/)
-      if (colMatch) {
-        const containerId = colMatch[1]
-        const targetColumnIndex = parseInt(colMatch[2], 10)
+      const regionMatch = overId.match(/^(.+)__region_(\w+)$/)
+      if (regionMatch) {
+        const containerId = regionMatch[1]
+        const targetRegionKey = regionMatch[2]
         const sourcePos = findFieldPosition(fields, activeId)
         if (!sourcePos) return
         if (isAncestorOf(fields, activeId, containerId)) return
-        if (sourcePos.parentId === containerId && sourcePos.columnIndex === targetColumnIndex) return
+        if (sourcePos.parentId === containerId && sourcePos.regionKey === targetRegionKey) return
 
         const container = findInTree(fields, containerId)
         if (!container) return
@@ -363,7 +317,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
           toIndex: targetIndex,
           fromParentId: sourcePos.parentId,
           toParentId: containerId,
-          columnIndex: targetColumnIndex,
+          regionKey: targetRegionKey,
         })
         return
       }
@@ -392,8 +346,19 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       if (!targetPos) return
 
       if (sourcePos.parentId === targetPos.parentId) {
-        const newFields = reorderFieldsInContainer(fields, sourcePos.parentId, sourcePos.index, targetPos.index)
-        dispatch({ type: 'REORDER_FIELDS', fields: newFields })
+        if (sourcePos.regionKey !== targetPos.regionKey) {
+          dispatch({
+            type: 'MOVE_FIELD',
+            fromIndex: sourcePos.index,
+            toIndex: targetPos.index,
+            fromParentId: sourcePos.parentId,
+            toParentId: targetPos.parentId,
+            regionKey: targetPos.regionKey,
+          })
+        } else {
+          const newFields = reorderFieldsInContainer(fields, sourcePos.parentId, sourcePos.index, targetPos.index)
+          dispatch({ type: 'REORDER_FIELDS', fields: newFields })
+        }
       } else {
         dispatch({
           type: 'MOVE_FIELD',
@@ -401,6 +366,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
           toIndex: targetPos.index,
           fromParentId: sourcePos.parentId,
           toParentId: targetPos.parentId,
+          regionKey: targetPos.regionKey,
         })
       }
     },

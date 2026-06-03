@@ -27,11 +27,11 @@ import type { ImageProps } from '../components/image/types'
 import type { DividerProps } from '../components/divider/types'
 import type { TitleProps } from '../components/title/types'
 import type { ContainerProps } from '../components/container/types'
-import type { GridProps, GridRowConfig, GridColConfig } from '../components/grid/types'
+import type { GridProps } from '../components/grid/types'
 import type { FlexProps } from '../components/flex/types'
-import type { CollapseProps } from '../components/collapse/types'
-import type { TabsProps } from '../components/tabs/types'
-import type { TableProps } from '../components/table/types'
+import type { CollapseProps, CollapsePanelConfig } from '../components/collapse/types'
+import type { TabsProps, TabPaneConfig } from '../components/tabs/types'
+import type { TableProps, TableColumnConfig } from '../components/table/types'
 import type { CascaderProps } from '../components/cascader/types'
 import type { TreeSelectProps } from '../components/tree-select/types'
 
@@ -60,12 +60,13 @@ export type {
   TitleProps,
   ContainerProps,
   GridProps,
-  GridRowConfig,
-  GridColConfig,
   FlexProps,
   CollapseProps,
+  CollapsePanelConfig,
   TabsProps,
+  TabPaneConfig,
   TableProps,
+  TableColumnConfig,
   CascaderProps,
   TreeSelectProps,
 }

@@ -1,18 +1,20 @@
 /**
  * Antd Tabs 组件
- * 适配 Form Engine
+ * 适配 Form Engine（tabs + regionKey 模式）
  * 使用 Ant Design 的 Tabs 组件
  */
 
 import React from 'react'
 import { Tabs as AntTabs } from 'antd'
-import type { TabsProps } from '@form-engine/core'
+import type { TabsProps, TabPaneConfig } from '@form-engine/core'
 
 /**
  * Tabs 组件
+ * children 通过 regionKey 关联到 tabs 中对应 tab
  */
 export const Tabs: React.FC<TabsProps> = ({
   children,
+  tabs,
   activeKey,
   defaultActiveKey,
   onChange,
@@ -28,7 +30,10 @@ export const Tabs: React.FC<TabsProps> = ({
   const handleChange = (key: string) => {
     onChange?.(key)
   }
-  
+
+  const childrenArray = React.Children.toArray(children)
+  const tabConfigs = (tabs ?? []) as TabPaneConfig[]
+
   return (
     <AntTabs
       activeKey={activeKey}
@@ -43,13 +48,34 @@ export const Tabs: React.FC<TabsProps> = ({
       id={id}
       {...rest}
     >
-      {children}
+      {tabConfigs.map((tab, idx) => {
+        const tabChildren = childrenArray.filter((child: any) =>
+          child.props?.field?.regionKey === tab.key ||
+          Number(child.props?.field?.columnIndex ?? -1) === idx
+        )
+        return (
+          <AntTabs.TabPane key={tab.key} tab={tab.title} disabled={tab.disabled}>
+            {tabChildren}
+          </AntTabs.TabPane>
+        )
+      })}
     </AntTabs>
   )
 }
 
+/** TabPane Props */
+interface TabPaneProps {
+  children?: React.ReactNode
+  key: string
+  tab: React.ReactNode
+  disabled?: boolean
+  style?: React.CSSProperties
+  className?: string
+  [key: string]: any
+}
+
 /**
- * TabPane 组件
+ * TabPane 组件（保留导出兼容）
  */
 export const TabPane: React.FC<TabPaneProps> = ({
   children,
@@ -72,31 +98,4 @@ export const TabPane: React.FC<TabPaneProps> = ({
       {children}
     </AntTabs.TabPane>
   )
-}
-
-/** TabPane Props */
-interface TabPaneProps {
-  children?: React.ReactNode
-  key: string
-  tab: React.ReactNode
-  disabled?: boolean
-  style?: React.CSSProperties
-  className?: string
-  [key: string]: any
-}
-
-/** Tabs Props */
-interface TabsProps {
-  children?: React.ReactNode
-  activeKey?: string
-  defaultActiveKey?: string
-  onChange?: (key: string) => void
-  type?: 'line' | 'card' | 'editable-card'
-  size?: 'small' | 'middle' | 'large'
-  tabPosition?: 'top' | 'right' | 'bottom' | 'left'
-  centered?: boolean
-  style?: React.CSSProperties
-  className?: string
-  id?: string
-  [key: string]: any
 }

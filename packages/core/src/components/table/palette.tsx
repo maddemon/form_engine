@@ -1,5 +1,5 @@
 import type { ComponentPalette } from '../../types/palette'
-import { GridIcon, TableIcon } from '../icons'
+import { TableIcon } from '../icons'
 export const palette: ComponentPalette = {
   label: '表格',
   category: 'container',
@@ -7,8 +7,8 @@ export const palette: ComponentPalette = {
   defaultProps: {
     componentProps: {
       columns: [
-        { label: '列1', width: 50, minWidth: 20 },
-        { label: '列2', width: 50, minWidth: 20 },
+        { id: 'col_1', label: '列1', width: 120 },
+        { id: 'col_2', label: '列2', width: 120 },
       ],
       rowMode: 'dynamic',
     },

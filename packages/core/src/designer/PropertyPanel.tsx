@@ -260,7 +260,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
   )
 }
 
-function PropertyPanelInner({ field, w, token, resolvedWidth, hasTabs, activeTab, setActiveTab, dispatch, propertyPanelTabs, allFields }: { field: FormFieldSchema; w: any; token: ReturnType<typeof useStyle>['token']; resolvedWidth: string | number; hasTabs: boolean; activeTab: string; setActiveTab: (v: string) => void; dispatch: React.Dispatch<DesignerAction>; propertyPanelTabs?: PropertyPanelTab[]; allFields: FormFieldSchema[] }) {
+function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPanelTabs, allFields }: { field: FormFieldSchema; w: any; token: ReturnType<typeof useStyle>['token']; activeTab: string; dispatch: React.Dispatch<DesignerAction>; propertyPanelTabs?: PropertyPanelTab[]; allFields: FormFieldSchema[] }) {
   const ComponentPropsRender = PropsRenderMap[field.type]
   const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
   const category = getComponentCategory(field.type)
@@ -286,61 +286,63 @@ function PropertyPanelInner({ field, w, token, resolvedWidth, hasTabs, activeTab
     [dispatch, field.id],
   )
 
-  const allTabs = hasTabs ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: '属性' }, ...(propertyPanelTabs || [])] : []
-
   return (
-    <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', overflow: 'auto', height: '100%' }}>
-      {hasTabs && (
-        <div style={{ display: 'flex', padding: token('spacingSm'), borderBottom: '1px solid var(--fe-border-light)', background: 'var(--fe-bg-tertiary)', position: 'sticky', top: 0, zIndex: 1 }}>
-          {allTabs.map((tab, idx) => {
-            const isFirst = idx === 0
-            const isLast = idx === allTabs.length - 1
-            return (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                style={{
-                  flex: 1,
-                  border: '1px solid var(--fe-border-primary)',
-                  borderRight: isLast ? '1px solid var(--fe-border-primary)' : 'none',
-                  background: activeTab === tab.key ? 'var(--fe-bg-primary)' : 'var(--fe-bg-tertiary)',
-                  color: activeTab === tab.key ? 'var(--fe-primary)' : 'var(--fe-text-secondary)',
-                  cursor: 'pointer',
-                  padding: `${token('spacingXs')} ${token('spacingSm')}`,
-                  fontSize: token('fontSizeXs'),
-                  fontWeight: activeTab === tab.key ? 500 : 400,
-                  transition: 'all 0.2s',
-                  outline: 'none',
-                  borderTopLeftRadius: isFirst ? token('borderRadiusSm') : 0,
-                  borderBottomLeftRadius: isFirst ? token('borderRadiusSm') : 0,
-                  borderTopRightRadius: isLast ? token('borderRadiusSm') : 0,
-                  borderBottomRightRadius: isLast ? token('borderRadiusSm') : 0,
-                }}
-              >
-                {tab.title}
-              </button>
-            )
-          })}
-        </div>
-      )}
-
-      <div style={{ padding: token('spacingMd') }}>
-        <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500 }}>
-          {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
-          <span style={{ marginLeft: token('spacingXs'), color: 'var(--fe-text-muted)', fontWeight: 400 }}>({field.type})</span>
-        </h4>
-
-        {activeTab === PROPERTIES_DEFAULT_TAB_KEY ? (
+    <>
+      {activeTab === PROPERTIES_DEFAULT_TAB_KEY ? (
+        <>
+          <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500 }}>
+            {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
+            <span style={{ marginLeft: token('spacingXs'), color: 'var(--fe-text-muted)', fontWeight: 400 }}>({field.type})</span>
+          </h4>
           <DefaultPropertyContent field={field} w={w} dispatch={dispatch} isForm={isForm} isContainer={isContainer} isButton={isButton} ComponentPropsRender={ComponentPropsRender} customConfig={customConfig} allFields={allFields} />
-        ) : (
-          (() => {
-            const tab = propertyPanelTabs?.find((t) => t.key === activeTab)
-            if (!tab) return null
-            const TabContent = tab.content
-            return <TabContent field={field} onUpdate={onUpdate} onUpdateProp={onUpdateProp} widgets={w} dispatch={dispatch} />
-          })()
-        )}
-      </div>
+        </>
+      ) : (
+        (() => {
+          const tab = propertyPanelTabs?.find((t) => t.key === activeTab)
+          if (!tab) return null
+          const TabContent = tab.content
+          return <TabContent field={field} onUpdate={onUpdate} onUpdateProp={onUpdateProp} widgets={w} dispatch={dispatch} />
+        })()
+      )}
+    </>
+  )
+}
+
+/**
+ * 渲染顶部 Tab 栏（仅在有 propertyPanelTabs 时调用）
+ */
+function PropertyPanelTabs({ allTabs, activeTab, setActiveTab, token }: { allTabs: { key: string; title: string }[]; activeTab: string; setActiveTab: (v: string) => void; token: ReturnType<typeof useStyle>['token'] }) {
+  return (
+    <div style={{ display: 'flex', padding: token('spacingSm'), borderBottom: '1px solid var(--fe-border-light)', background: 'var(--fe-bg-tertiary)', position: 'sticky', top: 0, zIndex: 1 }}>
+      {allTabs.map((tab, idx) => {
+        const isFirst = idx === 0
+        const isLast = idx === allTabs.length - 1
+        return (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            style={{
+              flex: 1,
+              border: '1px solid var(--fe-border-primary)',
+              borderRight: isLast ? '1px solid var(--fe-border-primary)' : 'none',
+              background: activeTab === tab.key ? 'var(--fe-bg-primary)' : 'var(--fe-bg-tertiary)',
+              color: activeTab === tab.key ? 'var(--fe-primary)' : 'var(--fe-text-secondary)',
+              cursor: 'pointer',
+              padding: `${token('spacingXs')} ${token('spacingSm')}`,
+              fontSize: token('fontSizeXs'),
+              fontWeight: activeTab === tab.key ? 500 : 400,
+              transition: 'all 0.2s',
+              outline: 'none',
+              borderTopLeftRadius: isFirst ? token('borderRadiusSm') : 0,
+              borderBottomLeftRadius: isFirst ? token('borderRadiusSm') : 0,
+              borderTopRightRadius: isLast ? token('borderRadiusSm') : 0,
+              borderBottomRightRadius: isLast ? token('borderRadiusSm') : 0,
+            }}
+          >
+            {tab.title}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -351,10 +353,47 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
   const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
   const hasTabs = propertyPanelTabs && propertyPanelTabs.length > 0
   const [activeTab, setActiveTab] = useState(PROPERTIES_DEFAULT_TAB_KEY)
+  const allTabs = hasTabs ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: '属性' }, ...(propertyPanelTabs || [])] : []
 
-  if (!field) {
-    return <FormConfigPanel formConfig={formConfig} dispatch={dispatch} widgets={w} width={width} />
+  /**
+   * 无字段时扩展 Tab 的 onUpdate / onUpdateProp 退化为 no-op
+   * （PropertyPanelTabContentProps.field 允许为 null，扩展 Tab 应自行处理"未选中"提示）
+   */
+  const noopUpdate = useCallback((_patch: Partial<FormFieldSchema>) => {}, [])
+  const noopUpdateProp = useCallback((_key: string, _value: unknown) => {}, [])
+
+  /**
+   * 无字段时"属性" Tab 的内容
+   */
+  const renderNoFieldContent = () => {
+    if (activeTab === PROPERTIES_DEFAULT_TAB_KEY) {
+      return <FormConfigPanel formConfig={formConfig} dispatch={dispatch} widgets={w} />
+    }
+    const tab = propertyPanelTabs?.find((t) => t.key === activeTab)
+    if (!tab) return null
+    const TabContent = tab.content
+    return <TabContent field={null} onUpdate={noopUpdate} onUpdateProp={noopUpdateProp} widgets={w} dispatch={dispatch} />
   }
 
-  return <PropertyPanelInner field={field} w={w} token={token} resolvedWidth={resolvedWidth} hasTabs={!!hasTabs} activeTab={activeTab} setActiveTab={setActiveTab} dispatch={dispatch} propertyPanelTabs={propertyPanelTabs} allFields={allFields || []} />
+  return (
+    <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', overflow: 'auto', height: '100%' }}>
+      {hasTabs && <PropertyPanelTabs allTabs={allTabs} activeTab={activeTab} setActiveTab={setActiveTab} token={token} />}
+
+      <div style={{ padding: token('spacingMd') }}>
+        {field
+          ? (
+            <PropertyPanelInner
+              field={field}
+              w={w}
+              token={token}
+              activeTab={activeTab}
+              dispatch={dispatch}
+              propertyPanelTabs={propertyPanelTabs}
+              allFields={allFields || []}
+            />
+          )
+          : renderNoFieldContent()}
+      </div>
+    </div>
+  )
 }

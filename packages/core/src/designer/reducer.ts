@@ -132,9 +132,13 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
       return { ...state, selectedFieldId: action.fieldId }
 
     case 'ADD_FIELD': {
-      const fieldToAdd = action.columnIndex !== undefined
-        ? { ...action.field, columnIndex: action.columnIndex }
-        : action.field
+      let fieldToAdd = action.field
+      if (action.columnIndex !== undefined) {
+        fieldToAdd = { ...fieldToAdd, columnIndex: action.columnIndex }
+      }
+      if (action.regionKey !== undefined) {
+        fieldToAdd = { ...fieldToAdd, regionKey: action.regionKey }
+      }
       if (action.parentId) {
         const addToParent = (nodes: FormFieldSchema[]): FormFieldSchema[] =>
           nodes.map(n => {
@@ -179,8 +183,17 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
       if (action.columnIndex !== undefined) {
         movedField = { ...movedField, columnIndex: action.columnIndex }
       }
-      if (!action.toParentId && movedField.columnIndex !== undefined) {
-        movedField = { ...movedField, columnIndex: undefined }
+      if (action.regionKey !== undefined) {
+        movedField = { ...movedField, regionKey: action.regionKey }
+      }
+      // 移出 region 容器时清空 regionKey 和 columnIndex
+      if (!action.toParentId) {
+        if (movedField.regionKey !== undefined) {
+          movedField = { ...movedField, regionKey: undefined }
+        }
+        if (movedField.columnIndex !== undefined) {
+          movedField = { ...movedField, columnIndex: undefined }
+        }
       }
       const fields = insertIntoTree(afterRemove, action.toParentId, adjustedToIndex, movedField)
       return { ...state, schema: { ...state.schema, fields } }

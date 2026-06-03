@@ -131,9 +131,9 @@ export interface DesignerProps {
  */
 export type DesignerAction =
   | { type: 'SELECT_FIELD'; fieldId: string | null }
-  | { type: 'ADD_FIELD'; field: FormFieldSchema; index: number; parentId?: string; columnIndex?: number }
+  | { type: 'ADD_FIELD'; field: FormFieldSchema; index: number; parentId?: string; columnIndex?: number; regionKey?: string }
   | { type: 'REMOVE_FIELD'; fieldId: string }
-  | { type: 'MOVE_FIELD'; fromIndex: number; toIndex: number; parentId?: string; fromParentId?: string; toParentId?: string; columnIndex?: number }
+  | { type: 'MOVE_FIELD'; fromIndex: number; toIndex: number; parentId?: string; fromParentId?: string; toParentId?: string; columnIndex?: number; regionKey?: string }
   | { type: 'UPDATE_FIELD'; fieldId: string; patch: Partial<FormFieldSchema> }
   | { type: 'UPDATE_FORM_CONFIG'; patch: Partial<FormConfig> }
   | { type: 'UPDATE_SUBMIT_CONFIG'; patch: Partial<SubmitConfig> }

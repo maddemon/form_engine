@@ -5,9 +5,13 @@ export const palette: ComponentPalette = {
   category: 'container',
   icon: <FolderOpen />,
   defaultProps: {
-    children: [
-      { name: 'panel_1', type: 'collapse', label: '面板一' },
-      { name: 'panel_2', type: 'collapse', label: '面板二' },
-    ],
+    componentProps: {
+      panels: [
+        { id: 'panel_1', key: 'panel_1', header: '面板一' },
+        { id: 'panel_2', key: 'panel_2', header: '面板二' },
+      ],
+      accordion: false,
+      ghost: false,
+    },
   },
 }

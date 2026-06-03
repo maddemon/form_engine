@@ -1,37 +1,11 @@
-import type { BaseFormComponentProps, BaseLayoutComponentProps } from '../../types/component-props'
+import type { BaseLayoutComponentProps } from '../../types/component-props'
 
 /** Grid / Row / Col */
 export interface GridProps extends BaseLayoutComponentProps {
-  /** 布局模式 */
-  variant?: 'grid' | 'flex'
-  /** 列数（grid 模式） */
-  columns?: number
-  /** 各列宽度百分比，如 [50, 50]，默认均分 */
-  colWidths?: number[]
+  /** 列配置。每项 1-24，sum(colSpans) ≤ 24，至少 1 列 */
+  colSpans?: Array<{ id: string; span: number }>
   /** 间距 */
   gap?: number | [number, number]
-  /** 行配置（可选，用于精细控制） */
-  rows?: GridRowConfig[]
-  /** 列配置（可选，用于精细控制） */
-  cols?: GridColConfig[]
+  /** 布局模式 */
+  variant?: 'grid' | 'flex'
 }
-
-export interface GridRowConfig {
-  height?: string | number
-}
-
-export interface GridColConfig {
-  span?: number
-  offset?: number
-  order?: number
-  push?: number
-  pull?: number
-  xs?: number
-  sm?: number
-  md?: number
-  lg?: number
-  xl?: number
-  xxl?: number
-}
-
-
