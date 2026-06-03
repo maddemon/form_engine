@@ -179,6 +179,13 @@ export const iconMap: Record<string, React.FC<IconProps>> = {
   Monitor,
   Smartphone,
   Table: TableIcon,
+  Layout,
+  Columns,
+  Square,
+  Minus,
+  FolderOpen,
+  Image: ImageIcon,
+  Bold,
 }
 
 export default iconMap

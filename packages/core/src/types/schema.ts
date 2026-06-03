@@ -125,6 +125,9 @@ export type FieldType =
   | 'custom'
   | `custom:${string}`
   | 'table'
+  | 'card'
+  | 'alert'
+  | 'segment'
 
 export interface FormFieldSchema {
   id?: string

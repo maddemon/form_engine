@@ -34,6 +34,9 @@ import type { TabsProps, TabPaneConfig } from '../components/tabs/types'
 import type { TableProps, TableColumnConfig } from '../components/table/types'
 import type { CascaderProps } from '../components/cascader/types'
 import type { TreeSelectProps } from '../components/tree-select/types'
+import type { CardProps } from '../components/card/types'
+import type { AlertProps } from '../components/alert/types'
+import type { SegmentProps } from '../components/segment/types'
 
 // ============================
 // 导出类型（供其他模块使用）
@@ -69,6 +72,9 @@ export type {
   TableColumnConfig,
   CascaderProps,
   TreeSelectProps,
+  CardProps,
+  AlertProps,
+  SegmentProps,
 }
 
 // ============================
@@ -131,6 +137,9 @@ export interface ComponentPropsMap {
   'Tabs': TabsProps
   'Table': TableProps
   'Button': ButtonProps
+  'Card': CardProps
+  'Alert': AlertProps
+  'Segment': SegmentProps
 }
 
 /** 根据组件类型获取 Props 类型 */

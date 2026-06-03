@@ -88,6 +88,9 @@ export type {
   TableColumnConfig,
   CascaderProps,
   TreeSelectProps,
+  CardProps,
+  AlertProps,
+  SegmentProps,
   TimePickerProps,
   ComponentPropsMap,
   ComponentProps,
@@ -145,6 +148,9 @@ export {
 
 // 组件事件声明查询
 export { getEventDeclarations } from './components'
+
+// 图标映射（供 adapter 解析图标字符串）
+export { iconMap } from './components'
 
 // ============================
 // 自定义组件注册 API

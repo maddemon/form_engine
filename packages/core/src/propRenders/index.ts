@@ -27,6 +27,9 @@ import TimePickerPropsRender from '../components/time-picker/Props'
 import TitlePropsRender from '../components/title/Props'
 import TreeSelectPropsRender from '../components/tree-select/Props'
 import UploadPropsRender from '../components/upload/UploadPropsRender'
+import CardPropsRender from '../components/card/Props'
+import AlertPropsRender from '../components/alert/Props'
+import SegmentPropsRender from '../components/segment/Props'
 import type { PropsRenderProps } from './types'
 
 export { FieldItem, OptionRender } from './shared'
@@ -65,4 +68,7 @@ export const PropsRenderMap: Record<string, ComponentType<PropsRenderProps>> = {
   title: TitlePropsRender,
   cascader: CascaderPropsRender,
   'tree-select': TreeSelectPropsRender,
+  card: CardPropsRender,
+  alert: AlertPropsRender,
+  segment: SegmentPropsRender,
 }

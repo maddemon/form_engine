@@ -63,7 +63,7 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
   const { scene, formConfig, adapter } = useDesignerContext()
 
   // 通用容器
-  if (!['grid', 'table', 'tabs', 'collapse'].includes(field.type)) {
+  if (!['grid', 'table', 'tabs', 'collapse', 'card'].includes(field.type)) {
     const { setNodeRef, isOver } = useDroppable({
       id: `${field.id}__container`,
       data: { parentId: field.id },
@@ -113,6 +113,57 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
           ))}
         </SortableContext>
       </div>
+    )
+  }
+
+  // Card：使用真实 Card 组件包裹子组件
+  if (field.type === 'card') {
+    const { setNodeRef, isOver } = useDroppable({
+      id: `${field.id}__container`,
+      data: { parentId: field.id },
+    })
+    const childIds = useMemo(() => field.children?.map(c => c.id!) ?? [], [field.children])
+
+    const cardBody = (
+      <div
+        ref={setNodeRef}
+        style={{
+          minHeight: token('containerMinHeight'),
+          border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+          borderRadius: 'var(--fe-border-radius-sm)',
+          background: isOver ? 'var(--fe-primary-hover-bg)' : 'transparent',
+          transition: 'border-color 0.2s, background 0.2s',
+          padding: token('spacingXs'),
+        }}
+      >
+        <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
+          {field.children?.map((child, index) => (
+            <NestedField key={child.id} field={child} parentContainerId={field.id!} childIndex={index} />
+          ))}
+        </SortableContext>
+        {(!field.children || field.children.length === 0) && (
+          <div style={{ textAlign: 'center', color: 'var(--fe-text-muted)', fontSize: token('fontSizeSm'), padding: token('spacingSm') }}>
+            拖拽组件到此处
+          </div>
+        )}
+      </div>
+    )
+
+    const enhancedField: FormFieldSchema = {
+      ...field,
+      componentProps: { ...field.componentProps, children: cardBody },
+    }
+
+    return (
+      <FieldRenderer
+        field={enhancedField}
+        value={undefined}
+        onChange={() => {}}
+        options={[]}
+        disabled={false}
+        adapter={adapter}
+        formConfig={formConfig}
+      />
     )
   }
 

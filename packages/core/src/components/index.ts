@@ -24,6 +24,8 @@ import { uploadEventDeclarations } from './upload/types'
 import { buttonEventDeclarations } from './button/types'
 import { cascaderEventDeclarations } from './cascader/types'
 import { treeSelectEventDeclarations } from './tree-select/types'
+import { alertEventDeclarations } from './alert/types'
+import { segmentEventDeclarations } from './segment/types'
 
 // ============================
 // 类型导出
@@ -49,6 +51,9 @@ export type { GridProps } from './grid/types'
 export type { FlexProps } from './flex/types'
 export type { CascaderProps } from './cascader/types'
 export type { TreeSelectProps } from './tree-select/types'
+export type { CardProps } from './card/types'
+export type { AlertProps } from './alert/types'
+export type { SegmentProps } from './segment/types'
 
 // ============================
 // 事件声明 re-export
@@ -70,6 +75,8 @@ export {
   buttonEventDeclarations,
   cascaderEventDeclarations,
   treeSelectEventDeclarations,
+  alertEventDeclarations,
+  segmentEventDeclarations,
 }
 
 // ============================
@@ -100,6 +107,8 @@ const EVENT_DECLARATION_MAP: Record<string, EventDeclaration[]> = {
   button: buttonEventDeclarations,
   cascader: cascaderEventDeclarations,
   'tree-select': treeSelectEventDeclarations,
+  alert: alertEventDeclarations,
+  segment: segmentEventDeclarations,
 }
 
 /**

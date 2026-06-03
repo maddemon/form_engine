@@ -148,7 +148,7 @@ export interface DesignerWidgets {
     style?: React.CSSProperties
   }>
   /** 开关 */
-  Switch?: React.ComponentType<{
+  Switch: React.ComponentType<{
     checked?: boolean
     onChange?: (v: boolean) => void
     disabled?: boolean

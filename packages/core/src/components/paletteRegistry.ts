@@ -29,6 +29,9 @@ import { palette as timePalette } from './time-picker/palette'
 import { palette as titlePalette } from './title/palette'
 import { palette as treeSelectPalette } from './tree-select/palette'
 import { palette as uploadPalette } from './upload/palette'
+import { palette as cardPalette } from './card/palette'
+import { palette as alertPalette } from './alert/palette'
+import { palette as segmentPalette } from './segment/palette'
 
 export const componentPalettes: Record<string, ComponentPalette> = {
   input: inputPalette,
@@ -59,6 +62,9 @@ export const componentPalettes: Record<string, ComponentPalette> = {
   image: imagePalette,
   divider: dividerPalette,
   title: titlePalette,
+  card: cardPalette,
+  alert: alertPalette,
+  segment: segmentPalette,
 }
 
 export function getComponentLabel(type: string): string {
