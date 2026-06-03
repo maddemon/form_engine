@@ -22,7 +22,7 @@ export const WidgetTextArea: React.FC<{
       style={{
         ...BASE_STYLE,
         resize: 'vertical',
-        minHeight: 48,
+        minHeight: 36,
         ...(focused ? FOCUS_STYLE : {}),
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? 'not-allowed' : 'text',

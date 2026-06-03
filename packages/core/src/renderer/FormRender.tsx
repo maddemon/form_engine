@@ -9,6 +9,7 @@ import { isContainerComponent } from '../types/component-category'
 import type { $Form } from '../types/events'
 import type { DataSourceResolver } from '../types/render'
 import { evalExpr, matchVisibleWhen } from '../utils'
+import { pickAdapter } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import { validateForm } from './validate'
 
@@ -18,7 +19,12 @@ export interface FormRenderProps {
   onChange?: (values: Record<string, unknown>) => void
   dataSourceResolver?: DataSourceResolver
   components?: Record<string, (props: any) => React.ReactNode>
-  adapter: FormEngineAdapter
+  /** 桌面端适配器 */
+  desktopAdapter?: FormEngineAdapter
+  /** 移动端适配器 */
+  mobileAdapter?: FormEngineAdapter
+  /** 当前场景（默认 'desktop'） */
+  scene?: import('../types/adapter').DeviceScene
   initialValues?: Record<string, unknown>
   loading?: boolean
   /**
@@ -34,9 +40,12 @@ export interface FormRenderProps {
  */
 const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChange, dataSourceResolver, components = {}, adapter, initialValues = {}, loading = false, callbacks = {} }) => {
+export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {} }) => {
   useEnsureDefaultTheme()
   const { token } = useStyle()
+
+  // 根据 scene 选取 adapter
+  const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
   const [formValues, setFormValues] = useState<Record<string, unknown>>(initialValues)
   const [fieldOptions, setFieldOptions] = useState<Record<string, OptionItem[]>>({})
   // 记录每个 field 当前请求的依赖快照，避免过期响应覆盖
@@ -296,7 +305,7 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
 
     const enhancedField: FormFieldSchema = childNodes ? { ...field, componentProps: { ...field.componentProps, children: childNodes } } : field
 
-    return <FieldRenderer field={enhancedField} value={formValues[field.name]} onChange={(val) => handleFieldChange(field.name, val)} options={fieldOptions[field.name] || []} disabled={loading || field.disabled === true} adapter={adapter} components={components} eventContext={eventContext} errors={fieldErrors[field.name]} formConfig={schema.form} />
+    return <FieldRenderer field={enhancedField} value={formValues[field.name]} onChange={(val) => handleFieldChange(field.name, val)} options={fieldOptions[field.name] || []} disabled={loading || field.disabled === true} adapter={resolvedAdapter} components={components} eventContext={eventContext} errors={fieldErrors[field.name]} formConfig={schema.form} />
   }
 
   return (

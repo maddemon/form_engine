@@ -90,13 +90,14 @@ interface DesignerProps {
   groups?: PaletteGroup[]
   excludeTypes?: string[]
   readOnly?: boolean
-  adapter: FormEngineAdapter
+  desktopAdapter?: FormEngineAdapter
+  mobileAdapter?: FormEngineAdapter
   panelWidths?: PanelWidths
   sidePanelTabs?: SidePanelTab[]
   propertyPanelTabs?: PropertyPanelTab[]
 }
 
-export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, adapter, panelWidths, sidePanelTabs, propertyPanelTabs }) => {
+export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, desktopAdapter, mobileAdapter, panelWidths, sidePanelTabs, propertyPanelTabs }) => {
   useEnsureDefaultTheme()
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
 
@@ -137,6 +138,12 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
   }, [state.schema, notifyChange])
 
   const selectedField = state.selectedFieldId ? findInTree(state.schema.fields, state.selectedFieldId) || null : null
+
+  // 根据 scene 选取画布 adapter；属性面板始终优先使用 desktopAdapter
+  const canvasAdapter = (desktopAdapter && mobileAdapter)
+    ? (scene === 'mobile' ? mobileAdapter : desktopAdapter)
+    : (desktopAdapter ?? mobileAdapter) as FormEngineAdapter
+  const widgetsAdapter = (desktopAdapter ?? mobileAdapter) as FormEngineAdapter
 
   const handleSelectField = useCallback((id: string | null) => {
     dispatch({ type: 'SELECT_FIELD', fieldId: id })
@@ -393,7 +400,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
         {/* 中间画布 */}
         <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-          <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form, adapter }}>
+          <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form, adapter: canvasAdapter, desktopAdapter: widgetsAdapter }}>
             <Canvas fields={state.schema.fields} activeId={activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} />
           </DesignerContext.Provider>
         </div>
@@ -423,8 +430,8 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       </DndContext>
 
       {/* 右侧属性面板 */}
-      <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form, adapter }}>
-        <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} designerWidgets={adapter?.designerWidgets} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
+      <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form, adapter: canvasAdapter, desktopAdapter: widgetsAdapter }}>
+        <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} designerWidgets={widgetsAdapter?.designerWidgets} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
       </DesignerContext.Provider>
     </div>
   )

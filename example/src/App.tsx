@@ -264,7 +264,7 @@ const App: React.FC = () => {
           >
             <AntdBridgeProvider>
               {tab === 'design' ? (
-                <Designer schema={schema} onSchemaChange={setSchema} adapter={antdAdapter} panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }} excludeTypes={['date-range']} sidePanelTabs={sidePanelTabs} propertyPanelTabs={propertyPanelTabs} />
+                <Designer schema={schema} onSchemaChange={setSchema} desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }} excludeTypes={['date-range']} sidePanelTabs={sidePanelTabs} propertyPanelTabs={propertyPanelTabs} />
               ) : (
                 <div style={{ height: '100%', overflow: 'auto', padding: 32, background: isDark ? '#1f1f1f' : '#f5f5f5' }}>
                   <PreviewFrame scene={previewScene} isDark={isDark}>
@@ -272,7 +272,7 @@ const App: React.FC = () => {
                       <div style={{ textAlign: 'center', color: isDark ? '#888' : '#999', padding: 64 }}>暂无字段，请切换到「设计」Tab 添加字段</div>
                     ) : (
                       <AntdMobileBridgeProvider key="mobile">
-                        <FormRender schema={schema} onSubmit={handleSubmit} onChange={handleChange} adapter={previewScene === 'mobile' ? antdMobileAdapter : antdAdapter} />
+                        <FormRender schema={schema} onSubmit={handleSubmit} onChange={handleChange} desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} scene={previewScene} />
                       </AntdMobileBridgeProvider>
                     )}
                   </PreviewFrame>

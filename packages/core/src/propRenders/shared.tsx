@@ -64,8 +64,8 @@ export const OptionRender: React.FC<{
     <div>
       {options.map((opt, idx) => (
         <div key={idx} style={{ display: 'flex', gap: token('spacingXs'), marginBottom: token('spacingXs'), alignItems: 'center' }}>
-          <input value={opt.label} onChange={(e) => handleChange(idx, 'label', e.target.value)} placeholder="标签" style={{ flex: 1, padding: '2px 6px', border: '1px solid var(--fe-border-primary)', borderRadius: 'var(--fe-border-radius-sm)', fontSize: token('fontSizeSm') }} />
-          <input value={opt.value as string} onChange={(e) => handleChange(idx, 'value', e.target.value)} placeholder="值" style={{ flex: 1, padding: '2px 6px', border: '1px solid var(--fe-border-primary)', borderRadius: 'var(--fe-border-radius-sm)', fontSize: token('fontSizeSm') }} />
+          <input value={opt.label} onChange={(e) => handleChange(idx, 'label', e.target.value)} placeholder="标签" style={{ flex: 1, padding: '1px 6px', border: '1px solid var(--fe-border-primary)', borderRadius: 'var(--fe-border-radius-sm)', fontSize: token('fontSizeSm'), lineHeight: '18px', boxSizing: 'border-box' }} />
+          <input value={opt.value as string} onChange={(e) => handleChange(idx, 'value', e.target.value)} placeholder="值" style={{ flex: 1, padding: '1px 6px', border: '1px solid var(--fe-border-primary)', borderRadius: 'var(--fe-border-radius-sm)', fontSize: token('fontSizeSm'), lineHeight: '18px', boxSizing: 'border-box' }} />
           <button
             onClick={() => handleRemove(idx)}
             style={{
@@ -76,6 +76,7 @@ export const OptionRender: React.FC<{
               color: 'var(--fe-error)',
               cursor: 'pointer',
               fontSize: token('fontSizeSm'),
+              lineHeight: '18px',
             }}
           >
             ✕
@@ -85,12 +86,13 @@ export const OptionRender: React.FC<{
       <button
         onClick={handleAdd}
         style={{
-          padding: '4px 8px',
+          padding: '2px 6px',
           border: '1px dashed var(--fe-border-primary)',
           borderRadius: 'var(--fe-border-radius-sm)',
           background: 'var(--fe-bg-primary)',
           cursor: 'pointer',
           fontSize: token('fontSizeSm'),
+          lineHeight: '18px',
           width: '100%',
         }}
       >

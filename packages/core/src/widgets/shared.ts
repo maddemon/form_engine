@@ -3,13 +3,13 @@ import { useStyle } from '../styles'
 
 export const BASE_STYLE: React.CSSProperties = {
   width: '100%',
-  padding: '3px 8px',
+  padding: '1px 6px',
   borderRadius: 'var(--fe-border-radius-sm)',
   borderWidth: 1,
   borderStyle: 'solid',
   borderColor: 'var(--fe-border-primary)',
   fontSize: 'var(--fe-font-size-sm)',
-  lineHeight: '20px',
+  lineHeight: '18px',
   outline: 'none',
   boxSizing: 'border-box',
   background: 'var(--fe-bg-primary)',

@@ -23,9 +23,9 @@ export const WidgetButtonGroup: React.FC<{
             onClick={() => onChange?.(opt.value)}
             style={{
               flex: 1,
-              padding: '3px 8px',
+              padding: '1px 6px',
               fontSize: token('fontSizeSm') as string,
-              lineHeight: '20px',
+              lineHeight: '18px',
               borderWidth: 1,
               borderStyle: 'solid',
               borderColor: isActive ? token('primary') as string : token('borderPrimary') as string,

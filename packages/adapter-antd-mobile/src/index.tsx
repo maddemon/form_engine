@@ -72,7 +72,7 @@ const designerWidgets: import('@form-engine/core/types/adapter').DesignerWidgets
       onChange={v => onChange?.(v)}
       placeholder={placeholder}
       disabled={disabled}
-      style={{ width: '100%', ...style }}
+      style={{ width: '100%', fontSize: 13, ...style }}
     />
   ),
   Select: ({ value, onChange, options, disabled, style }: any) => (
@@ -85,7 +85,8 @@ const designerWidgets: import('@form-engine/core/types/adapter').DesignerWidgets
         <Button
           onClick={actions.open}
           disabled={disabled}
-          style={{ width: '100%', textAlign: 'left', color: value ? undefined : '#999', ...style }}
+          size="small"
+          style={{ width: '100%', textAlign: 'left', color: value ? undefined : '#999', fontSize: 13, padding: '2px 8px', minHeight: 24, ...style }}
         >
           {value ? options?.find((o: any) => o.value === value)?.label || value : '请选择'}
         </Button>
@@ -150,12 +151,12 @@ const designerWidgets: import('@form-engine/core/types/adapter').DesignerWidgets
       min={min}
       max={max}
       disabled={disabled}
-      style={{ width: '100%', ...style }}
+      style={{ width: '100%', fontSize: 13, ...style }}
     />
   ),
   ButtonGroup: ({ value, onChange, options, disabled, style }: any) => (
-    <div style={{ display: 'inline-flex', borderRadius: 6, overflow: 'hidden', border: '1px solid var(--fe-border-primary, #d9d9d9)', ...style }}>
-      {options?.map((opt: any) => {
+    <div style={{ display: 'inline-flex', borderRadius: 4, overflow: 'hidden', border: '1px solid var(--fe-border-primary, #d9d9d9)', ...style }}>
+      {options?.map((opt: any, idx: number, arr: any[]) => {
         const active = value === opt.value
         return (
           <button
@@ -165,13 +166,14 @@ const designerWidgets: import('@form-engine/core/types/adapter').DesignerWidgets
             onClick={() => !disabled && onChange?.(opt.value)}
             style={{
               flex: 1,
-              padding: '3px 10px',
+              padding: '1px 6px',
               border: 'none',
-              borderRight: '1px solid var(--fe-border-primary, #d9d9d9)',
+              borderRight: idx < arr.length - 1 ? '1px solid var(--fe-border-primary, #d9d9d9)' : 'none',
               background: active ? 'var(--fe-primary, #1677ff)' : 'var(--fe-bg-primary, #fff)',
               color: active ? '#fff' : 'var(--fe-text-primary, #333)',
               cursor: disabled ? 'not-allowed' : 'pointer',
               fontSize: 12,
+              lineHeight: '20px',
               fontWeight: active ? 500 : 400,
               outline: 'none',
               transition: 'background 0.15s, color 0.15s',

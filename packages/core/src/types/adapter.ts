@@ -78,13 +78,12 @@ export interface PropEditorConfig {
  * import { antdAdapter } from '@form-engine/adapter-antd'
  * import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
  *
- * // 设计/预览：手动切换场景
- * <Designer adapter={scene === 'mobile' ? antdMobileAdapter : antdAdapter} />
- * <FormRender adapter={scene === 'mobile' ? antdMobileAdapter : antdAdapter} />
+ * // 设计/预览：传两个 adapter，框架按 scene 自动切换
+ * <Designer desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} />
+ * <FormRender desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} scene={scene} />
  *
- * // 运行时：自动检测设备
- * const adapter = useAdaptiveAdapter(antdAdapter, antdMobileAdapter)
- * <FormRender adapter={adapter} />
+ * // 只传一个时，无论 scene 都使用它
+ * <Designer desktopAdapter={antdAdapter} />
  * ```
  */
 export interface FormEngineAdapter {

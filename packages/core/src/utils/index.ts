@@ -1,4 +1,5 @@
 export { genId } from './id'
+export { pickAdapter } from './adapterResolver'
 
 /**
  * 工具函数：深层获取对象属性

@@ -9,7 +9,10 @@ export interface DesignerContextValue {
   onSelectField: (id: string | null) => void
   scene: DeviceScene
   formConfig: FormConfig
+  /** 画布 adapter（跟随 scene 切换） */
   adapter: FormEngineAdapter
+  /** 属性面板 widgets 所用的 desktop adapter（始终优先 desktop） */
+  desktopAdapter: FormEngineAdapter
 }
 
 const DesignerContext = createContext<DesignerContextValue | null>(null)

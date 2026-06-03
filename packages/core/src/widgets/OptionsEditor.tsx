@@ -29,8 +29,8 @@ export const WidgetOptionsEditor: React.FC<{
     <div style={{ ...style }}>
       {options.map((opt, idx) => (
         <div key={idx} style={{ display: 'flex', gap: token('spacingXs'), marginBottom: token('spacingXs'), alignItems: 'center' }}>
-          <input type="text" value={opt.label} placeholder="标签" onChange={e => update(idx, { label: e.target.value })} disabled={disabled} style={{ ...BASE_STYLE, flex: 1 }} />
-          <input type="text" value={opt.value} placeholder="值" onChange={e => update(idx, { value: e.target.value })} disabled={disabled} style={{ ...BASE_STYLE, flex: 1 }} />
+          <input type="text" value={opt.label} placeholder="标签" onChange={e => update(idx, { label: e.target.value })} disabled={disabled} style={{ ...BASE_STYLE, flex: 1, lineHeight: '18px' }} />
+          <input type="text" value={opt.value} placeholder="值" onChange={e => update(idx, { value: e.target.value })} disabled={disabled} style={{ ...BASE_STYLE, flex: 1, lineHeight: '18px' }} />
           <button onClick={() => remove(idx)} disabled={disabled} style={{ border: 'none', background: 'none', color: token('error') as string, cursor: disabled ? 'not-allowed' : 'pointer', fontSize: token('fontSizeLg'), padding: `0 ${token('spacingXs')}` }}>×</button>
         </div>
       ))}

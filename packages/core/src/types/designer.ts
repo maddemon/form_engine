@@ -105,8 +105,16 @@ export interface DesignerProps {
   excludeTypes?: string[]
   /** 可选：只读模式 */
   readOnly?: boolean
-  /** 可选：当前平台适配器，用于设计器属性面板风格统一 */
-  adapter?: FormEngineAdapter
+  /** 可选：桌面端适配器 */
+  desktopAdapter?: FormEngineAdapter
+  /**
+   * 可选：移动端适配器
+   *
+   * 同时传 desktopAdapter + mobileAdapter 时，框架根据当前 scene 自动切换画布渲染；
+   * 属性面板 widgets 始终优先使用 desktopAdapter。
+   * 只传一个时，无论 scene 都使用它。
+   */
+  mobileAdapter?: FormEngineAdapter
   /**
    * 可选：左侧面板扩展 Tab（有值时自动切换为 Tabs 布局）
    * 竖向 icon-only Tabs，第一个 Tab 固定为组件库
