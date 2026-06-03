@@ -153,17 +153,19 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
 
       <CollapsibleSection title="高级属性" defaultCollapsed={true} forceExpand={hasAdvanced}>
         {isForm && (
-          <FieldItem label="列宽">
-            <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
-          </FieldItem>
+          <>
+            <FieldItem label="列宽">
+              <w.NumberInput value={field.colSpan || 24} onChange={(v: number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } })} min={1} max={24} />
+            </FieldItem>
+            <RulesEditor field={field} widgets={w} dispatch={dispatch} />
+            <FieldItem label="禁用">
+              <w.Switch checked={!!field.disabled} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { disabled: v } })} />
+            </FieldItem>
+            <FieldItem label="只读">
+              <w.Switch checked={!!field.readOnly} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { readOnly: v } })} />
+            </FieldItem>
+          </>
         )}
-        {isForm && <RulesEditor field={field} widgets={w} dispatch={dispatch} />}
-        <FieldItem label="禁用">
-          <w.Switch checked={!!field.disabled} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { disabled: v } })} />
-        </FieldItem>
-        <FieldItem label="只读">
-          <w.Switch checked={!!field.readOnly} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { readOnly: v } })} />
-        </FieldItem>
 
         <FieldItem label="是否隐藏">
           <w.Input value={typeof field.hidden === 'string' ? field.hidden : ''} onChange={(v: string | number) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } })} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />

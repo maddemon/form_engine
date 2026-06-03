@@ -75,6 +75,9 @@ importers:
 
   packages/adapter-antd:
     dependencies:
+      '@ant-design/icons':
+        specifier: ^6.2.3
+        version: 6.2.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@form-engine/core':
         specifier: workspace:*
         version: link:../core

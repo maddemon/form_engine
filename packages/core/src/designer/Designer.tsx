@@ -9,7 +9,7 @@ import type { FormEngineAdapter } from '../types/adapter'
 import { isContainerComponent } from '../types/component-category'
 import type { PaletteGroup, PanelWidths, SidePanelTab, PropertyPanelTab } from '../types/designer'
 import { isPaletteDrag, toPaletteItem, type DesignerDragData } from '../types/designer-drag'
-import type { FormFieldSchema, FormSchema } from '../types/schema'
+import { DEFAULT_FORM_CONFIG, type FormFieldSchema, type FormSchema } from '../types/schema'
 import { Canvas, CANVAS_ROOT_ID, CANVAS_ROOT_HEAD_ID } from './Canvas'
 import { DesignerContext } from './DesignerContext'
 import { createFieldFromPalette, FieldList, getFullPaletteGroups } from './FieldList'
@@ -107,7 +107,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       version: '0.1',
       name: '未命名表单',
       fields: [],
-      form: { layout: 'vertical', size: 'middle' },
+      form: { ...DEFAULT_FORM_CONFIG },
       submit: { text: '提交', showReset: true, resetText: '重置' },
     },
     selectedFieldId: null,
@@ -429,7 +429,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
         {/* 中间画布 */}
         <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-          <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene }}>
+          <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form }}>
             <Canvas fields={state.schema.fields} activeId={activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} />
           </DesignerContext.Provider>
         </div>
@@ -459,7 +459,9 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       </DndContext>
 
       {/* 右侧属性面板 */}
-      <PropertyPanel field={selectedField} formConfig={state.schema.form || { layout: 'vertical', size: 'middle' }} dispatch={dispatch} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
+      <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form }}>
+        <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
+      </DesignerContext.Provider>
     </div>
   )
 }

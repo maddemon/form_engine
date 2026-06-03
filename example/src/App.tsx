@@ -120,7 +120,7 @@ const App: React.FC = () => {
     version: '0.1',
     name: '未命名表单',
     fields: [],
-    form: { layout: 'vertical', size: 'middle' },
+    form: { layout: 'vertical', size: 'middle', labelAlign: 'right', labelCol: { span: 5 }, wrapperCol: { span: 15 }, colon: false },
     submit: { text: '提交', showReset: true, resetText: '重置' },
   })
 

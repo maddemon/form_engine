@@ -1,14 +1,14 @@
 import React from 'react'
 import { Button } from 'antd'
-import { getAdapter } from '@form-engine/core'
+import { getAdapter, useFieldSchema } from '@form-engine/core'
 import type { FieldComponentProps, TableColumnConfig } from '@form-engine/core'
 
 export const Table: React.FC<FieldComponentProps> = ({
   value = [],
   onChange,
-  fieldSchema,
   ...rest
 }) => {
+  const fieldSchema = useFieldSchema()
   const adapter = getAdapter()
   const children = fieldSchema?.children || []
   const columns = (fieldSchema?.componentProps?.columns || []) as TableColumnConfig[]

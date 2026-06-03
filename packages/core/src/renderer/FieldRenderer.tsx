@@ -1,12 +1,13 @@
 import React from 'react'
-import type { FormFieldSchema, OptionItem } from '../types/schema'
-import type { FormEngineAdapter } from '../types/adapter'
-import type { $Self, ResolvedEventHandler } from '../types/events'
-import { matchVisibleWhen, evalExpr } from '../utils'
-import { resolveEvents, type EventContext } from '../events'
 import { getEventDeclarations } from '../components'
+import { resolveEvents, type EventContext } from '../events'
 import { useStyle } from '../styles'
+import type { FormEngineAdapter } from '../types/adapter'
 import { isFormComponent } from '../types/component-category'
+import type { $Self, ResolvedEventHandler } from '../types/events'
+import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
+import { evalExpr, matchVisibleWhen } from '../utils'
+import { FieldSchemaContext } from './FieldSchemaContext'
 
 export interface FieldRendererProps {
   field: FormFieldSchema
@@ -23,6 +24,8 @@ export interface FieldRendererProps {
   eventContext?: EventContext
   /** 校验错误信息（由 FormRender 的 fieldErrors 注入） */
   errors?: string[]
+  /** 已解析的表单全局配置（labelCol/wrapperCol 保证存在） */
+  formConfig: FormConfig
 }
 
 /**
@@ -36,54 +39,33 @@ export interface FieldRendererProps {
  * 事件合并优先级（后写覆盖前写）：
  * 内置 props < componentProps < 事件处理器（events 解析结果）
  */
-export function FieldRenderer({
-  field,
-  value,
-  onChange,
-  options,
-  disabled,
-  adapter,
-  components = {},
-  eventContext,
-  errors,
-}: FieldRendererProps) {
+export function FieldRenderer({ field, value, onChange, options, disabled, adapter, components = {}, eventContext, errors, formConfig }: FieldRendererProps) {
   const { token } = useStyle()
 
   // 判断是否禁用
-  const isDisabled = disabled ||
-    (typeof field.disabled === 'string'
-      ? !!evalExpr(field.disabled, { ...({} as Record<string, unknown>), [field.name]: value })
-      : false) ||
-    (field.disabledIfExpr
-      ? !!evalExpr(field.disabledIfExpr, { ...({} as Record<string, unknown>), [field.name]: value })
-      : false)
+  const isDisabled = disabled || (typeof field.disabled === 'string' ? !!evalExpr(field.disabled, { ...({} as Record<string, unknown>), [field.name]: value }) : false) || (field.disabledIfExpr ? !!evalExpr(field.disabledIfExpr, { ...({} as Record<string, unknown>), [field.name]: value }) : false)
 
   // 判断是否必填
-  const isRequired =
-    field.rules?.some(r => r.required) ||
-    (field.requiredIfExpr
-      ? !!evalExpr(field.requiredIfExpr, { ...({} as Record<string, unknown>), [field.name]: value })
-      : false) ||
-    (field.requiredWhen ? matchVisibleWhen(field.requiredWhen, { [field.name]: value } as Record<string, unknown>) : false)
+  const isRequired = field.rules?.some((r) => r.required) || (field.requiredIfExpr ? !!evalExpr(field.requiredIfExpr, { ...({} as Record<string, unknown>), [field.name]: value }) : false) || (field.requiredWhen ? matchVisibleWhen(field.requiredWhen, { [field.name]: value } as Record<string, unknown>) : false)
 
   // label 渲染（仅表单组件显示 label）
   const showLabel = isFormComponent(field.type) && field.label
+  const colon = formConfig.colon
+  const labelText = field.label + (colon ? '：' : '')
   const label = !showLabel ? null : (
     <label className="fe-field-label" style={{ display: 'block', marginBottom: 'var(--fe-spacing-xs, 4px)', fontWeight: isRequired ? 'var(--fe-font-weight-semibold, 600)' : 'var(--fe-font-weight-regular, 400)' }}>
       {isRequired && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
-      {field.label}
+      {labelText}
       {field.tooltip && (
-        <span title={field.tooltip} style={{ marginLeft: 'var(--fe-spacing-xs, 4px)', cursor: 'help', color: token('textTertiary') as string }}>?</span>
+        <span title={field.tooltip} style={{ marginLeft: 'var(--fe-spacing-xs, 4px)', cursor: 'help', color: token('textTertiary') as string }}>
+          ?
+        </span>
       )}
     </label>
   )
 
   // 通用 props
-  const resolvedOptions: OptionItem[] =
-    field.mock?.options?.length ? field.mock.options as OptionItem[] :
-    options.length ? options :
-    field.dataSource?.type === 'static' ? field.dataSource.static.options :
-    []
+  const resolvedOptions: OptionItem[] = field.mock?.options?.length ? (field.mock.options as OptionItem[]) : options.length ? options : field.dataSource?.type === 'static' ? field.dataSource.static.options : []
 
   // 解析事件处理器
   const $self: $Self = {
@@ -96,22 +78,14 @@ export function FieldRenderer({
       placeholder: field.placeholder,
     },
   }
-  const eventHandlers: Record<string, ResolvedEventHandler> = eventContext
-    ? resolveEvents(
-        field.events,
-        $self,
-        eventContext.$form,
-        eventContext.callbacks,
-        getEventDeclarations(field.type),
-      )
-    : {}
+  const eventHandlers: Record<string, ResolvedEventHandler> = eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}
 
   // onChange 包装：先更新当前字段值，再执行用户事件
   // 这样无论用户配置的是 expression / action / callback，
   // 当前字段的 formValues 都会被同步更新
   const handleChange = (newValue: unknown) => {
-    onChange(newValue)                          // ① 始终写入 formValues
-    eventHandlers.onChange?.(newValue)          // ② 再执行用户事件
+    onChange(newValue) // ① 始终写入 formValues
+    eventHandlers.onChange?.(newValue) // ② 再执行用户事件
   }
 
   const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
@@ -128,8 +102,8 @@ export function FieldRenderer({
     rules: field.rules,
     validateStatus: errorMsg ? 'error' : undefined,
     help: errorMsg,
-    ...field.componentProps,            // ③ 透传（优先级：内置 < componentProps）
-    ...eventHandlers,                   // ④ 事件处理器最后 spread，最高优先级
+    ...field.componentProps, // ③ 透传（优先级：内置 < componentProps）
+    ...eventHandlers, // ④ 事件处理器最后 spread，最高优先级
   }
 
   /**
@@ -143,26 +117,35 @@ export function FieldRenderer({
     // 3. 兜底
     (adapter as any)['default']
 
-  if (!renderFn) {
+  const { labelCol, wrapperCol } = formConfig
+  const labelColSpan = labelCol.span
+  const wrapperColSpan = wrapperCol.span
+  const isHorizontal = !(labelColSpan === 24 && wrapperColSpan === 24)
+
+  const fieldContent = (
+    <>
+      {!renderFn ? <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>未知字段类型: {field.type}</div> : (
+        <FieldSchemaContext.Provider value={field}>
+          {renderFn(fieldProps)}
+        </FieldSchemaContext.Provider>
+      )}
+      {errorMsg && <div style={{ color: token('error') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{errorMsg}</div>}
+    </>
+  )
+
+  if (!showLabel || !isHorizontal) {
     return (
-      <div className="fe-field" style={{ padding: `${token('spacingSm')} 0`, color: token('textTertiary') as string }}>
+      <div className="fe-field" style={!renderFn ? { padding: `${token('spacingSm')} 0`, color: token('textTertiary') as string } : undefined}>
         {label}
-        <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>
-          未知字段类型: {field.type}
-        </div>
+        {fieldContent}
       </div>
     )
   }
 
   return (
-    <div className="fe-field">
-      {label}
-      {renderFn(fieldProps)}
-      {errorMsg && (
-        <div style={{ color: token('error') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>
-          {errorMsg}
-        </div>
-      )}
+    <div className="fe-field" style={{ display: 'flex', gap: token('spacingSm'), alignItems: 'flex-start' }}>
+      <div style={{ width: `${(labelColSpan / 24) * 100}%`, flexShrink: 0, textAlign: (formConfig.labelAlign || 'right') as 'left' | 'right' }}>{label}</div>
+      <div style={{ width: `${(wrapperColSpan / 24) * 100}%` }}>{fieldContent}</div>
     </div>
   )
 }

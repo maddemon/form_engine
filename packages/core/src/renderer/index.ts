@@ -1,4 +1,5 @@
 export { FormRender } from './FormRender'
 export { FieldRenderer } from './FieldRenderer'
 export { default as defaultAdapter } from './defaultAdapter'
+export { FieldSchemaContext, useFieldSchema } from './FieldSchemaContext'
 export type { FormRenderProps } from './FormRender'

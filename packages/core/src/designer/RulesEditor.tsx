@@ -42,7 +42,7 @@ export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
   )
 
   return (
-    <div style={{ borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm'), marginTop: token('spacingSm') }}>
+    <>
       <div style={{ fontSize: token('fontSizeSm'), fontWeight: 500, marginBottom: token('spacingSm') }}>校验规则</div>
       <FieldItem label="必填">
         <w.Switch checked={!!rule.required} onChange={(v: boolean) => updateRule({ required: v || undefined })} />
@@ -56,6 +56,6 @@ export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
       <FieldItem label="常用正则预设">
         <w.Select value={COMMON_PATTERNS.some((p) => p.value === rule.pattern) ? rule.pattern || '' : ''} onChange={handlePatternSelect} options={COMMON_PATTERNS} />
       </FieldItem>
-    </div>
+    </>
   )
 }

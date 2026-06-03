@@ -7,7 +7,7 @@ export interface UploadProps extends BaseFormComponentProps<string[] | undefined
   action?: string
   accept?: string
   maxCount?: number
-  listType?: 'text' | 'picture' | 'picture-card'
+  listType?: 'text' | 'picture-card'
   multiple?: boolean
   directory?: boolean
   showUploadList?: boolean

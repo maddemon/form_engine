@@ -16,7 +16,7 @@ interface NestedFieldProps {
 }
 
 export const NestedField: React.FC<NestedFieldProps> = ({ field, parentContainerId, childIndex }) => {
-  const { selectedFieldId } = useDesignerContext()
+  const { selectedFieldId, formConfig } = useDesignerContext()
   const isContainer = isContainerComponent(field.type)
 
   const {
@@ -30,7 +30,7 @@ export const NestedField: React.FC<NestedFieldProps> = ({ field, parentContainer
 
   const content = isContainer
     ? <ContainerPreview field={field} />
-    : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={defaultAdapter} />
+    : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={defaultAdapter} formConfig={formConfig} />
 
   return (
     <FieldItem

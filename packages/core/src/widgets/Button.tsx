@@ -13,7 +13,9 @@ export const WidgetButton: React.FC<{
   const base: React.CSSProperties = {
     padding: '3px 12px',
     borderRadius: token('borderRadiusSm') as string,
-    border: `1px solid ${token('borderPrimary') as string}`,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: token('borderPrimary') as string,
     fontSize: token('fontSizeSm') as string,
     lineHeight: '20px',
     cursor: disabled ? 'not-allowed' : 'pointer',

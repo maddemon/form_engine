@@ -122,8 +122,8 @@ export const antdComponents = {
 
 function createFieldRenderer(Component: React.ComponentType<any>): FieldRendererFn {
   return (props: FieldComponentProps) => {
-    const { value, onChange, fieldSchema, ...rest } = props
-    return React.createElement(Component, { ...rest, value, onChange, fieldSchema })
+    const { value, onChange, fieldSchema: _fs, validateStatus, help, rules, ...rest } = props
+    return React.createElement(Component, { ...rest, value, onChange })
   }
 }
 

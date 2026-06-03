@@ -26,7 +26,7 @@ export default function FlexPropsRender({ widgets: w, values, onChange }: PropsR
   return (
     <>
       <FieldItem label="方向">
-        <w.ButtonGroup
+        <w.Select
           value={(values.direction as string) ?? 'row'}
           onChange={(v) => onChange('direction', v)}
           options={[

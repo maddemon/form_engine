@@ -14,7 +14,7 @@ interface RootFieldsProps {
 }
 
 const SortableField: React.FC<{ field: FormFieldSchema }> = ({ field }) => {
-  const { selectedFieldId } = useDesignerContext()
+  const { selectedFieldId, formConfig } = useDesignerContext()
   const {
     attributes, listeners, setNodeRef, setActivatorNodeRef,
     transform, transition, isDragging,
@@ -40,7 +40,7 @@ const SortableField: React.FC<{ field: FormFieldSchema }> = ({ field }) => {
       {isContainerComponent(field.type) ? (
         <ContainerPreview field={field} />
       ) : (
-        <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={defaultAdapter} />
+        <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={defaultAdapter} formConfig={formConfig} />
       )}
     </FieldItem>
   )

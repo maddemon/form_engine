@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import type { FormFieldSchema, FormSchema, OptionItem } from '../types/schema'
+
 import type { FormEngineAdapter } from '../types/adapter'
 import type { DataSourceResolver, CustomComponents } from '../types/render'
 import type { $Form } from '../types/events'
@@ -304,6 +305,7 @@ export const FormRender: React.FC<FormRenderProps> = ({
         components={components}
         eventContext={eventContext}
         errors={fieldErrors[field.name]}
+        formConfig={schema.form}
       />
     )
   }

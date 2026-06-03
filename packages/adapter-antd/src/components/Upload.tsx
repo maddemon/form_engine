@@ -1,17 +1,8 @@
-/**
- * Antd Upload 组件
- * 适配 Form Engine 的 UploadProps
- */
-
 import React from 'react'
-import { Upload as AntUpload } from 'antd'
+import { Upload as AntUpload, Button } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
 import type { UploadProps, UploadFile } from '@form-engine/core'
 
-const { Dragger } = AntUpload
-
-/**
- * Upload 组件
- */
 export const Upload: React.FC<UploadProps> = ({
   value,
   onChange,
@@ -19,13 +10,14 @@ export const Upload: React.FC<UploadProps> = ({
   accept,
   maxCount,
   listType = 'text',
-  multiple,
+  multiple = (maxCount ?? 1) > 1,
   directory,
   showUploadList = true,
   disabled,
   style,
   className,
   id,
+  children,
   ...rest
 }) => {
   const handleChange = (info: any) => {
@@ -40,16 +32,18 @@ export const Upload: React.FC<UploadProps> = ({
     }))
     onChange?.(fileList)
   }
-  
+
+  const isCard = listType === 'picture-card'
+
   return (
     <AntUpload
       action={action}
       accept={accept}
       maxCount={maxCount}
-      listType={listType}
+      listType={isCard ? 'picture-card' : 'text'}
       multiple={multiple}
       directory={directory}
-      showUploadList={showUploadList}
+      showUploadList={isCard || showUploadList}
       disabled={disabled}
       style={style}
       className={className}
@@ -57,7 +51,24 @@ export const Upload: React.FC<UploadProps> = ({
       onChange={handleChange}
       {...rest}
     >
-      {rest.children}
+      {children || (isCard ? (
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 32,
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            color: 'var(--fe-text-tertiary, #999)',
+          }}
+        >
+          +
+        </div>
+      ) : (
+        <Button disabled={disabled} icon={<UploadOutlined />}>上传文件</Button>
+      ))}
     </AntUpload>
   )
 }

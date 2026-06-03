@@ -130,7 +130,9 @@ export function createButtonStyle(
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.5 : 1,
     transition: 'all 0.2s',
-    border: `${theme.inputBorder}`,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: theme.borderPrimary,
   }
 
   if (danger) {

@@ -22,12 +22,11 @@ function findComponent(type: string): React.ComponentType<any> | null {
 
 function createRenderFn(Component: React.ComponentType<any>): FieldRendererFn {
   return (props: FieldComponentProps) => {
-    const { value, onChange, fieldSchema, ...rest } = props
+    const { value, onChange, fieldSchema: _fs, validateStatus, help, rules, ...rest } = props
     return React.createElement(Component, {
       ...rest,
       value,
       onChange,
-      fieldSchema,
     })
   }
 }

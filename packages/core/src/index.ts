@@ -215,6 +215,8 @@ export {
   FormRender,
   FieldRenderer,
   defaultAdapter,
+  FieldSchemaContext,
+  useFieldSchema,
 } from './renderer'
 
 // ============================
