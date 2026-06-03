@@ -152,6 +152,8 @@ export interface ThemeTokens {
   // ItemListEditor 物理尺寸
   itemListDragHandleWidth: string
   itemListDragHandleHeight: string
+  itemListDragHandleWidthLg: string
+  itemListDragHandleHeightLg: string
   itemListRemoveButtonSize: string
   itemListRemoveButtonPadding: string
 }
@@ -303,6 +305,8 @@ export const defaultTheme: ThemeTokens = {
   // ItemListEditor 物理尺寸
   itemListDragHandleWidth: '16px',
   itemListDragHandleHeight: '24px',
+  itemListDragHandleWidthLg: '20px',
+  itemListDragHandleHeightLg: '28px',
   itemListRemoveButtonSize: '18px',
   itemListRemoveButtonPadding: '0',
 }

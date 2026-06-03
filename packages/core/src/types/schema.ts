@@ -174,6 +174,11 @@ export interface FormConfig {
   disabled?: boolean
   autoComplete?: string
   requiredMark?: boolean
+  /** 页面背景色（desktop/mobile 分别配置） */
+  pageBackground?: {
+    desktop?: string
+    mobile?: string
+  }
   scenes?: {
     desktop?: { labelCol?: { span: number }; wrapperCol?: { span: number } }
     mobile?: { labelCol?: { span: number }; wrapperCol?: { span: number } }

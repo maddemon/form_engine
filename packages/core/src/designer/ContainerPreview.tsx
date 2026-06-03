@@ -9,10 +9,58 @@ import { RegionPreview } from './RegionPreview'
 import type { CollapsePanelConfig } from '../components/collapse/types'
 import type { TabPaneConfig } from '../components/tabs/types'
 import { useDesignerContext } from './DesignerContext'
+import { FieldRenderer } from '../renderer/FieldRenderer'
+
+function RegionDroppable({ parentId, regionKey, items, fieldId }: {
+  parentId: string
+  regionKey: string
+  items: FormFieldSchema[]
+  fieldId: string
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `${fieldId}__region_${regionKey}`,
+    data: { parentId, regionKey },
+  })
+  const { token } = useStyle()
+  const childIds = useMemo(() => items.map(c => c.id!), [items])
+
+  return (
+    <div ref={setNodeRef} style={{
+      minHeight: token('containerMinHeight'),
+      border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+      borderRadius: 'var(--fe-border-radius-sm)',
+      background: isOver ? 'var(--fe-primary-hover-bg)' : 'transparent',
+      transition: 'border-color 0.2s, background 0.2s',
+      padding: token('spacingXs'),
+    }}>
+      {items.length > 0 ? (
+        <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
+          {items.map((child, index) => (
+            <NestedField
+              key={child.id}
+              field={child}
+              parentContainerId={parentId}
+              childIndex={index}
+            />
+          ))}
+        </SortableContext>
+      ) : (
+        <div style={{
+          color: 'var(--fe-text-muted)',
+          fontSize: token('fontSizeXs'),
+          textAlign: 'center',
+          padding: token('spacingSm'),
+        }}>
+          拖拽组件到此处
+        </div>
+      )}
+    </div>
+  )
+}
 
 function ContainerContent({ field }: { field: FormFieldSchema }) {
   const { token } = useStyle()
-  const { scene } = useDesignerContext()
+  const { scene, formConfig, adapter } = useDesignerContext()
 
   // 通用容器
   if (!['grid', 'table', 'tabs', 'collapse'].includes(field.type)) {
@@ -169,17 +217,19 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
     }
 
     // Desktop：横向分列
+    const totalWidth = columns.reduce((sum, col) => sum + (col.width ?? 120), 0)
     return (
-      <div style={{ display: 'flex', padding: token('spacingXs') }}>
+      <div style={{ display: 'flex', width: '100%', padding: token('spacingXs') }}>
         {columns.map((col, idx) => {
           const colItems = field.children?.filter(c => (c.columnIndex ?? c.regionKey ? Number(c.regionKey ?? c.columnIndex) : idx) === idx) ?? []
+          const proportion = (col.width ?? 120) / totalWidth
           return (
             <RegionPreview
               key={col.id}
               parent={field}
               regionKey={String(idx)}
               items={colItems}
-              regionWidth={col.width != null ? `0 0 ${col.width}px` : undefined}
+              regionWidth={`${proportion} ${proportion} 0px`}
               regionLabel={col.label}
               labelBg="var(--fe-bg-tertiary)"
             />
@@ -189,7 +239,7 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
     )
   }
 
-  // Collapse：按 panels 分面板
+  // Collapse：按 panels 分面板（使用 FieldRenderer + 真实 antd Collapse）
   if (field.type === 'collapse') {
     const panels = ((field.componentProps?.panels as CollapsePanelConfig[]) ?? []).filter(Boolean)
     if (panels.length === 0) {
@@ -217,27 +267,34 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
       )
     }
 
+    const panelChildren = panels.map(panel => {
+      const items = field.children?.filter(c => c.regionKey === panel.key) ?? []
+      return React.createElement(
+        'div',
+        { key: panel.key, field: { regionKey: panel.key }, style: { display: 'contents' } as React.CSSProperties },
+        <RegionDroppable parentId={field.id!} regionKey={panel.key} items={items} fieldId={field.id!} />
+      )
+    })
+
+    const enhancedField: FormFieldSchema = {
+      ...field,
+      componentProps: { ...field.componentProps, children: panelChildren },
+    }
+
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--fe-spacing-xs)', padding: token('spacingXs') }}>{/* Collapse panels */}
-        {panels.map((panel, idx) => {
-          const panelItems = field.children?.filter(c => c.regionKey === panel.key) ?? []
-          return (
-            <RegionPreview
-              key={panel.id}
-              parent={field}
-              regionKey={panel.key}
-              items={panelItems}
-              regionWidth="100%"
-              regionLabel={panel.header}
-              labelBg="var(--fe-bg-tertiary)"
-            />
-          )
-        })}
-      </div>
+      <FieldRenderer
+        field={enhancedField}
+        value={undefined}
+        onChange={() => {}}
+        options={[]}
+        disabled={false}
+        adapter={adapter}
+        formConfig={formConfig}
+      />
     )
   }
 
-  // Tabs：按 tabs 分标签页
+  // Tabs：按 tabs 分标签页（使用 FieldRenderer + 真实 antd Tabs）
   if (field.type === 'tabs') {
     const tabs = ((field.componentProps?.tabs as TabPaneConfig[]) ?? []).filter(Boolean)
     if (tabs.length === 0) {
@@ -265,23 +322,30 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
       )
     }
 
+    const tabChildren = tabs.map(tab => {
+      const items = field.children?.filter(c => c.regionKey === tab.key) ?? []
+      return React.createElement(
+        'div',
+        { key: tab.key, field: { regionKey: tab.key }, style: { display: 'contents' } as React.CSSProperties },
+        <RegionDroppable parentId={field.id!} regionKey={tab.key} items={items} fieldId={field.id!} />
+      )
+    })
+
+    const enhancedField: FormFieldSchema = {
+      ...field,
+      componentProps: { ...field.componentProps, children: tabChildren },
+    }
+
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--fe-spacing-xs)', padding: token('spacingXs') }}>{/* Tabs */}
-        {tabs.map((tab, idx) => {
-          const tabItems = field.children?.filter(c => c.regionKey === tab.key) ?? []
-          return (
-            <RegionPreview
-              key={tab.id}
-              parent={field}
-              regionKey={tab.key}
-              items={tabItems}
-              regionWidth="100%"
-              regionLabel={tab.title}
-              labelBg="var(--fe-bg-tertiary)"
-            />
-          )
-        })}
-      </div>
+      <FieldRenderer
+        field={enhancedField}
+        value={undefined}
+        onChange={() => {}}
+        options={[]}
+        disabled={false}
+        adapter={adapter}
+        formConfig={formConfig}
+      />
     )
   }
 

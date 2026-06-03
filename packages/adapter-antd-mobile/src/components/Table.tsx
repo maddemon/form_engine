@@ -39,7 +39,38 @@ export const TableField: FieldRendererFn = (props: any) => {
   return (
     <div>
       {rows.map((row, rowIndex) => (
-        <Card key={rowIndex} style={{ marginBottom: 12 }}>
+        <Card key={rowIndex} style={{ marginBottom: 12, position: 'relative' }}>
+          {rowMode === 'dynamic' && !disabled && (
+            <button
+              type="button"
+              onClick={() => handleDeleteRow(rowIndex)}
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                width: 24,
+                height: 24,
+                borderRadius: '50%',
+                border: 'none',
+                background: 'rgba(255, 77, 79, 0.1)',
+                color: '#ff4d4f',
+                fontSize: 14,
+                lineHeight: '24px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+                zIndex: 1,
+              }}
+              title="删除"
+            >
+              <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+            </button>
+          )}
           {columnChildren.map((colChildren: any[], colIdx: number) => (
             <div key={colIdx}>
               {columns[colIdx] && <div style={{ fontSize: 13, fontWeight: 600, color: '#333', marginBottom: 6 }}>{columns[colIdx].label}</div>}
@@ -64,13 +95,6 @@ export const TableField: FieldRendererFn = (props: any) => {
               })}
             </div>
           ))}
-          {rowMode === 'dynamic' && !disabled && (
-            <div style={{ textAlign: 'right', marginTop: 4 }}>
-              <Button size="mini" color="danger" fill="none" onClick={() => handleDeleteRow(rowIndex)}>
-                删除
-              </Button>
-            </div>
-          )}
         </Card>
       ))}
       {rowMode === 'dynamic' && !disabled && (

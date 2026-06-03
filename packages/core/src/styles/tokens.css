@@ -292,6 +292,8 @@
   /* ItemListEditor 物理尺寸 */
   --fe-item-list-drag-handle-width: 16px;
   --fe-item-list-drag-handle-height: 24px;
+  --fe-item-list-drag-handle-width-lg: 20px;
+  --fe-item-list-drag-handle-height-lg: 28px;
   --fe-item-list-remove-button-size: 18px;
   --fe-item-list-remove-button-padding: 0;
 

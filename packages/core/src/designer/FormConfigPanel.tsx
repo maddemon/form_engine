@@ -48,12 +48,29 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
     }
   }
 
+  const handlePageBgChange = (v: string | number) => {
+    const val = String(v)
+    dispatch({
+      type: 'UPDATE_FORM_CONFIG',
+      patch: {
+        pageBackground: {
+          ...formConfig.pageBackground,
+          [isMobile ? 'mobile' : 'desktop']: val || undefined,
+        },
+      },
+    })
+  }
+
   const labelColSpan = isMobile
     ? (formConfig.scenes?.mobile?.labelCol?.span ?? 24)
     : (formConfig.labelCol?.span ?? 5)
   const wrapperColSpan = isMobile
     ? (formConfig.scenes?.mobile?.wrapperCol?.span ?? 24)
     : (formConfig.wrapperCol?.span ?? 15)
+
+  const pageBg = isMobile
+    ? (formConfig.pageBackground?.mobile ?? '')
+    : (formConfig.pageBackground?.desktop ?? '')
 
   return (
     <>
@@ -69,6 +86,24 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
           onChange={(v: string) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { labelAlign: v as 'left' | 'right' } })}
           options={LABEL_ALIGN_OPTIONS}
         />
+      </FieldItem>
+
+      <FieldItem label={isMobile ? '移动端页面背景色' : '桌面端页面背景色'}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
+          <div style={{
+            width: token('spacingXl'),
+            height: token('spacingXl'),
+            borderRadius: 'var(--fe-border-radius-sm)',
+            border: '1px solid var(--fe-border)',
+            background: pageBg || (isMobile ? 'var(--fe-bg-secondary)' : 'var(--fe-bg-primary)'),
+            flexShrink: 0,
+          }} />
+          <w.Input
+            value={pageBg}
+            onChange={handlePageBgChange}
+            placeholder={isMobile ? 'var(--fe-bg-secondary)' : 'var(--fe-bg-primary)'}
+          />
+        </div>
       </FieldItem>
 
       <div style={{ marginTop: token('spacingMd'), borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm') }}>

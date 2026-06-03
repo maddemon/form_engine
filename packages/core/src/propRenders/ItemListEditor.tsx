@@ -150,14 +150,16 @@ function ItemListEditorInner<T extends { id: string }>(
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    width: token('itemListDragHandleWidth'),
-    height: token('itemListDragHandleHeight'),
+    width: token('itemListDragHandleWidthLg'),
+    height: token('itemListDragHandleHeightLg'),
     cursor: disabled || !sortable ? 'default' : 'grab',
-    color: 'var(--fe-text-tertiary)',
-    fontSize: token('widgetInputFontSizeXxs'),
+    color: 'var(--fe-text-secondary)',
+    fontSize: token('fontSizeMd'),
     lineHeight: 1,
     userSelect: 'none',
     touchAction: 'none',
+    borderRadius: 'var(--fe-border-radius-sm)',
+    background: 'var(--fe-bg-tertiary)',
   }
 
   const inputBaseStyle: React.CSSProperties = {
@@ -313,15 +315,20 @@ function ItemListEditorInner<T extends { id: string }>(
             onClick={handleAdd}
             style={{
               width: '100%',
-              padding: '2px 0',
-              border: 'none',
+              padding: '4px 0',
+              border: '1px dashed var(--fe-primary)',
+              borderRadius: 'var(--fe-border-radius-sm)',
               background: 'transparent',
               cursor: disabled ? 'not-allowed' : 'pointer',
               fontSize: token('fontSizeXs'),
-              color: 'var(--fe-text-tertiary)',
+              fontWeight: 500,
+              color: 'var(--fe-primary)',
               opacity: disabled ? 0.4 : 1,
               textAlign: 'center',
+              transition: 'background 0.2s',
             }}
+            onMouseEnter={(e) => { if (!disabled) (e.currentTarget.style.background = 'var(--fe-primary-hover-bg)') }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
           >
             + {addLabel ?? '添加'}
           </button>

@@ -50,11 +50,17 @@ function buildTreeData(fields: FormFieldSchema[]): { id: string; label: string; 
 }
 
 export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange, canUndo = false, canRedo = false }) => {
-  const { dispatch, selectedFieldId, onSelectField, scene } = useDesignerContext()
+  const { dispatch, selectedFieldId, onSelectField, scene, formConfig } = useDesignerContext()
   const [showTree, setShowTree] = useState(false)
 
   const treeData = useMemo(() => buildTreeData(fields), [fields])
   const canvasWidth = scene === 'mobile' ? 375 : '100%'
+
+  // Page background: from formConfig, defaults differ by scene
+  const defaultBg = scene === 'mobile' ? 'var(--fe-bg-secondary)' : 'var(--fe-bg-primary)'
+  const pageBg = (scene === 'mobile'
+    ? formConfig.pageBackground?.mobile
+    : formConfig.pageBackground?.desktop) ?? defaultBg
 
   const { token } = useStyle()
 
@@ -91,7 +97,7 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
           style={{
             width: canvasWidth,
             maxWidth: '100%',
-            background: 'var(--fe-bg-primary)',
+            background: pageBg,
             borderRadius: 'var(--fe-border-radius-md)',
             padding: token('spacingMd'),
             boxShadow: scene === 'mobile' ? 'var(--fe-shadow-sm)' : 'none',
