@@ -10,7 +10,6 @@ import type { $Form } from '../types/events'
 import type { DataSourceResolver } from '../types/render'
 import { evalExpr, matchVisibleWhen } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
-import defaultAdapter from './defaultAdapter'
 import { validateForm } from './validate'
 
 export interface FormRenderProps {
@@ -19,7 +18,7 @@ export interface FormRenderProps {
   onChange?: (values: Record<string, unknown>) => void
   dataSourceResolver?: DataSourceResolver
   components?: Record<string, (props: any) => React.ReactNode>
-  adapter?: FormEngineAdapter
+  adapter: FormEngineAdapter
   initialValues?: Record<string, unknown>
   loading?: boolean
   /**
@@ -35,7 +34,7 @@ export interface FormRenderProps {
  */
 const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChange, dataSourceResolver, components = {}, adapter = defaultAdapter, initialValues = {}, loading = false, callbacks = {} }) => {
+export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChange, dataSourceResolver, components = {}, adapter, initialValues = {}, loading = false, callbacks = {} }) => {
   useEnsureDefaultTheme()
   const { token } = useStyle()
   const [formValues, setFormValues] = useState<Record<string, unknown>>(initialValues)

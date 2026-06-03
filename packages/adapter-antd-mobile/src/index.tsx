@@ -1,6 +1,18 @@
-import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
-import type { DesignerWidgets, FieldRendererFn } from '@form-engine/core'
+/**
+ * Form Engine - Antd Mobile Adapter
+ *
+ * 纯对象适配器，无全局注册、无 Proxy、无副作用。
+ *
+ * 使用方式：
+ * ```tsx
+ * import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+ * import { FormRender } from '@form-engine/core'
+ *
+ * <FormRender schema={schema} adapter={antdMobileAdapter} />
+ * ```
+ */
 
+import type { FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
 import { Button, Checkbox, Input, Picker, Stepper } from 'antd-mobile'
 
 import { InputField } from './components/Input'
@@ -33,16 +45,24 @@ import { TableField } from './components/Table'
 // Theme Bridge
 export { AntdMobileBridgeProvider } from './themeBridge'
 
+// ============================
+// 兜底渲染
+// ============================
+
 const DefaultField: FieldRendererFn = (props: any) => {
   const { fieldSchema } = props
   return (
     <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>
-      未支持的字段类型：{fieldSchema.type}
+      未支持的字段类型：{fieldSchema?.type}
     </div>
   )
 }
 
-const designerWidgets: DesignerWidgets = {
+// ============================
+// 设计器属性面板小组件
+// ============================
+
+const designerWidgets: import('@form-engine/core/types/adapter').DesignerWidgets = {
   Input: ({ value, onChange, placeholder, disabled, style }: any) => (
     <Input
       value={value ?? ''}
@@ -87,90 +107,73 @@ const designerWidgets: DesignerWidgets = {
       style={{ width: '100%', ...style }}
     />
   ),
+  ButtonGroup: ({ value, onChange, options, disabled, style }: any) => (
+    <div style={{ display: 'flex', gap: 4, ...style }}>
+      {options?.map((opt: any) => (
+        <Button
+          key={opt.value}
+          size="mini"
+          color={value === opt.value ? 'primary' : 'default'}
+          disabled={disabled}
+          onClick={() => !disabled && onChange?.(opt.value)}
+        >
+          {opt.label}
+        </Button>
+      ))}
+    </div>
+  ),
 }
 
-export const antdMobileComponents = {
-  'Input': InputField,
-  'Password': PasswordField,
-  'Textarea': TextAreaField,
-  'TextArea': TextAreaField,
-  'InputNumber': InputNumberField,
-  'Select': SelectField,
-  'MultiSelect': SelectField,
-  'Radio': RadioField,
-  'RadioGroup': RadioField,
-  'Checkbox': CheckboxField,
-  'CheckboxGroup': CheckboxField,
-  'Switch': SwitchField,
-  'Slider': SliderField,
-  'Rate': RateField,
-  'DatePicker': DateField,
-  'DateRangePicker': DateRangeField,
-  'TimePicker': TimeField,
-  'Upload': UploadField,
-  'Grid': GridField,
-  'Flex': FlexField,
-  'Container': ContainerField,
-  'Collapse': CollapseField,
-  'Tabs': TabsField,
-  'Text': TextField,
-  'Image': ImageField,
-  'Divider': DividerField,
-  'Title': TitleField,
-  'Table': TableField,
-}
+// ============================
+// Adapter 定义
+// ============================
 
-export const antdMobileAdapter = {
+/**
+ * Antd Mobile Adapter — 移动端
+ *
+ * 纯对象，field.type → FieldRendererFn 的映射。
+ * 通过 adapter.components['input'] 查找组件。
+ */
+export const antdMobileAdapter: FormEngineAdapter = {
   name: 'antd-mobile',
-  version: '5.0.0',
+  scene: 'mobile',
 
-  'default': DefaultField,
-  'input': InputField,
-  'input-number': InputNumberField,
-  'textarea': TextAreaField,
-  'password': PasswordField,
-  'select': SelectField,
-  'multi-select': SelectField,
-  'radio': RadioField,
-  'checkbox': CheckboxField,
-  'switch': SwitchField,
-  'slider': SliderField,
-  'rate': RateField,
-  'date': DateField,
-  'datetime': DateField,
-  'date-range': DateRangeField,
-  'time': TimeField,
-  'upload': UploadField,
-  'cascader': CascaderField,
-  'tree-select': TreeSelectField,
-  'grid': GridField,
-  'flex': FlexField,
-  'container': ContainerField,
-  'collapse': CollapseField,
-  'tabs': TabsField,
-  'text': TextField,
-  'image': ImageField,
-  'divider': DividerField,
-  'title': TitleField,
-  'table': TableField,
+  components: {
+    // 表单组件
+    'input': InputField,
+    'password': PasswordField,
+    'textarea': TextAreaField,
+    'input-number': InputNumberField,
+    'select': SelectField,
+    'multi-select': SelectField,
+    'radio': RadioField,
+    'checkbox': CheckboxField,
+    'switch': SwitchField,
+    'slider': SliderField,
+    'rate': RateField,
+    'date': DateField,
+    'datetime': DateField,
+    'date-range': DateRangeField,
+    'time': TimeField,
+    'upload': UploadField,
+    'cascader': CascaderField,
+    'tree-select': TreeSelectField,
+    // 容器组件
+    'container': ContainerField,
+    'grid': GridField,
+    'flex': FlexField,
+    'collapse': CollapseField,
+    'tabs': TabsField,
+    'table': TableField,
+    // 展示组件
+    'text': TextField,
+    'image': ImageField,
+    'divider': DividerField,
+    'title': TitleField,
+  },
 
-  _designerWidgets: designerWidgets,
+  default: DefaultField,
+  designerWidgets,
 }
 
-function autoRegister() {
-  try {
-    if (registerComponents) {
-      registerComponents(antdMobileComponents as any, 'mobile')
-      console.log('[Form Engine] antd-mobile adapter 已自动注册 (mobile)')
-    }
-    if (registerDesignerWidgets) {
-      registerDesignerWidgets(designerWidgets as any, 'mobile')
-    }
-  } catch (e) {
-    console.warn('[Form Engine] 无法自动注册 antd-mobile adapter，请手动注册', e)
-  }
-}
-
-if (typeof window !== 'undefined') {
-  autoRegister()
-}
+export default antdMobileAdapter

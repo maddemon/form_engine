@@ -7,14 +7,13 @@ import { ContainerPreview } from './ContainerPreview'
 import { useDesignerContext } from './DesignerContext'
 import { isContainerComponent } from '../types/component-category'
 import { FieldRenderer } from '../renderer/FieldRenderer'
-import defaultAdapter from '../renderer/defaultAdapter'
 
 interface RootFieldsProps {
   fields: FormFieldSchema[]
 }
 
 const SortableField: React.FC<{ field: FormFieldSchema }> = ({ field }) => {
-  const { selectedFieldId, formConfig } = useDesignerContext()
+  const { selectedFieldId, formConfig, adapter } = useDesignerContext()
   const {
     attributes, listeners, setNodeRef, setActivatorNodeRef,
     transform, transition, isDragging,
@@ -40,7 +39,7 @@ const SortableField: React.FC<{ field: FormFieldSchema }> = ({ field }) => {
       {isContainerComponent(field.type) ? (
         <ContainerPreview field={field} />
       ) : (
-        <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={defaultAdapter} formConfig={formConfig} />
+        <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
       )}
     </FieldItem>
   )

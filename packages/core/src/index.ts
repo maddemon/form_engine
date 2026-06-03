@@ -1,28 +1,21 @@
 /**
  * Form Engine Core - 核心包入口
- * 
- * 功能：
- * 1. 提供标准组件 Props 类型定义
- * 2. 提供组件属性配置（用于属性面板）
- * 3. 提供 Schema 渲染器
- * 4. 提供 Adapter 注册机制
- * 5. 提供设计器
- * 
- * 重要：
- * - 必须安装 adapter 才能使用（不再提供 HTML 兜底）
- * - 支持 antd 和 antd-mobile 两个官方 adapter
- * 
+ *
  * 使用方式：
- * ```typescript
- * import { FormRender } from '@form-engine/react'
+ * ```tsx
+ * import { FormRender, useAdaptiveAdapter } from '@form-engine/core'
  * import { antdAdapter } from '@form-engine/adapter-antd'
- * 
- * // 注册 adapter
- * registerAdapter(antdAdapter)
- * 
- * function App() {
- *   return <FormRender schema={schema} />
- * }
+ * import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+ *
+ * // 方式1：显式指定 adapter
+ * <FormRender schema={schema} adapter={antdAdapter} />
+ *
+ * // 方式2：运行时自动检测设备
+ * const adapter = useAdaptiveAdapter(antdAdapter, antdMobileAdapter)
+ * <FormRender schema={schema} adapter={adapter} />
+ *
+ * // 方式3：设计/预览手动切换
+ * <FormRender adapter={scene === 'mobile' ? antdMobileAdapter : antdAdapter} />
  * ```
  */
 
@@ -106,10 +99,14 @@ export type {
   FormEngineAdapter,
   PropEditorConfig,
   PropertyPanelRenderProps,
-  AdapterTheme,
   DesignerWidgets,
   FieldRendererFn,
   FieldComponentProps,
+} from './types/adapter'
+
+// Adapter 值导出（DeviceScene 既是类型也是值）
+export {
+  type DeviceScene,
 } from './types/adapter'
 
 // 渲染器类型
@@ -150,40 +147,7 @@ export {
 export { getEventDeclarations } from './components'
 
 // ============================
-// Adapter 注册 API
-// ============================
-
-export {
-  registerAdapter,
-  getAdapter,
-  hasAdapter,
-  getAdapterComponents,
-  getAdapterPropertyPanel,
-  clearAdapter,
-} from './registry/adapterRegistry'
-
-// ============================
-// 组件注册表 API（兼容旧代码，推荐使用 Adapter）
-// ============================
-
-export {
-  setScene,
-  getScene,
-  autoDetectScene,
-  registerComponent,
-  registerComponents,
-  registerDesignerWidgets,
-  getDesignerWidgets,
-  getComponent,
-  getDesktopComponent,
-  getMobileComponent,
-  hasComponent,
-  clearRegistry,
-  type DeviceScene,
-} from './registry/componentRegistry'
-
-// ============================
-// 自定义组件注册 API（新增）
+// 自定义组件注册 API
 // ============================
 
 export {
@@ -216,11 +180,12 @@ export type {
 export {
   FormRender,
   FieldRenderer,
-  defaultAdapter,
   FieldSchemaContext,
   useFieldSchema,
   AdapterContext,
   useAdapter,
+  useAdaptiveAdapter,
+  detectScene,
 } from './renderer'
 
 // ============================
@@ -278,13 +243,13 @@ export {
 
 /**
  * 样式系统 - CSS Variables & Theme Tokens
- * 
+ *
  * 使用方式：
- * 
+ *
  * 1. 使用 StyleProvider（推荐）
  * ```tsx
  * import { StyleProvider, FormRender } from '@form-engine/core'
- * 
+ *
  * function App() {
  *   return (
  *     <StyleProvider theme={{ primary: '#722ed1' }} themeMode="light">
@@ -293,17 +258,17 @@ export {
  *   )
  * }
  * ```
- * 
+ *
  * 2. 在组件中使用主题
  * ```tsx
  * import { useStyle } from '@form-engine/core'
- * 
+ *
  * function MyComponent() {
  *   const { token, cssVar } = useStyle()
  *   return <div style={{ color: token('primary') }} />
  * }
  * ```
- * 
+ *
  * 3. 覆盖 CSS 变量（最简单）
  * 在项目的 CSS 中：
  * ```css

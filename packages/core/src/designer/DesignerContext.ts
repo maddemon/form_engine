@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react'
 import type { SelectedFieldId, DesignerAction } from '../types/designer'
-import type { DeviceScene } from '../registry/componentRegistry'
+import type { DeviceScene, FormEngineAdapter } from '../types/adapter'
 import type { FormConfig } from '../types/schema'
 
 export interface DesignerContextValue {
@@ -9,6 +9,7 @@ export interface DesignerContextValue {
   onSelectField: (id: string | null) => void
   scene: DeviceScene
   formConfig: FormConfig
+  adapter: FormEngineAdapter
 }
 
 const DesignerContext = createContext<DesignerContextValue | null>(null)

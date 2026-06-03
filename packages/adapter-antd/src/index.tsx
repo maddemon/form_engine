@@ -1,32 +1,22 @@
 /**
  * Form Engine - Antd Adapter
- * 提供 antd 组件实现
+ *
+ * 纯对象适配器，无全局注册、无 Proxy、无副作用。
  *
  * 使用方式：
- * ```typescript
- * // 方式1：使用 registerAdapter（推荐）
+ * ```tsx
  * import { antdAdapter } from '@form-engine/adapter-antd'
- * import { registerAdapter } from '@form-engine/core'
+ * import { FormRender } from '@form-engine/core'
  *
- * registerAdapter(antdAdapter)
- *
- * // 方式2：手动注册组件
- * import { antdComponents } from '@form-engine/adapter-antd'
- * import { registerComponents } from '@form-engine/core'
- *
- * registerComponents(antdComponents)
+ * <FormRender schema={schema} adapter={antdAdapter} />
  * ```
  */
 
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
-import { registerComponents, registerDesignerWidgets } from '@form-engine/core'
+import type { FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
 import { Checkbox as AntdCheckbox, Input as AntdInput, InputNumber as AntdInputNumber, Select as AntdSelect } from 'antd'
 import React from 'react'
 
-// ============================
-// 导入所有 antd 组件实现
-// ============================
-
+// 组件导出
 export { Button } from './components/Button'
 export { Checkbox, CheckboxGroup } from './components/Checkbox'
 export { DatePicker, DateRangePicker, TimePicker } from './components/DatePicker'
@@ -39,16 +29,14 @@ export { Slider } from './components/Slider'
 export { Switch } from './components/Switch'
 export { TextArea } from './components/TextArea'
 export { Upload } from './components/Upload'
-
-// 布局组件（使用 antd 的实现）
+export { Cascader } from './components/Cascader'
+export { TreeSelect } from './components/TreeSelect'
 export { Collapse, CollapsePanel } from './components/Collapse'
 export { Container } from './components/Container'
 export { Flex } from './components/Flex'
 export { Grid } from './components/Grid'
 export { Table } from './components/Table'
 export { TabPane, Tabs } from './components/Tabs'
-
-// 展示组件
 export { Divider } from './components/Divider'
 export { Image } from './components/Image'
 export { Text } from './components/Text'
@@ -58,78 +46,23 @@ export { Title } from './components/Title'
 export { AntdBridgeProvider } from './themeBridge'
 
 // ============================
-// 组件映射（用于注册）
+// 兜底渲染
 // ============================
 
-/**
- * Antd 组件映射
- * 支持 desktop 场景
- */
-export const antdComponents = {
-  // 表单组件
-  'Input': React.lazy(() => import('./components/Input').then(m => ({ default: m.Input }))),
-  'Password': React.lazy(() => import('./components/Input').then(m => ({ default: m.Password }))),
-  'Textarea': React.lazy(() => import('./components/TextArea').then(m => ({ default: m.TextArea }))),
-  'TextArea': React.lazy(() => import('./components/TextArea').then(m => ({ default: m.TextArea }))),
-  'Select': React.lazy(() => import('./components/Select').then(m => ({ default: m.Select }))),
-  'MultiSelect': React.lazy(() => import('./components/Select').then(m => ({ default: m.Select }))),
-  'Switch': React.lazy(() => import('./components/Switch').then(m => ({ default: m.Switch }))),
-  'Radio': React.lazy(() => import('./components/Radio').then(m => ({ default: m.Radio }))),
-  'RadioGroup': React.lazy(() => import('./components/Radio').then(m => ({ default: m.RadioGroup }))),
-  'Checkbox': React.lazy(() => import('./components/Checkbox').then(m => ({ default: m.Checkbox }))),
-  'CheckboxGroup': React.lazy(() => import('./components/Checkbox').then(m => ({ default: m.CheckboxGroup }))),
-  'InputNumber': React.lazy(() => import('./components/InputNumber').then(m => ({ default: m.InputNumber }))),
-  'Slider': React.lazy(() => import('./components/Slider').then(m => ({ default: m.Slider }))),
-  'Rate': React.lazy(() => import('./components/Rate').then(m => ({ default: m.Rate }))),
-  'DatePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker }))),
-  'DateRangePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DateRangePicker }))),
-  'TimePicker': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.TimePicker }))),
-  'Cascader': React.lazy(() => import('./components/Cascader').then(m => ({ default: m.Cascader }))),
-  'TreeSelect': React.lazy(() => import('./components/TreeSelect').then(m => ({ default: m.TreeSelect }))),
-  
-  // 日期类型别名（兼容 field.type 小写命名）
-  'date': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker }))),
-  'time': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.TimePicker }))),
-  'datetime': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker }))),
-  'date-range': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DateRangePicker }))),
-  'Upload': React.lazy(() => import('./components/Upload').then(m => ({ default: m.Upload }))),
-  'Button': React.lazy(() => import('./components/Button').then(m => ({ default: m.Button }))),
-  
-  // 布局组件
-  'Grid': React.lazy(() => import('./components/Grid').then(m => ({ default: m.Grid }))),
-  'Flex': React.lazy(() => import('./components/Flex').then(m => ({ default: m.Flex }))),
-  'Container': React.lazy(() => import('./components/Container').then(m => ({ default: m.Container }))),
-  'Collapse': React.lazy(() => import('./components/Collapse').then(m => ({ default: m.Collapse }))),
-  'Tabs': React.lazy(() => import('./components/Tabs').then(m => ({ default: m.Tabs }))),
-  'Table': React.lazy(() => import('./components/Table').then(m => ({ default: m.Table }))),
-  
-  // 展示组件
-  'Text': React.lazy(() => import('./components/Text').then(m => ({ default: m.Text }))),
-  'Image': React.lazy(() => import('./components/Image').then(m => ({ default: m.Image }))),
-  'Divider': React.lazy(() => import('./components/Divider').then(m => ({ default: m.Divider }))),
-  'Title': React.lazy(() => import('./components/Title').then(m => ({ default: m.Title }))),
+const DefaultField: FieldRendererFn = (props: any) => {
+  const { fieldSchema } = props
+  return (
+    <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>
+      未支持的字段类型：{fieldSchema?.type}
+    </div>
+  )
 }
 
 // ============================
-// Antd Adapter 定义
+// 设计器属性面板小组件
 // ============================
 
-/**
- * Antd Adapter
- * 完整的 adapter 定义，包含组件映射和属性面板配置
- *
- * 注意：为了简化，这里不使用 FormEngineAdapter 类型
- * 用户可以直接使用 antdComponents 进行注册
- */
-
-function createFieldRenderer(Component: React.ComponentType<any>): FieldRendererFn {
-  return (props: FieldComponentProps) => {
-    const { value, onChange, ...rest } = props
-    return React.createElement(Component, { ...rest, value, onChange })
-  }
-}
-
-export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidgets = {
+const designerWidgets: import('@form-engine/core/types/adapter').DesignerWidgets = {
   Input: ({ value, onChange, placeholder, disabled, style }: any) => (
     <AntdInput
       value={value ?? ''}
@@ -166,98 +99,80 @@ export const antdWidgets: import('@form-engine/core/types/adapter').DesignerWidg
       style={{ width: '100%', ...style }}
     />
   ),
+  ButtonGroup: ({ value, onChange, options, disabled, style }: any) => (
+    <div style={{ display: 'flex', gap: 4, ...style }}>
+      {options?.map((opt: any) => (
+        <AntdInput
+          key={opt.value}
+          style={{
+            flex: 1,
+            textAlign: 'center',
+            background: value === opt.value ? '#1677ff' : 'transparent',
+            color: value === opt.value ? '#fff' : undefined,
+            borderColor: value === opt.value ? '#1677ff' : '#d9d9d9',
+            cursor: disabled ? 'not-allowed' : 'pointer',
+          }}
+          readOnly
+          value={opt.label}
+          onClick={() => !disabled && onChange?.(opt.value)}
+        />
+      ))}
+    </div>
+  ),
 }
 
-export const antdAdapter = {
-  name: 'antd',
-  version: '6.x',
-
-  // 组件映射
-  components: antdComponents,
-
-  // 主题配置（Ant Design 5 的 token）
-  theme: {
-    token: {
-      // 默认 token，用户可以通过 StyleProvider 覆盖
-    },
-    components: {
-      // 组件级 token
-    }
-  },
-
-  // 布局组件覆写（使用 antd 的布局组件）
-  layout: {
-    Grid: undefined, // 将在运行时设置
-    Container: undefined,
-    Flex: undefined,
-    Collapse: undefined,
-    Tabs: undefined,
-  },
-
-  // 属性面板小组件（由 core 按场景获取）
-  _designerWidgets: antdWidgets,
-
-  // 小写字段类型映射（兼容 FieldRenderer 按 field.type 查找）
-  'input': createFieldRenderer(antdComponents['Input']),
-  'password': createFieldRenderer(antdComponents['Password']),
-  'textarea': createFieldRenderer(antdComponents['TextArea']),
-  'input-number': createFieldRenderer(antdComponents['InputNumber']),
-  'select': createFieldRenderer(antdComponents['Select']),
-  'multi-select': createFieldRenderer(antdComponents['Select']),
-  'switch': createFieldRenderer(antdComponents['Switch']),
-  'radio': createFieldRenderer(antdComponents['Radio']),
-  'checkbox': createFieldRenderer(antdComponents['Checkbox']),
-  'slider': createFieldRenderer(antdComponents['Slider']),
-  'rate': createFieldRenderer(antdComponents['Rate']),
-  'date': createFieldRenderer(antdComponents['DatePicker']),
-  'datetime': createFieldRenderer(antdComponents['DatePicker']),
-  'date-range': createFieldRenderer(antdComponents['DateRangePicker']),
-  'time': createFieldRenderer(antdComponents['TimePicker']),
-  'upload': createFieldRenderer(antdComponents['Upload']),
-  'cascader': createFieldRenderer(antdComponents['Cascader']),
-  'tree-select': createFieldRenderer(antdComponents['TreeSelect']),
-  'container': createFieldRenderer(antdComponents['Container']),
-  'grid': createFieldRenderer(antdComponents['Grid']),
-  'flex': createFieldRenderer(antdComponents['Flex']),
-  'collapse': createFieldRenderer(antdComponents['Collapse']),
-  'tabs': createFieldRenderer(antdComponents['Tabs']),
-  'table': createFieldRenderer(antdComponents['Table']),
-  'text': createFieldRenderer(antdComponents['Text']),
-  'image': createFieldRenderer(antdComponents['Image']),
-  'divider': createFieldRenderer(antdComponents['Divider']),
-  'title': createFieldRenderer(antdComponents['Title']),
-}
-
-// 设置 layout 的引用（避免循环引用）
-;(antdAdapter.layout as any).Grid = antdComponents['Grid']
-;(antdAdapter.layout as any).Container = antdComponents['Container']
-;(antdAdapter.layout as any).Flex = antdComponents['Flex']
-;(antdAdapter.layout as any).Collapse = antdComponents['Collapse']
-;(antdAdapter.layout as any).Tabs = antdComponents['Tabs']
+// ============================
+// Adapter 定义
+// ============================
 
 /**
- * 自动注册 antd 组件和小组件（副作用）
- * 当导入此模块时自动执行
+ * Antd Adapter — 桌面端
  *
- * 注意：推荐使用 registerAdapter 代替自动注册
+ * 纯对象，field.type → FieldRendererFn 的映射。
+ * 通过 adapter.components['input'] 查找组件。
  */
-function autoRegister() {
-  try {
-    if (registerComponents) {
-      registerComponents(antdComponents as any, 'desktop')
-      console.log('[Form Engine] antd adapter 已自动注册 (desktop)')
-    }
-    if (registerDesignerWidgets) {
-      registerDesignerWidgets(antdWidgets as any, 'desktop')
-    }
-  } catch (e) {
-    console.warn('[Form Engine] 无法自动注册 antd adapter，请手动注册', e)
-  }
-}
+export const antdAdapter: FormEngineAdapter = {
+  name: 'antd',
+  scene: 'desktop',
 
-// 如果在浏览器环境，自动注册
-if (typeof window !== 'undefined') {
-  autoRegister()
+  components: {
+    // 表单组件（直接 import，不使用 React.lazy，避免 Suspense 依赖）
+    'input': React.lazy(() => import('./components/Input').then(m => ({ default: m.Input as any }))),
+
+    // 以下先直接 import，后续按需改为 lazy
+    'password': React.lazy(() => import('./components/Input').then(m => ({ default: m.Password as any }))),
+    'textarea': React.lazy(() => import('./components/TextArea').then(m => ({ default: m.TextArea as any }))),
+    'input-number': React.lazy(() => import('./components/InputNumber').then(m => ({ default: m.InputNumber as any }))),
+    'select': React.lazy(() => import('./components/Select').then(m => ({ default: m.Select as any }))),
+    'multi-select': React.lazy(() => import('./components/Select').then(m => ({ default: m.Select as any }))),
+    'switch': React.lazy(() => import('./components/Switch').then(m => ({ default: m.Switch as any }))),
+    'radio': React.lazy(() => import('./components/Radio').then(m => ({ default: m.Radio as any }))),
+    'checkbox': React.lazy(() => import('./components/Checkbox').then(m => ({ default: m.Checkbox as any }))),
+    'slider': React.lazy(() => import('./components/Slider').then(m => ({ default: m.Slider as any }))),
+    'rate': React.lazy(() => import('./components/Rate').then(m => ({ default: m.Rate as any }))),
+    'date': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker as any }))),
+    'datetime': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DatePicker as any }))),
+    'date-range': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.DateRangePicker as any }))),
+    'time': React.lazy(() => import('./components/DatePicker').then(m => ({ default: m.TimePicker as any }))),
+    'upload': React.lazy(() => import('./components/Upload').then(m => ({ default: m.Upload as any }))),
+    'cascader': React.lazy(() => import('./components/Cascader').then(m => ({ default: m.Cascader as any }))),
+    'tree-select': React.lazy(() => import('./components/TreeSelect').then(m => ({ default: m.TreeSelect as any }))),
+    // 容器组件
+    'container': React.lazy(() => import('./components/Container').then(m => ({ default: m.Container as any }))),
+    'grid': React.lazy(() => import('./components/Grid').then(m => ({ default: m.Grid as any }))),
+    'flex': React.lazy(() => import('./components/Flex').then(m => ({ default: m.Flex as any }))),
+    'collapse': React.lazy(() => import('./components/Collapse').then(m => ({ default: m.Collapse as any }))),
+    'tabs': React.lazy(() => import('./components/Tabs').then(m => ({ default: m.Tabs as any }))),
+    'table': React.lazy(() => import('./components/Table').then(m => ({ default: m.Table as any }))),
+    // 展示组件
+    'text': React.lazy(() => import('./components/Text').then(m => ({ default: m.Text as any }))),
+    'image': React.lazy(() => import('./components/Image').then(m => ({ default: m.Image as any }))),
+    'divider': React.lazy(() => import('./components/Divider').then(m => ({ default: m.Divider as any }))),
+    'title': React.lazy(() => import('./components/Title').then(m => ({ default: m.Title as any }))),
+  },
+
+  default: DefaultField,
+  designerWidgets,
 }
 
 export default antdAdapter

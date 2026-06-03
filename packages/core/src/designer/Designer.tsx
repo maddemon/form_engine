@@ -2,8 +2,7 @@ import { DndContext, DragOverlay, PointerSensor, pointerWithin, TouchSensor, use
 import { arrayMove } from '@dnd-kit/sortable'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { getComponentIcon } from '../components/paletteRegistry'
-import type { DeviceScene } from '../registry/componentRegistry'
-import { setScene } from '../registry/componentRegistry'
+import type { DeviceScene } from '../types/adapter'
 import { useEnsureDefaultTheme, useStyle } from '../styles'
 import type { FormEngineAdapter } from '../types/adapter'
 import type { PaletteGroup, PanelWidths, SidePanelTab, PropertyPanelTab } from '../types/designer'
@@ -91,7 +90,7 @@ interface DesignerProps {
   groups?: PaletteGroup[]
   excludeTypes?: string[]
   readOnly?: boolean
-  adapter?: FormEngineAdapter
+  adapter: FormEngineAdapter
   panelWidths?: PanelWidths
   sidePanelTabs?: SidePanelTab[]
   propertyPanelTabs?: PropertyPanelTab[]
@@ -123,7 +122,6 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
   }, [externalSchema])
 
   useEffect(() => {
-    setScene(scene)
     onSceneChange?.(scene)
   }, [scene, onSceneChange])
 
@@ -395,7 +393,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
         {/* 中间画布 */}
         <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-          <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form }}>
+          <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form, adapter }}>
             <Canvas fields={state.schema.fields} activeId={activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} />
           </DesignerContext.Provider>
         </div>
@@ -425,8 +423,8 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       </DndContext>
 
       {/* 右侧属性面板 */}
-      <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form }}>
-        <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
+      <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form, adapter }}>
+        <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} designerWidgets={adapter?.designerWidgets} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
       </DesignerContext.Provider>
     </div>
   )

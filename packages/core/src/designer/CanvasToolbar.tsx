@@ -1,5 +1,5 @@
 import React from 'react'
-import type { DeviceScene } from '../registry/componentRegistry'
+import type { DeviceScene } from '../types/adapter'
 import { Monitor, Smartphone } from '../components/icons'
 import { useStyle } from '../styles'
 

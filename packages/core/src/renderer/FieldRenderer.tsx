@@ -33,9 +33,9 @@ export interface FieldRendererProps {
  * 单字段渲染器
  *
  * 组件查找优先级（三层覆盖机制）：
- * 1. adapter[field.type]         — 标准类型映射（如 'input' → InputField）
- * 2. components[componentId]     — 自定义组件注册表（schema.type='custom' 时按 componentId 查找）
- * 3. adapter['default']          — 兜底渲染（避免白屏）
+ * 1. adapter.components[field.type] — 标准类型映射（如 'input' → InputField）
+ * 2. components[componentId]        — 自定义组件注册表（schema.type='custom' 时按 componentId 查找）
+ * 3. adapter.default                — 兜底渲染（避免白屏）
  *
  * 事件合并优先级（后写覆盖前写）：
  * 内置 props < componentProps < 事件处理器（events 解析结果）
@@ -134,11 +134,11 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
    */
   const renderFn: ((props: any) => React.ReactNode) | undefined =
     // 1. 标准类型映射
-    (adapter as any)[field.type] ||
+    adapter.components[field.type] ||
     // 2. 自定义组件（按 componentId 查找）
     (field.custom?.componentId ? components[field.custom.componentId] : undefined) ||
     // 3. 兜底
-    (adapter as any)['default']
+    adapter.default
 
   const { labelCol, wrapperCol } = formConfig
   const labelColSpan = labelCol.span
@@ -151,9 +151,12 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
         <FieldSchemaContext.Provider value={field}>
           <AdapterContext.Provider value={adapter}>
           {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
-              其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误 */}
+              其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
+              Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
+          <React.Suspense fallback={null}>
           {/* eslint-disable-next-line react-hooks/refs -- composingRef 仅在事件回调中读取，此处为传参非 render 中访问 */}
           {React.createElement(renderFn, fieldProps)}
+          </React.Suspense>
           </AdapterContext.Provider>
         </FieldSchemaContext.Provider>
       )}

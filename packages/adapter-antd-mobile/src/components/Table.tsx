@@ -4,7 +4,7 @@ import React from 'react'
 
 export const TableField: FieldRendererFn = (props: any) => {
   const { value, onChange, fieldSchema, disabled } = props
-  const adp = useAdapter() ?? (props as any).adapter
+  const adapter = useAdapter()
   const rows: Record<string, any>[] = value ?? []
   const children: any[] = fieldSchema?.children ?? []
   const columns: any[] = fieldSchema?.componentProps?.columns ?? []
@@ -45,7 +45,7 @@ export const TableField: FieldRendererFn = (props: any) => {
               {columns[colIdx] && <div style={{ fontSize: 13, fontWeight: 600, color: '#333', marginBottom: 6 }}>{columns[colIdx].label}</div>}
               {colChildren.map((child: any) => {
                 const cellValue = row[child.name]
-                const renderFn = adp?.[child.type]
+                const renderFn = adapter?.components[child.type]
                 return (
                   <div key={child.name} style={{ marginBottom: 10 }}>
                     <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>{child.label}</div>

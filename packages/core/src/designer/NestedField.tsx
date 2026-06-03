@@ -3,7 +3,6 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { FormFieldSchema } from '../types/schema'
 import { FieldRenderer } from '../renderer/FieldRenderer'
-import defaultAdapter from '../renderer/defaultAdapter'
 import { isContainerComponent } from '../types/component-category'
 import { useDesignerContext } from './DesignerContext'
 import { FieldItem } from './FieldItem'
@@ -16,7 +15,7 @@ interface NestedFieldProps {
 }
 
 export const NestedField: React.FC<NestedFieldProps> = ({ field, parentContainerId, childIndex }) => {
-  const { selectedFieldId, formConfig } = useDesignerContext()
+  const { selectedFieldId, formConfig, adapter } = useDesignerContext()
   const isContainer = isContainerComponent(field.type)
 
   const {
@@ -30,7 +29,7 @@ export const NestedField: React.FC<NestedFieldProps> = ({ field, parentContainer
 
   const content = isContainer
     ? <ContainerPreview field={field} />
-    : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={defaultAdapter} formConfig={formConfig} />
+    : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
 
   return (
     <FieldItem

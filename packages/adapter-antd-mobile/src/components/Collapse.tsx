@@ -4,7 +4,7 @@ import { useAdapter, type FieldRendererFn } from '@form-engine/core'
 
 export const CollapseField: FieldRendererFn = (props: any) => {
   const { fieldSchema } = props
-  const adp = useAdapter() ?? (props as any).adapter
+  const adapter = useAdapter()
   const panels = fieldSchema?.componentProps?.panels ?? []
   const accordion = fieldSchema?.componentProps?.accordion ?? false
   const children = fieldSchema?.children ?? []
@@ -18,7 +18,7 @@ export const CollapseField: FieldRendererFn = (props: any) => {
         return (
           <Collapse.Panel key={panel.key} title={panel.header}>
             {panelChildren.map((child: any) => {
-              const renderFn = adp?.[child.type]
+              const renderFn = adapter?.components[child.type]
               return renderFn
                 ? React.createElement(renderFn, { ...props, fieldSchema: child, key: child.id })
                 : <div key={child.id} style={{ color: '#ccc', fontSize: 12 }}>未知类型: {child.type}</div>

@@ -1,6 +1,6 @@
 import { useDroppable, type UniqueIdentifier } from '@dnd-kit/core'
 import React, { useMemo, useState } from 'react'
-import type { DeviceScene } from '../registry/componentRegistry'
+import type { DeviceScene } from '../types/adapter'
 import { useStyle } from '../styles'
 import type { FormFieldSchema } from '../types/schema'
 import { CanvasToolbar } from './CanvasToolbar'

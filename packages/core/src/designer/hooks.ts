@@ -2,7 +2,7 @@ import { useReducer, useCallback, useMemo, useState } from 'react'
 import type { FormSchema, FormFieldSchema, FormConfig, SubmitConfig } from '../types/schema'
 import type { PaletteItem, DesignerAction } from '../types/designer'
 import { createFieldFromPalette } from './FieldList'
-import type { DeviceScene } from '../registry/componentRegistry'
+import type { DeviceScene } from '../types/adapter'
 import { designerReducer } from './reducer'
 import type { DesignerState } from './reducer'
 

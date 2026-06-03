@@ -1,12 +1,15 @@
 /**
  * Form Engine Adapter 接口定义
  *
- * Adapter 负责将 Form Engine 的组件类型映射到具体的 UI 库组件
- * 并定义属性面板如何渲染组件配置
+ * Adapter 负责将 Form Engine 的字段类型映射到具体的 UI 库组件。
+ *
+ * 核心原则：
+ * - 纯对象，无 Proxy，无全局状态
+ * - 显式传入，谁用谁传
+ * - scene 标明适配场景，由调用方按需选择
  */
 
 import * as React from 'react'
-import type { ComponentPropsMap } from './component-props'
 
 // ============================
 // 字段渲染相关类型
@@ -34,6 +37,9 @@ export interface FieldComponentProps {
 
 /** 字段渲染函数类型 */
 export type FieldRendererFn = (props: FieldComponentProps) => React.ReactElement
+
+/** 设备场景 */
+export type DeviceScene = 'desktop' | 'mobile'
 
 // ============================
 // 属性面板编辑器类型
@@ -63,48 +69,49 @@ export interface PropEditorConfig {
 
 /**
  * Form Engine Adapter 接口
- * 每个 UI 库（antd、antd-mobile 等）实现一个 adapter
+ *
+ * 每个 UI 库（antd、antd-mobile 等）实现一个 adapter。
+ * Adapter 是一个纯对象，无 Proxy、无全局注册。
+ *
+ * 使用方式：
+ * ```tsx
+ * import { antdAdapter } from '@form-engine/adapter-antd'
+ * import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+ *
+ * // 设计/预览：手动切换场景
+ * <Designer adapter={scene === 'mobile' ? antdMobileAdapter : antdAdapter} />
+ * <FormRender adapter={scene === 'mobile' ? antdMobileAdapter : antdAdapter} />
+ *
+ * // 运行时：自动检测设备
+ * const adapter = useAdaptiveAdapter(antdAdapter, antdMobileAdapter)
+ * <FormRender adapter={adapter} />
+ * ```
  */
 export interface FormEngineAdapter {
-  /** Adapter 名称 */
+  /** Adapter 名称，如 'antd'、'antd-mobile' */
   name: string
 
-  /** Adapter 版本 */
-  version: string
-
-  /** 字段组件映射（type -> React 组件） */
-  components: Partial<{
-    [K in keyof ComponentPropsMap]: React.ComponentType<ComponentPropsMap[K]>
-  }>
-
-  /** 属性面板组件（用于设计器） */
-  propertyPanel?: {
-    /** 渲染属性面板 */
-    render: (props: PropertyPanelRenderProps) => React.ReactNode
-  }
-
-  /** 主题配置（可选） */
-  theme?: AdapterTheme
-
-  /** 布局组件覆写（可选，如果 UI 库有更好的实现） */
-  layout?: {
-    Grid?: React.ComponentType<any>
-    Container?: React.ComponentType<any>
-    Flex?: React.ComponentType<any>
-    Collapse?: React.ComponentType<any>
-    Tabs?: React.ComponentType<any>
-  }
+  /** 适配场景 */
+  scene: DeviceScene
 
   /**
-   * 属性面板小组件（由 adapter 提供，用于设计器属性面板）
-   * 如果不提供，core 会用纯 HTML 兜底
+   * 字段组件映射：field.type → FieldRendererFn
+   *
+   * key 为小写字段类型（如 'input'、'select'、'date-picker'），
+   * value 为对应的渲染函数。
    */
-  _designerWidgets?: DesignerWidgets
+  components: Record<string, FieldRendererFn>
+
+  /** 兜底渲染函数，未知字段类型时使用 */
+  default?: FieldRendererFn
+
+  /** 设计器属性面板小组件 */
+  designerWidgets?: DesignerWidgets
 }
 
-// ========================
+// ============================
 // 属性面板小组件接口（由 adapter 提供）
-// ========================
+// ============================
 
 /** 属性面板使用的基础小组件 */
 export interface DesignerWidgets {
@@ -189,14 +196,4 @@ export interface PropertyPanelRenderProps {
   onChange: (updatedField: any) => void
   /** 所有字段（用于联动配置） */
   allFields?: any[]
-}
-
-/** Adapter 主题配置 */
-export interface AdapterTheme {
-  /** 主题 Token（如 Ant Design 的 token） */
-  token?: Record<string, unknown>
-  /** 组件级 Token */
-  components?: Record<string, Record<string, unknown>>
-  /** 全局样式覆写 */
-  styleOverrides?: Record<string, React.CSSProperties>
 }

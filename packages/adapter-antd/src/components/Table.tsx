@@ -24,7 +24,7 @@ export const Table: React.FC<{
   ...rest
 }) => {
   const field = fieldSchema ?? (rest as any).fieldSchema
-  const adp = useAdapter() ?? (rest as any).adapter
+  const adapter = useAdapter()
   const children: any[] = field?.children ?? []
   const columns = ((field?.componentProps?.columns as TableColumnConfig[]) || []).filter(Boolean)
 
@@ -37,7 +37,7 @@ export const Table: React.FC<{
   }
 
   const renderCell = (child: Record<string, unknown>, row: Record<string, unknown>, rowIndex: number) => {
-    const renderFn = (adp as any)?.[child.type as string]
+    const renderFn = adapter?.components[child.type as string]
     if (!renderFn) {
       return (
         <span style={{ color: 'var(--fe-text-tertiary)', fontSize: 12 }}>
