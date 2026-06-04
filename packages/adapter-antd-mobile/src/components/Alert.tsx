@@ -1,5 +1,5 @@
 import React from 'react'
-import type { FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 import { iconMap } from '@form-engine/core'
 
 // antd-mobile 无 Alert 组件，使用简化 div 实现
@@ -11,7 +11,7 @@ const TYPE_STYLES: Record<string, { bg: string; border: string; color: string }>
   error:   { bg: '#fff2f0', border: '#ffccc7', color: '#ff4d4f' },
 }
 
-export const AlertField: FieldRendererFn = (props: any) => {
+export const AlertField: FieldRendererFn = (props: FieldComponentProps) => {
   const { style } = props
   const type = props.type ?? 'info'
   const title = props.title

@@ -7,7 +7,7 @@ const GROUP_MEMBERS: Record<string, FieldType[]> = {
   '数值': ['input-number', 'slider', 'rate'],
   '选择': ['select', 'cascader', 'tree-select', 'radio', 'checkbox', 'switch', 'segment'],
   '日期时间': ['date', 'datetime', 'date-range', 'time'],
-  '布局': ['grid', 'flex', 'container', 'collapse', 'tabs', 'table', 'card'],
+  '布局': ['grid', 'flex', 'collapse', 'tabs', 'table', 'card'],
   '展示': ['text', 'title', 'image', 'divider', 'alert'],
   '其他': ['button', 'upload'],
 }

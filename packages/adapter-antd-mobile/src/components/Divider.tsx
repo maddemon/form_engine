@@ -1,7 +1,7 @@
 import React from 'react'
-import type { FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
-export const DividerField: FieldRendererFn = (props: any) => {
+export const DividerField: FieldRendererFn = (props: FieldComponentProps) => {
   const { style } = props
   const type = props.type || 'horizontal'
   const children = props.children

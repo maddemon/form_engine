@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getEventDeclarations } from '../components'
 import { FieldItem, PropsRenderMap } from '../propRenders'
 import CustomPropsRender from '../propRenders/CustomPropsRender'
+import type { PropsRenderProps } from '../propRenders/types'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { useStyle } from '../styles'
-import type { PropsRenderProps } from '../propRenders/types'
 import type { DesignerWidgets } from '../types/adapter'
 import { getComponentCategory } from '../types/component-category'
 import type { CustomComponentConfig } from '../types/custom-component'
@@ -12,13 +12,13 @@ import type { DesignerAction, PropertyPanelTab } from '../types/designer'
 import type { EventDeclaration, FormFieldEvents } from '../types/events'
 import type { FormConfig, FormFieldSchema } from '../types/schema'
 import { resolvePanelWidth } from '../utils'
+import { defaultDesignerWidgets } from '../widgets'
 import { CollapsibleSection } from './CollapsibleSection'
 import { EventHandlerEditor } from './EventHandlerEditor'
 import { FormConfigPanel } from './FormConfigPanel'
 import { collectFieldNames } from './reducer'
 import { RulesEditor } from './RulesEditor'
 import { useDebouncedInput } from './useDebouncedInput'
-import { defaultDesignerWidgets } from './widgets'
 
 /**
  * 属性面板最小宽度（防呆）：再小 FieldItem / 控件就显示不全
@@ -44,7 +44,7 @@ interface PropertyPanelProps {
   allFields?: FormFieldSchema[]
 }
 
-type WidgetsForProps = DesignerWidgets & Required<Pick<DesignerWidgets, 'ButtonGroup' | 'TextArea' | 'ExpressionInput' | 'OptionsEditor'>>
+type WidgetsForProps = DesignerWidgets
 
 function useWidgets(designerWidgets?: DesignerWidgets) {
   const merged = { ...defaultDesignerWidgets, ...designerWidgets }
@@ -83,24 +83,24 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
   const { token } = useStyle()
   const hasAdvanced = hasAdvancedConfig(field)
   const [nameDirty, setNameDirty] = useState(false)
-  const existingNames = useMemo(() => collectFieldNames(allFields, field.id!), [allFields, field.id])
+  const existingNames = useMemo(() => collectFieldNames(allFields, field.id), [allFields, field.id])
   const nameError = nameDirty && field.name && existingNames.has(field.name) ? '该字段名已存在' : null
 
   // ===== 防抖输入 =====
 
-  const [labelValue, handleLabelChange] = useDebouncedInput<string | number>(field.label || '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { label: String(v) || undefined } }))
+  const [labelValue, handleLabelChange] = useDebouncedInput<string | number>(field.label || '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { label: String(v) || undefined } }))
 
-  const [defaultValueValue, handleDefaultValueChange] = useDebouncedInput<string | number>(field.defaultValue != null ? String(field.defaultValue) : '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { defaultValue: v || undefined } }))
+  const [defaultValueValue, handleDefaultValueChange] = useDebouncedInput<string | number>(field.defaultValue != null ? String(field.defaultValue) : '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { defaultValue: v || undefined } }))
 
-  const [hiddenValue, handleHiddenChange] = useDebouncedInput<string | number>(typeof field.hidden === 'string' ? field.hidden : '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { hidden: (v as string) || undefined } }))
+  const [hiddenValue, handleHiddenChange] = useDebouncedInput<string | number>(typeof field.hidden === 'string' ? field.hidden : '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { hidden: (v as string) || undefined } }))
 
-  const [colSpanValue, handleColSpanChange] = useDebouncedInput<number>(field.colSpan || 24, (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { colSpan: Number(v) } }))
+  const [colSpanValue, handleColSpanChange] = useDebouncedInput<number>(field.colSpan || 24, (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { colSpan: Number(v) } }))
 
   // 字段名防抖（含重复校验，setNameDirty 立即执行）
   const [nameValue, handleNameChangeRaw] = useDebouncedInput<string | number>(field.name, (v) => {
     const newName = String(v)
     if (newName && !existingNames.has(newName)) {
-      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { name: newName } })
+      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { name: newName } })
     }
   })
   const handleNameChange = useCallback(
@@ -132,7 +132,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
           isEditingComponentPropsRef.current = false
           dispatch({
             type: 'UPDATE_FIELD',
-            fieldId: field.id!,
+            fieldId: field.id,
             patch: { componentProps: next },
           })
         }, 300)
@@ -177,10 +177,10 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
             </FieldItem>
             <RulesEditor field={field} widgets={w} dispatch={dispatch} />
             <FieldItem label="禁用">
-              <w.Switch checked={!!field.disabled} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { disabled: v } })} />
+              <w.Switch checked={!!field.disabled} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { disabled: v } })} />
             </FieldItem>
             <FieldItem label="只读">
-              <w.Switch checked={!!field.readOnly} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch: { readOnly: v } })} />
+              <w.Switch checked={!!field.readOnly} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { readOnly: v } })} />
             </FieldItem>
           </>
         )}
@@ -211,7 +211,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
                   const cleaned = Object.keys(next).length > 0 ? next : undefined
                   dispatch({
                     type: 'UPDATE_FIELD',
-                    fieldId: field.id!,
+                    fieldId: field.id,
                     patch: { events: cleaned },
                   })
                 }}
@@ -236,7 +236,7 @@ function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPane
     (key: string, value: unknown) => {
       dispatch({
         type: 'UPDATE_FIELD',
-        fieldId: field.id!,
+        fieldId: field.id,
         patch: { componentProps: { ...field.componentProps, [key]: value } },
       })
     },
@@ -245,7 +245,7 @@ function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPane
 
   const onUpdate = useCallback(
     (patch: Partial<FormFieldSchema>) => {
-      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id!, patch })
+      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch })
     },
     [dispatch, field.id],
   )

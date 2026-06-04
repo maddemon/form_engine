@@ -19,7 +19,7 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
   const isContainer = isContainerComponent(field.type)
 
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
-    id: field.id!,
+    id: field.id,
     data: { source: 'canvas', fieldId: field.id },
     disabled: parentContainerId === undefined || childIndex === undefined,
   })

@@ -23,9 +23,7 @@ export interface FieldComponentProps {
   /** 值变化回调 */
   onChange?: (value: unknown) => void
   /** 字段 Schema */
-  fieldSchema?: FormFieldSchema
-  /** 字段名称 */
-  name?: string
+  fieldSchema: FormFieldSchema
   /** 是否禁用 */
   disabled?: boolean
   /** 是否只读 */
@@ -106,7 +104,7 @@ export interface FormEngineAdapter {
   components: Record<string, FieldRendererFn>
 
   /** 兜底渲染函数，未知字段类型时使用 */
-  default?: FieldRendererFn
+  default: FieldRendererFn
 
   /** 设计器属性面板小组件 */
   designerWidgets?: DesignerWidgets
@@ -127,7 +125,7 @@ export interface DesignerWidgets {
     style?: React.CSSProperties
   }>
   /** 多行文本 */
-  TextArea?: React.ComponentType<{
+  TextArea: React.ComponentType<{
     value?: string
     onChange?: (v: string) => void
     placeholder?: string
@@ -168,7 +166,7 @@ export interface DesignerWidgets {
     style?: React.CSSProperties
   }>
   /** 按钮 */
-  Button?: React.ComponentType<{
+  Button: React.ComponentType<{
     children?: React.ReactNode
     onClick?: () => void
     type?: 'default' | 'primary' | 'danger' | 'dashed'
@@ -176,7 +174,7 @@ export interface DesignerWidgets {
     style?: React.CSSProperties
   }>
   /** 选项编辑器（用于 select/radio/checkbox 等） */
-  OptionsEditor?: React.ComponentType<{
+  OptionsEditor: React.ComponentType<{
     value?: { label: string; value: string }[]
     onChange?: (v: { label: string; value: string }[]) => void
     disabled?: boolean
@@ -191,7 +189,7 @@ export interface DesignerWidgets {
     style?: React.CSSProperties
   }>
   /** 表达式输入框（尾部 ƒ 图标，弹窗编辑，可插入字段名） */
-  ExpressionInput?: React.ComponentType<{
+  ExpressionInput: React.ComponentType<{
     value?: string
     onChange?: (v: string) => void
     placeholder?: string

@@ -1,10 +1,10 @@
 import React from 'react'
-import type { FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
-export const GridField: FieldRendererFn = (props: any) => {
+export const GridField: FieldRendererFn = (props: FieldComponentProps) => {
   const { fieldSchema, children, style } = props
-  const colSpans = fieldSchema?.componentProps?.colSpans ?? []
-  const gap = fieldSchema?.componentProps?.gap ?? 8
+  const colSpans = fieldSchema.componentProps?.colSpans ?? []
+  const gap = fieldSchema.componentProps?.gap ?? 8
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap, ...style }}>

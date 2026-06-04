@@ -12,7 +12,7 @@
  * ```
  */
 
-import type { FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
 import React from 'react'
 
 // 静态导入所有组件
@@ -29,7 +29,6 @@ import { DatePicker, DateRangePicker, TimePicker } from './components/DatePicker
 import { Upload } from './components/Upload'
 import { Cascader } from './components/Cascader'
 import { TreeSelect } from './components/TreeSelect'
-import { Container } from './components/Container'
 import { Grid } from './components/Grid'
 import { Flex } from './components/Flex'
 import { Collapse, CollapsePanel } from './components/Collapse'
@@ -61,7 +60,6 @@ export { Upload } from './components/Upload'
 export { Cascader } from './components/Cascader'
 export { TreeSelect } from './components/TreeSelect'
 export { Collapse, CollapsePanel } from './components/Collapse'
-export { Container } from './components/Container'
 export { Flex } from './components/Flex'
 export { Grid } from './components/Grid'
 export { Table } from './components/Table'
@@ -84,9 +82,10 @@ export { designerWidgets } from './widgets'
 // 兜底渲染
 // ============================
 
-const DefaultField: FieldRendererFn = (props: any) => {
+const DefaultField: FieldRendererFn = (props: FieldComponentProps) => {
   const { fieldSchema } = props
-  return <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>未支持的字段类型：{fieldSchema?.type}</div>
+  const displayName = fieldSchema.label || fieldSchema.name || fieldSchema.type
+  return <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>{displayName}</div>
 }
 
 // ============================
@@ -128,7 +127,6 @@ export const antdAdapter: FormEngineAdapter = {
     cascader: Cascader,
     'tree-select': TreeSelect,
     // 容器组件
-    container: Container,
     grid: Grid,
     flex: Flex,
     collapse: Collapse,
@@ -142,6 +140,7 @@ export const antdAdapter: FormEngineAdapter = {
     title: Title,
     alert: Alert,
     segment: Segment,
+    button: Button,
   },
 
   default: DefaultField,

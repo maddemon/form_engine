@@ -34,7 +34,7 @@ declare const expect: (value: unknown) => {
 const mock$self: $Self = {
   name: 'username',
   value: 'test',
-  schema: { type: 'input', name: 'username', label: '用户名' } as FormFieldSchema,
+  schema: { id: 'field_input_1', type: 'input', name: 'username', label: '用户名', children: [] } as FormFieldSchema,
   props: { disabled: false, readOnly: false, placeholder: '请输入' },
 }
 

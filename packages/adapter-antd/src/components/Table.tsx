@@ -7,12 +7,12 @@
 import React from 'react'
 import { Table as AntTable } from 'antd'
 import { useAdapter } from '@form-engine/core'
-import type { TableColumnConfig } from '@form-engine/core'
+import type { TableColumnConfig, FormFieldSchema } from '@form-engine/core'
 
 export const Table: React.FC<{
   value?: Record<string, unknown>[]
   onChange?: (val: Record<string, unknown>[]) => void
-  fieldSchema?: any
+  fieldSchema: FormFieldSchema
   disabled?: boolean
   readOnly?: boolean
   [key: string]: any
@@ -23,10 +23,10 @@ export const Table: React.FC<{
   disabled,
   ...rest
 }) => {
-  const field = fieldSchema ?? (rest as any).fieldSchema
+  const field = fieldSchema
   const adapter = useAdapter()
-  const children: any[] = field?.children ?? []
-  const columns = ((field?.componentProps?.columns as TableColumnConfig[]) || []).filter(Boolean)
+  const children: any[] = field.children ?? []
+  const columns = ((field.componentProps?.columns as TableColumnConfig[]) || []).filter(Boolean)
 
   if (columns.length === 0) {
     return (

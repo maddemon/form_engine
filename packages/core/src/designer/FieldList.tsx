@@ -81,6 +81,7 @@ export function createFieldFromPalette(item: PaletteItem): FormFieldSchema {
     name: `${item.type}_${randomSuffix}`,
     type: item.type,
     label: item.label,
+    children: [] as FormFieldSchema[],
     ...(item.defaultProps || {}),
   } as FormFieldSchema
   if (item.extraData) {
@@ -233,15 +234,17 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, widt
   )
 }
 
+const ALL_FIELD_TYPES: readonly FieldType[] = [
+  'input', 'input-number', 'textarea', 'password', 'select',
+  'multi-select', 'cascader', 'tree-select',
+  'radio', 'checkbox', 'switch', 'slider',
+  'date', 'date-range', 'time', 'datetime', 'upload',
+  'rate', 'custom',
+  'button', 'grid', 'flex', 'collapse', 'tabs',
+  'text', 'image', 'divider', 'title', 'table',
+  'card', 'alert', 'segment',
+] as const
+
 function isValidFieldType(type: string): type is FieldType {
-  const validTypes: FieldType[] = [
-    'input', 'input-number', 'textarea', 'password', 'select',
-    'multi-select', 'cascader', 'tree-select',
-    'radio', 'checkbox', 'switch', 'slider',
-    'date', 'date-range', 'time', 'datetime', 'upload',
-    'rate', 'custom',
-    'button', 'grid', 'flex', 'container', 'collapse', 'tabs',
-    'text', 'image', 'divider', 'title', 'table',
-  ]
-  return (validTypes as string[]).includes(type) || type.startsWith('custom:')
+  return (ALL_FIELD_TYPES as readonly string[]).includes(type) || type.startsWith('custom:')
 }

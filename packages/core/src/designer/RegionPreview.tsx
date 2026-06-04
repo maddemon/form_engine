@@ -39,7 +39,7 @@ export const RegionPreview: React.FC<RegionPreviewProps> = ({
     data: { parentId: parent.id, regionKey },
   })
   const { token } = useStyle()
-  const childIds = useMemo(() => items.map(c => c.id!), [items])
+  const childIds = useMemo(() => items.map(c => c.id), [items])
 
   const flexStyle: React.CSSProperties = regionWidth == null
     ? { flex: 1 }
@@ -61,6 +61,7 @@ export const RegionPreview: React.FC<RegionPreviewProps> = ({
         border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
         borderRadius: 'var(--fe-border-radius-sm)',
         background: isOver ? 'var(--fe-primary-hover-bg)' : 'transparent',
+        pointerEvents: 'auto',
         transition: 'border-color 0.2s, background 0.2s',
         overflow: 'hidden',
       }}
@@ -94,7 +95,7 @@ export const RegionPreview: React.FC<RegionPreviewProps> = ({
               <NestedField
                 key={child.id}
                 field={child}
-                parentContainerId={parent.id!}
+                parentContainerId={parent.id}
                 childIndex={index}
               />
             ))}

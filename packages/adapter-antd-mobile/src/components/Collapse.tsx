@@ -1,15 +1,15 @@
 import React from 'react'
 import { Collapse } from 'antd-mobile'
-import { useAdapter, type FieldRendererFn } from '@form-engine/core'
+import { useAdapter, type FieldComponentProps, type FieldRendererFn } from '@form-engine/core'
 
-export const CollapseField: FieldRendererFn = (props: any) => {
+export const CollapseField: FieldRendererFn = (props: FieldComponentProps) => {
   const { fieldSchema } = props
   const adapter = useAdapter()
-  const panels = fieldSchema?.componentProps?.panels ?? []
-  const accordion = fieldSchema?.componentProps?.accordion ?? false
-  const children = fieldSchema?.children ?? []
-  const activeKey = fieldSchema?.componentProps?.activeKey
-  const defaultActiveKey = fieldSchema?.componentProps?.defaultActiveKey
+  const panels = fieldSchema.componentProps?.panels ?? []
+  const accordion = fieldSchema.componentProps?.accordion ?? false
+  const children = fieldSchema.children ?? []
+  const activeKey = fieldSchema.componentProps?.activeKey
+  const defaultActiveKey = fieldSchema.componentProps?.defaultActiveKey
 
   return (
     <Collapse accordion={accordion} activeKey={activeKey} defaultActiveKey={defaultActiveKey}>

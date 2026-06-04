@@ -1,7 +1,7 @@
 import React from 'react'
-import type { FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
-export const FlexField: FieldRendererFn = (props: any) => {
+export const FlexField: FieldRendererFn = (props: FieldComponentProps) => {
   const { children, style } = props
   const direction = props.direction ?? 'row'
   const justify = props.justify ?? 'flex-start'

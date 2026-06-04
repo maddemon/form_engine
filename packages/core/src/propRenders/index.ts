@@ -5,7 +5,6 @@ import CardPropsRender from '../components/card/Props'
 import CascaderPropsRender from '../components/cascader/Props'
 import CheckboxPropsRender from '../components/checkbox/Props'
 import CollapsePropsRender from '../components/collapse/Props'
-import ContainerPropsRender from '../components/container/Props'
 import DateRangePropsRender from '../components/date-picker/DateRangePropsRender'
 import DatePickerPropsRender from '../components/date-picker/Props'
 import DateTimePropsRender from '../components/date-time/Props'
@@ -58,7 +57,6 @@ export const PropsRenderMap: Record<string, ComponentType<PropsRenderProps>> = {
   button: ButtonPropsRender,
   grid: GridPropsRender,
   flex: FlexPropsRender,
-  container: ContainerPropsRender,
   collapse: CollapsePropsRender,
   tabs: TabsPropsRender,
   table: TablePropsRender,

@@ -6,7 +6,7 @@ import { palette as buttonPalette } from './button/palette'
 import { palette as cascaderPalette } from './cascader/palette'
 import { palette as checkboxPalette } from './checkbox/palette'
 import { palette as collapsePalette } from './collapse/palette'
-import { palette as containerPalette } from './container/palette'
+
 import { datePalette, dateRangePalette } from './date-picker/palette'
 import { palette as dateTimePalette } from './date-time/palette'
 import { palette as dividerPalette } from './divider/palette'
@@ -52,7 +52,6 @@ export const componentPalettes: Record<string, ComponentPalette> = {
   button: buttonPalette,
   grid: gridPalette,
   flex: flexPalette,
-  container: containerPalette,
   collapse: collapsePalette,
   table: tablePalette,
   tabs: tabsPalette,

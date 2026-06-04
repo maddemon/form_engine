@@ -5,9 +5,11 @@ import { FormRender } from '../FormRender'
 import type { FormSchema, FormFieldSchema, FormEngineAdapter } from '../../types'
 
 const createTextField = (overrides: Partial<FormFieldSchema> = {}): FormFieldSchema => ({
+  id: `field_${Math.random().toString(36).slice(2, 8)}`,
   type: 'input',
   name: 'test',
   label: '测试字段',
+  children: [],
   ...overrides,
 })
 

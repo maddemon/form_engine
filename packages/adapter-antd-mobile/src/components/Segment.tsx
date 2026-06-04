@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import type { FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 // antd-mobile 无 Segmented 组件，使用自定义实现
-export const SegmentField: FieldRendererFn = (props: any) => {
+export const SegmentField: FieldRendererFn = (props: FieldComponentProps) => {
   const { style } = props
   const options = props.options ?? []
   const defaultValue = props.defaultValue

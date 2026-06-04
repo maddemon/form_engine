@@ -86,7 +86,6 @@ export interface CustomComponent {
 export interface FieldMock {
   formValue?: unknown
   options?: OptionItem[]
-  [key: string]: unknown
 }
 
 // ============================
@@ -115,7 +114,6 @@ export type FieldType =
   | 'button'
   | 'grid'
   | 'flex'
-  | 'container'
   | 'collapse'
   | 'tabs'
   | 'text'
@@ -130,7 +128,7 @@ export type FieldType =
   | 'segment'
 
 export interface FormFieldSchema {
-  id?: string
+  id: string
   name: string
   type: FieldType
   label?: string
@@ -156,7 +154,7 @@ export interface FormFieldSchema {
   /** 事件配置 */
   events?: FormFieldEvents
   /** 子字段（仅容器组件使用，如 grid/flex/container/collapse/tabs） */
-  children?: FormFieldSchema[]
+  children: FormFieldSchema[]
   /** 所属列索引（仅 grid/table 子节点使用） */
   columnIndex?: number
   /** 所属区域 key（仅在 region 容器内有效：collapse/tabs）。children 用此字段关联到具体面板/标签页 */

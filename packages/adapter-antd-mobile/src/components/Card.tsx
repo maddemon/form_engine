@@ -1,9 +1,9 @@
 import React from 'react'
 import { Card as AntdMobileCard } from 'antd-mobile'
-import type { FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 import { iconMap } from '@form-engine/core'
 
-export const CardField: FieldRendererFn = (props: any) => {
+export const CardField: FieldRendererFn = (props: FieldComponentProps) => {
   const { children, style } = props
   const title = props.title
   const icon = props.icon

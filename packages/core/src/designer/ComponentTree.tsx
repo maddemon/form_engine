@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react'
 import { useStyle } from '../styles'
 
-interface TreeItem {
+export interface TreeItem {
   id: string
   label: string
   type: string
-  children?: TreeItem[]
+  children: TreeItem[]
 }
 
 interface ComponentTreeProps {
@@ -34,10 +34,10 @@ const TreeNode: React.FC<{ item: TreeItem; selectedId: string | null; onSelect: 
           marginLeft: depth * parseInt(token('spacingMd') as string),
         }}
       >
-        {item.children ? '📁' : '📄'} {item.label}
+        {item.children.length ? '📁' : '📄'} {item.label}
         <span style={{ color: 'var(--fe-text-muted)', fontSize: token('widgetInputFontSizeXxs') }}>({item.type})</span>
       </div>
-      {item.children?.map(child => (
+      {item.children.map(child => (
         <TreeNode key={child.id} item={child} selectedId={selectedId} onSelect={onSelect} depth={depth + 1} />
       ))}
     </div>

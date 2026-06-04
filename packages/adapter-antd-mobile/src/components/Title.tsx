@@ -1,9 +1,9 @@
 import React from 'react'
-import type { FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 const levelFontSize = ['', '24px', '20px', '18px', '16px', '14px']
 
-export const TitleField: FieldRendererFn = (props: any) => {
+export const TitleField: FieldRendererFn = (props: FieldComponentProps) => {
   const { children, style } = props
   const content = children || props.content || ''
   const level = props.level || 1

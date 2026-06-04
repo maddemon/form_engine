@@ -8,6 +8,9 @@ import type { DataSourceResolver } from '../types/render'
 import { pickAdapter } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import { useFormRender } from './hooks/useFormRender'
+import { FormConfigContext, useFormConfig } from './FormConfigContext'
+import { FormEngineContext, useFormEngine, type FormEngineContextValue } from './FormEngineContext'
+import { FormStateContext, useFormState, type FormStateContextValue } from './FormStateContext'
 
 export interface FormRenderHandle {
   submit(): void
@@ -65,16 +68,35 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({
     handleSubmit()
   }
 
+  const engineCtx = useMemo<FormEngineContextValue>(() => ({
+    adapter: resolvedAdapter,
+    components,
+    loading,
+  }), [resolvedAdapter, components, loading])
+
+  const stateCtx = useMemo<FormStateContextValue>(() => ({
+    formValues,
+    fieldOptions,
+    fieldErrors,
+    eventContext,
+  }), [formValues, fieldOptions, fieldErrors, eventContext])
+
   return (
-    <form onSubmit={handleFormSubmit} className="fe-form">
-      <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
-        {visibleFields.map((field) => (
-          <div key={field.id || field.name} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
-            <NestedFieldRenderer field={field} formValues={formValues} fieldOptions={fieldOptions} fieldErrors={fieldErrors} loading={loading} adapter={resolvedAdapter} components={components} eventContext={eventContext} formConfig={formConfig} onFieldChange={handleFieldChange} />
-          </div>
-        ))}
-      </div>
-    </form>
+    <FormConfigContext.Provider value={formConfig}>
+      <FormEngineContext.Provider value={engineCtx}>
+        <FormStateContext.Provider value={stateCtx}>
+          <form onSubmit={handleFormSubmit} className="fe-form">
+            <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
+              {visibleFields.map((field) => (
+                <div key={field.id} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
+                  <NestedFieldRenderer field={field} onFieldChange={handleFieldChange} />
+                </div>
+              ))}
+            </div>
+          </form>
+        </FormStateContext.Provider>
+      </FormEngineContext.Provider>
+    </FormConfigContext.Provider>
   )
 })
 FormRender.displayName = 'FormRender'
@@ -83,27 +105,23 @@ FormRender.displayName = 'FormRender'
 
 interface NestedFieldRendererProps {
   field: FormFieldSchema
-  formValues: Record<string, unknown>
-  fieldOptions: Record<string, OptionItem[]>
-  fieldErrors: Record<string, string[]>
-  loading: boolean
-  adapter: FormEngineAdapter
-  components: Record<string, ComponentRenderFn>
-  eventContext: EventContext
-  formConfig: FormSchema['form']
   onFieldChange: (name: string, value: unknown) => void
 }
 
-const NestedFieldRenderer: React.FC<NestedFieldRendererProps> = React.memo(({ field, formValues, fieldOptions, fieldErrors, loading, adapter, components, eventContext, formConfig, onFieldChange }) => {
+const NestedFieldRenderer: React.FC<NestedFieldRendererProps> = React.memo(({ field, onFieldChange }) => {
+  const { adapter, components, loading } = useFormEngine()
+  const { formValues, fieldOptions, fieldErrors, eventContext } = useFormState()
+  const formConfig = useFormConfig()
+
   const isContainer = isContainerComponent(field.type)
 
   const handleChange = useCallback((val: unknown) => onFieldChange(field.name, val), [field.name, onFieldChange])
 
   const enhancedField: FormFieldSchema = useMemo(() => {
-    if (!isContainer || !field.children?.length) return field
-    const childNodes = field.children.map((child) => <NestedFieldRenderer key={child.id || child.name} field={child} formValues={formValues} fieldOptions={fieldOptions} fieldErrors={fieldErrors} loading={loading} adapter={adapter} components={components} eventContext={eventContext} formConfig={formConfig} onFieldChange={onFieldChange} />)
+    if (!isContainer || !field.children.length) return field
+    const childNodes = field.children.map((child) => <NestedFieldRenderer key={child.id} field={child} onFieldChange={onFieldChange} />)
     return { ...field, componentProps: { ...field.componentProps, children: childNodes } }
-  }, [field, isContainer, formValues, fieldOptions, fieldErrors, loading, adapter, components, eventContext, formConfig, onFieldChange])
+  }, [field, isContainer, onFieldChange])
 
   return <FieldRenderer field={enhancedField} value={formValues[field.name]} onChange={handleChange} options={fieldOptions[field.name] || []} disabled={loading || field.disabled === true} adapter={adapter} components={components} eventContext={eventContext} errors={fieldErrors[field.name]} formConfig={formConfig} />
 })

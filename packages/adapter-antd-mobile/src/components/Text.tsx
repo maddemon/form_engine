@@ -1,7 +1,7 @@
 import React from 'react'
-import type { FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
-export const TextField: FieldRendererFn = (props: any) => {
+export const TextField: FieldRendererFn = (props: FieldComponentProps) => {
   const { children, style } = props
   const content = children || props.content || ''
   const strong = props.strong

@@ -44,7 +44,7 @@ export function useFormRender({
     formValues, formValuesRef, setFormValues,
     setFieldValue, setFieldsValue, getFieldValue,
     reset: resetValues, submit: submitValues, debouncedOnChange,
-  } = useFormValues({ initialValues: initialValues ?? schema.values ?? {}, onChange })
+  } = useFormValues({ initialValues: initialValues ?? {}, onChange })
 
   const {
     fieldErrors, fieldOptions, setFieldErrors, setFieldOptions,
@@ -98,8 +98,7 @@ export function useFormRender({
 
   const eventContext: EventContext = useMemo(
     () => ({ formValues, $form, callbacks }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [$form, callbacks],
+    [formValues, $form, callbacks],
   )
 
   return {

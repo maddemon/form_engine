@@ -1,35 +1,24 @@
 /**
  * Form Engine - Designer 模块
  * 表单设计器（可视化拖拽编辑）
-*/
+ */
 
 // 导出主组件
-export { Designer } from './Designer'
 export { Canvas } from './Canvas'
+export { Designer } from './Designer'
 export { FieldList } from './FieldList'
 export { PropertyPanel } from './PropertyPanel'
 
 // 导出默认设计器小组件（可传入 PropertyPanel 的 designerWidgets prop）
-export { defaultDesignerWidgets as designerWidgets } from './widgets'
+export { defaultDesignerWidgets as designerWidgets } from '../widgets'
 
 // 导出 Hooks（方便开发者自定义设计器）
-export {
-  useFormDesigner,
-  useDesignerScene,
-  useDesignerHistory,
-  useFieldActions,
-} from './hooks'
+export { useDesignerHistory, useDesignerScene, useFieldActions, useFormDesigner } from './hooks'
 
 // 导出工具和类型
-export { defaultPaletteGroups as defaultPalette } from './paletteData'
 export { createFieldFromPalette, generateFieldId, getFullPaletteGroups } from './FieldList'
+export { defaultPaletteGroups as defaultPalette } from './paletteData'
 
 // 导出类型定义
-export type {
-  DesignerProps,
-  DesignerAction,
-  PaletteItem,
-  PaletteGroup,
-  PanelWidths,
-  SelectedFieldId,
-} from '../types/designer'
+export type { DesignerAction, DesignerProps, PaletteGroup, PaletteItem, PanelWidths, SelectedFieldId } from '../types/designer'
+

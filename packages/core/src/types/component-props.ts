@@ -26,7 +26,6 @@ import type { TextProps } from '../components/text/types'
 import type { ImageProps } from '../components/image/types'
 import type { DividerProps } from '../components/divider/types'
 import type { TitleProps } from '../components/title/types'
-import type { ContainerProps } from '../components/container/types'
 import type { GridProps } from '../components/grid/types'
 import type { FlexProps } from '../components/flex/types'
 import type { CollapseProps, CollapsePanelConfig } from '../components/collapse/types'
@@ -61,7 +60,6 @@ export type {
   ImageProps,
   DividerProps,
   TitleProps,
-  ContainerProps,
   GridProps,
   FlexProps,
   CollapseProps,
@@ -130,7 +128,6 @@ export interface ComponentPropsMap {
   'Image': ImageProps
   'Divider': DividerProps
   'Title': TitleProps
-  'Container': ContainerProps
   'Grid': GridProps
   'Flex': FlexProps
   'Collapse': CollapseProps

@@ -12,14 +12,13 @@
  * ```
  */
 
-import type { FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
 
 import { AlertField } from './components/Alert'
 import { CardField } from './components/Card'
 import { CascaderField } from './components/Cascader'
 import { CheckboxField } from './components/Checkbox'
 import { CollapseField } from './components/Collapse'
-import { ContainerField } from './components/Container'
 import { DateField } from './components/DatePicker'
 import { DateRangeField } from './components/DateRange'
 import { DividerField } from './components/Divider'
@@ -43,6 +42,7 @@ import { TimeField } from './components/TimePicker'
 import { TitleField } from './components/Title'
 import { TreeSelectField } from './components/TreeSelect'
 import { UploadField } from './components/Upload'
+import { ButtonField } from './components/Button'
 
 // Theme Bridge
 export { AntdMobileBridgeProvider } from './themeBridge'
@@ -51,9 +51,10 @@ export { AntdMobileBridgeProvider } from './themeBridge'
 // 兜底渲染
 // ============================
 
-const DefaultField: FieldRendererFn = (props: any) => {
+const DefaultField: FieldRendererFn = (props: FieldComponentProps) => {
   const { fieldSchema } = props
-  return <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>未支持的字段类型：{fieldSchema?.type}</div>
+  const displayName = fieldSchema.label || fieldSchema.name || fieldSchema.type
+  return <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>{displayName}</div>
 }
 
 // ============================
@@ -98,13 +99,14 @@ export const antdMobileAdapter: FormEngineAdapter = {
     cascader: CascaderField,
     'tree-select': TreeSelectField,
     // 容器组件
-    container: ContainerField,
     grid: GridField,
     flex: FlexField,
     collapse: CollapseField,
     tabs: TabsField,
     table: TableField,
     card: CardField,
+    // 按钮组件
+    button: ButtonField,
     // 展示组件
     text: TextField,
     image: ImageField,

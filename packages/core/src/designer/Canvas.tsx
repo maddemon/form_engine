@@ -4,16 +4,9 @@ import type { DeviceScene } from '../types/adapter'
 import { useStyle } from '../styles'
 import type { FormFieldSchema } from '../types/schema'
 import { CanvasToolbar } from './CanvasToolbar'
-import { ComponentTree } from './ComponentTree'
+import { ComponentTree, type TreeItem } from './ComponentTree'
 import { useDesignerContext } from './DesignerContext'
 import { RootFields } from './RootFields'
-
-interface TreeDataNode {
-  id: string
-  label: string
-  type: string
-  children?: TreeDataNode[]
-}
 
 export const CANVAS_ROOT_ID = 'canvas-root'
 export const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
@@ -47,12 +40,12 @@ interface CanvasProps {
   canRedo?: boolean
 }
 
-function buildTreeData(fields: FormFieldSchema[]): TreeDataNode[] {
+function buildTreeData(fields: FormFieldSchema[]): TreeItem[] {
   return fields.map((f) => ({
-    id: f.id!,
+    id: f.id,
     label: f.label || f.type,
     type: f.type,
-    ...(f.children?.length ? { children: buildTreeData(f.children) } : {}),
+    children: f.children.length ? buildTreeData(f.children) : [],
   }))
 }
 

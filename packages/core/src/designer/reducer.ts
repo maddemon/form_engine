@@ -25,7 +25,7 @@ function insertAfter(fields: FormFieldSchema[], targetId: string, newField: Form
     return result
   }
   return fields.map(f =>
-    f.children ? { ...f, children: insertAfter(f.children, targetId, newField) } : f,
+    ({ ...f, children: insertAfter(f.children, targetId, newField) }),
   )
 }
 
@@ -37,7 +37,7 @@ function cloneField(field: FormFieldSchema): FormFieldSchema {
   return {
     ...structuredClone(field),
     id: generateFieldId(),
-    children: field.children?.map(cloneField),
+    children: field.children.map(cloneField),
   }
 }
 
@@ -53,11 +53,11 @@ function removeFieldFromTree(
   if (parentId) {
     let removed: FormFieldSchema | null = null
     const result = fields.map(n => {
-      if (n.id === parentId && n.children) {
+      if (n.id === parentId) {
         removed = n.children[index] || null
         return { ...n, children: n.children.filter((_, i) => i !== index) }
       }
-      return n.children ? { ...n, children: removeFieldFromTree(n.children, parentId, index).fields } : n
+      return { ...n, children: removeFieldFromTree(n.children, parentId, index).fields }
     })
     return { fields: result, removed }
   }
@@ -75,11 +75,11 @@ function insertIntoTree(
   if (parentId) {
     return fields.map(n => {
       if (n.id === parentId) {
-        const children = [...(n.children || [])]
+        const children = [...n.children]
         children.splice(index, 0, field)
         return { ...n, children }
       }
-      return n.children ? { ...n, children: insertIntoTree(n.children, parentId, index, field) } : n
+      return { ...n, children: insertIntoTree(n.children, parentId, index, field) }
     })
   }
   const copy = [...fields]
@@ -90,14 +90,13 @@ function insertIntoTree(
 function removeFieldById(fields: FormFieldSchema[], fieldId: string): FormFieldSchema[] {
   return fields
     .filter(f => f.id !== fieldId)
-    .map(f => f.children ? { ...f, children: removeFieldById(f.children, fieldId) } : f)
+    .map(f => ({ ...f, children: removeFieldById(f.children, fieldId) }))
 }
 
 function updateFieldInTree(fields: FormFieldSchema[], fieldId: string, patch: Partial<FormFieldSchema>): FormFieldSchema[] {
   return fields.map(f => {
     if (f.id === fieldId) return { ...f, ...patch }
-    if (f.children) return { ...f, children: updateFieldInTree(f.children, fieldId, patch) }
-    return f
+    return { ...f, children: updateFieldInTree(f.children, fieldId, patch) }
   })
 }
 
@@ -119,7 +118,7 @@ export function buildFieldIndex(fields: FormFieldSchema[]): FieldIndex {
       if (!field.id) return
       const currentPath = [...parentPath, field.id]
       index.set(field.id, { field, parentId, index: idx, path: currentPath, regionKey: field.regionKey })
-      if (field.children?.length) {
+      if (field.children.length) {
         walk(field.children, field.id, currentPath)
       }
     })
@@ -132,10 +131,8 @@ export function buildFieldIndex(fields: FormFieldSchema[]): FieldIndex {
 export function findInTree(fields: FormFieldSchema[], id: string): FormFieldSchema | undefined {
   for (const f of fields) {
     if (f.id === id) return f
-    if (f.children) {
-      const found = findInTree(f.children, id)
-      if (found) return found
-    }
+    const found = findInTree(f.children, id)
+    if (found) return found
   }
   return undefined
 }
@@ -147,7 +144,7 @@ export function collectFieldNames(fields: FormFieldSchema[], excludeFieldId: str
       if (f.id !== excludeFieldId) {
         names.add(f.name)
       }
-      if (f.children) walk(f.children)
+      walk(f.children)
     }
   }
   walk(fields)
@@ -170,12 +167,12 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
       if (action.parentId) {
         const addToParent = (nodes: FormFieldSchema[]): FormFieldSchema[] =>
           nodes.map(n => {
-            if (n.id === action.parentId) return { ...n, children: [...(n.children || []), fieldToAdd] }
-            return n.children ? { ...n, children: addToParent(n.children) } : n
+            if (n.id === action.parentId) return { ...n, children: [...n.children, fieldToAdd] }
+            return { ...n, children: addToParent(n.children) }
           })
         return {
           ...state,
-          selectedFieldId: action.field.id!,
+          selectedFieldId: action.field.id,
           schema: { ...state.schema, fields: addToParent(state.schema.fields) },
         }
       }
@@ -183,7 +180,7 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
       fields.splice(action.index, 0, fieldToAdd)
       return {
         ...state,
-        selectedFieldId: action.field.id!,
+        selectedFieldId: action.field.id,
         schema: { ...state.schema, fields },
       }
     }
@@ -253,9 +250,7 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
       }
 
     case 'SET_SCHEMA': {
-      const findInTree = (fields: FormFieldSchema[], id: string): boolean =>
-        fields.some(f => f.id === id || (f.children && findInTree(f.children, id)))
-      const stillExists = state.selectedFieldId ? findInTree(action.schema.fields, state.selectedFieldId) : false
+      const stillExists = state.selectedFieldId ? !!findInTree(action.schema.fields, state.selectedFieldId) : false
       return {
         ...state,
         schema: action.schema,

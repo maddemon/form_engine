@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { getEventDeclarations } from '../components'
 import { resolveEvents, type EventContext } from '../events'
 import { useStyle } from '../styles'
-import type { ComponentRenderFn, FormEngineAdapter } from '../types/adapter'
+import type { ComponentRenderFn, FieldComponentProps, FormEngineAdapter } from '../types/adapter'
 import { isFormComponent } from '../types/component-category'
 import type { $Self, ResolvedEventHandler } from '../types/events'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
@@ -74,7 +74,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
   )
 
   // 通用 props
-  const resolvedOptions: OptionItem[] = field.mock?.options?.length ? (field.mock.options as OptionItem[]) : options.length ? options : field.dataSource?.type === 'static' ? field.dataSource.static.options : []
+  const resolvedOptions: OptionItem[] = field.mock?.options?.length ? field.mock.options : options.length ? options : field.dataSource?.type === 'static' ? field.dataSource.static.options : []
 
   // 解析事件处理器（memo 避免每次渲染重建 handler 闭包）
   const $self: $Self = useMemo(
@@ -105,7 +105,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
 
   const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
 
-  const fieldProps: Record<string, unknown> = useMemo(
+  const fieldProps: FieldComponentProps & Record<string, unknown> = useMemo(
     () => ({
       value,
       onChange: handleChange,
@@ -127,7 +127,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
   /**
    * 查找渲染函数（按优先级）
    */
-  const renderFn: ComponentRenderFn | undefined =
+  const renderFn: ComponentRenderFn =
     // 1. 标准类型映射
     adapter.components[field.type] ||
     // 2. 自定义组件（按 componentId 查找）
@@ -142,21 +142,17 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
 
   const fieldContent = (
     <>
-      {!renderFn ? (
-        <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>未知字段类型: {field.type}</div>
-      ) : (
-        <FieldSchemaContext.Provider value={field}>
-          <AdapterContext.Provider value={adapter}>
-            {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
-              其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
-              Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
-            <React.Suspense fallback={null}>
-              {}
-              {React.createElement(renderFn, fieldProps)}
-            </React.Suspense>
-          </AdapterContext.Provider>
-        </FieldSchemaContext.Provider>
-      )}
+      <FieldSchemaContext.Provider value={field}>
+        <AdapterContext.Provider value={adapter}>
+          {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
+            其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
+            Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
+          <React.Suspense fallback={null}>
+            {}
+            {React.createElement(renderFn, fieldProps)}
+          </React.Suspense>
+        </AdapterContext.Provider>
+      </FieldSchemaContext.Provider>
       {errorMsg && <div style={{ color: token('error') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{errorMsg}</div>}
     </>
   )
@@ -172,7 +168,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
 
   return (
     <div className="fe-field" style={{ display: 'flex', gap: token('spacingSm'), alignItems: 'flex-start' }}>
-      <div style={{ width: `${(labelColSpan / 24) * 100}%`, flexShrink: 0, textAlign: (formConfig.labelAlign || 'right') as 'left' | 'right' }}>{label}</div>
+      <div style={{ width: `${(labelColSpan / 24) * 100}%`, flexShrink: 0, textAlign: formConfig.labelAlign }}>{label}</div>
       <div style={{ width: `${(wrapperColSpan / 24) * 100}%` }}>{fieldContent}</div>
     </div>
   )

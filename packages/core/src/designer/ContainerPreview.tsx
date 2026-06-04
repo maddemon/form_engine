@@ -1,5 +1,5 @@
 import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy, horizontalListSortingStrategy } from '@dnd-kit/sortable'
 import React, { useMemo } from 'react'
 import type { CollapsePanelConfig } from '../components/collapse/types'
 import type { TabPaneConfig } from '../components/tabs/types'
@@ -18,7 +18,7 @@ function RegionDroppable({ parentId, regionKey, items, fieldId }: { parentId: st
     data: { parentId, regionKey },
   })
   const { token } = useStyle()
-  const childIds = useMemo(() => items.map((c) => c.id!), [items])
+  const childIds = useMemo(() => items.map((c) => c.id), [items])
 
   return (
     <div
@@ -99,10 +99,14 @@ const GenericContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo
     id: `${field.id}__container`,
     data: { parentId: field.id },
   })
-  const childIds = useMemo(() => field.children?.map((c) => c.id!) ?? [], [field.children])
+  const childIds = useMemo(() => field.children.map((c) => c.id), [field.children])
   const { token } = useStyle()
 
-  if (!field.children || field.children.length === 0) {
+  const rawLayout = (field.componentProps?.layout as string) ?? 'vertical'
+  const isHorizontal = rawLayout === 'horizontal'
+  const strategy = isHorizontal ? horizontalListSortingStrategy : verticalListSortingStrategy
+
+  if (field.children.length === 0) {
     return (
       <div
         ref={setNodeRef}
@@ -111,6 +115,7 @@ const GenericContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          pointerEvents: 'auto',
           border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
           borderRadius: 'var(--fe-border-radius-sm)',
           background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
@@ -119,12 +124,7 @@ const GenericContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo
           transition: 'border-color 0.2s, background 0.2s',
         }}
       >
-        <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
-          {field.children?.map((child, index) => (
-            <NestedField key={child.id} field={child} parentContainerId={field.id!} childIndex={index} />
-          ))}
-          <span>拖入组件</span>
-        </SortableContext>
+        拖入组件
       </div>
     )
   }
@@ -132,17 +132,20 @@ const GenericContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo
     <div
       ref={setNodeRef}
       style={{
+        display: isHorizontal ? 'flex' : undefined,
+        flexDirection: isHorizontal ? 'row' : undefined,
         minHeight: token('containerMinHeight'),
         border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
         borderRadius: 'var(--fe-border-radius-sm)',
         background: isOver ? 'var(--fe-primary-hover-bg)' : 'transparent',
+        pointerEvents: 'auto',
         transition: 'border-color 0.2s, background 0.2s',
         padding: token('spacingXs'),
       }}
     >
-      <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
+      <SortableContext items={childIds} strategy={strategy}>
         {field.children.map((child, index) => (
-          <NestedField key={child.id} field={child} parentContainerId={field.id!} childIndex={index} />
+          <NestedField key={child.id} field={child} parentContainerId={field.id} childIndex={index} />
         ))}
       </SortableContext>
     </div>
@@ -159,7 +162,7 @@ const CardContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(({
     id: `${field.id}__container`,
     data: { parentId: field.id },
   })
-  const childIds = useMemo(() => field.children?.map((c) => c.id!) ?? [], [field.children])
+  const childIds = useMemo(() => field.children.map((c) => c.id), [field.children])
 
   const cardBody = (
     <div
@@ -174,11 +177,11 @@ const CardContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(({
       }}
     >
       <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
-        {field.children?.map((child, index) => (
-          <NestedField key={child.id} field={child} parentContainerId={field.id!} childIndex={index} />
+        {field.children.map((child, index) => (
+          <NestedField key={child.id} field={child} parentContainerId={field.id} childIndex={index} />
         ))}
       </SortableContext>
-      {(!field.children || field.children.length === 0) && <div style={{ textAlign: 'center', color: 'var(--fe-text-muted)', fontSize: token('fontSizeSm'), padding: token('spacingSm') }}>拖拽组件到此处</div>}
+      {field.children.length === 0 && <div style={{ textAlign: 'center', color: 'var(--fe-text-muted)', fontSize: token('fontSizeSm'), padding: token('spacingSm') }}>拖拽组件到此处</div>}
     </div>
   )
 
@@ -187,7 +190,11 @@ const CardContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(({
     componentProps: { ...field.componentProps, children: cardBody },
   }
 
-  return <FieldRenderer field={enhancedField} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
+  return (
+    <div style={{ pointerEvents: 'auto' }}>
+      <FieldRenderer field={enhancedField} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
+    </div>
+  )
 })
 CardContainerContent.displayName = 'CardContainerContent'
 
@@ -203,7 +210,7 @@ const GridContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(({
   })
 
   if (colSpans.length === 0) {
-    return <EmptyContainerPlaceholder containerId={field.id!} />
+    return <EmptyContainerPlaceholder containerId={field.id} />
   }
 
   const gap = (field.componentProps?.gap as number) ?? 0
@@ -213,7 +220,7 @@ const GridContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(({
   return (
     <div style={{ display: 'flex', gap, padding: token('spacingXs') }}>
       {colSpans.map((col, idx) => {
-        const colItems = (field.children ?? []).filter((c) => ((c.columnIndex ?? c.regionKey) ? Number(c.regionKey ?? c.columnIndex) : idx) === idx)
+        const colItems = field.children.filter((c) => ((c.columnIndex ?? c.regionKey) ? Number(c.regionKey ?? c.columnIndex) : idx) === idx)
         return <RegionPreview key={col.id} parent={field} regionKey={String(idx)} items={colItems} regionWidth={`0 0 calc(${(col.span / 24) * 100}% - ${gapOffset}px)`} />
       })}
     </div>
@@ -234,7 +241,7 @@ const TableContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo((
   })
 
   if (columns.length === 0) {
-    return <EmptyContainerPlaceholder containerId={field.id!} />
+    return <EmptyContainerPlaceholder containerId={field.id} />
   }
 
   // Mobile：卡片模式，每列纵向堆叠
@@ -242,7 +249,7 @@ const TableContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo((
     return (
       <div style={{ padding: token('spacingXs') }}>
         {columns.map((col, idx) => {
-          const colItems = field.children?.filter((c) => ((c.columnIndex ?? c.regionKey) ? Number(c.regionKey ?? c.columnIndex) : idx) === idx) ?? []
+          const colItems = field.children.filter((c) => ((c.columnIndex ?? c.regionKey) ? Number(c.regionKey ?? c.columnIndex) : idx) === idx)
           return <RegionPreview key={col.id} parent={field} regionKey={String(idx)} items={colItems} regionWidth="100%" regionLabel={col.label} labelBg="var(--fe-bg-tertiary)" />
         })}
       </div>
@@ -254,7 +261,7 @@ const TableContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo((
   return (
     <div style={{ display: 'flex', width: '100%', padding: token('spacingXs') }}>
       {columns.map((col, idx) => {
-        const colItems = field.children?.filter((c) => ((c.columnIndex ?? c.regionKey) ? Number(c.regionKey ?? c.columnIndex) : idx) === idx) ?? []
+        const colItems = field.children.filter((c) => ((c.columnIndex ?? c.regionKey) ? Number(c.regionKey ?? c.columnIndex) : idx) === idx)
         const proportion = (col.width ?? 120) / totalWidth
         return <RegionPreview key={col.id} parent={field} regionKey={String(idx)} items={colItems} regionWidth={`${proportion} ${proportion} 0px`} regionLabel={col.label} labelBg="var(--fe-bg-tertiary)" />
       })}
@@ -275,12 +282,12 @@ const CollapseContainerContent: React.FC<{ field: FormFieldSchema }> = React.mem
   })
 
   if (panels.length === 0) {
-    return <EmptyContainerPlaceholder containerId={field.id!} />
+    return <EmptyContainerPlaceholder containerId={field.id} />
   }
 
   const panelChildren = panels.map((panel) => {
-    const items = field.children?.filter((c) => c.regionKey === panel.key) ?? []
-    return React.createElement('div', { key: panel.key, field: { regionKey: panel.key }, style: { display: 'contents' } as React.CSSProperties }, <RegionDroppable parentId={field.id!} regionKey={panel.key} items={items} fieldId={field.id!} />)
+    const items = field.children.filter((c) => c.regionKey === panel.key)
+    return React.createElement('div', { key: panel.key, field: { regionKey: panel.key }, style: { display: 'contents' } as React.CSSProperties }, <RegionDroppable parentId={field.id} regionKey={panel.key} items={items} fieldId={field.id} />)
   })
 
   const enhancedField: FormFieldSchema = {
@@ -308,12 +315,12 @@ const TabsContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(({
   })
 
   if (tabs.length === 0) {
-    return <EmptyContainerPlaceholder containerId={field.id!} />
+    return <EmptyContainerPlaceholder containerId={field.id} />
   }
 
   const tabChildren = tabs.map((tab) => {
-    const items = field.children?.filter((c) => c.regionKey === tab.key) ?? []
-    return React.createElement('div', { key: tab.key, field: { regionKey: tab.key }, style: { display: 'contents' } as React.CSSProperties }, <RegionDroppable parentId={field.id!} regionKey={tab.key} items={items} fieldId={field.id!} />)
+    const items = field.children.filter((c) => c.regionKey === tab.key)
+    return React.createElement('div', { key: tab.key, field: { regionKey: tab.key }, style: { display: 'contents' } as React.CSSProperties }, <RegionDroppable parentId={field.id} regionKey={tab.key} items={items} fieldId={field.id} />)
   })
 
   const enhancedField: FormFieldSchema = {
@@ -328,6 +335,77 @@ const TabsContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(({
   )
 })
 TabsContainerContent.displayName = 'TabsContainerContent'
+
+/** Flex container */
+const FlexContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(({ field }) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `${field.id}__container`,
+    data: { parentId: field.id },
+  })
+  const childIds = useMemo(() => field.children.map((c) => c.id), [field.children])
+  const { token } = useStyle()
+
+  const rawDirection = (field.componentProps?.direction as string) ?? 'row'
+  const direction = rawDirection === 'horizontal' ? 'row' : rawDirection
+  const isHorizontal = direction === 'row' || direction === 'row-reverse'
+  const gap = (field.componentProps?.gap as number) ?? 0
+  const justify = (field.componentProps?.justify as string) ?? 'flex-start'
+  const align = (field.componentProps?.align as string) ?? 'stretch'
+  const wrap = (field.componentProps?.wrap as string) === 'wrap'
+
+  const strategy = isHorizontal ? horizontalListSortingStrategy : verticalListSortingStrategy
+
+  if (field.children.length === 0) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={{
+          minHeight: token('containerMinHeight'),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'auto',
+          border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+          borderRadius: 'var(--fe-border-radius-sm)',
+          background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
+          color: 'var(--fe-text-muted)',
+          fontSize: token('fontSizeSm'),
+          transition: 'border-color 0.2s, background 0.2s',
+        }}
+      >
+        拖入组件
+      </div>
+    )
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        display: 'flex',
+        flexDirection: direction,
+        flexWrap: wrap ? 'wrap' : 'nowrap',
+        justifyContent: justify,
+        alignItems: align,
+        gap,
+        minHeight: token('containerMinHeight'),
+        padding: token('spacingXs'),
+        border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+        borderRadius: 'var(--fe-border-radius-sm)',
+        background: isOver ? 'var(--fe-primary-hover-bg)' : 'transparent',
+        pointerEvents: 'auto',
+        transition: 'border-color 0.2s, background 0.2s',
+      }}
+    >
+      <SortableContext items={childIds} strategy={strategy}>
+        {field.children.map((child, index) => (
+          <NestedField key={child.id} field={child} parentContainerId={field.id} childIndex={index} />
+        ))}
+      </SortableContext>
+    </div>
+  )
+})
+FlexContainerContent.displayName = 'FlexContainerContent'
 
 // ── ContainerPreview ────────────────────────────────────────────────
 
@@ -349,6 +427,8 @@ export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field, child
     content = <CollapseContainerContent field={field} />
   } else if (field.type === 'tabs') {
     content = <TabsContainerContent field={field} />
+  } else if (field.type === 'flex') {
+    content = <FlexContainerContent field={field} />
   } else {
     content = <GenericContainerContent field={field} />
   }

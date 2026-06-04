@@ -15,7 +15,7 @@ interface RootFieldsProps {
 const SortableField: React.FC<{ field: FormFieldSchema }> = React.memo(({ field }) => {
   const { selectedFieldId, formConfig, adapter } = useDesignerContext()
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
-    id: field.id!,
+    id: field.id,
     data: { source: 'canvas', fieldId: field.id },
   })
 
@@ -40,7 +40,7 @@ const SortableField: React.FC<{ field: FormFieldSchema }> = React.memo(({ field 
 SortableField.displayName = 'SortableField'
 
 export const RootFields: React.FC<RootFieldsProps> = ({ fields }) => {
-  const fieldIds = useMemo(() => fields.map((f) => f.id!), [fields])
+  const fieldIds = useMemo(() => fields.map((f) => f.id), [fields])
 
   if (fields.length === 0) return null
 

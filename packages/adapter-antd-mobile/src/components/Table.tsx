@@ -1,14 +1,14 @@
-import { useAdapter, type FieldRendererFn } from '@form-engine/core'
+import { useAdapter, type FieldComponentProps, type FieldRendererFn } from '@form-engine/core'
 import { Button, Card } from 'antd-mobile'
 import React from 'react'
 
-export const TableField: FieldRendererFn = (props: any) => {
+export const TableField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, fieldSchema, disabled } = props
   const adapter = useAdapter()
   const rows: Record<string, any>[] = value ?? []
-  const children: any[] = fieldSchema?.children ?? []
-  const columns: any[] = fieldSchema?.componentProps?.columns ?? []
-  const rowMode = fieldSchema?.componentProps?.rowMode ?? 'dynamic'
+  const children: any[] = fieldSchema.children ?? []
+  const columns: any[] = fieldSchema.componentProps?.columns ?? []
+  const rowMode = fieldSchema.componentProps?.rowMode ?? 'dynamic'
 
   // 按 regionKey 分组列字段
   const columnChildren = columns.map((col: any, colIdx: number) => children.filter((child: any) => (child.columnIndex ?? Number(child.regionKey ?? colIdx)) === colIdx))

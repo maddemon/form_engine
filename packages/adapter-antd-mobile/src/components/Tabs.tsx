@@ -1,14 +1,14 @@
 import React from 'react'
 import { Tabs } from 'antd-mobile'
-import { useAdapter, type FieldRendererFn } from '@form-engine/core'
+import { useAdapter, type FieldComponentProps, type FieldRendererFn } from '@form-engine/core'
 
-export const TabsField: FieldRendererFn = (props: any) => {
+export const TabsField: FieldRendererFn = (props: FieldComponentProps) => {
   const { fieldSchema } = props
   const adapter = useAdapter()
-  const tabs = fieldSchema?.componentProps?.tabs ?? []
-  const children = fieldSchema?.children ?? []
-  const activeKey = fieldSchema?.componentProps?.activeKey
-  const defaultActiveKey = fieldSchema?.componentProps?.defaultActiveKey
+  const tabs = fieldSchema.componentProps?.tabs ?? []
+  const children = fieldSchema.children ?? []
+  const activeKey = fieldSchema.componentProps?.activeKey
+  const defaultActiveKey = fieldSchema.componentProps?.defaultActiveKey
 
   return (
     <Tabs activeKey={activeKey} defaultActiveKey={defaultActiveKey}>

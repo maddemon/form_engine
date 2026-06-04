@@ -3,9 +3,11 @@ import { useVisibility } from '../useVisibility'
 import type { FormSchema, FormFieldSchema } from '../../../types/schema'
 
 const createField = (overrides: Partial<FormFieldSchema>): FormFieldSchema => ({
+  id: `field_${Math.random().toString(36).slice(2, 8)}`,
   type: 'input',
   name: 'test',
   label: '测试',
+  children: [],
   ...overrides,
 })
 

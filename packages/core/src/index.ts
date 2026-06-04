@@ -76,7 +76,6 @@ export type {
   ImageProps,
   DividerProps,
   TitleProps,
-  ContainerProps,
   GridProps,
   FlexProps,
   CollapseProps,

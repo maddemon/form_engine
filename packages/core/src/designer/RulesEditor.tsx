@@ -30,7 +30,7 @@ export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
       const cleaned = Object.keys(nextRule).length > 0 ? nextRule : undefined
       dispatch({
         type: 'UPDATE_FIELD',
-        fieldId: field.id!,
+        fieldId: field.id,
         patch: { rules: cleaned ? [cleaned] : undefined },
       })
     },

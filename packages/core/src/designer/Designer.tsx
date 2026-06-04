@@ -19,7 +19,7 @@ function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?
   if (field) return { parentId, index: fields.indexOf(field), regionKey: field.regionKey }
 
   for (const f of fields) {
-    if (!f.children) continue
+    if (!f.children.length) continue
     const result = findFieldPosition(f.children, fieldId, f.id)
     if (result) return result
   }
@@ -35,7 +35,7 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[], fieldIndex
     const containerId = overId.replace(/__container$/, '')
     const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
     if (container) {
-      return { parentId: containerId, index: container.children?.length || 0 }
+      return { parentId: containerId, index: container.children.length }
     }
   }
 
@@ -45,7 +45,7 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[], fieldIndex
     const regionKey = regionMatch[2]
     const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
     if (container) {
-      return { parentId: containerId, index: container.children?.length || 0, regionKey }
+      return { parentId: containerId, index: container.children.length, regionKey }
     }
   }
 
@@ -63,10 +63,10 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[], fieldIndex
 function reorderFieldsInContainer(fields: FormFieldSchema[], containerId: string | undefined, fromIdx: number, toIdx: number): FormFieldSchema[] {
   if (!containerId) return arrayMove(fields, fromIdx, toIdx)
   return fields.map((f) => {
-    if (f.id === containerId && f.children) {
+    if (f.id === containerId) {
       return { ...f, children: arrayMove(f.children, fromIdx, toIdx) }
     }
-    if (f.children) {
+    if (f.children.length) {
       return { ...f, children: reorderFieldsInContainer(f.children, containerId, fromIdx, toIdx) }
     }
     return f
@@ -244,7 +244,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema, onSchemaChange, onSc
         const container = fieldIndex.get(containerId)?.field ?? findInTree(state.schema.fields, containerId)
         if (!container) return
         targetParentId = containerId
-        targetIndex = container.children?.length || 0
+        targetIndex = container.children.length
       } else if (overId.endsWith('__container')) {
         const containerId = overId.replace(/__container$/, '')
         if (sourcePos.parentId === containerId) return
@@ -252,7 +252,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema, onSchemaChange, onSc
         const container = fieldIndex.get(containerId)?.field ?? findInTree(state.schema.fields, containerId)
         if (!container) return
         targetParentId = containerId
-        targetIndex = container.children?.length || 0
+        targetIndex = container.children.length
       } else {
         const overEntry = fieldIndex.get(overId)
         const targetPos = overEntry ? { parentId: overEntry.parentId ?? undefined, index: overEntry.index, regionKey: overEntry.regionKey } : findFieldPosition(state.schema.fields, overId)
@@ -320,7 +320,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema, onSchemaChange, onSc
 
         const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
         if (!container) return
-        const targetIndex = container.children?.length || 0
+        const targetIndex = container.children.length
 
         dispatch({
           type: 'MOVE_FIELD',
@@ -345,7 +345,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema, onSchemaChange, onSc
         dispatch({
           type: 'MOVE_FIELD',
           fromIndex: sourcePos.index,
-          toIndex: container.children?.length || 0,
+          toIndex: container.children.length,
           fromParentId: sourcePos.parentId,
           toParentId: containerId,
         })
