@@ -137,6 +137,7 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = React.memo(({ item }) =
     </div>
   )
 })
+PaletteItemCard.displayName = 'PaletteItemCard'
 
 function ComponentLibContent({ groups }: { groups: PaletteGroup[] }) {
   const { token } = useStyle()

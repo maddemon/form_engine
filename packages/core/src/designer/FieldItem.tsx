@@ -138,9 +138,10 @@ export const FieldItem: React.FC<FieldItemProps> = React.memo(({
         </div>
       )}
 
-      <div style={{ pointerEvents: 'auto' }}>
+      <div style={{ pointerEvents: 'none' }}>
         {children}
       </div>
     </div>
   )
 })
+FieldItem.displayName = 'FieldItem'

@@ -70,7 +70,7 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
   const mobilePageBg = formConfig.pageBackground?.mobile ?? ''
 
   const renderPageBgField = (scene: 'desktop' | 'mobile', bgValue: string) => (
-    <FieldItem label={`${scene === 'desktop' ? '桌面端' : '移动端'}页面背景色`}>
+    <FieldItem label={`页面背景色`}>
       <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
         <div
           style={{
@@ -78,17 +78,17 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
             height: token('spacingXl'),
             borderRadius: 'var(--fe-border-radius-sm)',
             border: '1px solid var(--fe-border)',
-            background: bgValue || (scene === 'desktop' ? 'var(--fe-bg-primary)' : 'var(--fe-bg-secondary)'),
+            background: bgValue || 'var(--fe-bg-primary)',
             flexShrink: 0,
           }}
         />
-        <w.Input value={bgValue} onChange={(v) => handlePageBgChange(scene, v)} placeholder={scene === 'desktop' ? 'var(--fe-bg-primary)' : 'var(--fe-bg-secondary)'} />
+        <w.Input value={bgValue} onChange={(v) => handlePageBgChange(scene, v)} placeholder={'var(--fe-bg-primary)'} />
       </div>
     </FieldItem>
   )
 
   const renderColSection = (title: string, labelColSpan: number, wrapperColSpan: number, onColChange: (key: 'labelCol' | 'wrapperCol', v: string | undefined) => void) => (
-    <div style={{ marginTop: token('spacingMd'), borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm') }}>
+    <div style={{ marginTop: token('spacingMd'), paddingTop: token('spacingSm') }}>
       <div style={{ fontSize: token('fontSizeSm'), fontWeight: 500, marginBottom: token('spacingSm'), color: 'var(--fe-text-secondary)' }}>{title}</div>
       <FieldItem label="标签宽度">
         <w.Select value={String(labelColSpan)} onChange={(v) => onColChange('labelCol', v)} options={COL_SPAN_OPTIONS} />
@@ -111,13 +111,17 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
         <w.Select value={formConfig.labelAlign || 'right'} onChange={(v) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { labelAlign: v as 'left' | 'right' } })} options={LABEL_ALIGN_OPTIONS} />
       </FieldItem>
 
+      <div style={{ width: '100%', background: 'var(--fe-border-primary)', margin: `${token('spacingMd')} 0` }} />
+
       <h4 style={{ margin: `${token('spacingMd')} 0 ${token('spacingSm')} 0`, fontSize: token('fontSizeSm'), color: 'var(--fe-text-secondary)' }}>桌面端配置</h4>
       {renderPageBgField('desktop', desktopPageBg)}
-      {renderColSection('桌面端标签/控件宽度', desktopLabelColSpan, desktopWrapperColSpan, handleDesktopColChange)}
+      {renderColSection('控件宽度', desktopLabelColSpan, desktopWrapperColSpan, handleDesktopColChange)}
+
+      <div style={{ width: '100%', background: 'var(--fe-border-primary)', margin: `${token('spacingMd')} 0` }} />
 
       <h4 style={{ margin: `${token('spacingMd')} 0 ${token('spacingSm')} 0`, fontSize: token('fontSizeSm'), color: 'var(--fe-text-secondary)' }}>移动端配置</h4>
       {renderPageBgField('mobile', mobilePageBg)}
-      {renderColSection('移动端标签/控件宽度', mobileLabelColSpan, mobileWrapperColSpan, handleMobileColChange)}
+      {renderColSection('控件宽度', mobileLabelColSpan, mobileWrapperColSpan, handleMobileColChange)}
     </>
   )
 }

@@ -33,10 +33,11 @@ const SortableField: React.FC<{ field: FormFieldSchema }> = React.memo(({ field 
         opacity: isDragging ? 0 : 1,
       }}
     >
-      {isContainerComponent(field.type) ? <ContainerPreview field={field} /> : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled adapter={adapter} formConfig={formConfig} />}
+      {isContainerComponent(field.type) ? <ContainerPreview field={field} /> : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />}
     </FieldItem>
   )
 })
+SortableField.displayName = 'SortableField'
 
 export const RootFields: React.FC<RootFieldsProps> = ({ fields }) => {
   const fieldIds = useMemo(() => fields.map((f) => f.id!), [fields])

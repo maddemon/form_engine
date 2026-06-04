@@ -26,7 +26,6 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   const handleChange = (val: number | string | null) => {
     onChange?.(val as number | undefined)
@@ -49,7 +48,6 @@ export const InputNumber: React.FC<InputNumberProps> = ({
       style={{ ...style }}
       className={className}
       id={id}
-      {...rest}
     />
   )
 }

@@ -56,8 +56,8 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
   const treeData = useMemo(() => buildTreeData(fields), [fields])
   const canvasWidth = scene === 'mobile' ? 375 : '100%'
 
-  // Page background: from formConfig, defaults differ by scene
-  const defaultBg = scene === 'mobile' ? 'var(--fe-bg-secondary)' : 'var(--fe-bg-primary)'
+  // Page background: from formConfig, default to white
+  const defaultBg = 'var(--fe-bg-primary)'
   const pageBg = (scene === 'mobile'
     ? formConfig.pageBackground?.mobile
     : formConfig.pageBackground?.desktop) ?? defaultBg
@@ -100,6 +100,7 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
             background: pageBg,
             borderRadius: 'var(--fe-border-radius-md)',
             padding: token('spacingMd'),
+            border: scene === 'mobile' ? '2px solid var(--fe-border-primary)' : 'none',
             boxShadow: scene === 'mobile' ? 'var(--fe-shadow-sm)' : 'none',
             overflow: 'auto',
           }}

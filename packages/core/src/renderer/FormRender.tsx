@@ -308,8 +308,12 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
     submit()
   }
 
+  const pageBg = (scene === 'mobile'
+    ? formConfig.pageBackground?.mobile
+    : formConfig.pageBackground?.desktop) ?? 'var(--fe-bg-primary)'
+
   return (
-    <form onSubmit={handleSubmit} className="fe-form" style={{ maxWidth: 640 }}>
+    <form onSubmit={handleSubmit} className="fe-form" style={{ maxWidth: 640, background: pageBg, minHeight: 400 }}>
       <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
         {visibleFields.map((field) => (
           <div key={field.id || field.name} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
@@ -362,3 +366,4 @@ const NestedFieldRenderer: React.FC<NestedFieldRendererProps> = React.memo(({ fi
 
   return <FieldRenderer field={enhancedField} value={formValues[field.name]} onChange={handleChange} options={fieldOptions[field.name] || []} disabled={loading || field.disabled === true} adapter={adapter} components={components} eventContext={eventContext} errors={fieldErrors[field.name]} formConfig={formConfig} />
 })
+NestedFieldRenderer.displayName = 'NestedFieldRenderer'

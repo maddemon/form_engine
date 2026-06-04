@@ -24,9 +24,9 @@ export const Input: React.FC<InputProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if ((e.nativeEvent as InputEvent)?.isComposing) return
     onChange?.(e.target.value)
   }
   
@@ -47,7 +47,6 @@ export const Input: React.FC<InputProps> = ({
     style: { width: '100%', ...style },
     className,
     id,
-    ...rest
   }
   
   if (type === 'password') {

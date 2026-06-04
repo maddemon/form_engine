@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { getEventDeclarations } from '../components'
 import { resolveEvents, type EventContext } from '../events'
 import { useStyle } from '../styles'
@@ -94,30 +94,13 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
   const eventHandlers: Record<string, ResolvedEventHandler> = useMemo(() => (eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}), [eventContext, field.events, field.type, $self])
 
   // onChange 包装：先更新当前字段值，再执行用户事件
-  // IME 组合输入检测：通过 onCompositionStart/onCompositionEnd 跟踪组合输入状态
-  const composingRef = useRef(false)
-
-  const handleCompositionStart = useCallback(() => {
-    composingRef.current = true
-  }, [])
-
-  const handleCompositionEnd = useCallback(
-    (e: React.CompositionEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      composingRef.current = false
-      const target = e.target as HTMLInputElement
-      onChange(target.value)
-      eventHandlers.onChange?.(target.value)
-    },
-    [onChange, eventHandlers.onChange],
-  )
-
+  // IME 组合输入由各 adapter 通过 nativeEvent.isComposing 自行拦截
   const handleChange = useCallback(
     (newValue: unknown) => {
-      if (composingRef.current) return
       onChange(newValue)
       eventHandlers.onChange?.(newValue)
     },
-    [onChange, eventHandlers.onChange],
+    [onChange, eventHandlers],
   )
 
   const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
@@ -126,8 +109,6 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
     () => ({
       value,
       onChange: handleChange,
-      onCompositionStart: handleCompositionStart,
-      onCompositionEnd: handleCompositionEnd,
       disabled: isDisabled,
       readOnly: field.readOnly,
       placeholder: field.placeholder,
@@ -140,7 +121,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
       ...field.componentProps,
       ...eventHandlers,
     }),
-    [value, handleChange, handleCompositionStart, handleCompositionEnd, isDisabled, field.readOnly, field.placeholder, resolvedOptions, field, isRequired, field.rules, errorMsg, field.componentProps, eventHandlers],
+    [value, handleChange, isDisabled, resolvedOptions, field, isRequired, errorMsg, eventHandlers],
   )
 
   /**
@@ -170,7 +151,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
               其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
               Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
             <React.Suspense fallback={null}>
-              {/* eslint-disable-next-line react-hooks/refs -- composingRef 仅在事件回调中读取，此处为传参非 render 中访问 */}
+              {}
               {React.createElement(renderFn, fieldProps)}
             </React.Suspense>
           </AdapterContext.Provider>

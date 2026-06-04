@@ -21,9 +21,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if ((e.nativeEvent as InputEvent)?.isComposing) return
     onChange?.(e.target.value)
   }
   
@@ -41,7 +41,6 @@ export const TextArea: React.FC<TextAreaProps> = ({
       style={{ width: '100%', ...style }}
       className={className}
       id={id}
-      {...rest}
     />
   )
 }

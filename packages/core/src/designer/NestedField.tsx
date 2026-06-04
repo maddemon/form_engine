@@ -24,7 +24,7 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
     disabled: parentContainerId === undefined || childIndex === undefined,
   })
 
-  const content = isContainer ? <ContainerPreview field={field} /> : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled adapter={adapter} formConfig={formConfig} />
+  const content = isContainer ? <ContainerPreview field={field} /> : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
 
   return (
     <FieldItem
@@ -44,3 +44,4 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
     </FieldItem>
   )
 })
+NestedField.displayName = 'NestedField'

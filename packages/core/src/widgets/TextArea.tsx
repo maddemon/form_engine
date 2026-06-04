@@ -36,3 +36,4 @@ export const WidgetTextArea = React.forwardRef<HTMLTextAreaElement, WidgetTextAr
     )
   },
 )
+WidgetTextArea.displayName = 'WidgetTextArea'
