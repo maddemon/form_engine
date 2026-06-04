@@ -1,10 +1,18 @@
 import { useReducer, useCallback, useMemo, useState } from 'react'
-import type { FormSchema, FormFieldSchema, FormConfig, SubmitConfig } from '../types/schema'
+import { DEFAULT_FORM_CONFIG, type FormSchema, type FormFieldSchema, type FormConfig, type SubmitConfig } from '../types/schema'
 import type { PaletteItem, DesignerAction } from '../types/designer'
 import { createFieldFromPalette } from './FieldList'
 import type { DeviceScene } from '../types/adapter'
-import { designerReducer } from './reducer'
+import { designerReducer, findInTree } from './reducer'
 import type { DesignerState } from './reducer'
+
+export const DEFAULT_SCHEMA: FormSchema = {
+  version: '0.1',
+  name: '未命名表单',
+  fields: [],
+  form: { ...DEFAULT_FORM_CONFIG },
+  submit: { text: '提交', showReset: true, resetText: '重置' },
+}
 
 // ===========================
 // Hooks
@@ -12,18 +20,12 @@ import type { DesignerState } from './reducer'
 
 export function useFormDesigner(initialSchema?: FormSchema) {
   const [state, dispatch] = useReducer(designerReducer, {
-    schema: initialSchema || {
-      version: '0.1',
-      name: '未命名表单',
-      fields: [],
-      form: { layout: 'vertical', size: 'middle' },
-      submit: { text: '提交', showReset: true, resetText: '重置' },
-    },
+    schema: initialSchema || DEFAULT_SCHEMA,
     selectedFieldId: null,
   } as DesignerState)
 
   const selectedField = useMemo(
-    () => state.schema.fields.find((f) => f.id === state.selectedFieldId) || null,
+    () => (state.selectedFieldId ? findInTree(state.schema.fields, state.selectedFieldId) || null : null),
     [state.schema.fields, state.selectedFieldId],
   )
 

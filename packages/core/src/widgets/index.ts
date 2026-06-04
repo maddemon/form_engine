@@ -2,6 +2,7 @@ import type { DesignerWidgets } from '../types/adapter'
 import { WidgetButton } from './Button'
 import { WidgetButtonGroup } from './ButtonGroup'
 import { WidgetCheckbox } from './Checkbox'
+import { WidgetExpressionInput } from './ExpressionInput'
 import { WidgetInput } from './Input'
 import { WidgetNumberInput } from './NumberInput'
 import { WidgetOptionsEditor } from './OptionsEditor'
@@ -19,4 +20,5 @@ export const defaultDesignerWidgets: DesignerWidgets = {
   Button: WidgetButton,
   OptionsEditor: WidgetOptionsEditor,
   ButtonGroup: WidgetButtonGroup,
+  ExpressionInput: WidgetExpressionInput,
 }

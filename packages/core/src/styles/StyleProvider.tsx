@@ -239,14 +239,20 @@ export function useToken<K extends keyof ThemeTokens>(tokenName: K): ThemeTokens
 // Helper Functions
 // ============================
 
+// 模块级缓存，避免每次 fallback 创建新对象
+let cachedDefaultContext: StyleContextValue | null = null
+
 function createDefaultContext(): StyleContextValue {
-  return {
-    theme: defaultTheme,
-    themeMode: 'light',
-    sizeMode: 'default',
-    prefix: 'fe',
-    getCssVar: (tokenName) => `var(--fe-${toKebabCase(tokenName)})`,
-    getToken: (tokenName) => defaultTheme[tokenName],
+  if (!cachedDefaultContext) {
+    cachedDefaultContext = {
+      theme: defaultTheme,
+      themeMode: 'light',
+      sizeMode: 'default',
+      prefix: 'fe',
+      getCssVar: (tokenName) => `var(--fe-${toKebabCase(tokenName)})`,
+      getToken: (tokenName) => defaultTheme[tokenName],
+    }
   }
+  return cachedDefaultContext
 }
 

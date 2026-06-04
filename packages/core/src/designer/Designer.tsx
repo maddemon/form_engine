@@ -1,19 +1,20 @@
 import { DndContext, DragOverlay, PointerSensor, pointerWithin, TouchSensor, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragOverEvent, type DragStartEvent, type UniqueIdentifier } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { getComponentIcon } from '../components/paletteRegistry'
 import type { DeviceScene } from '../types/adapter'
 import { useEnsureDefaultTheme, useStyle } from '../styles'
 import type { FormEngineAdapter } from '../types/adapter'
 import type { PaletteGroup, PanelWidths, SidePanelTab, PropertyPanelTab } from '../types/designer'
 import { isPaletteDrag, toPaletteItem, type DesignerDragData } from '../types/designer-drag'
-import { DEFAULT_FORM_CONFIG, type FormFieldSchema, type FormSchema } from '../types/schema'
+import { type FormFieldSchema, type FormSchema } from '../types/schema'
 import { Canvas, CANVAS_ROOT_ID, CANVAS_ROOT_HEAD_ID } from './Canvas'
 import { DesignerContext } from './DesignerContext'
 import { createFieldFromPalette, FieldList, getFullPaletteGroups } from './FieldList'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
 import { designerReducerWithHistory, findInTree } from './reducer'
+import { DEFAULT_SCHEMA } from './hooks'
 
 function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number; regionKey?: string } | null {
   const field = fields.find(f => f.id === fieldId)
@@ -102,13 +103,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
 
   const [state, dispatch] = useReducer(designerReducerWithHistory, {
-    schema: externalSchema || {
-      version: '0.1',
-      name: '未命名表单',
-      fields: [],
-      form: { ...DEFAULT_FORM_CONFIG },
-      submit: { text: '提交', showReset: true, resetText: '重置' },
-    },
+    schema: externalSchema || DEFAULT_SCHEMA,
     selectedFieldId: null,
     snapshots: [[]],
     historyIndex: 0,
@@ -385,8 +380,19 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
     setActiveDragType('')
   }, [])
 
+  const contextValue = useMemo(() => ({
+    dispatch,
+    selectedFieldId: state.selectedFieldId,
+    onSelectField: handleSelectField,
+    scene,
+    formConfig: state.schema.form,
+    adapter: canvasAdapter,
+    desktopAdapter: widgetsAdapter,
+  }), [dispatch, state.selectedFieldId, handleSelectField, scene, state.schema.form, canvasAdapter, widgetsAdapter])
+
   const { token } = useStyle()
   return (
+    <DesignerContext.Provider value={contextValue}>
     <div className="designer-scroll-container" style={{ display: 'flex', height: '100%', fontFamily: '-apple-system, sans-serif', background: 'var(--fe-bg-secondary)', overflow: 'hidden' }}>
       <style>{`
           .designer-scroll-container ::-webkit-scrollbar { width: var(--fe-spacing-xs); height: var(--fe-spacing-xs); }
@@ -400,9 +406,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
         {/* 中间画布 */}
         <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-          <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form, adapter: canvasAdapter, desktopAdapter: widgetsAdapter }}>
-            <Canvas fields={state.schema.fields} activeId={activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} />
-          </DesignerContext.Provider>
+          <Canvas fields={state.schema.fields} activeId={activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} />
         </div>
 
         <DragOverlay dropAnimation={null}>
@@ -430,9 +434,8 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       </DndContext>
 
       {/* 右侧属性面板 */}
-      <DesignerContext.Provider value={{ dispatch, selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField, scene, formConfig: state.schema.form, adapter: canvasAdapter, desktopAdapter: widgetsAdapter }}>
-        <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} designerWidgets={widgetsAdapter?.designerWidgets} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
-      </DesignerContext.Provider>
+      <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} designerWidgets={widgetsAdapter?.designerWidgets} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
     </div>
+    </DesignerContext.Provider>
   )
 }

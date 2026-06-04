@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import type { FormFieldSchema } from '../types/schema'
 import { useStyle } from '../styles'
-import { isContainerComponent } from '../types/component-category'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core'
 import { NestedField } from './NestedField'
@@ -10,6 +9,8 @@ import type { CollapsePanelConfig } from '../components/collapse/types'
 import type { TabPaneConfig } from '../components/tabs/types'
 import { useDesignerContext } from './DesignerContext'
 import { FieldRenderer } from '../renderer/FieldRenderer'
+
+// ── region droppable ────────────────────────────────────────────────
 
 function RegionDroppable({ parentId, regionKey, items, fieldId }: {
   parentId: string
@@ -58,17 +59,56 @@ function RegionDroppable({ parentId, regionKey, items, fieldId }: {
   )
 }
 
-function ContainerContent({ field }: { field: FormFieldSchema }) {
-  const { token } = useStyle()
-  const { scene, formConfig, adapter } = useDesignerContext()
+// ── reusable empty‑container placeholder ───────────────────────────
 
-  // 通用容器
-  if (!['grid', 'table', 'tabs', 'collapse', 'card'].includes(field.type)) {
+type EmptyPlaceholderProps = {
+  containerId: string
+  /** custom style overrides */
+  style?: React.CSSProperties
+}
+
+const EmptyContainerPlaceholder: React.FC<EmptyPlaceholderProps> = React.memo(
+  ({ containerId, style }) => {
+    const { setNodeRef, isOver } = useDroppable({
+      id: `${containerId}__container`,
+      data: { parentId: containerId },
+    })
+    const { token } = useStyle()
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={{
+          minHeight: token('containerMinHeight'),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
+          borderRadius: 'var(--fe-border-radius-sm)',
+          background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
+          color: 'var(--fe-text-muted)',
+          fontSize: token('fontSizeSm'),
+          ...style,
+        }}
+      >
+        拖入组件
+      </div>
+    )
+  },
+)
+
+// ── per‑type container content components ──────────────────────────
+
+/** Generic container (non‑special‑cased type) */
+const GenericContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(
+  ({ field }) => {
     const { setNodeRef, isOver } = useDroppable({
       id: `${field.id}__container`,
       data: { parentId: field.id },
     })
     const childIds = useMemo(() => field.children?.map(c => c.id!) ?? [], [field.children])
+    const { token } = useStyle()
+
     if (!field.children || field.children.length === 0) {
       return (
         <div
@@ -114,10 +154,15 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
         </SortableContext>
       </div>
     )
-  }
+  },
+)
 
-  // Card：使用真实 Card 组件包裹子组件
-  if (field.type === 'card') {
+/** Card container */
+const CardContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(
+  ({ field }) => {
+    const { token } = useStyle()
+    const { scene, formConfig, adapter } = useDesignerContext()
+
     const { setNodeRef, isOver } = useDroppable({
       id: `${field.id}__container`,
       data: { parentId: field.id },
@@ -165,34 +210,23 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
         formConfig={formConfig}
       />
     )
-  }
+  },
+)
 
-  // Grid：按 colSpans 分列
-  if (field.type === 'grid') {
+/** Grid container */
+const GridContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(
+  ({ field }) => {
+    const { token } = useStyle()
     const colSpans = ((field.componentProps?.colSpans as Array<{ id: string; span: number }>) ?? []).filter(Boolean)
+
+    // 无条件调用 useDroppable — 非空时不使用返回值
+    useDroppable({
+      id: `${field.id}__container`,
+      data: { parentId: field.id },
+    })
+
     if (colSpans.length === 0) {
-      const { setNodeRef, isOver } = useDroppable({
-        id: `${field.id}__container`,
-        data: { parentId: field.id },
-      })
-      return (
-        <div
-          ref={setNodeRef}
-          style={{
-            minHeight: token('containerMinHeight'),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
-            borderRadius: 'var(--fe-border-radius-sm)',
-            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
-            color: 'var(--fe-text-muted)',
-            fontSize: token('fontSizeSm'),
-          }}
-        >
-          拖入组件
-        </div>
-      )
+      return <EmptyContainerPlaceholder containerId={field.id!} />
     }
 
     const gap = (field.componentProps?.gap as number) ?? 0
@@ -215,34 +249,24 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
         })}
       </div>
     )
-  }
+  },
+)
 
-  // Table：按 columns 分列（desktop 横向分列，mobile 纵向卡片）
-  if (field.type === 'table') {
+/** Table container */
+const TableContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(
+  ({ field }) => {
+    const { token } = useStyle()
+    const { scene } = useDesignerContext()
     const columns = ((field.componentProps?.columns as Array<{ id: string; label: string; width: number }>) ?? []).filter(Boolean)
+
+    // 无条件调用 useDroppable — 非空时不使用返回值
+    useDroppable({
+      id: `${field.id}__container`,
+      data: { parentId: field.id },
+    })
+
     if (columns.length === 0) {
-      const { setNodeRef, isOver } = useDroppable({
-        id: `${field.id}__container`,
-        data: { parentId: field.id },
-      })
-      return (
-        <div
-          ref={setNodeRef}
-          style={{
-            minHeight: token('containerMinHeight'),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
-            borderRadius: 'var(--fe-border-radius-sm)',
-            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
-            color: 'var(--fe-text-muted)',
-            fontSize: token('fontSizeSm'),
-          }}
-        >
-          拖入组件
-        </div>
-      )
+      return <EmptyContainerPlaceholder containerId={field.id!} />
     }
 
     // Mobile：卡片模式，每列纵向堆叠
@@ -288,34 +312,23 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
         })}
       </div>
     )
-  }
+  },
+)
 
-  // Collapse：按 panels 分面板（使用 FieldRenderer + 真实 antd Collapse）
-  if (field.type === 'collapse') {
+/** Collapse container */
+const CollapseContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(
+  ({ field }) => {
+    const { formConfig, adapter } = useDesignerContext()
     const panels = ((field.componentProps?.panels as CollapsePanelConfig[]) ?? []).filter(Boolean)
+
+    // 无条件调用 useDroppable — 非空时不使用返回值
+    useDroppable({
+      id: `${field.id}__container`,
+      data: { parentId: field.id },
+    })
+
     if (panels.length === 0) {
-      const { setNodeRef, isOver } = useDroppable({
-        id: `${field.id}__container`,
-        data: { parentId: field.id },
-      })
-      return (
-        <div
-          ref={setNodeRef}
-          style={{
-            minHeight: token('containerMinHeight'),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
-            borderRadius: 'var(--fe-border-radius-sm)',
-            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
-            color: 'var(--fe-text-muted)',
-            fontSize: token('fontSizeSm'),
-          }}
-        >
-          拖入组件
-        </div>
-      )
+      return <EmptyContainerPlaceholder containerId={field.id!} />
     }
 
     const panelChildren = panels.map(panel => {
@@ -343,34 +356,23 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
         formConfig={formConfig}
       />
     )
-  }
+  },
+)
 
-  // Tabs：按 tabs 分标签页（使用 FieldRenderer + 真实 antd Tabs）
-  if (field.type === 'tabs') {
+/** Tabs container */
+const TabsContainerContent: React.FC<{ field: FormFieldSchema }> = React.memo(
+  ({ field }) => {
+    const { formConfig, adapter } = useDesignerContext()
     const tabs = ((field.componentProps?.tabs as TabPaneConfig[]) ?? []).filter(Boolean)
+
+    // 无条件调用 useDroppable — 非空时不使用返回值
+    useDroppable({
+      id: `${field.id}__container`,
+      data: { parentId: field.id },
+    })
+
     if (tabs.length === 0) {
-      const { setNodeRef, isOver } = useDroppable({
-        id: `${field.id}__container`,
-        data: { parentId: field.id },
-      })
-      return (
-        <div
-          ref={setNodeRef}
-          style={{
-            minHeight: token('containerMinHeight'),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: isOver ? '2px solid var(--fe-primary)' : '1px dashed var(--fe-border-light)',
-            borderRadius: 'var(--fe-border-radius-sm)',
-            background: isOver ? 'var(--fe-primary-hover-bg)' : 'var(--fe-bg-tertiary)',
-            color: 'var(--fe-text-muted)',
-            fontSize: token('fontSizeSm'),
-          }}
-        >
-          拖入组件
-        </div>
-      )
+      return <EmptyContainerPlaceholder containerId={field.id!} />
     }
 
     const tabChildren = tabs.map(tab => {
@@ -398,10 +400,10 @@ function ContainerContent({ field }: { field: FormFieldSchema }) {
         formConfig={formConfig}
       />
     )
-  }
+  },
+)
 
-  return null
-}
+// ── ContainerPreview ────────────────────────────────────────────────
 
 interface ContainerPreviewProps {
   field: FormFieldSchema
@@ -409,11 +411,23 @@ interface ContainerPreviewProps {
 }
 
 export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field, childIndex }) => {
-  return (
-    <div style={{ width: '100%' }}>
-      <ContainerContent field={field} />
-    </div>
-  )
+  let content: React.ReactNode = null
+
+  if (field.type === 'card') {
+    content = <CardContainerContent field={field} />
+  } else if (field.type === 'grid') {
+    content = <GridContainerContent field={field} />
+  } else if (field.type === 'table') {
+    content = <TableContainerContent field={field} />
+  } else if (field.type === 'collapse') {
+    content = <CollapseContainerContent field={field} />
+  } else if (field.type === 'tabs') {
+    content = <TabsContainerContent field={field} />
+  } else {
+    content = <GenericContainerContent field={field} />
+  }
+
+  return <div style={{ width: '100%' }}>{content}</div>
 }
 
 export default ContainerPreview

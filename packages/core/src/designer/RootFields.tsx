@@ -12,7 +12,7 @@ interface RootFieldsProps {
   fields: FormFieldSchema[]
 }
 
-const SortableField: React.FC<{ field: FormFieldSchema }> = ({ field }) => {
+const SortableField: React.FC<{ field: FormFieldSchema }> = React.memo(({ field }) => {
   const { selectedFieldId, formConfig, adapter } = useDesignerContext()
   const {
     attributes, listeners, setNodeRef, setActivatorNodeRef,
@@ -43,7 +43,7 @@ const SortableField: React.FC<{ field: FormFieldSchema }> = ({ field }) => {
       )}
     </FieldItem>
   )
-}
+})
 
 export const RootFields: React.FC<RootFieldsProps> = ({ fields }) => {
   const fieldIds = useMemo(() => fields.map(f => f.id!), [fields])

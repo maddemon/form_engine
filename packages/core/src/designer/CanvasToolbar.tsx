@@ -3,6 +3,11 @@ import type { DeviceScene } from '../types/adapter'
 import { Monitor, Smartphone } from '../components/icons'
 import { useStyle } from '../styles'
 
+const SCENE_TOGGLES = [
+  { key: 'desktop' as const, icon: Monitor, title: '桌面' },
+  { key: 'mobile' as const, icon: Smartphone, title: '手机' },
+]
+
 interface CanvasToolbarProps {
   scene: DeviceScene
   onSceneChange?: (scene: DeviceScene) => void
@@ -90,12 +95,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
-        {(
-          [
-            { key: 'desktop' as const, icon: Monitor, title: '桌面' },
-            { key: 'mobile' as const, icon: Smartphone, title: '手机' },
-          ] as { key: DeviceScene; icon: React.FC<{ size?: number; color?: string }>; title: string }[]
-        ).map(item => (
+        {SCENE_TOGGLES.map(item => (
           <button
             key={item.key}
             title={item.title}

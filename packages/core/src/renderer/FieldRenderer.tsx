@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import { getEventDeclarations } from '../components'
 import { resolveEvents, type EventContext } from '../events'
 import { useStyle } from '../styles'
@@ -53,8 +53,16 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
   const showLabel = isFormComponent(field.type) && field.label
   const colon = formConfig.colon
   const labelText = field.label + (colon ? '：' : '')
+  const labelStyle = useMemo(
+    () => ({
+      display: 'block',
+      marginBottom: 'var(--fe-spacing-xs, 4px)',
+      fontWeight: isRequired ? 'var(--fe-font-weight-semibold, 600)' : 'var(--fe-font-weight-regular, 400)',
+    }),
+    [isRequired],
+  )
   const label = !showLabel ? null : (
-    <label className="fe-field-label" style={{ display: 'block', marginBottom: 'var(--fe-spacing-xs, 4px)', fontWeight: isRequired ? 'var(--fe-font-weight-semibold, 600)' : 'var(--fe-font-weight-regular, 400)' }}>
+    <label className="fe-field-label" style={labelStyle}>
       {isRequired && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
       {labelText}
       {field.tooltip && (
@@ -68,66 +76,75 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
   // 通用 props
   const resolvedOptions: OptionItem[] = field.mock?.options?.length ? (field.mock.options as OptionItem[]) : options.length ? options : field.dataSource?.type === 'static' ? field.dataSource.static.options : []
 
-  // 解析事件处理器
-  const $self: $Self = {
-    name: field.name,
-    value,
-    schema: field,
-    props: {
-      disabled: isDisabled,
-      readOnly: !!field.readOnly,
-      placeholder: field.placeholder,
-    },
-  }
-  const eventHandlers: Record<string, ResolvedEventHandler> = eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}
+  // 解析事件处理器（memo 避免每次渲染重建 handler 闭包）
+  const $self: $Self = useMemo(
+    () => ({
+      name: field.name,
+      value,
+      schema: field,
+      props: {
+        disabled: isDisabled,
+        readOnly: !!field.readOnly,
+        placeholder: field.placeholder,
+      },
+    }),
+    [field.name, value, field, isDisabled, field.readOnly, field.placeholder],
+  )
+
+  const eventHandlers: Record<string, ResolvedEventHandler> = useMemo(
+    () => (eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}),
+    [eventContext, field.events, field.type, $self],
+  )
 
   // onChange 包装：先更新当前字段值，再执行用户事件
-  // 这样无论用户配置的是 expression / action / callback，
-  // 当前字段的 formValues 都会被同步更新
-  //
-  // IME 组合输入检测：通过 onCompositionStart/onCompositionEnd 跟踪组合输入状态，
-  // 在组合输入期间（如中文拼音输入）跳过 onChange 调用，避免中间值触发校验/联动。
+  // IME 组合输入检测：通过 onCompositionStart/onCompositionEnd 跟踪组合输入状态
   const composingRef = useRef(false)
 
-  const handleCompositionStart = () => {
+  const handleCompositionStart = useCallback(() => {
     composingRef.current = true
-  }
+  }, [])
 
-  const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    composingRef.current = false
-    // 组合输入结束后，用最终值触发 onChange
-    const target = e.target as HTMLInputElement
-    onChange(target.value)
-    eventHandlers.onChange?.(target.value)
-  }
+  const handleCompositionEnd = useCallback(
+    (e: React.CompositionEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      composingRef.current = false
+      const target = e.target as HTMLInputElement
+      onChange(target.value)
+      eventHandlers.onChange?.(target.value)
+    },
+    [onChange, eventHandlers.onChange],
+  )
 
-  const handleChange = (newValue: unknown) => {
-    if (composingRef.current) return // 组合输入中，跳过
-    onChange(newValue) // ① 始终写入 formValues
-    eventHandlers.onChange?.(newValue) // ② 再执行用户事件
-  }
+  const handleChange = useCallback(
+    (newValue: unknown) => {
+      if (composingRef.current) return
+      onChange(newValue)
+      eventHandlers.onChange?.(newValue)
+    },
+    [onChange, eventHandlers.onChange],
+  )
 
   const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
 
-  const fieldProps: Record<string, unknown> = {
-    value,
-    onChange: handleChange,
-    onCompositionStart: handleCompositionStart,
-    onCompositionEnd: handleCompositionEnd,
-    disabled: isDisabled,
-    readOnly: field.readOnly,
-    placeholder: field.placeholder,
-    options: resolvedOptions,
-    fieldSchema: field,
-    required: isRequired,
-    rules: field.rules,
-    validateStatus: errorMsg ? 'error' : undefined,
-    help: errorMsg,
-    // 注意：adapter 不放在这里，容器类组件用 useContext(AdapterContext) 拿。
-    // 原因：adapter 会被 spread 到所有 renderFn 的 props，污染 antd 内部 RcSelect 等
-    ...field.componentProps, // ③ 透传（优先级：内置 < componentProps）
-    ...eventHandlers, // ④ 事件处理器最后 spread，最高优先级
-  }
+  const fieldProps: Record<string, unknown> = useMemo(
+    () => ({
+      value,
+      onChange: handleChange,
+      onCompositionStart: handleCompositionStart,
+      onCompositionEnd: handleCompositionEnd,
+      disabled: isDisabled,
+      readOnly: field.readOnly,
+      placeholder: field.placeholder,
+      options: resolvedOptions,
+      fieldSchema: field,
+      required: isRequired,
+      rules: field.rules,
+      validateStatus: errorMsg ? 'error' : undefined,
+      help: errorMsg,
+      ...field.componentProps,
+      ...eventHandlers,
+    }),
+    [value, handleChange, handleCompositionStart, handleCompositionEnd, isDisabled, field.readOnly, field.placeholder, resolvedOptions, field, isRequired, field.rules, errorMsg, field.componentProps, eventHandlers],
+  )
 
   /**
    * 查找渲染函数（按优先级）

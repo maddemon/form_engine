@@ -1,17 +1,13 @@
-import { FieldItem, OptionRender, PropsRenderProps } from '../../propRenders'
+import { FieldItem, PropsRenderProps } from '../../propRenders'
 
 export default function SegmentPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
-      <FieldItem label="选项">
-        <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
+      <FieldItem label="选项" variant="group">
+        <w.OptionsEditor value={values.options as any[]} onChange={(v) => onChange('options', v)} />
       </FieldItem>
       <FieldItem label="默认值">
-        <w.Input
-          value={(values.defaultValue as string) ?? ''}
-          onChange={(v) => onChange('defaultValue', v)}
-          placeholder="选项的 value 值"
-        />
+        <w.Input value={(values.defaultValue as string) ?? ''} onChange={(v) => onChange('defaultValue', v)} placeholder="选项的 value 值" />
       </FieldItem>
       <FieldItem label="尺寸">
         <w.ButtonGroup

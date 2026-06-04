@@ -15,7 +15,7 @@ interface FieldItemProps {
   dragStyle?: React.CSSProperties
 }
 
-export const FieldItem: React.FC<FieldItemProps> = ({
+export const FieldItem: React.FC<FieldItemProps> = React.memo(({
   field,
   isSelected,
   children,
@@ -143,4 +143,4 @@ export const FieldItem: React.FC<FieldItemProps> = ({
       </div>
     </div>
   )
-}
+})

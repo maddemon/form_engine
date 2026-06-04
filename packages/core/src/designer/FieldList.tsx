@@ -89,7 +89,7 @@ export function createFieldFromPalette(item: PaletteItem): FormFieldSchema {
   return base
 }
 
-const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
+const PaletteItemCard: React.FC<{ item: PaletteItem }> = React.memo(({ item }) => {
   const [hovered, setHovered] = useState(false)
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `palette-${item.type}`,
@@ -136,7 +136,7 @@ const PaletteItemCard: React.FC<{ item: PaletteItem }> = ({ item }) => {
       <span>{item.label}</span>
     </div>
   )
-}
+})
 
 function ComponentLibContent({ groups }: { groups: PaletteGroup[] }) {
   const { token } = useStyle()

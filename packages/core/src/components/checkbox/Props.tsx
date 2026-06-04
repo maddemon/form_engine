@@ -1,10 +1,10 @@
-import { FieldItem, OptionRender, PropsRenderProps } from '../../propRenders'
+import { FieldItem, PropsRenderProps } from '../../propRenders'
 
 export default function CheckboxPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
       <FieldItem label="选项" variant="group">
-        <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
+        <w.OptionsEditor value={values.options as any[]} onChange={(v) => onChange('options', v)} />
       </FieldItem>
       <FieldItem label="半选状态">
         <w.Switch checked={!!values.indeterminate} onChange={(v) => onChange('indeterminate', v)} />

@@ -16,6 +16,7 @@ import { FormConfigPanel } from './FormConfigPanel'
 import { RulesEditor } from './RulesEditor'
 import { useDebouncedInput } from './useDebouncedInput'
 import { defaultDesignerWidgets } from './widgets'
+import { collectFieldNames } from './reducer'
 
 /**
  * 属性面板最小宽度（防呆）：再小 FieldItem / 控件就显示不全
@@ -74,23 +75,11 @@ interface DefaultContentProps {
   allFields: FormFieldSchema[]
 }
 
-function collectFieldNamesExcluding(fields: FormFieldSchema[], excludeId: string): Set<string> {
-  const names = new Set<string>()
-  const walk = (list: FormFieldSchema[]) => {
-    for (const f of list) {
-      if (f.id !== excludeId) names.add(f.name)
-      if (f.children) walk(f.children)
-    }
-  }
-  walk(fields)
-  return names
-}
-
 function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isButton, ComponentPropsRender, customConfig, allFields }: DefaultContentProps) {
   const { token } = useStyle()
   const hasAdvanced = hasAdvancedConfig(field)
   const [nameDirty, setNameDirty] = useState(false)
-  const existingNames = useMemo(() => collectFieldNamesExcluding(allFields, field.id!), [allFields, field.id])
+  const existingNames = useMemo(() => collectFieldNames(allFields, field.id!), [allFields, field.id])
   const nameError = nameDirty && field.name && existingNames.has(field.name) ? '该字段名已存在' : null
 
   // ===== 防抖输入 =====

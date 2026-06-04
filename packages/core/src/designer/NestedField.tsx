@@ -14,7 +14,7 @@ interface NestedFieldProps {
   childIndex?: number
 }
 
-export const NestedField: React.FC<NestedFieldProps> = ({ field, parentContainerId, childIndex }) => {
+export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, parentContainerId, childIndex }) => {
   const { selectedFieldId, formConfig, adapter } = useDesignerContext()
   const isContainer = isContainerComponent(field.type)
 
@@ -48,4 +48,4 @@ export const NestedField: React.FC<NestedFieldProps> = ({ field, parentContainer
       {content}
     </FieldItem>
   )
-}
+})

@@ -185,6 +185,16 @@ export interface DesignerWidgets {
     disabled?: boolean
     style?: React.CSSProperties
   }>
+  /** 表达式输入框（尾部 ƒ 图标，弹窗编辑，可插入字段名） */
+  ExpressionInput?: React.ComponentType<{
+    value?: string
+    onChange?: (v: string) => void
+    placeholder?: string
+    disabled?: boolean
+    /** 已存在的字段名称列表，弹窗中点击可插入光标位置 */
+    fieldNames?: string[]
+    style?: React.CSSProperties
+  }>
 }
 
 /** 属性面板渲染 Props */

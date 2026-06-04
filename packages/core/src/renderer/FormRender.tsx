@@ -8,8 +8,7 @@ import type { FormEngineAdapter } from '../types/adapter'
 import { isContainerComponent } from '../types/component-category'
 import type { $Form } from '../types/events'
 import type { DataSourceResolver } from '../types/render'
-import { evalExpr, matchVisibleWhen } from '../utils'
-import { pickAdapter } from '../utils'
+import { evalExpr, matchVisibleWhen, pickAdapter } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import { validateForm } from './validate'
 
@@ -37,8 +36,9 @@ export interface FormRenderProps {
 /**
  * 防抖定时器 Map：fieldName → timer
  * 防止依赖快速变化时频繁发请求
+ * 注意：此变量仅用于导出给外部测试，实际运行时每个 FormRender 实例使用内部 useRef
  */
-const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
+export const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
 export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {} }) => {
   useEnsureDefaultTheme()
@@ -51,6 +51,9 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
   // 记录每个 field 当前请求的依赖快照，避免过期响应覆盖
   const [fieldDepsSnapshot, setFieldDepsSnapshot] = useState<Record<string, string>>({})
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+
+  // 每个实例独立的防抖定时器
+  const debounceTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   const formSchema = useMemo(() => schema, [schema])
 
@@ -79,13 +82,9 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
   const formValuesRef = useRef(formValues)
   const onChangeRef = useRef(onChange)
 
-  // 用 effect 同步 ref 以避免 render 中写 ref 的 ESLint 报错
-  useEffect(() => {
-    formValuesRef.current = formValues
-  })
-  useEffect(() => {
-    onChangeRef.current = onChange
-  })
+  // render 阶段同步 ref（替代原 useEffect，保持所有下游 useMemo/useCallback 读到最新值）
+  formValuesRef.current = formValues
+  onChangeRef.current = onChange
 
   const debouncedOnChange = useCallback(() => {
     if (onChangeTimerRef.current) clearTimeout(onChangeTimerRef.current)
@@ -164,11 +163,11 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
     [formSchema.fields, formValues],
   )
 
-  // $form API 实例
+  // $form API 实例（values getter 通过 ref 访问最新 formValues，避免每次输入都重建）
   const $form: $Form = useMemo(
     () => ({
       get values(): Record<string, unknown> {
-        return formValues
+        return formValuesRef.current
       },
       setFieldValue,
       setFieldsValue,
@@ -177,17 +176,20 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
       reset,
       validate,
     }),
-    [formValues, setFieldValue, setFieldsValue, getFieldValue, submit, reset, validate],
+    [setFieldValue, setFieldsValue, getFieldValue, submit, reset, validate],
   )
 
   // 事件上下文（供 FieldRenderer 注入）
+  // formValues 通过 $form.values 间接访问，不直接依赖 formValues 避免每次输入重建
   const eventContext: EventContext = useMemo(
     () => ({
       formValues,
       $form,
       callbacks,
     }),
-    [formValues, $form, callbacks],
+    // formValues intentionally excluded — accessed via $form.values getter when needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [$form, callbacks],
   )
 
   /**
@@ -211,25 +213,29 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
 
       // remote：异步加载（带防抖）
       if (ds.type === 'remote') {
+        const currentValues = formValuesRef.current
+
         // 检查 requiredDeps
-        if (!checkRequiredDeps(ds, formValues)) return
+        if (!checkRequiredDeps(ds, currentValues)) return
 
         // 清除该 field 的旧定时器
-        const existing = debounceTimers.get(field.name)
+        const timers = debounceTimersRef.current
+        const existing = timers.get(field.name)
         if (existing) clearTimeout(existing)
 
         const timer = setTimeout(async () => {
           try {
+            const latestValues = formValuesRef.current
             // 记录当前依赖快照
             const deps = getDataSourceDeps(ds)
-            const snapshot = deps.map((d) => `${d}=${(formValues as Record<string, unknown>)[d]}`).join(',')
+            const snapshot = deps.map((d) => `${d}=${(latestValues as Record<string, unknown>)[d]}`).join(',')
             setFieldDepsSnapshot((prev) => ({ ...prev, [field.name]: snapshot }))
 
             const options = await resolveDataSource(
               ds,
               {
                 fieldName: field.name,
-                formValues,
+                formValues: latestValues,
                 fieldSchema: field,
                 formSchema: schema,
               },
@@ -237,7 +243,7 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
             )
 
             // 校验快照：如果依赖在请求期间发生了变化，丢弃本次结果
-            const currentSnapshot = deps.map((d) => `${d}=${(formValues as Record<string, unknown>)[d]}`).join(',')
+            const currentSnapshot = deps.map((d) => `${d}=${(formValuesRef.current as Record<string, unknown>)[d]}`).join(',')
             if (snapshot !== currentSnapshot) {
               console.warn(`[form-engine] 数据源 ${field.name} 依赖已变化，丢弃过期响应`)
               return
@@ -249,10 +255,10 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
           }
         }, debounceMs)
 
-        debounceTimers.set(field.name, timer)
+        timers.set(field.name, timer)
       }
     },
-    [formValues, schema, dataSourceResolver],
+    [schema, dataSourceResolver],
   )
 
   /**
@@ -299,21 +305,12 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
     submit()
   }
 
-  function renderNestedField(field: FormFieldSchema): React.ReactNode {
-    const isContainer = isContainerComponent(field.type)
-    const childNodes = isContainer && field.children?.length ? field.children.map(renderNestedField) : undefined
-
-    const enhancedField: FormFieldSchema = childNodes ? { ...field, componentProps: { ...field.componentProps, children: childNodes } } : field
-
-    return <FieldRenderer field={enhancedField} value={formValues[field.name]} onChange={(val) => handleFieldChange(field.name, val)} options={fieldOptions[field.name] || []} disabled={loading || field.disabled === true} adapter={resolvedAdapter} components={components} eventContext={eventContext} errors={fieldErrors[field.name]} formConfig={schema.form} />
-  }
-
   return (
     <form onSubmit={handleSubmit} className="fe-form" style={{ maxWidth: 640 }}>
       <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
         {visibleFields.map((field) => (
           <div key={field.id || field.name} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
-            {renderNestedField(field)}
+            <NestedFieldRenderer field={field} formValues={formValues} fieldOptions={fieldOptions} fieldErrors={fieldErrors} loading={loading} adapter={resolvedAdapter} components={components} eventContext={eventContext} formConfig={schema.form} onFieldChange={handleFieldChange} />
           </div>
         ))}
       </div>
@@ -333,3 +330,32 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
     </form>
   )
 }
+
+// ── NestedFieldRenderer（递归字段渲染器，含 React.memo）─────────────
+
+interface NestedFieldRendererProps {
+  field: FormFieldSchema
+  formValues: Record<string, unknown>
+  fieldOptions: Record<string, OptionItem[]>
+  fieldErrors: Record<string, string[]>
+  loading: boolean
+  adapter: FormEngineAdapter
+  components: Record<string, (props: any) => React.ReactNode>
+  eventContext: EventContext
+  formConfig: FormSchema['form']
+  onFieldChange: (name: string, value: unknown) => void
+}
+
+const NestedFieldRenderer: React.FC<NestedFieldRendererProps> = React.memo(({ field, formValues, fieldOptions, fieldErrors, loading, adapter, components, eventContext, formConfig, onFieldChange }) => {
+  const isContainer = isContainerComponent(field.type)
+
+  const handleChange = useCallback((val: unknown) => onFieldChange(field.name, val), [field.name, onFieldChange])
+
+  const enhancedField: FormFieldSchema = useMemo(() => {
+    if (!isContainer || !field.children?.length) return field
+    const childNodes = field.children.map((child) => <NestedFieldRenderer key={child.id || child.name} field={child} formValues={formValues} fieldOptions={fieldOptions} fieldErrors={fieldErrors} loading={loading} adapter={adapter} components={components} eventContext={eventContext} formConfig={formConfig} onFieldChange={onFieldChange} />)
+    return { ...field, componentProps: { ...field.componentProps, children: childNodes } }
+  }, [field, isContainer, formValues, fieldOptions, fieldErrors, loading, adapter, components, eventContext, formConfig, onFieldChange])
+
+  return <FieldRenderer field={enhancedField} value={formValues[field.name]} onChange={handleChange} options={fieldOptions[field.name] || []} disabled={loading || field.disabled === true} adapter={adapter} components={components} eventContext={eventContext} errors={fieldErrors[field.name]} formConfig={formConfig} />
+})

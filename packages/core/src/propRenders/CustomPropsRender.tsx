@@ -107,6 +107,13 @@ function renderWidget(config: PropertyConfigItem, value: unknown, onValueChange:
         />
       )
 
+    case 'expression':
+      return w.ExpressionInput ? (
+        <w.ExpressionInput value={(value as string) ?? ''} onChange={(v) => onValueChange(v)} placeholder={widgetProps?.placeholder} fieldNames={widgetProps?.fieldNames} />
+      ) : (
+        <w.Input value={(value as string) ?? ''} onChange={(v) => onValueChange(v)} placeholder={widgetProps?.placeholder} />
+      )
+
     case 'custom': {
       const customWidgetName = widgetProps?.customWidget
       if (!customWidgetName) return <span style={{ color: 'var(--fe-text-muted)' }}>未配置自定义 Widget</span>

@@ -1,4 +1,4 @@
-import { FieldItem, OptionRender, PropsRenderProps } from '../../propRenders'
+import { FieldItem, PropsRenderProps } from '../../propRenders'
 
 const MODE_OPTIONS = [
   { label: '默认', value: '' },
@@ -10,7 +10,7 @@ export default function SelectPropsRender({ widgets: w, values, onChange }: Prop
   return (
     <>
       <FieldItem label="选项" variant="group">
-        <OptionRender value={values.options as any[]} onChange={(v) => onChange('options', v)} />
+        <w.OptionsEditor value={values.options as any[]} onChange={(v) => onChange('options', v)} />
       </FieldItem>
       <FieldItem label="模式">
         <w.ButtonGroup options={MODE_OPTIONS} value={(values.mode as string) ?? ''} onChange={(v) => onChange('mode', v)} />

@@ -26,8 +26,20 @@ export function useAdaptiveAdapter(
     const handler = (e: MediaQueryListEvent) => {
       setScene(e.matches ? 'mobile' : 'desktop')
     }
-    mql.addEventListener('change', handler)
-    return () => mql.removeEventListener('change', handler)
+    // 现代浏览器使用 addEventListener，旧版 Safari 回退到 addListener
+    if (typeof mql.addEventListener === 'function') {
+      mql.addEventListener('change', handler)
+    } else {
+      ;(mql as any).addListener?.(handler)
+    }
+
+    return () => {
+      if (typeof mql.removeEventListener === 'function') {
+        mql.removeEventListener('change', handler)
+      } else {
+        ;(mql as any).removeListener?.(handler)
+      }
+    }
   }, [breakpoint])
 
   return scene === 'mobile' ? mobile : desktop

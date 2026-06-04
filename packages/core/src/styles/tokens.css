@@ -297,6 +297,10 @@
   --fe-item-list-remove-button-size: 18px;
   --fe-item-list-remove-button-padding: 0;
 
+  /* Modal */
+  --fe-modal-width-sm: 400px;
+  --fe-modal-width-md: 520px;
+
   /* ============================
      Dark Mode - 暗黑模式
      ============================ */

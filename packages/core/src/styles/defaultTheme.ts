@@ -156,6 +156,10 @@ export interface ThemeTokens {
   itemListDragHandleHeightLg: string
   itemListRemoveButtonSize: string
   itemListRemoveButtonPadding: string
+
+  // Modal 物理尺寸
+  modalWidthSm: string
+  modalWidthMd: string
 }
 
 export const defaultTheme: ThemeTokens = {
@@ -309,6 +313,10 @@ export const defaultTheme: ThemeTokens = {
   itemListDragHandleHeightLg: '28px',
   itemListRemoveButtonSize: '18px',
   itemListRemoveButtonPadding: '0',
+
+  // Modal 物理尺寸
+  modalWidthSm: '400px',
+  modalWidthMd: '520px',
 }
 
 /**

@@ -112,7 +112,7 @@ export function findInTree(fields: FormFieldSchema[], id: string): FormFieldSche
   return undefined
 }
 
-function collectFieldNames(fields: FormFieldSchema[], excludeFieldId: string): Set<string> {
+export function collectFieldNames(fields: FormFieldSchema[], excludeFieldId: string): Set<string> {
   const names = new Set<string>()
   const walk = (list: FormFieldSchema[]) => {
     for (const f of list) {

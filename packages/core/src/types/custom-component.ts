@@ -16,6 +16,7 @@ import type { EventDeclaration } from './events'
  * - switch: 开关
  * - json: JSON 编辑器
  * - options: 选项编辑器（编辑 OptionItem[]，用于 select/radio/checkbox 等）
+ * - expression: 表达式输入框（尾部 ƒ 图标，弹窗编辑，可插入字段名）
  * - custom: 自定义组件（需指定 customWidget 名称）
  */
 export type PropertyWidgetType =
@@ -27,6 +28,7 @@ export type PropertyWidgetType =
   | 'switch'
   | 'json'
   | 'options'
+  | 'expression'
   | 'custom'
 
 /**
@@ -96,6 +98,9 @@ export interface PropertyWidgetProps {
     /** 是否格式化显示 */
     formatted?: boolean
   }
+
+  /** 字段名称列表（widget='expression' 时使用，弹窗中点击可插入光标位置） */
+  fieldNames?: string[]
 }
 
 /**
