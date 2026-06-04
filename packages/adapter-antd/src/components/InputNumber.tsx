@@ -46,7 +46,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
       prefix={prefix}
       suffix={suffix}
       disabled={disabled}
-      style={{ width: '100%', ...style }}
+      style={{ ...style }}
       className={className}
       id={id}
       {...rest}

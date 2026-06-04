@@ -86,11 +86,7 @@ export { designerWidgets } from './widgets'
 
 const DefaultField: FieldRendererFn = (props: any) => {
   const { fieldSchema } = props
-  return (
-    <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>
-      未支持的字段类型：{fieldSchema?.type}
-    </div>
-  )
+  return <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>未支持的字段类型：{fieldSchema?.type}</div>
 }
 
 // ============================
@@ -113,39 +109,39 @@ export const antdAdapter: FormEngineAdapter = {
 
   components: {
     // 表单组件
-    'input': Input,
-    'password': Password,
-    'textarea': TextArea,
+    input: Input,
+    password: Password,
+    textarea: TextArea,
     'input-number': InputNumber,
-    'select': Select,
+    select: Select,
     'multi-select': Select,
-    'switch': SwitchField,
-    'radio': Radio,
-    'checkbox': Checkbox,
-    'slider': Slider,
-    'rate': Rate,
-    'date': DatePicker,
-    'datetime': DatePicker,
+    switch: SwitchField,
+    radio: Radio,
+    checkbox: Checkbox,
+    slider: Slider,
+    rate: Rate,
+    date: DatePicker,
+    datetime: DatePicker,
     'date-range': DateRangePicker,
-    'time': TimePicker,
-    'upload': Upload,
-    'cascader': Cascader,
+    time: TimePicker,
+    upload: Upload,
+    cascader: Cascader,
     'tree-select': TreeSelect,
     // 容器组件
-    'container': Container,
-    'grid': Grid,
-    'flex': Flex,
-    'collapse': Collapse,
-    'tabs': Tabs,
-    'table': Table,
-    'card': Card,
+    container: Container,
+    grid: Grid,
+    flex: Flex,
+    collapse: Collapse,
+    tabs: Tabs,
+    table: Table,
+    card: Card,
     // 展示组件
-    'text': Text,
-    'image': Image,
-    'divider': Divider,
-    'title': Title,
-    'alert': Alert,
-    'segment': Segment,
+    text: Text,
+    image: Image,
+    divider: Divider,
+    title: Title,
+    alert: Alert,
+    segment: Segment,
   },
 
   default: DefaultField,

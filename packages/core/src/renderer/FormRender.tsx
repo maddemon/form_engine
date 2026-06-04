@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { FormFieldSchema, FormSchema, OptionItem } from '../types/schema'
+import { type FormFieldSchema, type FormSchema, type OptionItem } from '../types/schema'
 
 import { checkRequiredDeps, getDataSourceDeps, resolveDataSource } from '../dataSource/resolver'
 import type { EventContext } from '../events'
@@ -46,6 +46,9 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
 
   // 根据 scene 选取 adapter
   const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
+
+  const formConfig = schema.form
+
   const [formValues, setFormValues] = useState<Record<string, unknown>>(initialValues)
   const [fieldOptions, setFieldOptions] = useState<Record<string, OptionItem[]>>({})
   // 记录每个 field 当前请求的依赖快照，避免过期响应覆盖
@@ -310,7 +313,7 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
       <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
         {visibleFields.map((field) => (
           <div key={field.id || field.name} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
-            <NestedFieldRenderer field={field} formValues={formValues} fieldOptions={fieldOptions} fieldErrors={fieldErrors} loading={loading} adapter={resolvedAdapter} components={components} eventContext={eventContext} formConfig={schema.form} onFieldChange={handleFieldChange} />
+            <NestedFieldRenderer field={field} formValues={formValues} fieldOptions={fieldOptions} fieldErrors={fieldErrors} loading={loading} adapter={resolvedAdapter} components={components} eventContext={eventContext} formConfig={formConfig} onFieldChange={handleFieldChange} />
           </div>
         ))}
       </div>

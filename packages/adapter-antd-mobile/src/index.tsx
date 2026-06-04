@@ -13,37 +13,36 @@
  */
 
 import type { FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
-import React from 'react'
 
-import { InputField } from './components/Input'
-import { TextAreaField } from './components/TextArea'
-import { PasswordField } from './components/Password'
-import { InputNumberField } from './components/InputNumber'
-import { SelectField } from './components/Select'
-import { RadioField } from './components/Radio'
+import { AlertField } from './components/Alert'
+import { CardField } from './components/Card'
+import { CascaderField } from './components/Cascader'
 import { CheckboxField } from './components/Checkbox'
-import { SwitchField } from './components/Switch'
-import { SliderField } from './components/Slider'
-import { RateField } from './components/Rate'
+import { CollapseField } from './components/Collapse'
+import { ContainerField } from './components/Container'
 import { DateField } from './components/DatePicker'
 import { DateRangeField } from './components/DateRange'
-import { TimeField } from './components/TimePicker'
-import { UploadField } from './components/Upload'
-import { CascaderField } from './components/Cascader'
-import { TreeSelectField } from './components/TreeSelect'
-import { GridField } from './components/Grid'
+import { DividerField } from './components/Divider'
 import { FlexField } from './components/Flex'
-import { ContainerField } from './components/Container'
-import { CollapseField } from './components/Collapse'
+import { GridField } from './components/Grid'
+import { ImageField } from './components/Image'
+import { InputField } from './components/Input'
+import { InputNumberField } from './components/InputNumber'
+import { PasswordField } from './components/Password'
+import { RadioField } from './components/Radio'
+import { RateField } from './components/Rate'
+import { SegmentField } from './components/Segment'
+import { SelectField } from './components/Select'
+import { SliderField } from './components/Slider'
+import { SwitchField } from './components/Switch'
+import { TableField } from './components/Table'
 import { TabsField } from './components/Tabs'
 import { TextField } from './components/Text'
-import { ImageField } from './components/Image'
-import { DividerField } from './components/Divider'
+import { TextAreaField } from './components/TextArea'
+import { TimeField } from './components/TimePicker'
 import { TitleField } from './components/Title'
-import { TableField } from './components/Table'
-import { CardField } from './components/Card'
-import { AlertField } from './components/Alert'
-import { SegmentField } from './components/Segment'
+import { TreeSelectField } from './components/TreeSelect'
+import { UploadField } from './components/Upload'
 
 // Theme Bridge
 export { AntdMobileBridgeProvider } from './themeBridge'
@@ -54,11 +53,7 @@ export { AntdMobileBridgeProvider } from './themeBridge'
 
 const DefaultField: FieldRendererFn = (props: any) => {
   const { fieldSchema } = props
-  return (
-    <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>
-      未支持的字段类型：{fieldSchema?.type}
-    </div>
-  )
+  return <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>未支持的字段类型：{fieldSchema?.type}</div>
 }
 
 // ============================
@@ -84,39 +79,39 @@ export const antdMobileAdapter: FormEngineAdapter = {
 
   components: {
     // 表单组件
-    'input': InputField,
-    'password': PasswordField,
-    'textarea': TextAreaField,
+    input: InputField,
+    password: PasswordField,
+    textarea: TextAreaField,
     'input-number': InputNumberField,
-    'select': SelectField,
+    select: SelectField,
     'multi-select': SelectField,
-    'radio': RadioField,
-    'checkbox': CheckboxField,
-    'switch': SwitchField,
-    'slider': SliderField,
-    'rate': RateField,
-    'date': DateField,
-    'datetime': DateField,
+    radio: RadioField,
+    checkbox: CheckboxField,
+    switch: SwitchField,
+    slider: SliderField,
+    rate: RateField,
+    date: DateField,
+    datetime: DateField,
     'date-range': DateRangeField,
-    'time': TimeField,
-    'upload': UploadField,
-    'cascader': CascaderField,
+    time: TimeField,
+    upload: UploadField,
+    cascader: CascaderField,
     'tree-select': TreeSelectField,
     // 容器组件
-    'container': ContainerField,
-    'grid': GridField,
-    'flex': FlexField,
-    'collapse': CollapseField,
-    'tabs': TabsField,
-    'table': TableField,
-    'card': CardField,
+    container: ContainerField,
+    grid: GridField,
+    flex: FlexField,
+    collapse: CollapseField,
+    tabs: TabsField,
+    table: TableField,
+    card: CardField,
     // 展示组件
-    'text': TextField,
-    'image': ImageField,
-    'divider': DividerField,
-    'title': TitleField,
-    'alert': AlertField,
-    'segment': SegmentField,
+    text: TextField,
+    image: ImageField,
+    divider: DividerField,
+    title: TitleField,
+    alert: AlertField,
+    segment: SegmentField,
   },
 
   default: DefaultField,

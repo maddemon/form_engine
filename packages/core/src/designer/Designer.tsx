@@ -2,22 +2,20 @@ import { DndContext, DragOverlay, PointerSensor, pointerWithin, TouchSensor, use
 import { arrayMove } from '@dnd-kit/sortable'
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { getComponentIcon } from '../components/paletteRegistry'
-import type { DeviceScene } from '../types/adapter'
 import { useEnsureDefaultTheme, useStyle } from '../styles'
-import type { FormEngineAdapter } from '../types/adapter'
-import type { PaletteGroup, PanelWidths, SidePanelTab, PropertyPanelTab } from '../types/designer'
+import type { DeviceScene, FormEngineAdapter } from '../types/adapter'
+import type { PaletteGroup, PanelWidths, PropertyPanelTab, SidePanelTab } from '../types/designer'
 import { isPaletteDrag, toPaletteItem, type DesignerDragData } from '../types/designer-drag'
 import { type FormFieldSchema, type FormSchema } from '../types/schema'
-import { Canvas, CANVAS_ROOT_ID, CANVAS_ROOT_HEAD_ID } from './Canvas'
+import { Canvas, CANVAS_ROOT_HEAD_ID, CANVAS_ROOT_ID } from './Canvas'
 import { DesignerContext } from './DesignerContext'
 import { createFieldFromPalette, FieldList, getFullPaletteGroups } from './FieldList'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
-import { buildFieldIndex, designerReducerWithHistory, findInTree, type FieldIndex, type FieldIndexEntry } from './reducer'
-import { DEFAULT_SCHEMA } from './hooks'
+import { buildFieldIndex, designerReducerWithHistory, findInTree, type FieldIndex } from './reducer'
 
 function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number; regionKey?: string } | null {
-  const field = fields.find(f => f.id === fieldId)
+  const field = fields.find((f) => f.id === fieldId)
   if (field) return { parentId, index: fields.indexOf(field), regionKey: field.regionKey }
 
   for (const f of fields) {
@@ -64,7 +62,7 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[], fieldIndex
 
 function reorderFieldsInContainer(fields: FormFieldSchema[], containerId: string | undefined, fromIdx: number, toIdx: number): FormFieldSchema[] {
   if (!containerId) return arrayMove(fields, fromIdx, toIdx)
-  return fields.map(f => {
+  return fields.map((f) => {
     if (f.id === containerId && f.children) {
       return { ...f, children: arrayMove(f.children, fromIdx, toIdx) }
     }
@@ -73,20 +71,6 @@ function reorderFieldsInContainer(fields: FormFieldSchema[], containerId: string
     }
     return f
   })
-}
-
-function isAncestorOf(fields: FormFieldSchema[], ancestorId: string, descendantId: string): boolean {
-  if (ancestorId === descendantId) return true
-  for (const f of fields) {
-    if (f.id === ancestorId && f.children) {
-      return findInTree(f.children, descendantId) !== undefined
-    }
-    if (f.children) {
-      const result = isAncestorOf(f.children, ancestorId, descendantId)
-      if (result) return true
-    }
-  }
-  return false
 }
 
 function isAncestorOfByIndex(fieldIndex: FieldIndex, ancestorId: string, descendantId: string): boolean {
@@ -103,8 +87,7 @@ function useFieldIndex(fields: FormFieldSchema[]): FieldIndex {
 
   if (prevFieldsRef.current !== fields) {
     const prev = prevFieldsRef.current
-    const changed = fields.length !== prev.length
-      || fields.some((f, i) => f !== prev[i])
+    const changed = fields.length !== prev.length || fields.some((f, i) => f !== prev[i])
     if (changed) {
       indexRef.current = buildFieldIndex(fields)
     }
@@ -128,12 +111,12 @@ interface DesignerProps {
   propertyPanelTabs?: PropertyPanelTab[]
 }
 
-export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, desktopAdapter, mobileAdapter, panelWidths, sidePanelTabs, propertyPanelTabs }) => {
+export const Designer: React.FC<DesignerProps> = ({ schema, onSchemaChange, onSceneChange, groups, excludeTypes, readOnly = false, desktopAdapter, mobileAdapter, panelWidths, sidePanelTabs, propertyPanelTabs }) => {
   useEnsureDefaultTheme()
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
 
   const [state, dispatch] = useReducer(designerReducerWithHistory, {
-    schema: externalSchema || DEFAULT_SCHEMA,
+    schema,
     selectedFieldId: null,
     snapshots: [[]],
     historyIndex: 0,
@@ -142,10 +125,10 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
   const [scene, setSceneState] = useState<DeviceScene>('desktop')
 
   useEffect(() => {
-    if (externalSchema) {
-      dispatch({ type: 'SET_SCHEMA', schema: externalSchema })
+    if (schema) {
+      dispatch({ type: 'SET_SCHEMA', schema })
     }
-  }, [externalSchema])
+  }, [schema])
 
   useEffect(() => {
     onSceneChange?.(scene)
@@ -167,9 +150,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
   const selectedField = state.selectedFieldId ? (fieldIndex.get(state.selectedFieldId)?.field ?? findInTree(state.schema.fields, state.selectedFieldId)) || null : null
 
   // 根据 scene 选取画布 adapter；属性面板始终优先使用 desktopAdapter
-  const canvasAdapter = (desktopAdapter && mobileAdapter)
-    ? (scene === 'mobile' ? mobileAdapter : desktopAdapter)
-    : (desktopAdapter ?? mobileAdapter) as FormEngineAdapter
+  const canvasAdapter = desktopAdapter && mobileAdapter ? (scene === 'mobile' ? mobileAdapter : desktopAdapter) : ((desktopAdapter ?? mobileAdapter) as FormEngineAdapter)
   const widgetsAdapter = (desktopAdapter ?? mobileAdapter) as FormEngineAdapter
 
   const handleSelectField = useCallback((id: string | null) => {
@@ -186,27 +167,24 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }))
 
-  const collisionDetection = useCallback<CollisionDetection>(
-    (args) => {
-      const pointerCollisions = pointerWithin(args)
+  const collisionDetection = useCallback<CollisionDetection>((args) => {
+    const pointerCollisions = pointerWithin(args)
 
-      if (pointerCollisions.length > 0) {
-        // 按布局面积排序：更小的区域 = 更具体（如字段 > region > container > 根级）
-        return [...pointerCollisions].sort((a, b) => {
-          const rectA = args.droppableRects.get(a.id)
-          const rectB = args.droppableRects.get(b.id)
-          if (rectA && rectB) {
-            return (rectA.width * rectA.height) - (rectB.width * rectB.height)
-          }
-          return 0
-        })
-      }
+    if (pointerCollisions.length > 0) {
+      // 按布局面积排序：更小的区域 = 更具体（如字段 > region > container > 根级）
+      return [...pointerCollisions].sort((a, b) => {
+        const rectA = args.droppableRects.get(a.id)
+        const rectB = args.droppableRects.get(b.id)
+        if (rectA && rectB) {
+          return rectA.width * rectA.height - rectB.width * rectB.height
+        }
+        return 0
+      })
+    }
 
-      // 指针不在任何 droppable 内时不返回碰撞，避免从控件库拖拽时自动高亮
-      return []
-    },
-    [],
-  )
+    // 指针不在任何 droppable 内时不返回碰撞，避免从控件库拖拽时自动高亮
+    return []
+  }, [])
 
   const handleDragStart = useCallback(
     (event: DragStartEvent) => {
@@ -250,9 +228,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       if (overId === CANVAS_ROOT_ID || overId === CANVAS_ROOT_HEAD_ID) return
 
       const sourceEntry = fieldIndex.get(activeId)
-      const sourcePos = sourceEntry
-        ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey }
-        : findFieldPosition(state.schema.fields, activeId)
+      const sourcePos = sourceEntry ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey } : findFieldPosition(state.schema.fields, activeId)
       if (!sourcePos) return
 
       let targetParentId: string | undefined
@@ -268,7 +244,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         const container = fieldIndex.get(containerId)?.field ?? findInTree(state.schema.fields, containerId)
         if (!container) return
         targetParentId = containerId
-        targetIndex = (container.children?.length || 0)
+        targetIndex = container.children?.length || 0
       } else if (overId.endsWith('__container')) {
         const containerId = overId.replace(/__container$/, '')
         if (sourcePos.parentId === containerId) return
@@ -279,9 +255,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         targetIndex = container.children?.length || 0
       } else {
         const overEntry = fieldIndex.get(overId)
-        const targetPos = overEntry
-          ? { parentId: overEntry.parentId ?? undefined, index: overEntry.index, regionKey: overEntry.regionKey }
-          : findFieldPosition(state.schema.fields, overId)
+        const targetPos = overEntry ? { parentId: overEntry.parentId ?? undefined, index: overEntry.index, regionKey: overEntry.regionKey } : findFieldPosition(state.schema.fields, overId)
         if (!targetPos) return
         if (sourcePos.parentId === targetPos.parentId) return
         targetParentId = targetPos.parentId
@@ -339,9 +313,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         const containerId = regionMatch[1]
         const targetRegionKey = regionMatch[2]
         const sourceEntry = fieldIndex.get(activeId)
-        const sourcePos = sourceEntry
-          ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey }
-          : findFieldPosition(fields, activeId)
+        const sourcePos = sourceEntry ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey } : findFieldPosition(fields, activeId)
         if (!sourcePos) return
         if (isAncestorOfByIndex(fieldIndex, activeId, containerId)) return
         if (sourcePos.parentId === containerId && sourcePos.regionKey === targetRegionKey) return
@@ -364,9 +336,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       if (overId.endsWith('__container')) {
         const containerId = overId.replace(/__container$/, '')
         const sourceEntry = fieldIndex.get(activeId)
-        const sourcePos = sourceEntry
-          ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey }
-          : findFieldPosition(fields, activeId)
+        const sourcePos = sourceEntry ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey } : findFieldPosition(fields, activeId)
         if (!sourcePos) return
         if (sourcePos.parentId === containerId) return
         if (isAncestorOfByIndex(fieldIndex, activeId, containerId)) return
@@ -383,14 +353,10 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       }
 
       const sourceEntry = fieldIndex.get(activeId)
-      const sourcePos = sourceEntry
-        ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey }
-        : findFieldPosition(fields, activeId)
+      const sourcePos = sourceEntry ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey } : findFieldPosition(fields, activeId)
       if (!sourcePos) return
       const overEntry = fieldIndex.get(overId)
-      const targetPos = overEntry
-        ? { parentId: overEntry.parentId ?? undefined, index: overEntry.index, regionKey: overEntry.regionKey }
-        : findFieldPosition(fields, overId)
+      const targetPos = overEntry ? { parentId: overEntry.parentId ?? undefined, index: overEntry.index, regionKey: overEntry.regionKey } : findFieldPosition(fields, overId)
       if (!targetPos) return
 
       if (sourcePos.parentId === targetPos.parentId) {
@@ -428,62 +394,67 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
     setActiveDragType('')
   }, [])
 
-  const contextValue = useMemo(() => ({
-    dispatch,
-    selectedFieldId: state.selectedFieldId,
-    onSelectField: handleSelectField,
-    scene,
-    formConfig: state.schema.form,
-    adapter: canvasAdapter,
-    desktopAdapter: widgetsAdapter,
-  }), [dispatch, state.selectedFieldId, handleSelectField, scene, state.schema.form, canvasAdapter, widgetsAdapter])
+  const formConfig = state.schema.form
+
+  const contextValue = useMemo(
+    () => ({
+      dispatch,
+      selectedFieldId: state.selectedFieldId,
+      onSelectField: handleSelectField,
+      scene,
+      formConfig,
+      adapter: canvasAdapter,
+      desktopAdapter: widgetsAdapter,
+    }),
+    [dispatch, state.selectedFieldId, handleSelectField, scene, formConfig, canvasAdapter, widgetsAdapter],
+  )
 
   const { token } = useStyle()
   return (
     <DesignerContext.Provider value={contextValue}>
-    <div className="designer-scroll-container" style={{ display: 'flex', height: '100%', fontFamily: '-apple-system, sans-serif', background: 'var(--fe-bg-secondary)', overflow: 'hidden' }}>
-      <style>{`
+      <div className="designer-scroll-container" style={{ display: 'flex', height: '100%', fontFamily: '-apple-system, sans-serif', background: 'var(--fe-bg-secondary)', overflow: 'hidden' }}>
+        <style>{`
           .designer-scroll-container ::-webkit-scrollbar { width: var(--fe-spacing-xs); height: var(--fe-spacing-xs); }
           .designer-scroll-container ::-webkit-scrollbar-track { background: transparent; }
           .designer-scroll-container ::-webkit-scrollbar-thumb { background: var(--fe-border-primary); border-radius: var(--fe-border-radius-sm); }
           .designer-scroll-container ::-webkit-scrollbar-thumb:hover { background: var(--fe-text-tertiary); }
         `}</style>
-      <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-        {/* 左侧控件库 */}
-        {!readOnly && <FieldList groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />}
+        <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
+          {/* 左侧控件库 */}
+          {!readOnly && <FieldList groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />}
 
-        {/* 中间画布 */}
-        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-          <Canvas fields={state.schema.fields} activeId={activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} />
-        </div>
+          {/* 中间画布 */}
+          <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+            <Canvas fields={state.schema.fields} activeId={activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} />
+          </div>
 
-        <DragOverlay dropAnimation={null}>
-          {activeDragLabel ? (
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 'var(--fe-spacing-xs)',
-                padding: '4px 10px',
-                background: 'var(--fe-primary)',
-                color: 'var(--fe-bg-primary)',
-                borderRadius: 'var(--fe-border-radius-sm)',
-                fontSize: 'var(--fe-font-size-sm)',
-                pointerEvents: 'none',
-                whiteSpace: 'nowrap',
-                boxShadow: token('widgetCanvasDndShadow') as React.CSSProperties['boxShadow'],
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center' }}>{getComponentIcon(activeDragType) || null}</span>
-              {activeDragLabel}
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          <DragOverlay dropAnimation={null}>
+            {activeDragLabel ? (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 'var(--fe-spacing-xs)',
+                  padding: '4px 10px',
+                  background: 'var(--fe-primary)',
+                  color: 'var(--fe-bg-primary)',
+                  borderRadius: 'var(--fe-border-radius-sm)',
+                  fontSize: 'var(--fe-font-size-sm)',
+                  pointerEvents: 'none',
+                  whiteSpace: 'nowrap',
+                  boxShadow: token('widgetCanvasDndShadow') as React.CSSProperties['boxShadow'],
+                }}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center' }}>{getComponentIcon(activeDragType) || null}</span>
+                {activeDragLabel}
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
 
-      {/* 右侧属性面板 */}
-      <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} designerWidgets={widgetsAdapter?.designerWidgets} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
-    </div>
+        {/* 右侧属性面板 */}
+        <PropertyPanel field={selectedField} formConfig={state.schema.form} dispatch={dispatch} designerWidgets={widgetsAdapter?.designerWidgets} width={panelWidths?.properties} propertyPanelTabs={propertyPanelTabs} allFields={state.schema.fields} />
+      </div>
     </DesignerContext.Provider>
   )
 }

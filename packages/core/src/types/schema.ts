@@ -99,7 +99,7 @@ export type FieldType =
   | 'textarea'
   | 'password'
   | 'select'
-  | 'multi-select'      // 保留类型兼容
+  | 'multi-select' // 保留类型兼容
   | 'radio'
   | 'checkbox'
   | 'switch'
@@ -169,8 +169,6 @@ export interface FormFieldSchema {
 
 export interface FormConfig {
   layout: 'horizontal' | 'vertical' | 'inline'
-  labelCol: { span: number }
-  wrapperCol: { span: number }
   colon: boolean
   size: 'small' | 'middle' | 'large'
   labelAlign: 'left' | 'right'
@@ -182,22 +180,11 @@ export interface FormConfig {
     desktop?: string
     mobile?: string
   }
-  scenes?: {
-    desktop?: { labelCol?: { span: number }; wrapperCol?: { span: number } }
-    mobile?: { labelCol?: { span: number }; wrapperCol?: { span: number } }
+  scenes: {
+    desktop: { labelCol: { span: number }; wrapperCol: { span: number } }
+    mobile: { labelCol: { span: number }; wrapperCol: { span: number } }
   }
 }
-
-export const DEFAULT_LABEL_COL_SPAN = 5
-export const DEFAULT_WRAPPER_COL_SPAN = 15
-export const DEFAULT_FORM_CONFIG = {
-  layout: 'vertical' as const,
-  size: 'middle' as const,
-  labelAlign: 'right' as const,
-  labelCol: { span: DEFAULT_LABEL_COL_SPAN } as const,
-  wrapperCol: { span: DEFAULT_WRAPPER_COL_SPAN } as const,
-  colon: false,
-} satisfies FormConfig
 
 export interface SubmitConfig {
   text?: string

@@ -85,8 +85,8 @@ const JsonViewTab: React.FC<PropertyPanelTabContentProps> = ({ field }) => {
         style={{
           fontSize: 12,
           lineHeight: 1.6,
-          background: '#f5f5f5',
-          border: '1px solid #e8e8e8',
+          background: 'var(--fe-bg-color)',
+          border: '1px solid var(--fe-border-primary)',
           borderRadius: 4,
           padding: 12,
           overflow: 'auto',
@@ -122,7 +122,16 @@ const App: React.FC = () => {
     version: '0.1',
     name: '未命名表单',
     fields: [],
-    form: { layout: 'vertical', size: 'middle', labelAlign: 'right', labelCol: { span: 5 }, wrapperCol: { span: 15 }, colon: false },
+    form: {
+      layout: 'vertical' as const,
+      size: 'middle' as const,
+      labelAlign: 'right' as const,
+      colon: false,
+      scenes: {
+        desktop: { labelCol: { span: 5 }, wrapperCol: { span: 15 } },
+        mobile: { labelCol: { span: 24 }, wrapperCol: { span: 24 } },
+      },
+    },
     submit: { text: '提交', showReset: true, resetText: '重置' },
   })
 
@@ -222,7 +231,7 @@ const App: React.FC = () => {
                       cursor: 'pointer',
                       background: previewScene === 'desktop' ? (isDark ? '#1677ff' : '#fff') : 'transparent',
                       boxShadow: previewScene === 'desktop' ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
-                      color: previewScene === 'desktop' ? '#fff' : isDark ? '#bbb' : '#666',
+                      color: previewScene === 'desktop' ? (isDark ? '#fff' : '#1677ff') : isDark ? '#bbb' : '#666',
                     }}
                   >
                     <DesktopIcon />

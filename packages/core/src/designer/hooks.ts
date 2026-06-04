@@ -1,79 +1,39 @@
-import { useReducer, useCallback, useMemo, useState } from 'react'
-import { DEFAULT_FORM_CONFIG, type FormSchema, type FormFieldSchema, type FormConfig, type SubmitConfig } from '../types/schema'
-import type { PaletteItem, DesignerAction } from '../types/designer'
-import { createFieldFromPalette } from './FieldList'
+import { useCallback, useMemo, useReducer, useState } from 'react'
 import type { DeviceScene } from '../types/adapter'
-import { designerReducer, findInTree } from './reducer'
+import type { DesignerAction, PaletteItem } from '../types/designer'
+import { type FormConfig, type FormFieldSchema, type FormSchema, type SubmitConfig } from '../types/schema'
+import { createFieldFromPalette } from './FieldList'
 import type { DesignerState } from './reducer'
-
-export const DEFAULT_SCHEMA: FormSchema = {
-  version: '0.1',
-  name: '未命名表单',
-  fields: [],
-  form: { ...DEFAULT_FORM_CONFIG },
-  submit: { text: '提交', showReset: true, resetText: '重置' },
-}
+import { designerReducer, findInTree } from './reducer'
 
 // ===========================
 // Hooks
 // ===========================
 
-export function useFormDesigner(initialSchema?: FormSchema) {
+export function useFormDesigner(form: FormSchema) {
   const [state, dispatch] = useReducer(designerReducer, {
-    schema: initialSchema || DEFAULT_SCHEMA,
+    schema: form,
     selectedFieldId: null,
   } as DesignerState)
 
-  const selectedField = useMemo(
-    () => (state.selectedFieldId ? findInTree(state.schema.fields, state.selectedFieldId) || null : null),
-    [state.schema.fields, state.selectedFieldId],
-  )
+  const selectedField = useMemo(() => (state.selectedFieldId ? findInTree(state.schema.fields, state.selectedFieldId) || null : null), [state.schema.fields, state.selectedFieldId])
 
   // ---- 便捷方法 ----
-  const selectField = useCallback(
-    (id: string | null) => dispatch({ type: 'SELECT_FIELD', fieldId: id }),
-    [],
-  )
+  const selectField = useCallback((id: string | null) => dispatch({ type: 'SELECT_FIELD', fieldId: id }), [])
 
-  const addField = useCallback(
-    (field: FormFieldSchema, index?: number) =>
-      dispatch({ type: 'ADD_FIELD', field, index: index ?? state.schema.fields.length }),
-    [state.schema.fields.length],
-  )
+  const addField = useCallback((field: FormFieldSchema, index?: number) => dispatch({ type: 'ADD_FIELD', field, index: index ?? state.schema.fields.length }), [state.schema.fields.length])
 
-  const removeField = useCallback(
-    (fieldId: string) => dispatch({ type: 'REMOVE_FIELD', fieldId }),
-    [],
-  )
+  const removeField = useCallback((fieldId: string) => dispatch({ type: 'REMOVE_FIELD', fieldId }), [])
 
-  const moveField = useCallback(
-    (fromIndex: number, toIndex: number) =>
-      dispatch({ type: 'MOVE_FIELD', fromIndex, toIndex }),
-    [],
-  )
+  const moveField = useCallback((fromIndex: number, toIndex: number) => dispatch({ type: 'MOVE_FIELD', fromIndex, toIndex }), [])
 
-  const updateField = useCallback(
-    (fieldId: string, patch: Partial<FormFieldSchema>) =>
-      dispatch({ type: 'UPDATE_FIELD', fieldId, patch }),
-    [],
-  )
+  const updateField = useCallback((fieldId: string, patch: Partial<FormFieldSchema>) => dispatch({ type: 'UPDATE_FIELD', fieldId, patch }), [])
 
-  const updateFormConfig = useCallback(
-    (patch: Partial<FormConfig>) =>
-      dispatch({ type: 'UPDATE_FORM_CONFIG', patch }),
-    [],
-  )
+  const updateFormConfig = useCallback((patch: Partial<FormConfig>) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch }), [])
 
-  const updateSubmitConfig = useCallback(
-    (patch: Partial<SubmitConfig>) =>
-      dispatch({ type: 'UPDATE_SUBMIT_CONFIG', patch }),
-    [],
-  )
+  const updateSubmitConfig = useCallback((patch: Partial<SubmitConfig>) => dispatch({ type: 'UPDATE_SUBMIT_CONFIG', patch }), [])
 
-  const setSchema = useCallback(
-    (schema: FormSchema) => dispatch({ type: 'SET_SCHEMA', schema }),
-    [],
-  )
+  const setSchema = useCallback((schema: FormSchema) => dispatch({ type: 'SET_SCHEMA', schema }), [])
 
   // 从控件库添加字段
   const addFieldFromPalette = useCallback(
@@ -139,22 +99,25 @@ export function useDesignerHistory(getFields: () => FormFieldSchema[]) {
   const [snapshots, setSnapshots] = useState<FormFieldSchema[][]>([[]])
   const [historyIndex, setHistoryIndex] = useState(0)
 
-  const pushSnapshot = useCallback((nextFields: FormFieldSchema[]) => {
-    setSnapshots(prev => {
-      const trimmed = prev.slice(0, historyIndex + 1)
-      const next = [...trimmed, structuredClone(nextFields)]
-      if (next.length > 50) next.shift()
-      return next
-    })
-    setHistoryIndex(prev => Math.min(prev + 1, 49))
-  }, [historyIndex])
+  const pushSnapshot = useCallback(
+    (nextFields: FormFieldSchema[]) => {
+      setSnapshots((prev) => {
+        const trimmed = prev.slice(0, historyIndex + 1)
+        const next = [...trimmed, structuredClone(nextFields)]
+        if (next.length > 50) next.shift()
+        return next
+      })
+      setHistoryIndex((prev) => Math.min(prev + 1, 49))
+    },
+    [historyIndex],
+  )
 
   const undo = useCallback(() => {
-    setHistoryIndex(i => Math.max(i - 1, 0))
+    setHistoryIndex((i) => Math.max(i - 1, 0))
   }, [])
 
   const redo = useCallback(() => {
-    setHistoryIndex(i => Math.min(i + 1, snapshots.length - 1))
+    setHistoryIndex((i) => Math.min(i + 1, snapshots.length - 1))
   }, [snapshots.length])
 
   const canUndo = historyIndex > 0

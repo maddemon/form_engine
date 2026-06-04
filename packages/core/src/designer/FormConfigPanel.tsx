@@ -1,7 +1,6 @@
 import React from 'react'
 import { FieldItem } from '../propRenders/shared'
 import { useStyle } from '../styles'
-import { useDesignerContext } from './DesignerContext'
 import type { DesignerWidgets } from '../types/adapter'
 import type { DesignerAction } from '../types/designer'
 import type { FormConfig } from '../types/schema'
@@ -25,53 +24,80 @@ interface FormConfigPanelProps {
  */
 export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, dispatch, widgets: w }) => {
   const { token } = useStyle()
-  const { scene } = useDesignerContext()
-  const isMobile = scene === 'mobile'
 
-  const handleColChange = (key: 'labelCol' | 'wrapperCol', v: string | undefined) => {
+  const handleDesktopColChange = (key: 'labelCol' | 'wrapperCol', v: string | undefined) => {
     if (v === undefined) return
     const num = Number(v)
-    if (isMobile) {
-      dispatch({
-        type: 'UPDATE_FORM_CONFIG',
-        patch: {
-          scenes: {
-            ...formConfig.scenes,
-            mobile: { ...formConfig.scenes?.mobile, [key]: num ? { span: num } : undefined },
-          },
-        },
-      })
-    } else {
-      dispatch({
-        type: 'UPDATE_FORM_CONFIG',
-        patch: { [key]: num ? { span: num } : undefined },
-      })
-    }
+    dispatch({
+      type: 'UPDATE_FORM_CONFIG',
+      patch: { [key]: { span: num } },
+    })
   }
 
-  const handlePageBgChange = (v: string | number) => {
+  const handleMobileColChange = (key: 'labelCol' | 'wrapperCol', v: string | undefined) => {
+    if (v === undefined) return
+    const num = Number(v)
+    dispatch({
+      type: 'UPDATE_FORM_CONFIG',
+      patch: {
+        scenes: {
+          ...formConfig.scenes,
+          mobile: { ...formConfig.scenes.mobile, [key]: { span: num } },
+        },
+      },
+    })
+  }
+
+  const handlePageBgChange = (scene: 'desktop' | 'mobile', v: string | number) => {
     const val = String(v)
     dispatch({
       type: 'UPDATE_FORM_CONFIG',
       patch: {
         pageBackground: {
           ...formConfig.pageBackground,
-          [isMobile ? 'mobile' : 'desktop']: val || undefined,
+          [scene]: val || undefined,
         },
       },
     })
   }
 
-  const labelColSpan = isMobile
-    ? (formConfig.scenes?.mobile?.labelCol?.span ?? 24)
-    : (formConfig.labelCol?.span ?? 5)
-  const wrapperColSpan = isMobile
-    ? (formConfig.scenes?.mobile?.wrapperCol?.span ?? 24)
-    : (formConfig.wrapperCol?.span ?? 15)
+  const desktopLabelColSpan = formConfig.scenes.desktop.labelCol.span
+  const desktopWrapperColSpan = formConfig.scenes.desktop.wrapperCol.span
+  const mobileLabelColSpan = formConfig.scenes.mobile.labelCol.span
+  const mobileWrapperColSpan = formConfig.scenes.mobile.wrapperCol.span
 
-  const pageBg = isMobile
-    ? (formConfig.pageBackground?.mobile ?? '')
-    : (formConfig.pageBackground?.desktop ?? '')
+  const desktopPageBg = formConfig.pageBackground?.desktop ?? ''
+  const mobilePageBg = formConfig.pageBackground?.mobile ?? ''
+
+  const renderPageBgField = (scene: 'desktop' | 'mobile', bgValue: string) => (
+    <FieldItem label={`${scene === 'desktop' ? '桌面端' : '移动端'}页面背景色`}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
+        <div
+          style={{
+            width: token('spacingXl'),
+            height: token('spacingXl'),
+            borderRadius: 'var(--fe-border-radius-sm)',
+            border: '1px solid var(--fe-border)',
+            background: bgValue || (scene === 'desktop' ? 'var(--fe-bg-primary)' : 'var(--fe-bg-secondary)'),
+            flexShrink: 0,
+          }}
+        />
+        <w.Input value={bgValue} onChange={(v) => handlePageBgChange(scene, v)} placeholder={scene === 'desktop' ? 'var(--fe-bg-primary)' : 'var(--fe-bg-secondary)'} />
+      </div>
+    </FieldItem>
+  )
+
+  const renderColSection = (title: string, labelColSpan: number, wrapperColSpan: number, onColChange: (key: 'labelCol' | 'wrapperCol', v: string | undefined) => void) => (
+    <div style={{ marginTop: token('spacingMd'), borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm') }}>
+      <div style={{ fontSize: token('fontSizeSm'), fontWeight: 500, marginBottom: token('spacingSm'), color: 'var(--fe-text-secondary)' }}>{title}</div>
+      <FieldItem label="标签宽度">
+        <w.Select value={String(labelColSpan)} onChange={(v) => onColChange('labelCol', v)} options={COL_SPAN_OPTIONS} />
+      </FieldItem>
+      <FieldItem label="控件宽度">
+        <w.Select value={String(wrapperColSpan)} onChange={(v) => onColChange('wrapperCol', v)} options={COL_SPAN_OPTIONS} />
+      </FieldItem>
+    </div>
+  )
 
   return (
     <>
@@ -82,50 +108,16 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
       </FieldItem>
 
       <FieldItem label="标签对齐">
-        <w.Select
-          value={formConfig.labelAlign || 'right'}
-          onChange={(v) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { labelAlign: v as 'left' | 'right' } })}
-          options={LABEL_ALIGN_OPTIONS}
-        />
+        <w.Select value={formConfig.labelAlign || 'right'} onChange={(v) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { labelAlign: v as 'left' | 'right' } })} options={LABEL_ALIGN_OPTIONS} />
       </FieldItem>
 
-      <FieldItem label={isMobile ? '移动端页面背景色' : '桌面端页面背景色'}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
-          <div style={{
-            width: token('spacingXl'),
-            height: token('spacingXl'),
-            borderRadius: 'var(--fe-border-radius-sm)',
-            border: '1px solid var(--fe-border)',
-            background: pageBg || (isMobile ? 'var(--fe-bg-secondary)' : 'var(--fe-bg-primary)'),
-            flexShrink: 0,
-          }} />
-          <w.Input
-            value={pageBg}
-            onChange={handlePageBgChange}
-            placeholder={isMobile ? 'var(--fe-bg-secondary)' : 'var(--fe-bg-primary)'}
-          />
-        </div>
-      </FieldItem>
+      <h4 style={{ margin: `${token('spacingMd')} 0 ${token('spacingSm')} 0`, fontSize: token('fontSizeSm'), color: 'var(--fe-text-secondary)' }}>桌面端配置</h4>
+      {renderPageBgField('desktop', desktopPageBg)}
+      {renderColSection('桌面端标签/控件宽度', desktopLabelColSpan, desktopWrapperColSpan, handleDesktopColChange)}
 
-      <div style={{ marginTop: token('spacingMd'), borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm') }}>
-        <div style={{ fontSize: token('fontSizeSm'), fontWeight: 500, marginBottom: token('spacingSm'), color: 'var(--fe-text-secondary)' }}>
-          {isMobile ? '移动端标签/控件宽度' : '桌面端标签/控件宽度'}
-        </div>
-        <FieldItem label="标签宽度">
-          <w.Select
-            value={String(labelColSpan)}
-            onChange={(v) => handleColChange('labelCol', v)}
-            options={COL_SPAN_OPTIONS}
-          />
-        </FieldItem>
-        <FieldItem label="控件宽度">
-          <w.Select
-            value={String(wrapperColSpan)}
-            onChange={(v) => handleColChange('wrapperCol', v)}
-            options={COL_SPAN_OPTIONS}
-          />
-        </FieldItem>
-      </div>
+      <h4 style={{ margin: `${token('spacingMd')} 0 ${token('spacingSm')} 0`, fontSize: token('fontSizeSm'), color: 'var(--fe-text-secondary)' }}>移动端配置</h4>
+      {renderPageBgField('mobile', mobilePageBg)}
+      {renderColSection('移动端标签/控件宽度', mobileLabelColSpan, mobileWrapperColSpan, handleMobileColChange)}
     </>
   )
 }

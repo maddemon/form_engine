@@ -123,7 +123,7 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
 export const TimePicker: React.FC<DatePickerProps> = ({
   value,
   onChange,
-  format = 'HH:mm:ss',
+  format = 'HH:mm',
   placeholder,
   allowClear = true,
   disabled,
@@ -136,11 +136,16 @@ export const TimePicker: React.FC<DatePickerProps> = ({
     onChange?.(timeString || undefined)
   }
 
+  // 根据 format 推导列的显隐：format 不含秒则隐藏秒列
+  const resolvedFormat = format || 'HH:mm'
+  const showSecond = resolvedFormat.includes('ss') || resolvedFormat.includes('s')
+
   return (
     <AntTimePicker
       value={toTimeDayjs(value)}
       onChange={handleChange}
-      format={format}
+      format={resolvedFormat}
+      showSecond={showSecond}
       placeholder={placeholder}
       allowClear={allowClear}
       disabled={disabled}

@@ -1,12 +1,12 @@
-import React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { FormFieldSchema } from '../types/schema'
+import React from 'react'
 import { FieldRenderer } from '../renderer/FieldRenderer'
 import { isContainerComponent } from '../types/component-category'
+import type { FormFieldSchema } from '../types/schema'
+import { ContainerPreview } from './ContainerPreview'
 import { useDesignerContext } from './DesignerContext'
 import { FieldItem } from './FieldItem'
-import { ContainerPreview } from './ContainerPreview'
 
 interface NestedFieldProps {
   field: FormFieldSchema
@@ -18,18 +18,13 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
   const { selectedFieldId, formConfig, adapter } = useDesignerContext()
   const isContainer = isContainerComponent(field.type)
 
-  const {
-    attributes, listeners, setNodeRef, setActivatorNodeRef,
-    transform, transition, isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id!,
     data: { source: 'canvas', fieldId: field.id },
     disabled: parentContainerId === undefined || childIndex === undefined,
   })
 
-  const content = isContainer
-    ? <ContainerPreview field={field} />
-    : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
+  const content = isContainer ? <ContainerPreview field={field} /> : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled adapter={adapter} formConfig={formConfig} />
 
   return (
     <FieldItem

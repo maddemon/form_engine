@@ -91,10 +91,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
     [field.name, value, field, isDisabled, field.readOnly, field.placeholder],
   )
 
-  const eventHandlers: Record<string, ResolvedEventHandler> = useMemo(
-    () => (eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}),
-    [eventContext, field.events, field.type, $self],
-  )
+  const eventHandlers: Record<string, ResolvedEventHandler> = useMemo(() => (eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}), [eventContext, field.events, field.type, $self])
 
   // onChange 包装：先更新当前字段值，再执行用户事件
   // IME 组合输入检测：通过 onCompositionStart/onCompositionEnd 跟踪组合输入状态
@@ -157,23 +154,25 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
     // 3. 兜底
     adapter.default
 
-  const { labelCol, wrapperCol } = formConfig
+  const { labelCol, wrapperCol } = formConfig.scenes[adapter.scene]
   const labelColSpan = labelCol.span
   const wrapperColSpan = wrapperCol.span
   const isHorizontal = !(labelColSpan === 24 && wrapperColSpan === 24)
 
   const fieldContent = (
     <>
-      {!renderFn ? <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>未知字段类型: {field.type}</div> : (
+      {!renderFn ? (
+        <div style={{ fontSize: token('fontSizeSm') as string, color: token('error') as string }}>未知字段类型: {field.type}</div>
+      ) : (
         <FieldSchemaContext.Provider value={field}>
           <AdapterContext.Provider value={adapter}>
-          {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
+            {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
               其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
               Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
-          <React.Suspense fallback={null}>
-          {/* eslint-disable-next-line react-hooks/refs -- composingRef 仅在事件回调中读取，此处为传参非 render 中访问 */}
-          {React.createElement(renderFn, fieldProps)}
-          </React.Suspense>
+            <React.Suspense fallback={null}>
+              {/* eslint-disable-next-line react-hooks/refs -- composingRef 仅在事件回调中读取，此处为传参非 render 中访问 */}
+              {React.createElement(renderFn, fieldProps)}
+            </React.Suspense>
           </AdapterContext.Provider>
         </FieldSchemaContext.Provider>
       )}

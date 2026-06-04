@@ -1,9 +1,10 @@
-import { Checkbox } from 'antd-mobile'
+import { Checkbox, Space } from 'antd-mobile'
 import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 export const CheckboxField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, disabled, fieldSchema, options } = props
   const checkboxOptions = (options || []) as OptionItem[]
+  const direction = (fieldSchema.componentProps as any)?.direction
 
   if (checkboxOptions.length > 0) {
     const vals = (value as string[]) || []
@@ -13,11 +14,13 @@ export const CheckboxField: FieldRendererFn = (props: FieldComponentProps) => {
         onChange={v => onChange?.(v)}
         disabled={disabled}
       >
-        {checkboxOptions.map(opt => (
-          <Checkbox key={String(opt.value)} value={String(opt.value)}>
-            {opt.label}
-          </Checkbox>
-        ))}
+        <Space direction={direction === 'vertical' ? 'vertical' : 'horizontal'} block>
+          {checkboxOptions.map(opt => (
+            <Checkbox key={String(opt.value)} value={String(opt.value)}>
+              {opt.label}
+            </Checkbox>
+          ))}
+        </Space>
       </Checkbox.Group>
     )
   }

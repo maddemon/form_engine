@@ -20,7 +20,7 @@ export const CascaderField: FieldRendererFn = (props: FieldComponentProps) => {
           disabled={disabled}
           style={{ width: '100%', textAlign: 'left', color: vals.length ? undefined : '#999' }}
         >
-          {vals.length > 0 ? vals.join(' / ') : placeholder}
+          {vals.length > 0 ? vals.map((v: any) => v?.label ?? v ?? '').join(' / ') : placeholder}
         </Button>
       )}
     </Cascader>

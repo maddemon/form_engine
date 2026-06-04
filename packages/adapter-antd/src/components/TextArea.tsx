@@ -29,7 +29,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
   
   return (
     <AntdTextArea
-      value={(value as string) || undefined}
+      value={(value as string) ?? ''}
       onChange={handleChange}
       placeholder={placeholder}
       disabled={disabled}

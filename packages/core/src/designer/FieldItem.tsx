@@ -138,7 +138,7 @@ export const FieldItem: React.FC<FieldItemProps> = React.memo(({
         </div>
       )}
 
-      <div style={{ pointerEvents: isContainer ? 'auto' : 'none' }}>
+      <div style={{ pointerEvents: 'auto' }}>
         {children}
       </div>
     </div>

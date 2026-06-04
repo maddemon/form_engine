@@ -31,7 +31,7 @@ export const Input: React.FC<InputProps> = ({
   }
   
   const inputProps = {
-    value: (value as string) || undefined,
+    value: (value as string) ?? '',
     onChange: handleChange,
     placeholder,
     disabled,

@@ -8,7 +8,7 @@ export const InputNumberField: FieldRendererFn = (props: FieldComponentProps) =>
       value={(value as number) ?? 0}
       onChange={v => onChange?.(v)}
       disabled={disabled}
-      style={{ width: '100%' }}
+      style={{}}
     />
   )
 }
