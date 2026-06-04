@@ -12,6 +12,7 @@
 import { evalExpr } from '../utils'
 import type {
   EventHandler,
+  EventCallbacks,
   EventDeclaration,
   FormFieldEvents,
   $Form,
@@ -30,7 +31,7 @@ export interface EventContext {
   /** $form API */
   $form: $Form
   /** 宿主传入的回调表（供 callback 类型 handler 查表，签名由使用者决定） */
-  callbacks: Record<string, (...args: any[]) => void>
+  callbacks: EventCallbacks
 }
 
 /**
@@ -76,7 +77,7 @@ function createActionHandler(
  */
 function createCallbackHandler(
   callback: string,
-  callbacks: Record<string, (...args: any[]) => void>,
+  callbacks: EventCallbacks,
 ): ResolvedEventHandler {
   return (...args: unknown[]) => {
     const fn = callbacks[callback]
@@ -96,7 +97,7 @@ export function resolveEventHandler(
   $self: $Self,
   $form: $Form,
   $event: unknown,
-  callbacks: Record<string, (...args: any[]) => void>,
+  callbacks: EventCallbacks,
 ): ResolvedEventHandler {
   switch (handler.type) {
     case 'expression':
@@ -135,7 +136,7 @@ export function resolveEvents(
   events: FormFieldEvents | undefined,
   $self: $Self,
   $form: $Form,
-  callbacks: Record<string, (...args: any[]) => void>,
+  callbacks: EventCallbacks,
   eventDeclarations?: EventDeclaration[],
 ): Record<string, ResolvedEventHandler> {
   if (!events) return {}

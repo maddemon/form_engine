@@ -17,7 +17,7 @@ export const Radio: React.FC<RadioProps> = ({
   id,
   ...rest
 }) => {
-  const handleChange = (e: any) => {
+  const handleChange = (e: { target: { value: string } }) => {
     onChange?.(e.target.value)
   }
 

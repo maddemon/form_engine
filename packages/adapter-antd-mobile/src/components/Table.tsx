@@ -1,23 +1,31 @@
 import { useAdapter, type FieldComponentProps, type FieldRendererFn } from '@form-engine/core'
+import type { FormFieldSchema } from '@form-engine/core'
 import { Button, Card } from 'antd-mobile'
 import React from 'react'
+
+interface TableColumnConfig {
+  id: string
+  label: string
+  width?: number
+  key?: string
+}
 
 export const TableField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, fieldSchema, disabled } = props
   const adapter = useAdapter()
-  const rows: Record<string, any>[] = value ?? []
-  const children: any[] = fieldSchema.children ?? []
-  const columns: any[] = fieldSchema.componentProps?.columns ?? []
+  const rows: Record<string, unknown>[] = (value ?? []) as Record<string, unknown>[]
+  const children: FormFieldSchema[] = fieldSchema.children ?? []
+  const columns: TableColumnConfig[] = (fieldSchema.componentProps?.columns as TableColumnConfig[]) ?? []
   const rowMode = fieldSchema.componentProps?.rowMode ?? 'dynamic'
 
   // 按 regionKey 分组列字段
-  const columnChildren = columns.map((col: any, colIdx: number) => children.filter((child: any) => (child.columnIndex ?? Number(child.regionKey ?? colIdx)) === colIdx))
+  const columnChildren = columns.map((_col, colIdx) => children.filter((child) => (child.columnIndex ?? Number(child.regionKey ?? colIdx)) === colIdx))
 
   if (columns.length === 0) {
     return <div style={{ padding: 16, textAlign: 'center', color: 'var(--fe-text-tertiary)' }}>请先在「表格属性」中配置列</div>
   }
 
-  const handleCellChange = (rowIndex: number, fieldName: string, cellValue: any) => {
+  const handleCellChange = (rowIndex: number, fieldName: string, cellValue: unknown) => {
     const newRows = [...rows]
     newRows[rowIndex] = { ...newRows[rowIndex], [fieldName]: cellValue }
     onChange?.(newRows)
@@ -29,7 +37,7 @@ export const TableField: FieldRendererFn = (props: FieldComponentProps) => {
   }
 
   const handleAddRow = () => {
-    const newRow: Record<string, any> = {}
+    const newRow: Record<string, unknown> = {}
     for (const child of children) {
       newRow[child.name] = child.defaultValue
     }
@@ -71,10 +79,10 @@ export const TableField: FieldRendererFn = (props: FieldComponentProps) => {
               </svg>
             </button>
           )}
-          {columnChildren.map((colChildren: any[], colIdx: number) => (
+          {columnChildren.map((colChildren, colIdx) => (
             <div key={colIdx}>
               {columns[colIdx] && <div style={{ fontSize: 13, fontWeight: 600, color: '#333', marginBottom: 6 }}>{columns[colIdx].label}</div>}
-              {colChildren.map((child: any) => {
+              {colChildren.map((child) => {
                 const cellValue = row[child.name]
                 const renderFn = adapter?.components[child.type]
                 return (
@@ -83,7 +91,7 @@ export const TableField: FieldRendererFn = (props: FieldComponentProps) => {
                     {renderFn ? (
                       React.createElement(renderFn, {
                         value: cellValue,
-                        onChange: (v: any) => handleCellChange(rowIndex, child.name, v),
+                        onChange: (v: unknown) => handleCellChange(rowIndex, child.name, v),
                         fieldSchema: child,
                         disabled,
                       })

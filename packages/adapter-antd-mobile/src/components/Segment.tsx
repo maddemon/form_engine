@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import type { FieldComponentProps, FieldRendererFn, OptionItem } from '@form-engine/core'
 
 // antd-mobile 无 Segmented 组件，使用自定义实现
 export const SegmentField: FieldRendererFn = (props: FieldComponentProps) => {
   const { style } = props
-  const options = props.options ?? []
+  const options: OptionItem[] = (props.options ?? []) as OptionItem[]
   const defaultValue = props.defaultValue
   const disabled = props.disabled
   const block = props.block
@@ -29,7 +29,7 @@ export const SegmentField: FieldRendererFn = (props: FieldComponentProps) => {
       opacity: disabled ? 0.5 : 1,
       ...style,
     }}>
-      {options.map((opt: any) => {
+      {options.map((opt) => {
         const active = currentValue === opt.value
         const optDisabled = disabled || opt.disabled
         return (

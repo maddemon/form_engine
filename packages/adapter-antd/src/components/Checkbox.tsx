@@ -16,8 +16,8 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   id,
   ...rest
 }) => {
-  const handleChange = (checkedValues: any) => {
-    onChange?.(checkedValues)
+  const handleChange = (checkedValues: (string | number)[]) => {
+    onChange?.(checkedValues as string[])
   }
 
   if (options && options.length > 0) {

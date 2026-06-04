@@ -10,13 +10,13 @@
  */
 
 import * as React from 'react'
-import type { FormFieldSchema } from './schema'
+import type { FormFieldSchema, FormRule, OptionItem } from './schema'
 
 // ============================
 // 字段渲染相关类型
 // ============================
 
-/** 字段组件的 Props */
+/** 字段组件的 Props（adapter 组件接收的参数） */
 export interface FieldComponentProps {
   /** 字段值 */
   value?: unknown
@@ -30,8 +30,16 @@ export interface FieldComponentProps {
   readOnly?: boolean
   /** 占位符 */
   placeholder?: string
-  /** 其他属性（允许 adapter 透传任意 props 给底层 UI 库组件，索引签名架构设计使然） */
-  [key: string]: any
+  /** 选项列表（select / radio / checkbox 等） */
+  options?: OptionItem[]
+  /** 是否必填 */
+  required?: boolean
+  /** 校验规则 */
+  rules?: FormRule[]
+  /** 校验状态 */
+  validateStatus?: 'error' | undefined
+  /** 校验错误提示 */
+  help?: string
 }
 
 /** 字段渲染函数类型（adapter 组件映射使用） */

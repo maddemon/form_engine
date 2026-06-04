@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import type { FormSchema, OptionItem } from '../../types/schema'
 import type { EventContext } from '../../events'
-import type { $Form } from '../../types/events'
+import type { EventCallbacks, $Form } from '../../types/events'
 import type { DataSourceResolver } from '../../types/render'
 import { validateForm } from '../validate'
 import { useFormValues } from './useFormValues'
@@ -15,7 +15,7 @@ export interface UseFormRenderOptions {
   onSubmit?: (values: Record<string, unknown>) => void
   onChange?: (values: Record<string, unknown>) => void
   dataSourceResolver?: DataSourceResolver
-  callbacks?: Record<string, (...args: any[]) => void>
+  callbacks?: EventCallbacks
 }
 
 export interface UseFormRenderResult {

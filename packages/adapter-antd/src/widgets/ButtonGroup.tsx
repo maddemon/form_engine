@@ -7,10 +7,13 @@
  */
 import { Button, Space } from 'antd'
 import React from 'react'
+import type { DesignerWidgets } from '@form-engine/core'
 
-export const ButtonGroup: React.FC<any> = ({ value, onChange, options, disabled, style }) => (
+type ButtonGroupOption = { label: string; value: string }
+
+export const ButtonGroup: React.FC<DesignerWidgets['ButtonGroup']> = ({ value, onChange, options, disabled, style }) => (
   <Space.Compact size="small" style={style}>
-    {options?.map((opt: any) => {
+    {(options as ButtonGroupOption[])?.map((opt) => {
       const active = value === opt.value
       return (
         <Button

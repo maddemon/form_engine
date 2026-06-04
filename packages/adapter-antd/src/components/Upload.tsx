@@ -2,6 +2,7 @@ import React from 'react'
 import { Upload as AntUpload, Button } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import type { UploadProps, UploadFile } from '@form-engine/core'
+import type { UploadChangeParam } from 'antd/es/upload'
 
 export const Upload: React.FC<UploadProps> = ({
   value,
@@ -20,11 +21,11 @@ export const Upload: React.FC<UploadProps> = ({
   children,
   ...rest
 }) => {
-  const handleChange = (info: any) => {
-    const fileList = info.fileList.map((file: any) => ({
+  const handleChange = (info: UploadChangeParam) => {
+    const fileList: UploadFile[] = info.fileList.map((file) => ({
       uid: file.uid,
       name: file.name,
-      status: file.status,
+      status: file.status as UploadFile['status'],
       response: file.response,
       url: file.url,
       thumbUrl: file.thumbUrl,

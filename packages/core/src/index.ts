@@ -49,6 +49,7 @@ export type {
   EventParamDeclaration,
   FormFieldEvents,
   ResolvedEventHandler,
+  EventCallbacks,
   $Self,
   $Form,
 } from './types/events'
@@ -147,6 +148,17 @@ export {
 
 // 组件事件声明查询
 export { getEventDeclarations } from './components'
+
+// 组件注册表
+export {
+  componentRegistry,
+  getComponentLabel,
+  getComponentIcon,
+  getComponentIconName,
+  getComponentDefaultProps,
+  ALL_FIELD_TYPES,
+  type ComponentRegistration,
+} from './components'
 
 // 图标映射（供 adapter 解析图标字符串）
 export { iconMap } from './components'

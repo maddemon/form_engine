@@ -6,9 +6,9 @@ import type { ComponentRenderFn, FieldComponentProps, FormEngineAdapter } from '
 import { isFormComponent } from '../types/component-category'
 import type { $Self, ResolvedEventHandler } from '../types/events'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
-import { evalExpr, matchVisibleWhen } from '../utils'
 import { AdapterContext } from './AdapterContext'
 import { FieldSchemaContext } from './FieldSchemaContext'
+import { useFieldExpression } from './hooks/useFieldExpression'
 
 export interface FieldRendererProps {
   field: FormFieldSchema
@@ -40,14 +40,17 @@ export interface FieldRendererProps {
  * 事件合并优先级（后写覆盖前写）：
  * 内置 props < componentProps < 事件处理器（events 解析结果）
  */
-export function FieldRenderer({ field, value, onChange, options, disabled, adapter, components = {}, eventContext, errors, formConfig }: FieldRendererProps) {
+export const FieldRenderer = React.memo(function FieldRenderer({ field, value, onChange, options, disabled, adapter, components = {}, eventContext, errors, formConfig }: FieldRendererProps) {
   const { token } = useStyle()
 
+  // 表达式计算（disabled / required）
+  const { exprDisabled, exprRequired } = useFieldExpression(field, value)
+
   // 判断是否禁用
-  const isDisabled = disabled || (typeof field.disabled === 'string' ? !!evalExpr(field.disabled, { ...({} as Record<string, unknown>), [field.name]: value }) : false) || (field.disabledIfExpr ? !!evalExpr(field.disabledIfExpr, { ...({} as Record<string, unknown>), [field.name]: value }) : false)
+  const isDisabled = disabled || exprDisabled
 
   // 判断是否必填
-  const isRequired = field.rules?.some((r) => r.required) || (field.requiredIfExpr ? !!evalExpr(field.requiredIfExpr, { ...({} as Record<string, unknown>), [field.name]: value }) : false) || (field.requiredWhen ? matchVisibleWhen(field.requiredWhen, { [field.name]: value } as Record<string, unknown>) : false)
+  const isRequired = field.rules?.some((r) => r.required) || exprRequired
 
   // label 渲染（仅表单组件显示 label）
   const showLabel = isFormComponent(field.type) && field.label
@@ -172,4 +175,5 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
       <div style={{ width: `${(wrapperColSpan / 24) * 100}%` }}>{fieldContent}</div>
     </div>
   )
-}
+})
+FieldRenderer.displayName = 'FieldRenderer'

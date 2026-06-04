@@ -15,7 +15,6 @@ export const Table: React.FC<{
   fieldSchema: FormFieldSchema
   disabled?: boolean
   readOnly?: boolean
-  [key: string]: any
 }> = ({
   value = [],
   onChange,
@@ -25,7 +24,7 @@ export const Table: React.FC<{
 }) => {
   const field = fieldSchema
   const adapter = useAdapter()
-  const children: any[] = field.children ?? []
+  const children = field.children ?? []
   const columns = ((field.componentProps?.columns as TableColumnConfig[]) || []).filter(Boolean)
 
   if (columns.length === 0) {

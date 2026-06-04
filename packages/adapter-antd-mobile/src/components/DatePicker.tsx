@@ -19,7 +19,7 @@ function formatDisplayDate(d: Date, showTime: boolean): string {
 
 export const DateField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, disabled, fieldSchema } = props
-  const showTime = !!(fieldSchema.componentProps as any)?.showTime
+  const showTime = !!fieldSchema.componentProps?.showTime
   const placeholder = fieldSchema.placeholder || '请选择日期'
 
   return (

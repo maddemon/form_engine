@@ -4,7 +4,7 @@ import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-eng
 export const RadioField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, disabled, fieldSchema, options } = props
   const radioOptions = (options || []) as OptionItem[]
-  const direction = (fieldSchema.componentProps as any)?.direction
+  const direction = fieldSchema.componentProps?.direction as string | undefined
   return (
     <Radio.Group
       value={value as string}

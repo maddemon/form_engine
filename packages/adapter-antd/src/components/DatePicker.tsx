@@ -45,7 +45,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   id,
   ...rest
 }) => {
-  const handleChange = (date: any, dateString: string) => {
+  const handleChange = (_date: dayjs.Dayjs | null, dateString: string) => {
     onChange?.(dateString || undefined)
   }
 
@@ -90,7 +90,7 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
   id,
   ...rest
 }) => {
-  const handleChange = (dates: any, dateStrings: [string, string]) => {
+  const handleChange = (_dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null, dateStrings: [string, string]) => {
     onChange?.(dateStrings || undefined)
   }
 
@@ -132,7 +132,7 @@ export const TimePicker: React.FC<DatePickerProps> = ({
   id,
   ...rest
 }) => {
-  const handleChange = (time: any, timeString: string) => {
+  const handleChange = (_time: dayjs.Dayjs | null, timeString: string) => {
     onChange?.(timeString || undefined)
   }
 

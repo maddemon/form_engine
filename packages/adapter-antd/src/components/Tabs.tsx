@@ -49,9 +49,9 @@ export const Tabs: React.FC<TabsProps> = ({
       {...rest}
     >
       {tabConfigs.map((tab, idx) => {
-        const tabChildren = childrenArray.filter((child: any) =>
-          child.props?.field?.regionKey === tab.key ||
-          Number(child.props?.field?.columnIndex ?? -1) === idx
+        const tabChildren = childrenArray.filter((child: React.ReactNode) =>
+          (child as React.ReactElement)?.props?.field?.regionKey === tab.key ||
+          Number((child as React.ReactElement)?.props?.field?.columnIndex ?? -1) === idx
         )
         return (
           <AntTabs.TabPane key={tab.key} tab={tab.title} disabled={tab.disabled}>
@@ -71,7 +71,6 @@ interface TabPaneProps {
   disabled?: boolean
   style?: React.CSSProperties
   className?: string
-  [key: string]: any
 }
 
 /**

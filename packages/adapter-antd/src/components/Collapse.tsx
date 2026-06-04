@@ -47,9 +47,9 @@ export const Collapse: React.FC<CollapseProps> = ({
       {...rest}
     >
       {panelConfigs.map((panel, idx) => {
-        const panelChildren = childrenArray.filter((child: any) =>
-          child.props?.field?.regionKey === panel.key ||
-          Number(child.props?.field?.columnIndex ?? -1) === idx
+        const panelChildren = childrenArray.filter((child: React.ReactNode) =>
+          (child as React.ReactElement)?.props?.field?.regionKey === panel.key ||
+          Number((child as React.ReactElement)?.props?.field?.columnIndex ?? -1) === idx
         )
         return (
           <AntPanel key={panel.key} header={panel.header} disabled={panel.disabled}>
@@ -70,7 +70,6 @@ interface CollapsePanelProps {
   extra?: React.ReactNode
   style?: React.CSSProperties
   className?: string
-  [key: string]: any
 }
 
 /**

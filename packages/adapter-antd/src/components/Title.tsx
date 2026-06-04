@@ -30,6 +30,7 @@ export const Title: React.FC<TitleProps> = ({
     ...(color ? { color } : {}),
     ...style,
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const titleProps: any = {
     level,
     type,

@@ -19,7 +19,41 @@ interface CanvasToolbarProps {
   showTree: boolean
 }
 
-export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
+/** Toolbar 通用按钮（提取自重复的 button JSX） */
+const ToolbarButton: React.FC<{
+  label: string
+  onClick: () => void
+  disabled?: boolean
+  active?: boolean
+  children: React.ReactNode
+}> = React.memo(({ label, onClick, disabled, active, children }) => {
+  const { token } = useStyle()
+  return (
+    <button
+      title={label}
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: active ? '1px solid var(--fe-primary)' : '1px solid var(--fe-border-primary)',
+        background: active ? 'var(--fe-primary-bg)' : 'var(--fe-bg-primary)',
+        borderRadius: token('borderRadiusSm'),
+        padding: '2px 6px',
+        cursor: 'pointer',
+        fontSize: 'var(--fe-font-size-xs)',
+        opacity: disabled ? 0.4 : 1,
+        color: 'var(--fe-text-primary)',
+      }}
+    >
+      {children}
+    </button>
+  )
+})
+ToolbarButton.displayName = 'ToolbarButton'
+
+export const CanvasToolbar: React.FC<CanvasToolbarProps> = React.memo(({
   scene,
   onSceneChange,
   canUndo,
@@ -45,82 +79,27 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
-        <button
-          title="组件树"
-          onClick={onTreeClick}
-          style={{
-            border: showTree ? '1px solid var(--fe-primary)' : '1px solid var(--fe-border-primary)',
-            background: showTree ? 'var(--fe-primary-bg)' : 'var(--fe-bg-primary)',
-            borderRadius: token('borderRadiusSm'),
-            padding: '2px 6px',
-            cursor: 'pointer',
-            fontSize: 'var(--fe-font-size-xs)',
-            color: 'var(--fe-text-primary)',
-          }}
-        >
-          ☰
-        </button>
-
-        <button
-          title="撤销"
-          onClick={onUndo}
-          disabled={!canUndo}
-          style={{
-            border: '1px solid var(--fe-border-primary)',
-            background: 'var(--fe-bg-primary)',
-            borderRadius: token('borderRadiusSm'),
-            padding: '2px 6px',
-            cursor: 'pointer',
-            fontSize: 'var(--fe-font-size-xs)',
-            opacity: !canUndo ? 0.4 : 1,
-            color: 'var(--fe-text-primary)',
-          }}
-        >
-          ↩
-        </button>
-        <button
-          title="重做"
-          onClick={onRedo}
-          disabled={!canRedo}
-          style={{
-            border: '1px solid var(--fe-border-primary)',
-            background: 'var(--fe-bg-primary)',
-            borderRadius: token('borderRadiusSm'),
-            padding: '2px 6px',
-            cursor: 'pointer',
-            fontSize: 'var(--fe-font-size-xs)',
-            opacity: !canRedo ? 0.4 : 1,
-            color: 'var(--fe-text-primary)',
-          }}
-        >
-          ↪
-        </button>
+        <ToolbarButton label="组件树" onClick={onTreeClick} active={showTree}>☰</ToolbarButton>
+        <ToolbarButton label="撤销" onClick={onUndo} disabled={!canUndo}>↩</ToolbarButton>
+        <ToolbarButton label="重做" onClick={onRedo} disabled={!canRedo}>↪</ToolbarButton>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
         {SCENE_TOGGLES.map(item => (
-          <button
+          <ToolbarButton
             key={item.key}
-            title={item.title}
+            label={item.title}
             onClick={() => onSceneChange?.(item.key)}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: scene === item.key ? '1px solid var(--fe-primary)' : '1px solid var(--fe-border-primary)',
-              background: scene === item.key ? 'var(--fe-primary-bg)' : 'var(--fe-bg-primary)',
-              borderRadius: token('borderRadiusSm'),
-              padding: '2px 6px',
-              cursor: 'pointer',
-            }}
+            active={scene === item.key}
           >
             <item.icon
               size={14}
               color={scene === item.key ? 'var(--fe-primary)' : 'var(--fe-text-secondary)'}
             />
-          </button>
+          </ToolbarButton>
         ))}
       </div>
     </div>
   )
-}
+})
+CanvasToolbar.displayName = 'CanvasToolbar'

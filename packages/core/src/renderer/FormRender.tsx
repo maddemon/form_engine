@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import { type FormFieldSchema, type FormSchema, type OptionItem } from '../types/schema'
+import type { EventCallbacks } from '../types/events'
 import type { EventContext } from '../events'
 import { useEnsureDefaultTheme, useStyle } from '../styles'
 import type { ComponentRenderFn, FormEngineAdapter } from '../types/adapter'
@@ -35,9 +36,8 @@ export interface FormRenderProps {
   /**
    * 事件回调（供 EventHandler.type='callback' 引用）
    * key 为回调名，value 为函数；运行时会按 name 查表
-   * 使用 any 因为用户自定义回调签名由使用者决定
    */
-  callbacks?: Record<string, (...args: any[]) => void>
+  callbacks?: EventCallbacks
 }
 
 /**

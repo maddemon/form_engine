@@ -5,7 +5,7 @@ import type { DesignerAction } from '../types/designer'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { defaultPaletteGroups } from './paletteData'
 import { useDraggable } from '@dnd-kit/core'
-import { getComponentIcon } from '../components/paletteRegistry'
+import { getComponentIcon, ALL_FIELD_TYPES as REGISTRY_ALL_FIELD_TYPES } from '../components'
 import { useStyle } from '../styles'
 import { resolvePanelWidth } from '../utils'
 
@@ -234,17 +234,8 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, widt
   )
 }
 
-const ALL_FIELD_TYPES: readonly FieldType[] = [
-  'input', 'input-number', 'textarea', 'password', 'select',
-  'multi-select', 'cascader', 'tree-select',
-  'radio', 'checkbox', 'switch', 'slider',
-  'date', 'date-range', 'time', 'datetime', 'upload',
-  'rate', 'custom',
-  'button', 'grid', 'flex', 'collapse', 'tabs',
-  'text', 'image', 'divider', 'title', 'table',
-  'card', 'alert', 'segment',
-] as const
+const ALL_FIELD_TYPES: readonly string[] = [...REGISTRY_ALL_FIELD_TYPES, 'custom']
 
 function isValidFieldType(type: string): type is FieldType {
-  return (ALL_FIELD_TYPES as readonly string[]).includes(type) || type.startsWith('custom:')
+  return ALL_FIELD_TYPES.includes(type) || type.startsWith('custom:')
 }

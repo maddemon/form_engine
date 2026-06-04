@@ -4,6 +4,7 @@
  */
 
 import type { FormFieldEvents } from './events'
+import type { componentRegistry } from '../components'
 
 // ============================
 // 数据源
@@ -92,40 +93,11 @@ export interface FieldMock {
 // 字段 Schema
 // ============================
 
+/** 字段类型（内置类型从 componentRegistry 派生，支持 custom / custom:xxx 扩展） */
 export type FieldType =
-  | 'input'
-  | 'input-number'
-  | 'textarea'
-  | 'password'
-  | 'select'
-  | 'multi-select' // 保留类型兼容
-  | 'radio'
-  | 'checkbox'
-  | 'switch'
-  | 'slider'
-  | 'date'
-  | 'date-range'
-  | 'time'
-  | 'datetime'
-  | 'upload'
-  | 'rate'
-  | 'cascader'
-  | 'tree-select'
-  | 'button'
-  | 'grid'
-  | 'flex'
-  | 'collapse'
-  | 'tabs'
-  | 'text'
-  | 'image'
-  | 'divider'
-  | 'title'
+  | keyof typeof componentRegistry
   | 'custom'
   | `custom:${string}`
-  | 'table'
-  | 'card'
-  | 'alert'
-  | 'segment'
 
 export interface FormFieldSchema {
   id: string

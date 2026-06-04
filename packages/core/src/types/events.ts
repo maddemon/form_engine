@@ -99,5 +99,10 @@ export interface $Form {
  * 解析后的回调签名
  * 透传原始事件参数，丢弃返回值（异步事件除外）
  */
-// 事件系统通用回调签名，无法预知各事件参数类型
-export type ResolvedEventHandler = (...args: any[]) => any
+export type ResolvedEventHandler = (...args: unknown[]) => unknown
+
+/**
+ * 用户回调函数表（签名由使用者决定）
+ * FormRender callbacks prop 的类型
+ */
+export type EventCallbacks = Record<string, (...args: unknown[]) => unknown>

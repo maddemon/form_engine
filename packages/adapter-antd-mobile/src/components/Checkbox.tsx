@@ -4,7 +4,7 @@ import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-eng
 export const CheckboxField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, disabled, fieldSchema, options } = props
   const checkboxOptions = (options || []) as OptionItem[]
-  const direction = (fieldSchema.componentProps as any)?.direction
+  const direction = fieldSchema.componentProps?.direction as string | undefined
 
   if (checkboxOptions.length > 0) {
     const vals = (value as string[]) || []

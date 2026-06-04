@@ -6,7 +6,7 @@ export const SelectField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, disabled, fieldSchema, options } = props
   const opts = (options || []) as OptionItem[]
   const columns = toPickerColumns(opts)
-  const isMulti = (fieldSchema.componentProps as any)?.mode === 'multiple'
+  const isMulti = fieldSchema.componentProps?.mode === 'multiple'
   const placeholder = fieldSchema.placeholder || '请选择'
 
   const valArr = isMulti

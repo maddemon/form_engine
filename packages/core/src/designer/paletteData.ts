@@ -1,6 +1,6 @@
 import type { PaletteGroup } from '../types/designer'
 import type { FieldType } from '../types/schema'
-import { componentPalettes } from '../components/paletteRegistry'
+import { componentRegistry, type ComponentRegistration } from '../components'
 
 const GROUP_MEMBERS: Record<string, FieldType[]> = {
   '文本输入': ['input', 'textarea', 'password'],
@@ -16,11 +16,11 @@ function buildGroup(groupName: string, types: FieldType[]): PaletteGroup {
   return {
     groupName,
     items: types.map(type => {
-      const palette = componentPalettes[type]
+      const reg = (componentRegistry as Record<string, ComponentRegistration>)[type]
       return {
         type,
-        label: palette?.label ?? type,
-        defaultProps: palette?.defaultProps ?? {},
+        label: reg?.label ?? type,
+        defaultProps: reg?.defaultProps ?? {},
       }
     }),
   }

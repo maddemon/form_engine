@@ -28,8 +28,8 @@ export const Flex: React.FC<FlexProps> = ({
   return (
     <AntFlex
       vertical={direction === 'column' || direction === 'column-reverse'}
-      justify={justify as any}
-      align={align as any}
+      justify={justify}
+      align={align}
       wrap={wrap === 'wrap'}
       gap={gap}
       flex={flex}
