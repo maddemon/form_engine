@@ -192,6 +192,10 @@ export {
   useAdapter,
   useAdaptiveAdapter,
   detectScene,
+  useFormRender,
+  useVisibility,
+  useFormValues,
+  useFormValidation,
 } from './renderer'
 
 // ============================
