@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useReducer, useState } from 'react'
 import type { DeviceScene } from '../types/adapter'
 import type { DesignerAction, PaletteItem } from '../types/designer'
-import { type FormConfig, type FormFieldSchema, type FormSchema, type SubmitConfig } from '../types/schema'
+import { type FormConfig, type FormFieldSchema, type FormSchema } from '../types/schema'
 import { createFieldFromPalette } from './FieldList'
 import type { DesignerState } from './reducer'
 import { designerReducer, findInTree } from './reducer'
@@ -31,8 +31,6 @@ export function useFormDesigner(form: FormSchema) {
 
   const updateFormConfig = useCallback((patch: Partial<FormConfig>) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch }), [])
 
-  const updateSubmitConfig = useCallback((patch: Partial<SubmitConfig>) => dispatch({ type: 'UPDATE_SUBMIT_CONFIG', patch }), [])
-
   const setSchema = useCallback((schema: FormSchema) => dispatch({ type: 'SET_SCHEMA', schema }), [])
 
   // 从控件库添加字段
@@ -58,9 +56,6 @@ export function useFormDesigner(form: FormSchema) {
     fields: state.schema.fields,
     /** 表单配置 */
     formConfig: state.schema.form || { layout: 'vertical', size: 'middle' },
-    /** 提交配置 */
-    submitConfig: state.schema.submit || { text: '提交', showReset: true, resetText: '重置' },
-
     // 操作方法
     selectField,
     addField,
@@ -68,7 +63,6 @@ export function useFormDesigner(form: FormSchema) {
     moveField,
     updateField,
     updateFormConfig,
-    updateSubmitConfig,
     setSchema,
     addFieldFromPalette,
   }

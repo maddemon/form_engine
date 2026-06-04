@@ -33,7 +33,6 @@ export type {
   FormRule,
   VisibleWhen,
   FormConfig,
-  SubmitConfig,
   CustomComponent,
   CustomSource,
   FieldMock,
@@ -115,6 +114,7 @@ export {
 // 渲染器类型
 export type {
   FormRenderProps,
+  FormRenderHandle,
 } from './renderer/FormRender'
 
 export type {

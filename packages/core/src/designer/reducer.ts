@@ -252,12 +252,6 @@ export function designerReducer(state: DesignerState, action: DesignerAction): D
         schema: { ...state.schema, form: { ...state.schema.form, ...action.patch } },
       }
 
-    case 'UPDATE_SUBMIT_CONFIG':
-      return {
-        ...state,
-        schema: { ...state.schema, submit: { ...state.schema.submit, ...action.patch } },
-      }
-
     case 'SET_SCHEMA': {
       const findInTree = (fields: FormFieldSchema[], id: string): boolean =>
         fields.some(f => f.id === id || (f.children && findInTree(f.children, id)))

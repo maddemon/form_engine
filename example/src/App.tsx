@@ -1,9 +1,9 @@
 import { antdAdapter, AntdBridgeProvider } from '@form-engine/adapter-antd'
 import { antdMobileAdapter, AntdMobileBridgeProvider } from '@form-engine/adapter-antd-mobile'
-import type { FormFieldSchema, FormSchema, PropertyPanelTab, PropertyPanelTabContentProps, SidePanelTab, SidePanelTabContentProps } from '@form-engine/core'
+import type { FormFieldSchema, FormRenderHandle, FormSchema, PropertyPanelTab, PropertyPanelTabContentProps, SidePanelTab, SidePanelTabContentProps } from '@form-engine/core'
 import { Designer, FormRender, registerSimpleCustomComponent, StyleProvider, type DeviceScene, type ThemeMode } from '@form-engine/core'
-import { theme as antdTheme, ConfigProvider } from 'antd'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { Button, theme as antdTheme, ConfigProvider } from 'antd'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 // 注册自定义组件示例
 import '../custom-component-demo'
@@ -132,8 +132,9 @@ const App: React.FC = () => {
         mobile: { labelCol: { span: 24 }, wrapperCol: { span: 24 } },
       },
     },
-    submit: { text: '提交', showReset: true, resetText: '重置' },
   })
+
+  const formRef = useRef<FormRenderHandle>(null)
 
   const handleSubmit = useCallback((values: Record<string, unknown>) => {
     console.log('提交:', values)
@@ -281,7 +282,11 @@ const App: React.FC = () => {
                       <div style={{ textAlign: 'center', color: isDark ? '#888' : '#999', padding: 64 }}>暂无字段，请切换到「设计」Tab 添加字段</div>
                     ) : (
                       <AntdMobileBridgeProvider key="mobile">
-                        <FormRender schema={schema} onSubmit={handleSubmit} onChange={handleChange} desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} scene={previewScene} />
+                        <FormRender ref={formRef} schema={schema} onSubmit={handleSubmit} onChange={handleChange} desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} scene={previewScene} />
+                        <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
+                          <Button type="primary" onClick={() => formRef.current?.submit()}>提交</Button>
+                          <Button onClick={() => formRef.current?.reset()}>重置</Button>
+                        </div>
                       </AntdMobileBridgeProvider>
                     )}
                   </PreviewFrame>

@@ -14,7 +14,6 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   type = 'default',
   size = 'middle',
-  htmlType = 'button',
   loading,
   danger,
   onClick,
@@ -31,7 +30,6 @@ export const Button: React.FC<ButtonProps> = ({
     <AntButton
       type={antType as any}
       size={size}
-      htmlType={htmlType}
       loading={loading}
       danger={danger}
       onClick={onClick}

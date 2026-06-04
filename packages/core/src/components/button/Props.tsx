@@ -28,17 +28,6 @@ export default function ButtonPropsRender({ widgets: w, values, onChange }: Prop
           ]}
         />
       </FieldItem>
-      <FieldItem label="HTML 类型">
-        <w.ButtonGroup
-          value={(values.htmlType as string) ?? 'button'}
-          onChange={(v) => onChange('htmlType', v)}
-          options={[
-            { label: '按钮', value: 'button' },
-            { label: '提交', value: 'submit' },
-            { label: '重置', value: 'reset' },
-          ]}
-        />
-      </FieldItem>
       <FieldItem label="图标">
         <w.Input value={(values.icon as string) ?? ''} onChange={(v) => onChange('icon', v)} placeholder="如: SearchOutlined" />
       </FieldItem>

@@ -1,4 +1,4 @@
-import type { FormFieldSchema, FormSchema, FormConfig, SubmitConfig } from './schema'
+import type { FormFieldSchema, FormSchema, FormConfig } from './schema'
 import type { FormEngineAdapter, DesignerWidgets } from './adapter'
 import type React from 'react'
 
@@ -144,7 +144,6 @@ export type DesignerAction =
   | { type: 'MOVE_FIELD'; fromIndex: number; toIndex: number; parentId?: string; fromParentId?: string; toParentId?: string; columnIndex?: number; regionKey?: string }
   | { type: 'UPDATE_FIELD'; fieldId: string; patch: Partial<FormFieldSchema> }
   | { type: 'UPDATE_FORM_CONFIG'; patch: Partial<FormConfig> }
-  | { type: 'UPDATE_SUBMIT_CONFIG'; patch: Partial<SubmitConfig> }
   | { type: 'COPY_FIELD'; fieldId: string }
   | { type: 'SET_SCHEMA'; schema: FormSchema }
   | { type: 'UNDO' }

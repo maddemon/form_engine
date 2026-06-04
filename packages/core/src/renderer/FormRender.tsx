@@ -12,6 +12,12 @@ import { evalExpr, matchVisibleWhen, pickAdapter } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import { validateForm } from './validate'
 
+export interface FormRenderHandle {
+  submit(): void
+  reset(): void
+  validate(name?: string): Promise<boolean>
+}
+
 export interface FormRenderProps {
   schema: FormSchema
   onSubmit?: (values: Record<string, unknown>) => void
@@ -40,7 +46,7 @@ export interface FormRenderProps {
  */
 export const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {} }) => {
+export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {} }, ref) => {
   useEnsureDefaultTheme()
   const { token } = useStyle()
 
@@ -149,10 +155,16 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
     onChange?.(initialValues)
   }, [initialValues, onChange])
 
-  // 提交表单
+  // 提交表单（先校验后提交）
   const submit = useCallback(() => {
+    const result = validateForm(visibleFields, formValues)
+    if (!result.valid) {
+      setFieldErrors(result.errors)
+      return
+    }
+    setFieldErrors({})
     onSubmit?.(formValues)
-  }, [onSubmit, formValues])
+  }, [onSubmit, formValues, visibleFields])
 
   // 校验表单
   const validate = useCallback(
@@ -181,6 +193,8 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
     }),
     [setFieldValue, setFieldsValue, getFieldValue, submit, reset, validate],
   )
+
+  React.useImperativeHandle(ref, () => ({ submit, reset, validate }), [submit, reset, validate])
 
   // 事件上下文（供 FieldRenderer 注入）
   // formValues 通过 $form.values 间接访问，不直接依赖 formValues 避免每次输入重建
@@ -296,24 +310,13 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
     })
   }, [formValues, formSchema.fields, loadDataSource])
 
-  // 提交（form onSubmit 调用），先校验后提交
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const result = validateForm(visibleFields, formValues)
-    if (!result.valid) {
-      setFieldErrors(result.errors)
-      return
-    }
-    setFieldErrors({})
     submit()
   }
 
-  const pageBg = (scene === 'mobile'
-    ? formConfig.pageBackground?.mobile
-    : formConfig.pageBackground?.desktop) ?? 'var(--fe-bg-primary)'
-
   return (
-    <form onSubmit={handleSubmit} className="fe-form" style={{ maxWidth: 640, background: pageBg, minHeight: 400 }}>
+    <form onSubmit={handleFormSubmit} className="fe-form">
       <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
         {visibleFields.map((field) => (
           <div key={field.id || field.name} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
@@ -321,22 +324,10 @@ export const FormRender: React.FC<FormRenderProps> = ({ schema, onSubmit, onChan
           </div>
         ))}
       </div>
-
-      {formSchema.submit?.showReset !== false && (
-        <div className="fe-form-actions" style={{ marginTop: token('spacingLg'), display: 'flex', gap: token('spacingSm') }}>
-          <button type="submit" disabled={loading}>
-            {formSchema.submit?.text || '提交'}
-          </button>
-          {formSchema.submit?.showReset && (
-            <button type="button" onClick={reset}>
-              {formSchema.submit?.resetText || '重置'}
-            </button>
-          )}
-        </div>
-      )}
     </form>
   )
-}
+})
+FormRender.displayName = 'FormRender'
 
 // ── NestedFieldRenderer（递归字段渲染器，含 React.memo）─────────────
 

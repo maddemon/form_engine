@@ -6,7 +6,6 @@ export interface ButtonProps extends BaseComponentProps {
   children?: React.ReactNode
   type?: 'default' | 'primary' | 'dashed' | 'link' | 'text'
   size?: 'small' | 'middle' | 'large'
-  htmlType?: 'button' | 'submit' | 'reset'
   loading?: boolean
   danger?: boolean
   icon?: string

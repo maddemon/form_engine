@@ -186,13 +186,6 @@ export interface FormConfig {
   }
 }
 
-export interface SubmitConfig {
-  text?: string
-  align?: 'left' | 'center' | 'right'
-  resetText?: string
-  showReset?: boolean
-}
-
 // ============================
 // 自定义组件注册表
 // ============================
@@ -220,6 +213,5 @@ export interface FormSchema {
   description?: string
   form: FormConfig
   fields: FormFieldSchema[]
-  submit?: SubmitConfig
   componentRegistry?: Record<string, RegisteredComponent>
 }
