@@ -7,6 +7,7 @@ export const palette: ComponentPalette = {
   icon: <Layout />,
   defaultProps: {
     componentProps: {
+      title: '卡片标题',
       bodyPadding: 16,
       bodyGap: 8,
       bordered: true,

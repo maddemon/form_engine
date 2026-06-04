@@ -13,7 +13,7 @@
  */
 
 import type { FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
-import { Button, Checkbox, Input, Picker, Stepper } from 'antd-mobile'
+import React from 'react'
 
 import { InputField } from './components/Input'
 import { TextAreaField } from './components/TextArea'
@@ -64,128 +64,9 @@ const DefaultField: FieldRendererFn = (props: any) => {
 // ============================
 // 设计器属性面板小组件
 // ============================
-
-const designerWidgets: import('@form-engine/core/types/adapter').DesignerWidgets = {
-  Input: ({ value, onChange, placeholder, disabled, style }: any) => (
-    <Input
-      value={value ?? ''}
-      onChange={v => onChange?.(v)}
-      placeholder={placeholder}
-      disabled={disabled}
-      style={{ width: '100%', fontSize: 13, ...style }}
-    />
-  ),
-  Select: ({ value, onChange, options, disabled, style }: any) => (
-    <Picker
-      columns={[options || []]}
-      value={value ? [String(value)] : []}
-      onConfirm={vals => onChange?.(vals[0])}
-    >
-      {(vals, actions) => (
-        <Button
-          onClick={actions.open}
-          disabled={disabled}
-          size="small"
-          style={{ width: '100%', textAlign: 'left', color: value ? undefined : '#999', fontSize: 13, padding: '2px 8px', minHeight: 24, ...style }}
-        >
-          {value ? options?.find((o: any) => o.value === value)?.label || value : '请选择'}
-        </Button>
-      )}
-    </Picker>
-  ),
-  Checkbox: ({ checked, onChange, disabled, style }: any) => (
-    <Checkbox
-      checked={checked}
-      onChange={v => onChange?.(v)}
-      disabled={disabled}
-      style={style}
-    />
-  ),
-  Switch: ({ checked, onChange, disabled, style }: any) => (
-    <label
-      style={{
-        position: 'relative',
-        display: 'inline-block',
-        width: 36,
-        height: 20,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        ...style,
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={!!checked}
-        disabled={disabled}
-        onChange={e => onChange?.(e.target.checked)}
-        style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
-      />
-      <span
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: 10,
-          background: checked ? 'var(--fe-primary, #1677ff)' : '#bfbfbf',
-          transition: 'background 0.2s',
-        }}
-      />
-      <span
-        style={{
-          position: 'absolute',
-          top: 2,
-          left: checked ? 18 : 2,
-          width: 16,
-          height: 16,
-          borderRadius: '50%',
-          background: '#fff',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-          transition: 'left 0.2s',
-        }}
-      />
-    </label>
-  ),
-  NumberInput: ({ value, onChange, min, max, disabled, style }: any) => (
-    <Stepper
-      value={value}
-      onChange={v => onChange?.(v)}
-      min={min}
-      max={max}
-      disabled={disabled}
-      style={{ width: '100%', fontSize: 13, ...style }}
-    />
-  ),
-  ButtonGroup: ({ value, onChange, options, disabled, style }: any) => (
-    <div style={{ display: 'inline-flex', borderRadius: 4, overflow: 'hidden', border: '1px solid var(--fe-border-primary, #d9d9d9)', ...style }}>
-      {options?.map((opt: any, idx: number, arr: any[]) => {
-        const active = value === opt.value
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            disabled={disabled}
-            onClick={() => !disabled && onChange?.(opt.value)}
-            style={{
-              flex: 1,
-              padding: '1px 6px',
-              border: 'none',
-              borderRight: idx < arr.length - 1 ? '1px solid var(--fe-border-primary, #d9d9d9)' : 'none',
-              background: active ? 'var(--fe-primary, #1677ff)' : 'var(--fe-bg-primary, #fff)',
-              color: active ? '#fff' : 'var(--fe-text-primary, #333)',
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              fontSize: 12,
-              lineHeight: '20px',
-              fontWeight: active ? 500 : 400,
-              outline: 'none',
-              transition: 'background 0.15s, color 0.15s',
-            }}
-          >
-            {opt.label}
-          </button>
-        )
-      })}
-    </div>
-  ),
-}
+// 注意：adapter-antd-mobile 面向移动端场景。属性面板是 desktop 渲染器，
+// 不应在此提供 widgets 覆盖，应回退到 core 的 defaultDesignerWidgets。
+// 移动端适配器按场景只需提供 components（field.type 渲染器）。
 
 // ============================
 // Adapter 定义
@@ -239,7 +120,8 @@ export const antdMobileAdapter: FormEngineAdapter = {
   },
 
   default: DefaultField,
-  designerWidgets,
+  // designerWidgets: 不提供 — PropertyPanel 是 desktop 渲染器，
+  // 移动端适配器无 widgets 覆盖时自动回退到 core 的 defaultDesignerWidgets。
 }
 
 export default antdMobileAdapter

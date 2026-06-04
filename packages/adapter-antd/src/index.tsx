@@ -13,7 +13,6 @@
  */
 
 import type { FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
-import { Checkbox as AntdCheckbox, Input as AntdInput, InputNumber as AntdInputNumber, Select as AntdSelect } from 'antd'
 import React from 'react'
 
 // 静态导入所有组件
@@ -44,6 +43,7 @@ import { Button } from './components/Button'
 import { Card } from './components/Card'
 import { Alert } from './components/Alert'
 import { Segment } from './components/Segment'
+import { designerWidgets } from './widgets'
 
 // 组件导出
 export { Button } from './components/Button'
@@ -77,6 +77,9 @@ export { Segment } from './components/Segment'
 // Theme Bridge
 export { AntdBridgeProvider } from './themeBridge'
 
+// Designer PropertyPanel Widgets
+export { designerWidgets } from './widgets'
+
 // ============================
 // 兜底渲染
 // ============================
@@ -91,124 +94,8 @@ const DefaultField: FieldRendererFn = (props: any) => {
 }
 
 // ============================
-// 设计器属性面板小组件
+// 设计器属性面板小组件 — 见 ./widgets
 // ============================
-
-const designerWidgets: import('@form-engine/core/types/adapter').DesignerWidgets = {
-  Input: ({ value, onChange, placeholder, disabled, style }: any) => (
-    <AntdInput
-      value={value ?? ''}
-      onChange={v => onChange?.(v.target.value)}
-      placeholder={placeholder}
-      disabled={disabled}
-      size="small"
-      style={{ width: '100%', ...style }}
-    />
-  ),
-  Select: ({ value, onChange, options, disabled, style }: any) => (
-    <AntdSelect
-      value={value}
-      onChange={v => onChange?.(v)}
-      options={options}
-      disabled={disabled}
-      size="small"
-      style={{ width: '100%', ...style }}
-    />
-  ),
-  Checkbox: ({ checked, onChange, disabled, style }: any) => (
-    <AntdCheckbox
-      checked={!!checked}
-      onChange={v => onChange?.(v.target.checked)}
-      disabled={disabled}
-      style={style}
-    />
-  ),
-  Switch: ({ checked, onChange, disabled, style }: any) => (
-    <label
-      style={{
-        position: 'relative',
-        display: 'inline-block',
-        width: 36,
-        height: 20,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        ...style,
-      }}
-    >
-      <input
-        type="checkbox"
-        checked={!!checked}
-        disabled={disabled}
-        onChange={e => onChange?.(e.target.checked)}
-        style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
-      />
-      <span
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: 10,
-          background: checked ? 'var(--fe-primary, #1677ff)' : '#bfbfbf',
-          transition: 'background 0.2s',
-        }}
-      />
-      <span
-        style={{
-          position: 'absolute',
-          top: 2,
-          left: checked ? 18 : 2,
-          width: 16,
-          height: 16,
-          borderRadius: '50%',
-          background: '#fff',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-          transition: 'left 0.2s',
-        }}
-      />
-    </label>
-  ),
-  NumberInput: ({ value, onChange, min, max, disabled, style }: any) => (
-    <AntdInputNumber
-      value={value}
-      onChange={v => onChange?.(v)}
-      min={min}
-      max={max}
-      disabled={disabled}
-      size="small"
-      style={{ width: '100%', ...style }}
-    />
-  ),
-  ButtonGroup: ({ value, onChange, options, disabled, style }: any) => (
-    <div style={{ display: 'inline-flex', borderRadius: 4, overflow: 'hidden', border: '1px solid var(--fe-border-primary, #d9d9d9)', ...style }}>
-      {options?.map((opt: any, idx: number, arr: any[]) => {
-        const active = value === opt.value
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            disabled={disabled}
-            onClick={() => !disabled && onChange?.(opt.value)}
-            style={{
-              flex: 1,
-              padding: '1px 6px',
-              border: 'none',
-              borderRight: idx < arr.length - 1 ? '1px solid var(--fe-border-primary, #d9d9d9)' : 'none',
-              background: active ? 'var(--fe-primary, #1677ff)' : 'var(--fe-bg-primary, #fff)',
-              color: active ? '#fff' : 'var(--fe-text-primary, #333)',
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              fontSize: 12,
-              lineHeight: '20px',
-              fontWeight: active ? 500 : 400,
-              outline: 'none',
-              transition: 'background 0.15s, color 0.15s',
-            }}
-          >
-            {opt.label}
-          </button>
-        )
-      })}
-    </div>
-  ),
-}
 
 // ============================
 // Adapter 定义

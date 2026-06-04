@@ -134,9 +134,10 @@ export interface DesignerWidgets {
   /** 下拉选择 */
   Select: React.ComponentType<{
     value?: string
-    onChange?: (v: string) => void
+    onChange?: (v: string | undefined) => void
     options: { label: string; value: string }[]
     disabled?: boolean
+    allowClear?: boolean
     style?: React.CSSProperties
   }>
   /** 勾选框 */

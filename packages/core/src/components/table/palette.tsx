@@ -1,7 +1,7 @@
 import type { ComponentPalette } from '../../types/palette'
 import { TableIcon } from '../icons'
 export const palette: ComponentPalette = {
-  label: '表格',
+  label: '子表单',
   category: 'container',
   icon: <TableIcon />,
   defaultProps: {

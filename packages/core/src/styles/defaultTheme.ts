@@ -63,6 +63,7 @@ export interface ThemeTokens {
   disabledBorder: string
 
   // Spacing
+  spacingXxs: string
   spacingXs: string
   spacingSm: string
   spacingMd: string
@@ -220,6 +221,7 @@ export const defaultTheme: ThemeTokens = {
   disabledBorder: '#d9d9d9',
 
   // Spacing
+  spacingXxs: '2px',
   spacingXs: '4px',
   spacingSm: '8px',
   spacingMd: '12px',
@@ -433,6 +435,7 @@ export const compactOverrides: Partial<ThemeTokens> = {
   fontSize2xl: '20px',
   fontSize3xl: '24px',
 
+  spacingXxs: '1px',
   spacingXs: '2px',
   spacingSm: '4px',
   spacingMd: '8px',

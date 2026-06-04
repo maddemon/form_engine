@@ -55,6 +55,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             padding: '2px 6px',
             cursor: 'pointer',
             fontSize: 'var(--fe-font-size-xs)',
+            color: 'var(--fe-text-primary)',
           }}
         >
           ☰
@@ -72,6 +73,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             cursor: 'pointer',
             fontSize: 'var(--fe-font-size-xs)',
             opacity: !canUndo ? 0.4 : 1,
+            color: 'var(--fe-text-primary)',
           }}
         >
           ↩
@@ -88,6 +90,7 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             cursor: 'pointer',
             fontSize: 'var(--fe-font-size-xs)',
             opacity: !canRedo ? 0.4 : 1,
+            color: 'var(--fe-text-primary)',
           }}
         >
           ↪

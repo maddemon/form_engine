@@ -28,7 +28,8 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
   const { scene } = useDesignerContext()
   const isMobile = scene === 'mobile'
 
-  const handleColChange = (key: 'labelCol' | 'wrapperCol', v: string) => {
+  const handleColChange = (key: 'labelCol' | 'wrapperCol', v: string | undefined) => {
+    if (v === undefined) return
     const num = Number(v)
     if (isMobile) {
       dispatch({
@@ -83,7 +84,7 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
       <FieldItem label="标签对齐">
         <w.Select
           value={formConfig.labelAlign || 'right'}
-          onChange={(v: string) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { labelAlign: v as 'left' | 'right' } })}
+          onChange={(v) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { labelAlign: v as 'left' | 'right' } })}
           options={LABEL_ALIGN_OPTIONS}
         />
       </FieldItem>
@@ -113,14 +114,14 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
         <FieldItem label="标签宽度">
           <w.Select
             value={String(labelColSpan)}
-            onChange={(v: string) => handleColChange('labelCol', v)}
+            onChange={(v) => handleColChange('labelCol', v)}
             options={COL_SPAN_OPTIONS}
           />
         </FieldItem>
         <FieldItem label="控件宽度">
           <w.Select
             value={String(wrapperColSpan)}
-            onChange={(v: string) => handleColChange('wrapperCol', v)}
+            onChange={(v) => handleColChange('wrapperCol', v)}
             options={COL_SPAN_OPTIONS}
           />
         </FieldItem>

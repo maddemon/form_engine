@@ -3,6 +3,9 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
+import { WidgetButton } from './Button'
+import { WidgetModal } from './Modal'
+import { WidgetTextArea } from './TextArea'
 
 const SORTABLE_PREFIX = '__opteditor_'
 
@@ -96,20 +99,14 @@ function BatchEditModal({ open, options, onConfirm, onCancel }: { open: boolean;
     prevOpenRef.current = open
   }, [open, options])
 
-  if (!open) return null
-
   const handleConfirm = () => {
     const lines = text.split('\n').filter((l) => l.trim())
     const usedValues = new Set<string>()
     const result = lines.map((line, i) => {
-      // 每行格式：`label value`，label 与 value 之间用一个或多个空格分隔
-      // 找到第一个空白字符作为分隔点（支持多个空格）
-      // 若整行没有空格，则 label 与 value 相同（自动生成 value）
       const match = line.trim().match(/^(\S+)(?:\s+(.+))?$/)
       const label = match ? match[1] : line.trim()
       const explicitValue = match?.[2]
       let val = explicitValue ?? (label.replace(/\s+/g, '_').toLowerCase() || `option_${i + 1}`)
-      // 去重：如果 value 已存在则追加后缀
       if (usedValues.has(val)) {
         let suffix = 2
         while (usedValues.has(`${val}_${suffix}`)) suffix++
@@ -121,83 +118,11 @@ function BatchEditModal({ open, options, onConfirm, onCancel }: { open: boolean;
     onConfirm(result)
   }
 
-  const overlayStyle: React.CSSProperties = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'var(--fe-bg-mask)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  }
-
-  const modalStyle: React.CSSProperties = {
-    background: 'var(--fe-bg-primary)',
-    borderRadius: token('borderRadiusLg'),
-    boxShadow: token('shadowLg'),
-    width: token('modalWidthSm'),
-    maxWidth: '90vw',
-    padding: token('spacingLg'),
-  }
-
   return (
-    <div style={overlayStyle} onClick={onCancel}>
-      <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
-        <div style={{ fontSize: token('fontSizeMd'), fontWeight: 500, marginBottom: token('spacingSm') }}>批量编辑选项</div>
-        <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: token('spacingSm') }}>每行一个选项，格式：`label value`，不写 value 时与 label 相同</div>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={10}
-          style={{
-            width: '100%',
-            padding: token('spacingXs'),
-            border: `1px solid var(--fe-border-primary)`,
-            borderRadius: token('borderRadiusSm'),
-            fontSize: token('fontSizeSm'),
-            lineHeight: 1.5,
-            resize: 'vertical',
-            outline: 'none',
-            boxSizing: 'border-box',
-            background: 'var(--fe-bg-primary)',
-            color: 'var(--fe-text-primary)',
-          }}
-        />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: token('spacingSm'), marginTop: token('spacingMd') }}>
-          <button
-            onClick={onCancel}
-            style={{
-              padding: '4px 12px',
-              border: `1px solid var(--fe-border-primary)`,
-              borderRadius: token('borderRadiusSm'),
-              background: 'var(--fe-bg-primary)',
-              cursor: 'pointer',
-              fontSize: token('fontSizeSm'),
-              color: 'var(--fe-text-primary)',
-            }}
-          >
-            取消
-          </button>
-          <button
-            onClick={handleConfirm}
-            style={{
-              padding: '4px 12px',
-              border: `1px solid var(--fe-primary)`,
-              borderRadius: token('borderRadiusSm'),
-              background: 'var(--fe-primary)',
-              cursor: 'pointer',
-              fontSize: token('fontSizeSm'),
-              color: 'var(--fe-bg-primary)',
-            }}
-          >
-            确定
-          </button>
-        </div>
-      </div>
-    </div>
+    <WidgetModal open={open} title="批量编辑选项" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
+      <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: token('spacingSm') }}>每行一个选项，格式：`label value`，不写 value 时与 label 相同</div>
+      <WidgetTextArea value={text} onChange={setText} rows={10} />
+    </WidgetModal>
   )
 }
 
@@ -355,51 +280,24 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
 
       {/* 底部按钮组 */}
       <div style={{ display: 'flex', gap: token('spacingXs') }}>
-        <button
+        <WidgetButton
+          type="dashed"
+          size="sm"
           onClick={add}
           disabled={disabled}
-          onMouseEnter={(e) => {
-            if (!disabled) e.currentTarget.style.background = 'var(--fe-primary-hover-bg)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent'
-          }}
-          style={{
-            flex: 1,
-            padding: '4px 0',
-            border: '1px dashed var(--fe-primary)',
-            borderRadius: token('borderRadiusSm'),
-            background: 'transparent',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            fontSize: token('fontSizeXs'),
-            fontWeight: 500,
-            color: 'var(--fe-primary)',
-            opacity: disabled ? 0.4 : 1,
-            textAlign: 'center',
-            transition: 'background 0.2s',
-          }}
+          style={{ flex: 1, textAlign: 'center' as const, color: 'var(--fe-primary)', borderColor: 'var(--fe-primary)' }}
         >
           + 添加选项
-        </button>
-        <button
+        </WidgetButton>
+        <WidgetButton
+          type="dashed"
+          size="sm"
           onClick={() => setBatchOpen(true)}
           disabled={disabled}
-          style={{
-            flex: 1,
-            padding: '4px 0',
-            border: '1px dashed var(--fe-border-primary)',
-            borderRadius: token('borderRadiusSm'),
-            background: 'transparent',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            fontSize: token('fontSizeXs'),
-            fontWeight: 500,
-            color: 'var(--fe-text-secondary)',
-            opacity: disabled ? 0.4 : 1,
-            textAlign: 'center',
-          }}
+          style={{ flex: 1, textAlign: 'center' as const, color: 'var(--fe-text-secondary)', borderColor: 'var(--fe-border-primary)' }}
         >
           批量编辑
-        </button>
+        </WidgetButton>
       </div>
 
       <BatchEditModal open={batchOpen} options={fromInternal(options)} onConfirm={handleBatchConfirm} onCancel={() => setBatchOpen(false)} />
