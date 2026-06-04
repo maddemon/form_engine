@@ -42,24 +42,24 @@ declare const expect: (value: unknown) => {
 }
 
 // 模拟自定义按钮组件
-function TestButton(props: any) {
+function TestButton(props: Record<string, unknown>) {
   return (
     <button 
-      style={{ background: props.bgColor || '#1677ff' }}
+      style={{ background: (props.bgColor as string) || '#1677ff' }}
       data-testid="test-button"
     >
-      {props.text || '按钮'}
+      {(props.text as string) || '按钮'}
     </button>
   )
 }
 
 // 模拟自定义颜色选择器 Widget
-function TestColorPicker(props: any) {
+function TestColorPicker(props: Record<string, unknown>) {
   return (
     <input 
       type="color" 
       data-testid="color-picker"
-      onChange={(e) => props.onChange(e.target.value)} 
+      onChange={(e) => (props.onChange as (v: string) => void)(e.target.value)} 
     />
   )
 }

@@ -29,7 +29,7 @@ export interface EventContext {
   formValues: Record<string, unknown>
   /** $form API */
   $form: $Form
-  /** 宿主传入的回调表（供 callback 类型 handler 查表） */
+  /** 宿主传入的回调表（供 callback 类型 handler 查表，签名由使用者决定） */
   callbacks: Record<string, (...args: any[]) => void>
 }
 

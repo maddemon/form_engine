@@ -19,7 +19,7 @@ export interface UploadFile {
   uid: string
   name: string
   status?: 'uploading' | 'done' | 'error' | 'removed'
-  response?: any
+  response?: unknown
   url?: string
   thumbUrl?: string
   percent?: number

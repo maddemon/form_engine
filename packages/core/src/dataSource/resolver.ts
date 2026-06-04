@@ -62,9 +62,9 @@ function mapRawItems(
     return []
   }
 
-  return (raw as any[]).map(item => ({
+  return (raw as Record<string, unknown>[]).map(item => ({
     label: String(item[labelField] ?? ''),
-    value: item[valueField] ?? item[labelField] ?? '',
+    value: (item[valueField] ?? item[labelField] ?? '') as string | number,
     disabled: !!item.disabled,
     ...(item.children
       ? { children: mapRawItems(item.children, labelField, valueField) }

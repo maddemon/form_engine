@@ -4,7 +4,7 @@ export default function SegmentPropsRender({ widgets: w, values, onChange }: Pro
   return (
     <>
       <FieldItem label="选项" variant="group">
-        <w.OptionsEditor value={values.options as any[]} onChange={(v) => onChange('options', v)} />
+        <w.OptionsEditor value={values.options as { label: string; value: string }[]} onChange={(v) => onChange('options', v)} />
       </FieldItem>
       <FieldItem label="默认值">
         <w.Input value={(values.defaultValue as string) ?? ''} onChange={(v) => onChange('defaultValue', v)} placeholder="选项的 value 值" />

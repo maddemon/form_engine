@@ -16,7 +16,7 @@ export default function SliderPropsRender({ widgets: w, values, onChange }: Prop
         <w.NumberInput value={(values.step as number) ?? 1} onChange={(v) => onChange('step', v)} min={0} />
       </FieldItem>
       <FieldItem label="格式化">
-        <w.Input value={((values.tooltip as any)?.formatter as string) ?? ''} onChange={(v) => onChange('tooltip', v ? { formatter: v } : undefined)} placeholder="如: {value}%" />
+        <w.Input value={((values.tooltip as { formatter?: string })?.formatter as string) ?? ''} onChange={(v) => onChange('tooltip', v ? { formatter: v } : undefined)} placeholder="如: {value}%" />
       </FieldItem>
     </>
   )

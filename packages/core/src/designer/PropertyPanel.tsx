@@ -4,11 +4,13 @@ import { FieldItem, PropsRenderMap } from '../propRenders'
 import CustomPropsRender from '../propRenders/CustomPropsRender'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { useStyle } from '../styles'
+import type { PropsRenderProps } from '../propRenders/types'
 import type { DesignerWidgets } from '../types/adapter'
 import { getComponentCategory } from '../types/component-category'
+import type { CustomComponentConfig } from '../types/custom-component'
 import type { DesignerAction, PropertyPanelTab } from '../types/designer'
 import type { EventDeclaration, FormFieldEvents } from '../types/events'
-import type { FormFieldSchema } from '../types/schema'
+import type { FormConfig, FormFieldSchema } from '../types/schema'
 import { resolvePanelWidth } from '../utils'
 import { CollapsibleSection } from './CollapsibleSection'
 import { EventHandlerEditor } from './EventHandlerEditor'
@@ -26,7 +28,7 @@ const PROPERTIES_DEFAULT_TAB_KEY = '__default-props__'
 
 interface PropertyPanelProps {
   field: FormFieldSchema | null
-  formConfig: any
+  formConfig: FormConfig
   dispatch: React.Dispatch<DesignerAction>
   designerWidgets?: DesignerWidgets
   /**
@@ -42,9 +44,11 @@ interface PropertyPanelProps {
   allFields?: FormFieldSchema[]
 }
 
+type WidgetsForProps = DesignerWidgets & Required<Pick<DesignerWidgets, 'ButtonGroup' | 'TextArea' | 'ExpressionInput' | 'OptionsEditor'>>
+
 function useWidgets(designerWidgets?: DesignerWidgets) {
   const merged = { ...defaultDesignerWidgets, ...designerWidgets }
-  return merged as Required<Pick<DesignerWidgets, 'ButtonGroup' | 'TextArea'>> & Omit<DesignerWidgets, 'ButtonGroup' | 'TextArea'>
+  return merged as WidgetsForProps
 }
 
 function hasAdvancedConfig(field: FormFieldSchema): boolean {
@@ -65,13 +69,13 @@ function getFieldEventDeclarations(field: FormFieldSchema): EventDeclaration[] {
 
 interface DefaultContentProps {
   field: FormFieldSchema
-  w: any
+  w: WidgetsForProps
   dispatch: React.Dispatch<DesignerAction>
   isForm: boolean
   isContainer: boolean
   isButton: boolean
-  ComponentPropsRender: React.ComponentType<any> | undefined
-  customConfig: any
+  ComponentPropsRender: React.ComponentType<PropsRenderProps> | undefined
+  customConfig: CustomComponentConfig | null
   allFields: FormFieldSchema[]
 }
 
@@ -182,7 +186,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
         )}
 
         <FieldItem label="是否隐藏">
-          <w.ExpressionInput value={hiddenValue} onChange={handleHiddenChange} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
+          <w.ExpressionInput value={hiddenValue as string | undefined} onChange={handleHiddenChange} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
         </FieldItem>
       </CollapsibleSection>
 
@@ -220,7 +224,7 @@ function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer, isBut
   )
 }
 
-function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPanelTabs, allFields }: { field: FormFieldSchema; w: any; token: ReturnType<typeof useStyle>['token']; activeTab: string; dispatch: React.Dispatch<DesignerAction>; propertyPanelTabs?: PropertyPanelTab[]; allFields: FormFieldSchema[] }) {
+function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPanelTabs, allFields }: { field: FormFieldSchema; w: WidgetsForProps; token: ReturnType<typeof useStyle>['token']; activeTab: string; dispatch: React.Dispatch<DesignerAction>; propertyPanelTabs?: PropertyPanelTab[]; allFields: FormFieldSchema[] }) {
   const ComponentPropsRender = PropsRenderMap[field.type]
   const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
   const category = getComponentCategory(field.type)
@@ -254,7 +258,7 @@ function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPane
             {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
             <span style={{ marginLeft: token('spacingXs'), color: 'var(--fe-text-muted)', fontWeight: 400 }}>({field.type})</span>
           </h4>
-          <DefaultPropertyContent field={field} w={w} dispatch={dispatch} isForm={isForm} isContainer={isContainer} isButton={isButton} ComponentPropsRender={ComponentPropsRender} customConfig={customConfig} allFields={allFields} />
+          <DefaultPropertyContent field={field} w={w} dispatch={dispatch} isForm={isForm} isContainer={isContainer} isButton={isButton} ComponentPropsRender={ComponentPropsRender} customConfig={customConfig ?? null} allFields={allFields} />
         </>
       ) : (
         (() => {

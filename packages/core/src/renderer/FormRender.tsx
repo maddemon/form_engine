@@ -4,7 +4,7 @@ import { type FormFieldSchema, type FormSchema, type OptionItem } from '../types
 import { checkRequiredDeps, getDataSourceDeps, resolveDataSource } from '../dataSource/resolver'
 import type { EventContext } from '../events'
 import { useEnsureDefaultTheme, useStyle } from '../styles'
-import type { FormEngineAdapter } from '../types/adapter'
+import type { ComponentRenderFn, FormEngineAdapter } from '../types/adapter'
 import { isContainerComponent } from '../types/component-category'
 import type { $Form } from '../types/events'
 import type { DataSourceResolver } from '../types/render'
@@ -23,7 +23,7 @@ export interface FormRenderProps {
   onSubmit?: (values: Record<string, unknown>) => void
   onChange?: (values: Record<string, unknown>) => void
   dataSourceResolver?: DataSourceResolver
-  components?: Record<string, (props: any) => React.ReactNode>
+  components?: Record<string, ComponentRenderFn>
   /** 桌面端适配器 */
   desktopAdapter?: FormEngineAdapter
   /** 移动端适配器 */
@@ -35,6 +35,7 @@ export interface FormRenderProps {
   /**
    * 事件回调（供 EventHandler.type='callback' 引用）
    * key 为回调名，value 为函数；运行时会按 name 查表
+   * 使用 any 因为用户自定义回调签名由使用者决定
    */
   callbacks?: Record<string, (...args: any[]) => void>
 }
@@ -338,7 +339,7 @@ interface NestedFieldRendererProps {
   fieldErrors: Record<string, string[]>
   loading: boolean
   adapter: FormEngineAdapter
-  components: Record<string, (props: any) => React.ReactNode>
+  components: Record<string, ComponentRenderFn>
   eventContext: EventContext
   formConfig: FormSchema['form']
   onFieldChange: (name: string, value: unknown) => void

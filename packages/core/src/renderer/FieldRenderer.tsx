@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { getEventDeclarations } from '../components'
 import { resolveEvents, type EventContext } from '../events'
 import { useStyle } from '../styles'
-import type { FormEngineAdapter } from '../types/adapter'
+import type { ComponentRenderFn, FormEngineAdapter } from '../types/adapter'
 import { isFormComponent } from '../types/component-category'
 import type { $Self, ResolvedEventHandler } from '../types/events'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
@@ -17,7 +17,7 @@ export interface FieldRendererProps {
   options: OptionItem[]
   disabled: boolean
   adapter: FormEngineAdapter
-  components?: Record<string, (props: any) => React.ReactNode>
+  components?: Record<string, ComponentRenderFn>
   /**
    * 事件上下文（由 FormRender 注入）
    * 不传时事件系统降级为无 events 配置（向后兼容）
@@ -127,7 +127,7 @@ export function FieldRenderer({ field, value, onChange, options, disabled, adapt
   /**
    * 查找渲染函数（按优先级）
    */
-  const renderFn: ((props: any) => React.ReactNode) | undefined =
+  const renderFn: ComponentRenderFn | undefined =
     // 1. 标准类型映射
     adapter.components[field.type] ||
     // 2. 自定义组件（按 componentId 查找）

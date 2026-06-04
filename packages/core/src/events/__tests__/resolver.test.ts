@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test'
 import type { $Form, $Self, EventHandler, EventDeclaration, FormFieldEvents } from '../../types/events'
+import type { FormFieldSchema } from '../../types/schema'
 import { resolveEventHandler, resolveEvents } from '../resolver'
 import { getActionDef, listActionNames, invokeAction } from '../actions'
 
@@ -33,7 +34,7 @@ declare const expect: (value: unknown) => {
 const mock$self: $Self = {
   name: 'username',
   value: 'test',
-  schema: { type: 'input', name: 'username', label: '用户名' } as any,
+  schema: { type: 'input', name: 'username', label: '用户名' } as FormFieldSchema,
   props: { disabled: false, readOnly: false, placeholder: '请输入' },
 }
 
@@ -41,12 +42,13 @@ const mock$form: $Form = {
   get values() { return { username: 'test' } },
   setFieldValue: (_name: string, _value: unknown) => {},
   setFieldsValue: (_patch: Record<string, unknown>) => {},
-  getFieldValue: (name: string) => (mock$form as any).values[name],
+  getFieldValue: (name: string) => (mock$form as unknown as Record<string, Record<string, unknown>>).values[name],
   submit: () => {},
   reset: () => {},
   validate: async (_name?: string) => true,
 }
 
+// 测试 mock，签名与 resolver 的 callbacks 类型一致
 const mockCallbacks: Record<string, (...args: any[]) => void> = {
   onCustomClick: (...args: any[]) => args,
 }
@@ -77,6 +79,7 @@ describe('resolveEventHandler', () => {
       type: 'expression',
       expression: '!!!invalid!!!<<<',
     }
+    // 测试 spy
     const warnSpy = (..._args: any[]) => {}
     const originalWarn = console.warn
     console.warn = warnSpy
@@ -116,6 +119,7 @@ describe('resolveEventHandler', () => {
   it('action 类型：未知 action 应 console.warn', () => {
     const warnings: string[] = []
     const originalWarn = console.warn
+    // 测试 spy
     console.warn = (...args: any[]) => { warnings.push(String(args[0])) }
     const handler: EventHandler = {
       type: 'action',
@@ -145,6 +149,7 @@ describe('resolveEventHandler', () => {
   it('callback 类型：不存在的回调应 console.warn', () => {
     const warnings: string[] = []
     const originalWarn = console.warn
+    // 测试 spy
     console.warn = (...args: any[]) => { warnings.push(String(args[0])) }
     const handler: EventHandler = {
       type: 'callback',
@@ -158,7 +163,7 @@ describe('resolveEventHandler', () => {
   })
 
   it('未知 type 应返回空函数', () => {
-    const handler = { type: 'unknown' as any }
+    const handler = { type: 'unknown' as EventHandler['type'] }
     const fn = resolveEventHandler(handler, mock$self, mock$form, undefined, {})
     const result = fn()
     expect(result).toBeUndefined()
@@ -262,6 +267,7 @@ describe('actions 注册表', () => {
   it('invokeAction 对未知 action 应 console.warn', () => {
     const warnings: string[] = []
     const originalWarn = console.warn
+    // 测试 spy
     console.warn = (...args: any[]) => { warnings.push(String(args[0])) }
     invokeAction('nonexistent', undefined, mock$form)
     console.warn = originalWarn

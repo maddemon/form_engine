@@ -8,6 +8,13 @@ import { ComponentTree } from './ComponentTree'
 import { useDesignerContext } from './DesignerContext'
 import { RootFields } from './RootFields'
 
+interface TreeDataNode {
+  id: string
+  label: string
+  type: string
+  children?: TreeDataNode[]
+}
+
 export const CANVAS_ROOT_ID = 'canvas-root'
 export const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
 
@@ -40,7 +47,7 @@ interface CanvasProps {
   canRedo?: boolean
 }
 
-function buildTreeData(fields: FormFieldSchema[]): { id: string; label: string; type: string; children?: any[] }[] {
+function buildTreeData(fields: FormFieldSchema[]): TreeDataNode[] {
   return fields.map((f) => ({
     id: f.id!,
     label: f.label || f.type,

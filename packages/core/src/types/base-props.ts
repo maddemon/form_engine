@@ -35,6 +35,7 @@ export interface BaseComponentProps {
  * 表单组件的基类 Props（泛型）
  * @template TValue - 组件值的类型
  */
+// 泛型默认值，下游 ComponentPropsMap 已为每种组件类型精确覆盖
 export interface BaseFormComponentProps<TValue = any> extends BaseComponentProps {
   // 值相关
   value?: TValue
@@ -42,6 +43,9 @@ export interface BaseFormComponentProps<TValue = any> extends BaseComponentProps
   /**
    * 值变化回调
    * 注意：子接口应该重新定义这个类型，提供更精确的类型
+   */
+  /**
+   * onChange 在子接口（如 UploadProps）中被重定义为不同参数签名，无法用 unknown 统一
    */
   onChange?: (value: any) => void
   

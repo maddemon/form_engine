@@ -10,6 +10,7 @@
  */
 
 import * as React from 'react'
+import type { FormFieldSchema } from './schema'
 
 // ============================
 // 字段渲染相关类型
@@ -18,11 +19,11 @@ import * as React from 'react'
 /** 字段组件的 Props */
 export interface FieldComponentProps {
   /** 字段值 */
-  value?: any
+  value?: unknown
   /** 值变化回调 */
-  onChange?: (value: any) => void
+  onChange?: (value: unknown) => void
   /** 字段 Schema */
-  fieldSchema?: any
+  fieldSchema?: FormFieldSchema
   /** 字段名称 */
   name?: string
   /** 是否禁用 */
@@ -31,12 +32,15 @@ export interface FieldComponentProps {
   readOnly?: boolean
   /** 占位符 */
   placeholder?: string
-  /** 其他属性 */
+  /** 其他属性（允许 adapter 透传任意 props 给底层 UI 库组件，索引签名架构设计使然） */
   [key: string]: any
 }
 
-/** 字段渲染函数类型 */
+/** 字段渲染函数类型（adapter 组件映射使用） */
 export type FieldRendererFn = (props: FieldComponentProps) => React.ReactElement
+
+/** 通用组件渲染函数（支持 ReactNode 返回值，用于自定义组件覆盖） */
+export type ComponentRenderFn = (props: FieldComponentProps) => React.ReactNode
 
 /** 设备场景 */
 export type DeviceScene = 'desktop' | 'mobile'
@@ -201,9 +205,9 @@ export interface DesignerWidgets {
 /** 属性面板渲染 Props */
 export interface PropertyPanelRenderProps {
   /** 当前选中的字段 Schema */
-  field: any
+  field: FormFieldSchema
   /** 字段更新回调 */
-  onChange: (updatedField: any) => void
+  onChange: (updatedField: FormFieldSchema) => void
   /** 所有字段（用于联动配置） */
-  allFields?: any[]
+  allFields?: FormFieldSchema[]
 }

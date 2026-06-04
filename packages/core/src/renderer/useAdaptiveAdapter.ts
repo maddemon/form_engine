@@ -30,14 +30,16 @@ export function useAdaptiveAdapter(
     if (typeof mql.addEventListener === 'function') {
       mql.addEventListener('change', handler)
     } else {
-      ;(mql as any).addListener?.(handler)
+      // 旧版 Safari MediaQueryList 类型不包含 addListener
+      (mql as any).addListener?.(handler)
     }
 
     return () => {
       if (typeof mql.removeEventListener === 'function') {
         mql.removeEventListener('change', handler)
       } else {
-        ;(mql as any).removeListener?.(handler)
+        // 旧版 Safari MediaQueryList 类型不包含 removeListener
+        (mql as any).removeListener?.(handler)
       }
     }
   }, [breakpoint])

@@ -4,7 +4,7 @@ export default function RadioPropsRender({ widgets: w, values, onChange }: Props
   return (
     <>
       <FieldItem label="选项" variant="group">
-        <w.OptionsEditor value={values.options as any[]} onChange={(v) => onChange('options', v)} />
+        <w.OptionsEditor value={values.options as { label: string; value: string }[]} onChange={(v) => onChange('options', v)} />
       </FieldItem>
       <FieldItem label="选项类型">
         <w.ButtonGroup

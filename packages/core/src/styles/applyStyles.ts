@@ -43,10 +43,10 @@ export function applyThemeStyles(theme: ThemeTokens, mapping: Partial<Record<key
     if (tokenName) {
       if (mode === 'css-var') {
         // 使用 CSS 变量引用
-        ;(style as any)[cssProp] = `var(--fe-${toKebabCase(String(tokenName))})`
+        (style as Record<string, string>)[cssProp] = `var(--fe-${toKebabCase(String(tokenName))})`
       } else {
         // 直接使用值
-        ;(style as any)[cssProp] = theme[tokenName]
+        (style as Record<string, string | number>)[cssProp] = theme[tokenName]
       }
     }
   }
@@ -148,7 +148,7 @@ export function createButtonStyle(
     case 'primary':
       return { ...baseStyle, background: theme.primary, borderColor: theme.primary, color: theme.bgPrimary }
     case 'dashed':
-      return { ...baseStyle, background: theme.bgPrimary, borderColor: theme.borderPrimary, borderStyle: 'dashed' as any }
+      return { ...baseStyle, background: theme.bgPrimary, borderColor: theme.borderPrimary, borderStyle: 'dashed' as const }
     case 'link':
       return { ...baseStyle, background: 'transparent', borderColor: 'transparent', color: theme.primary }
     case 'text':

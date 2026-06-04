@@ -99,4 +99,5 @@ export interface $Form {
  * 解析后的回调签名
  * 透传原始事件参数，丢弃返回值（异步事件除外）
  */
+// 事件系统通用回调签名，无法预知各事件参数类型
 export type ResolvedEventHandler = (...args: any[]) => any

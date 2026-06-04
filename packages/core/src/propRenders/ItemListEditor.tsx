@@ -231,7 +231,7 @@ function ItemListEditorInner<T extends { id: string }>(
                         <span>{field.label}</span>
                         <input
                           type="checkbox"
-                          checked={!!(item as any)[field.key]}
+                          checked={!!(item as Record<string, unknown>)[String(field.key)]}
                           disabled={disabled}
                           onChange={(e) => handleFieldChange(index, String(field.key), e.target.checked)}
                         />
@@ -243,7 +243,7 @@ function ItemListEditorInner<T extends { id: string }>(
                       <div style={labelStyle}>{field.label}</div>
                       <input
                         type={field.kind === 'number' ? 'number' : 'text'}
-                        value={(item as any)[field.key] ?? ''}
+                        value={(item as Record<string, unknown>)[String(field.key)] ?? ''}
                         disabled={disabled}
                         min={field.min}
                         max={field.max}

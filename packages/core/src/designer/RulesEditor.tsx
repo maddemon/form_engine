@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react'
 import { FieldItem } from '../propRenders/shared'
 import { useStyle } from '../styles'
+import type { DesignerWidgets } from '../types/adapter'
+import type { DesignerAction } from '../types/designer'
 import type { FormFieldSchema, FormRule } from '../types/schema'
 import { useDebouncedInput } from './useDebouncedInput'
 
@@ -14,8 +16,8 @@ export const COMMON_PATTERNS: { label: string; value: string }[] = [
 
 interface RulesEditorProps {
   field: FormFieldSchema
-  widgets: any
-  dispatch: React.Dispatch<any>
+  widgets: DesignerWidgets
+  dispatch: React.Dispatch<DesignerAction>
 }
 
 export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
