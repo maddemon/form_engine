@@ -101,6 +101,34 @@ function updateFieldInTree(fields: FormFieldSchema[], fieldId: string, patch: Pa
   })
 }
 
+export interface FieldIndexEntry {
+  field: FormFieldSchema
+  parentId: string | null
+  index: number
+  path: string[]
+  regionKey?: string
+}
+
+export type FieldIndex = Map<string, FieldIndexEntry>
+
+export function buildFieldIndex(fields: FormFieldSchema[]): FieldIndex {
+  const index = new Map<string, FieldIndexEntry>()
+
+  function walk(nodes: FormFieldSchema[], parentId: string | null, parentPath: string[]): void {
+    nodes.forEach((field, idx) => {
+      if (!field.id) return
+      const currentPath = [...parentPath, field.id]
+      index.set(field.id, { field, parentId, index: idx, path: currentPath, regionKey: field.regionKey })
+      if (field.children?.length) {
+        walk(field.children, field.id, currentPath)
+      }
+    })
+  }
+
+  walk(fields, null, [])
+  return index
+}
+
 export function findInTree(fields: FormFieldSchema[], id: string): FormFieldSchema | undefined {
   for (const f of fields) {
     if (f.id === id) return f

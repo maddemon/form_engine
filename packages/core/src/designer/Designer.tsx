@@ -13,7 +13,7 @@ import { DesignerContext } from './DesignerContext'
 import { createFieldFromPalette, FieldList, getFullPaletteGroups } from './FieldList'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
-import { designerReducerWithHistory, findInTree } from './reducer'
+import { buildFieldIndex, designerReducerWithHistory, findInTree, type FieldIndex, type FieldIndexEntry } from './reducer'
 import { DEFAULT_SCHEMA } from './hooks'
 
 function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number; regionKey?: string } | null {
@@ -29,13 +29,13 @@ function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?
   return null
 }
 
-function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentId?: string; index: number; regionKey?: string } {
+function resolveDropTarget(overId: string, fields: FormFieldSchema[], fieldIndex: FieldIndex): { parentId?: string; index: number; regionKey?: string } {
   if (overId === CANVAS_ROOT_HEAD_ID) return { parentId: undefined, index: 0 }
   if (overId === CANVAS_ROOT_ID) return { parentId: undefined, index: fields.length }
 
   if (overId.endsWith('__container')) {
     const containerId = overId.replace(/__container$/, '')
-    const container = findInTree(fields, containerId)
+    const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
     if (container) {
       return { parentId: containerId, index: container.children?.length || 0 }
     }
@@ -45,10 +45,15 @@ function resolveDropTarget(overId: string, fields: FormFieldSchema[]): { parentI
   if (regionMatch) {
     const containerId = regionMatch[1]
     const regionKey = regionMatch[2]
-    const container = findInTree(fields, containerId)
+    const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
     if (container) {
       return { parentId: containerId, index: container.children?.length || 0, regionKey }
     }
+  }
+
+  const entry = fieldIndex.get(overId)
+  if (entry) {
+    return { parentId: entry.parentId ?? undefined, index: entry.index + 1, regionKey: entry.regionKey }
   }
 
   const pos = findFieldPosition(fields, overId)
@@ -82,6 +87,31 @@ function isAncestorOf(fields: FormFieldSchema[], ancestorId: string, descendantI
     }
   }
   return false
+}
+
+function isAncestorOfByIndex(fieldIndex: FieldIndex, ancestorId: string, descendantId: string): boolean {
+  if (ancestorId === descendantId) return true
+  const entry = fieldIndex.get(descendantId)
+  // 索引与 schema 同源，索引中缺失说明字段不存在，直接返回 false
+  if (!entry) return false
+  return entry.path.includes(ancestorId)
+}
+
+function useFieldIndex(fields: FormFieldSchema[]): FieldIndex {
+  const prevFieldsRef = useRef<FormFieldSchema[]>(fields)
+  const indexRef = useRef<FieldIndex>(buildFieldIndex(fields))
+
+  if (prevFieldsRef.current !== fields) {
+    const prev = prevFieldsRef.current
+    const changed = fields.length !== prev.length
+      || fields.some((f, i) => f !== prev[i])
+    if (changed) {
+      indexRef.current = buildFieldIndex(fields)
+    }
+    prevFieldsRef.current = fields
+  }
+
+  return indexRef.current
 }
 
 interface DesignerProps {
@@ -132,7 +162,9 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
     notifyChange(state.schema)
   }, [state.schema, notifyChange])
 
-  const selectedField = state.selectedFieldId ? findInTree(state.schema.fields, state.selectedFieldId) || null : null
+  const fieldIndex = useFieldIndex(state.schema.fields)
+
+  const selectedField = state.selectedFieldId ? (fieldIndex.get(state.selectedFieldId)?.field ?? findInTree(state.schema.fields, state.selectedFieldId)) || null : null
 
   // 根据 scene 选取画布 adapter；属性面板始终优先使用 desktopAdapter
   const canvasAdapter = (desktopAdapter && mobileAdapter)
@@ -188,8 +220,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         fieldType = data.fieldType
       } else {
         // 从画布拖拽组件
-        const fields = state.schema.fields
-        const field = findInTree(fields, String(event.active.id))
+        const field = fieldIndex.get(String(event.active.id))?.field ?? findInTree(state.schema.fields, String(event.active.id))
         if (field) {
           label = field.label || field.type || ''
           fieldType = field.type || ''
@@ -200,7 +231,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       setActiveDragLabel(label)
       setActiveDragType(fieldType)
     },
-    [state.schema.fields],
+    [state.schema.fields, fieldIndex],
   )
 
   const lastDragOverMoveRef = useRef<string | null>(null)
@@ -218,8 +249,10 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
       if (overId === CANVAS_ROOT_ID || overId === CANVAS_ROOT_HEAD_ID) return
 
-      const fields = state.schema.fields
-      const sourcePos = findFieldPosition(fields, activeId)
+      const sourceEntry = fieldIndex.get(activeId)
+      const sourcePos = sourceEntry
+        ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey }
+        : findFieldPosition(state.schema.fields, activeId)
       if (!sourcePos) return
 
       let targetParentId: string | undefined
@@ -231,21 +264,24 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         const containerId = regionMatch[1]
         targetRegionKey = regionMatch[2]
         if (sourcePos.parentId === containerId) return
-        if (isAncestorOf(fields, activeId, containerId)) return
-        const container = findInTree(fields, containerId)
+        if (isAncestorOfByIndex(fieldIndex, activeId, containerId)) return
+        const container = fieldIndex.get(containerId)?.field ?? findInTree(state.schema.fields, containerId)
         if (!container) return
         targetParentId = containerId
         targetIndex = (container.children?.length || 0)
       } else if (overId.endsWith('__container')) {
         const containerId = overId.replace(/__container$/, '')
         if (sourcePos.parentId === containerId) return
-        if (isAncestorOf(fields, activeId, containerId)) return
-        const container = findInTree(fields, containerId)
+        if (isAncestorOfByIndex(fieldIndex, activeId, containerId)) return
+        const container = fieldIndex.get(containerId)?.field ?? findInTree(state.schema.fields, containerId)
         if (!container) return
         targetParentId = containerId
         targetIndex = container.children?.length || 0
       } else {
-        const targetPos = findFieldPosition(fields, overId)
+        const overEntry = fieldIndex.get(overId)
+        const targetPos = overEntry
+          ? { parentId: overEntry.parentId ?? undefined, index: overEntry.index, regionKey: overEntry.regionKey }
+          : findFieldPosition(state.schema.fields, overId)
         if (!targetPos) return
         if (sourcePos.parentId === targetPos.parentId) return
         targetParentId = targetPos.parentId
@@ -266,7 +302,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         regionKey: targetRegionKey,
       })
     },
-    [state.schema.fields, dispatch],
+    [state.schema.fields, fieldIndex, dispatch],
   )
 
   const handleDragEnd = useCallback(
@@ -285,10 +321,10 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
       if (isPaletteDrag(activeData)) {
         const overStr = String(over.id)
-        const isValidCanvasTarget = overStr === CANVAS_ROOT_ID || overStr === CANVAS_ROOT_HEAD_ID || overStr.endsWith('__container') || overStr.includes('__region_') || fields.some((f) => f.id === overStr) || fields.some((f) => f.children?.some((c) => c.id === overStr))
+        const isValidCanvasTarget = overStr === CANVAS_ROOT_ID || overStr === CANVAS_ROOT_HEAD_ID || overStr.endsWith('__container') || overStr.includes('__region_') || fieldIndex.has(overStr)
         if (!isValidCanvasTarget) return
 
-        const target = resolveDropTarget(String(over.id), fields)
+        const target = resolveDropTarget(String(over.id), fields, fieldIndex)
         const newField = createFieldFromPalette(toPaletteItem(activeData))
         dispatch({ type: 'ADD_FIELD', field: newField, index: target.index, parentId: target.parentId, regionKey: target.regionKey })
         return
@@ -302,12 +338,15 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
       if (regionMatch) {
         const containerId = regionMatch[1]
         const targetRegionKey = regionMatch[2]
-        const sourcePos = findFieldPosition(fields, activeId)
+        const sourceEntry = fieldIndex.get(activeId)
+        const sourcePos = sourceEntry
+          ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey }
+          : findFieldPosition(fields, activeId)
         if (!sourcePos) return
-        if (isAncestorOf(fields, activeId, containerId)) return
+        if (isAncestorOfByIndex(fieldIndex, activeId, containerId)) return
         if (sourcePos.parentId === containerId && sourcePos.regionKey === targetRegionKey) return
 
-        const container = findInTree(fields, containerId)
+        const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
         if (!container) return
         const targetIndex = container.children?.length || 0
 
@@ -324,11 +363,14 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
 
       if (overId.endsWith('__container')) {
         const containerId = overId.replace(/__container$/, '')
-        const sourcePos = findFieldPosition(fields, activeId)
+        const sourceEntry = fieldIndex.get(activeId)
+        const sourcePos = sourceEntry
+          ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey }
+          : findFieldPosition(fields, activeId)
         if (!sourcePos) return
         if (sourcePos.parentId === containerId) return
-        if (isAncestorOf(fields, activeId, containerId)) return
-        const container = findInTree(fields, containerId)
+        if (isAncestorOfByIndex(fieldIndex, activeId, containerId)) return
+        const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
         if (!container) return
         dispatch({
           type: 'MOVE_FIELD',
@@ -340,9 +382,15 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         return
       }
 
-      const sourcePos = findFieldPosition(fields, activeId)
+      const sourceEntry = fieldIndex.get(activeId)
+      const sourcePos = sourceEntry
+        ? { parentId: sourceEntry.parentId ?? undefined, index: sourceEntry.index, regionKey: sourceEntry.regionKey }
+        : findFieldPosition(fields, activeId)
       if (!sourcePos) return
-      const targetPos = findFieldPosition(fields, overId)
+      const overEntry = fieldIndex.get(overId)
+      const targetPos = overEntry
+        ? { parentId: overEntry.parentId ?? undefined, index: overEntry.index, regionKey: overEntry.regionKey }
+        : findFieldPosition(fields, overId)
       if (!targetPos) return
 
       if (sourcePos.parentId === targetPos.parentId) {
@@ -370,7 +418,7 @@ export const Designer: React.FC<DesignerProps> = ({ schema: externalSchema, onSc
         })
       }
     },
-    [state.schema.fields, dispatch],
+    [state.schema.fields, fieldIndex, dispatch],
   )
 
   const handleDragCancel = useCallback(() => {
