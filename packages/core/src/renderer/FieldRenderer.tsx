@@ -171,6 +171,11 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
 
   const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
 
+  const componentProps = useMemo(() => {
+    const { options: _ignored, ...rest } = field.componentProps || {}
+    return rest
+  }, [field.componentProps])
+
   const fieldProps: FieldComponentProps & Record<string, unknown> = useMemo(
     () => ({
       value,
@@ -184,10 +189,10 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
       rules: field.rules,
       validateStatus: errorMsg ? 'error' : undefined,
       help: errorMsg,
-      ...field.componentProps,
+      ...componentProps,
       ...eventHandlers,
     }),
-    [value, handleChange, isDisabled, resolvedOptions, field, isRequired, errorMsg, eventHandlers],
+    [value, handleChange, isDisabled, resolvedOptions, field, isRequired, errorMsg, eventHandlers, componentProps],
   )
 
   /**

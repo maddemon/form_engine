@@ -6,14 +6,18 @@ const MODE_OPTIONS = [
   { label: '标签', value: 'tags' },
 ]
 
-export default function SelectPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+export default function SelectPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange }: PropsRenderProps) {
   return (
     <>
       <FieldItem label="允许清除">
         <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
       </FieldItem>
-      <FieldItem label="选项" variant="group">
-        <w.OptionsEditor value={values.options as { label: string; value: string }[]} onChange={(v) => onChange('options', v)} />
+      <FieldItem label="选项数据" variant="group">
+        <w.DataSourceEditor
+          value={dataSource}
+          onChange={(v) => onDataSourceChange?.(v)}
+          optionsType="flat"
+        />
       </FieldItem>
       <FieldItem label="模式">
         <w.ButtonGroup options={MODE_OPTIONS} value={(values.mode as string) ?? ''} onChange={(v) => onChange('mode', v)} />

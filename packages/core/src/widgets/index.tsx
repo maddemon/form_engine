@@ -7,6 +7,7 @@ export { defaultDesignerWidgets, defaultDesignerWidgets as designerWidgets } fro
 export { WidgetInput } from './Input'
 export { WidgetModal } from './Modal'
 export { WidgetNumberInput } from './NumberInput'
+export { WidgetDataSourceEditor } from './DataSourceEditor'
 export { WidgetOptionsEditor } from './OptionsEditor'
 export { WidgetTreeDataEditor } from './TreeDataEditor'
 export { WidgetSelect } from './Select'

@@ -146,32 +146,35 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
+  const internalRef = useRef(internal)
+  internalRef.current = internal
+
   const update = useCallback(
     (idx: number, patch: Partial<{ label: string; value: string }>) => {
-      setInternal((prev) => {
-        const next = prev.map((o, i) => (i === idx ? { ...o, ...patch } : o))
-        onChange?.(fromInternal(next))
-        return next
-      })
+      const prev = internalRef.current
+      const next = prev.map((o, i) => (i === idx ? { ...o, ...patch } : o))
+      setInternal(next)
+      internalRef.current = next
+      onChange?.(fromInternal(next))
     },
     [onChange],
   )
 
   const add = useCallback(() => {
-    setInternal((prev) => {
-      const next = [...prev, { label: `选项${prev.length + 1}`, value: `option_${prev.length + 1}`, _id: newId() }]
-      onChange?.(fromInternal(next))
-      return next
-    })
+    const prev = internalRef.current
+    const next = [...prev, { label: `选项${prev.length + 1}`, value: `option_${prev.length + 1}`, _id: newId() }]
+    setInternal(next)
+    internalRef.current = next
+    onChange?.(fromInternal(next))
   }, [onChange])
 
   const remove = useCallback(
     (idx: number) => {
-      setInternal((prev) => {
-        const next = prev.filter((_, i) => i !== idx)
-        onChange?.(fromInternal(next))
-        return next
-      })
+      const prev = internalRef.current
+      const next = prev.filter((_, i) => i !== idx)
+      setInternal(next)
+      internalRef.current = next
+      onChange?.(fromInternal(next))
     },
     [onChange],
   )
@@ -180,16 +183,15 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
     (event: DragEndEvent) => {
       const { active, over } = event
       if (!over || active.id === over.id) return
-      setInternal((prev) => {
-        const oldIndex = prev.findIndex((o) => `${SORTABLE_PREFIX}${o._id}` === String(active.id))
-        const newIndex = prev.findIndex((o) => `${SORTABLE_PREFIX}${o._id}` === String(over.id))
-        if (oldIndex !== -1 && newIndex !== -1) {
-          const next = arrayMove(prev, oldIndex, newIndex)
-          onChange?.(fromInternal(next))
-          return next
-        }
-        return prev
-      })
+      const prev = internalRef.current
+      const oldIndex = prev.findIndex((o) => `${SORTABLE_PREFIX}${o._id}` === String(active.id))
+      const newIndex = prev.findIndex((o) => `${SORTABLE_PREFIX}${o._id}` === String(over.id))
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const next = arrayMove(prev, oldIndex, newIndex)
+        setInternal(next)
+        internalRef.current = next
+        onChange?.(fromInternal(next))
+      }
     },
     [onChange],
   )

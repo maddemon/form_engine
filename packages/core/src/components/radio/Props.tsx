@@ -1,10 +1,14 @@
 import { FieldItem, PropsRenderProps } from '../../propRenders'
 
-export default function RadioPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+export default function RadioPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange }: PropsRenderProps) {
   return (
     <>
-      <FieldItem label="选项" variant="group">
-        <w.OptionsEditor value={values.options as { label: string; value: string }[]} onChange={(v) => onChange('options', v)} />
+      <FieldItem label="选项数据" variant="group">
+        <w.DataSourceEditor
+          value={dataSource}
+          onChange={(v) => onDataSourceChange?.(v)}
+          optionsType="flat"
+        />
       </FieldItem>
       <FieldItem label="选项类型">
         <w.ButtonGroup

@@ -1,13 +1,14 @@
 import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
-export default function CascaderPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+export default function CascaderPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange }: PropsRenderProps) {
   return (
     <>
       <FieldItem label="选项数据" variant="group">
-        <w.TreeDataEditor
-          value={values.options as { label: string; value: string; children?: unknown }[]}
-          onChange={(v) => onChange('options', v)}
+        <w.DataSourceEditor
+          value={dataSource}
+          onChange={(v) => onDataSourceChange?.(v)}
+          optionsType="tree"
         />
       </FieldItem>
       <FieldItem label="占位文本">

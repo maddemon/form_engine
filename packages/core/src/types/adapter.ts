@@ -10,7 +10,7 @@
  */
 
 import * as React from 'react'
-import type { FormConfig, FormFieldSchema, FormRule, OptionItem, ValidateResult } from './schema'
+import type { FieldDataSource, FormConfig, FormFieldSchema, FormRule, OptionItem, ValidateResult } from './schema'
 import type { BridgeProviderProps } from '../styles/themeBridge'
 
 // ============================
@@ -291,6 +291,14 @@ export interface DesignerWidgets {
     onChange?: (v: OptionItem[]) => void
     disabled?: boolean
     style?: React.CSSProperties
+  }>
+  /** 数据源编辑器（支持静态/远程，用于 select/radio/checkbox/cascader/tree-select 等） */
+  DataSourceEditor: React.ComponentType<{
+    value?: FieldDataSource
+    onChange?: (v: FieldDataSource) => void
+    disabled?: boolean
+    style?: React.CSSProperties
+    optionsType?: 'flat' | 'tree'
   }>
   /** 按钮组（用于少量选项的平铺选择，替代 Select） */
   ButtonGroup: React.ComponentType<{

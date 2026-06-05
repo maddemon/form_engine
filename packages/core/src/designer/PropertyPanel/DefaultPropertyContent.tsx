@@ -6,7 +6,7 @@ import { useStyle } from '../../styles'
 import type { DesignerWidgets } from '../../types/adapter'
 import type { CustomComponentConfig } from '../../types/custom-component'
 import type { DesignerAction } from '../../types/designer'
-import type { FormFieldSchema } from '../../types/schema'
+import type { FieldDataSource, FormFieldSchema } from '../../types/schema'
 import { CollapsibleSection } from '../CollapsibleSection'
 import { RulesEditor } from '../RulesEditor'
 import { useDebouncedInput } from '../useDebouncedInput'
@@ -133,7 +133,15 @@ export function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer
       {(ComponentPropsRender || customConfig?.propertyConfig?.length) && (
         <div style={{ borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm'), marginTop: token('spacingSm') }}>
           {ComponentPropsRender ? (
-            <ComponentPropsRender widgets={w} values={localComponentProps} onChange={handleComponentPropsChange} />
+            <ComponentPropsRender
+              widgets={w}
+              values={localComponentProps}
+              onChange={handleComponentPropsChange}
+              dataSource={field.dataSource}
+              onDataSourceChange={(ds: FieldDataSource) => {
+                dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { dataSource: ds } })
+              }}
+            />
           ) : customConfig?.propertyConfig ? (
             <CustomPropsRender configs={customConfig.propertyConfig} widgets={w} values={localComponentProps} onChange={handleComponentPropsChange} />
           ) : null}
