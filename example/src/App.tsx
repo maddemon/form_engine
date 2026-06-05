@@ -119,7 +119,7 @@ const App: React.FC = () => {
 
         <Content style={{ overflow: 'hidden' }}>
           {pageKey === 'designer' && <DesignerPage schema={schema} onSchemaChange={setSchema} themeMode={themeMode} />}
-          {pageKey === 'render' && <RenderPage schema={schema} />}
+          {pageKey === 'render' && <RenderPage schema={schema} themeMode={themeMode} />}
           {pageKey === 'doc' && <DocPage schema={schema} />}
         </Content>
       </Layout>

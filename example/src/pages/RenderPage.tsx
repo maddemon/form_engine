@@ -23,6 +23,7 @@ const MobileIcon: React.FC = () => (
 
 interface Props {
   schema: FormSchema
+  themeMode?: import('@form-engine/core').ThemeMode
 }
 
 const sceneOptions = [
@@ -30,7 +31,7 @@ const sceneOptions = [
   { label: '移动端', value: 'mobile' as const, icon: <MobileIcon /> },
 ]
 
-const RenderPage: React.FC<Props> = ({ schema }) => {
+const RenderPage: React.FC<Props> = ({ schema, themeMode }) => {
   const [scene, setScene] = useState<DeviceScene>('desktop')
   const formRef = useRef<FormRenderHandle>(null)
 
@@ -45,33 +46,40 @@ const RenderPage: React.FC<Props> = ({ schema }) => {
 
   return (
     <Flex vertical gap={0} style={{ height: '100%' }}>
-      <Card size="small" styles={{ body: { padding: '8px 24px' } }} style={{ borderRadius: 0, flexShrink: 0 }}>
-        <Segmented
-          size="small"
-          value={scene}
-          onChange={(v) => setScene(v as DeviceScene)}
-          options={sceneOptions.map((opt) => ({
-            label:
-              opt.icon && opt.label ? (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  {opt.icon}
-                  {opt.label}
-                </span>
-              ) : (
-                opt.label
-              ),
-            value: opt.value,
-          }))}
-        />
-      </Card>
-
       <Card size="small" style={{ flex: 1, overflow: 'auto', borderRadius: 0 }}>
+        <div style={{ textAlign: 'center' }}>
+          <Segmented
+            value={scene}
+            onChange={(v) => setScene(v as DeviceScene)}
+            options={sceneOptions.map((opt) => ({
+              label:
+                opt.icon && opt.label ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    {opt.icon}
+                    {opt.label}
+                  </span>
+                ) : (
+                  opt.label
+                ),
+              value: opt.value,
+            }))}
+          />
+        </div>
         <PreviewFrame scene={scene}>
           {schema.fields.length === 0 ? (
             <Empty description="暂无字段，请先到「设计器」页面添加字段" />
           ) : (
             <>
-              <FormRender ref={formRef} schema={schema} onSubmit={handleSubmit} onChange={handleChange} desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} scene={scene} />
+              <FormRender
+                ref={formRef}
+                schema={schema}
+                onSubmit={handleSubmit}
+                onChange={handleChange}
+                desktopAdapter={antdAdapter}
+                mobileAdapter={antdMobileAdapter}
+                scene={scene}
+                themeMode={themeMode}
+              />
               <Flex gap={8} style={{ marginTop: 24 }}>
                 <Button type="primary" onClick={() => formRef.current?.submit()}>
                   提交
@@ -97,7 +105,7 @@ const PreviewFrame: React.FC<{ scene: DeviceScene; children: React.ReactNode }> 
           maxWidth: '100%',
           margin: '0 auto',
           minHeight: 600,
-          border: '8px solid #222',
+          border: '8px solid var(--fe-border-heavy, #222)',
           borderRadius: 24,
         }}
       >
