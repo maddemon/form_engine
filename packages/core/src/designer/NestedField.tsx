@@ -5,8 +5,8 @@ import { FieldRenderer } from '../renderer/FieldRenderer'
 import { isContainerComponent } from '../types/component-category'
 import type { FormFieldSchema } from '../types/schema'
 import { ContainerPreview } from './ContainerPreview'
-import { useDesignerContext } from './DesignerContext'
 import { FieldItem } from './FieldItem'
+import { useDesignerConfig, useDesignerSelection } from './DesignerContext'
 
 interface NestedFieldProps {
   field: FormFieldSchema
@@ -15,7 +15,8 @@ interface NestedFieldProps {
 }
 
 export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, parentContainerId, childIndex }) => {
-  const { selectedFieldId, formConfig, adapter } = useDesignerContext()
+  const { selectedFieldId } = useDesignerSelection()
+  const { formConfig, adapter } = useDesignerConfig()
   const isContainer = isContainerComponent(field.type)
 
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
@@ -24,7 +25,11 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
     disabled: parentContainerId === undefined || childIndex === undefined,
   })
 
-  const content = isContainer ? <ContainerPreview field={field} /> : <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
+  const content = isContainer ? (
+    <ContainerPreview field={field} />
+  ) : (
+    <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
+  )
 
   return (
     <FieldItem

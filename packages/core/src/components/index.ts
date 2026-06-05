@@ -14,8 +14,8 @@
  */
 
 import React from 'react'
-import type { EventDeclaration } from '../types/events'
 import type { ComponentCategory } from '../types/component-category'
+import type { EventDeclaration } from '../types/events'
 import type { FormFieldSchema } from '../types/schema'
 import iconMap from './icons'
 
@@ -40,72 +40,58 @@ export interface ComponentRegistration {
 // 事件声明导入
 // ============================
 
-import { inputEventDeclarations } from './input/types'
-import { textAreaEventDeclarations } from './textarea/types'
-import { inputNumberEventDeclarations } from './input-number/types'
-import { selectEventDeclarations } from './select/types'
-import { radioEventDeclarations } from './radio/types'
-import { checkboxEventDeclarations } from './checkbox/types'
-import { switchEventDeclarations } from './switch/types'
-import { sliderEventDeclarations } from './slider/types'
-import { rateEventDeclarations } from './rate/types'
-import { datePickerEventDeclarations, dateRangeEventDeclarations } from './date-picker/types'
-import { uploadEventDeclarations } from './upload/types'
+import { alertEventDeclarations } from './alert/types'
 import { buttonEventDeclarations } from './button/types'
 import { cascaderEventDeclarations } from './cascader/types'
-import { treeSelectEventDeclarations } from './tree-select/types'
-import { alertEventDeclarations } from './alert/types'
+import { checkboxEventDeclarations } from './checkbox/types'
+import { datePickerEventDeclarations, dateRangeEventDeclarations } from './date-picker/types'
+import { inputNumberEventDeclarations } from './input-number/types'
+import { inputEventDeclarations } from './input/types'
+import { radioEventDeclarations } from './radio/types'
+import { rateEventDeclarations } from './rate/types'
 import { segmentEventDeclarations } from './segment/types'
+import { selectEventDeclarations } from './select/types'
+import { sliderEventDeclarations } from './slider/types'
+import { switchEventDeclarations } from './switch/types'
+import { textAreaEventDeclarations } from './textarea/types'
+import { treeSelectEventDeclarations } from './tree-select/types'
+import { uploadEventDeclarations } from './upload/types'
 
 // ============================
 // 类型导出（保持兼容）
 // ============================
 
-export type { InputProps } from './input/types'
-export type { TextAreaProps } from './textarea/types'
-export type { InputNumberProps } from './input-number/types'
-export type { SelectProps } from './select/types'
-export type { RadioProps } from './radio/types'
-export type { CheckboxProps } from './checkbox/types'
-export type { SwitchProps } from './switch/types'
-export type { SliderProps } from './slider/types'
-export type { RateProps } from './rate/types'
-export type { DatePickerProps, DateRangeProps } from './date-picker/types'
-export type { UploadProps, UploadFile } from './upload/types'
-export type { ButtonProps } from './button/types'
-export type { TextProps } from './text/types'
-export type { ImageProps } from './image/types'
-export type { DividerProps } from './divider/types'
-export type { GridProps } from './grid/types'
-export type { FlexProps } from './flex/types'
-export type { CascaderProps } from './cascader/types'
-export type { TreeSelectProps } from './tree-select/types'
-export type { CardProps } from './card/types'
 export type { AlertProps } from './alert/types'
+export type { ButtonProps } from './button/types'
+export type { CardProps } from './card/types'
+export type { CascaderProps } from './cascader/types'
+export type { CheckboxProps } from './checkbox/types'
+export type { DatePickerProps, DateRangeProps } from './date-picker/types'
+export type { DividerProps } from './divider/types'
+export type { FlexProps } from './flex/types'
+export type { GridProps } from './grid/types'
+export type { ImageProps } from './image/types'
+export type { InputNumberProps } from './input-number/types'
+export type { InputProps } from './input/types'
+export type { RadioProps } from './radio/types'
+export type { RateProps } from './rate/types'
 export type { SegmentProps } from './segment/types'
+export type { SelectProps } from './select/types'
+export type { SliderProps } from './slider/types'
+export type { SwitchProps } from './switch/types'
+export type { TextProps } from './text/types'
+export type { TextAreaProps } from './textarea/types'
+export type { TreeSelectProps } from './tree-select/types'
+export type { UploadFile, UploadProps } from './upload/types'
 
 // ============================
 // 事件声明 re-export（保持兼容）
 // ============================
 
 export {
-  inputEventDeclarations,
-  textAreaEventDeclarations,
-  inputNumberEventDeclarations,
-  selectEventDeclarations,
-  radioEventDeclarations,
-  checkboxEventDeclarations,
-  switchEventDeclarations,
-  sliderEventDeclarations,
-  rateEventDeclarations,
-  datePickerEventDeclarations,
-  dateRangeEventDeclarations,
-  uploadEventDeclarations,
-  buttonEventDeclarations,
-  cascaderEventDeclarations,
-  treeSelectEventDeclarations,
-  alertEventDeclarations,
-  segmentEventDeclarations,
+  alertEventDeclarations, buttonEventDeclarations,
+  cascaderEventDeclarations, checkboxEventDeclarations, datePickerEventDeclarations,
+  dateRangeEventDeclarations, inputEventDeclarations, inputNumberEventDeclarations, radioEventDeclarations, rateEventDeclarations, segmentEventDeclarations, selectEventDeclarations, sliderEventDeclarations, switchEventDeclarations, textAreaEventDeclarations, treeSelectEventDeclarations, uploadEventDeclarations
 }
 
 // ============================
@@ -142,105 +128,154 @@ const DEFAULT_CASCADER_OPTIONS = [
 export const componentRegistry = {
   // ── 表单组件 ─────────────────────────────────────
   input: {
-    label: '单行文本', category: 'form', icon: 'Type',
+    label: '单行文本',
+    category: 'form',
+    icon: 'Type',
     eventDeclarations: inputEventDeclarations,
   },
   textarea: {
-    label: '多行文本', category: 'form', icon: 'FileText',
+    label: '多行文本',
+    category: 'form',
+    icon: 'FileText',
     eventDeclarations: textAreaEventDeclarations,
   },
   'input-number': {
-    label: '数字', category: 'form', icon: 'Hash',
+    label: '数字',
+    category: 'form',
+    icon: 'Hash',
     eventDeclarations: inputNumberEventDeclarations,
   },
   password: {
-    label: '密码', category: 'form', icon: 'Lock',
+    label: '密码',
+    category: 'form',
+    icon: 'Lock',
     eventDeclarations: inputEventDeclarations,
   },
   select: {
-    label: '下拉框', category: 'form', icon: 'ChevronDown',
+    label: '下拉框',
+    category: 'form',
+    icon: 'ChevronDown',
     defaultProps: { componentProps: { options: DEFAULT_OPTIONS_3 } },
     eventDeclarations: selectEventDeclarations,
   },
   'multi-select': {
-    label: '下拉框', category: 'form', icon: 'ChevronDown',
+    label: '下拉框',
+    category: 'form',
+    icon: 'ChevronDown',
     defaultProps: { componentProps: { options: DEFAULT_OPTIONS_3 } },
     eventDeclarations: selectEventDeclarations,
   },
   radio: {
-    label: '单选框', category: 'form', icon: 'Circle',
+    label: '单选框',
+    category: 'form',
+    icon: 'Circle',
     defaultProps: { componentProps: { options: DEFAULT_OPTIONS_3 } },
     eventDeclarations: radioEventDeclarations,
   },
   checkbox: {
-    label: '多选框', category: 'form', icon: 'CheckSquare',
+    label: '多选框',
+    category: 'form',
+    icon: 'CheckSquare',
     defaultProps: { componentProps: { options: DEFAULT_OPTIONS_3 } },
     eventDeclarations: checkboxEventDeclarations,
   },
   switch: {
-    label: '开关', category: 'form', icon: 'ToggleLeft',
+    label: '开关',
+    category: 'form',
+    icon: 'ToggleLeft',
     defaultProps: { defaultValue: false },
     eventDeclarations: switchEventDeclarations,
   },
   slider: {
-    label: '滑块', category: 'form', icon: 'Slash',
+    label: '滑块',
+    category: 'form',
+    icon: 'Slash',
     defaultProps: { componentProps: { min: 0, max: 100, step: 1 } },
     eventDeclarations: sliderEventDeclarations,
   },
   rate: {
-    label: '评分', category: 'form', icon: 'Star',
+    label: '评分',
+    category: 'form',
+    icon: 'Star',
     defaultProps: { componentProps: { count: 5 } },
     eventDeclarations: rateEventDeclarations,
   },
   date: {
-    label: '日期', category: 'form', icon: 'Calendar',
+    label: '日期',
+    category: 'form',
+    icon: 'Calendar',
+    defaultProps: { componentProps: { format: 'YYYY-MM-DD' } },
     eventDeclarations: datePickerEventDeclarations,
   },
   'date-range': {
-    label: '日期范围', category: 'form', icon: 'Calendar',
+    label: '日期范围',
+    category: 'form',
+    icon: 'Calendar',
+    defaultProps: { componentProps: { format: 'YYYY-MM-DD' } },
     eventDeclarations: dateRangeEventDeclarations,
   },
   datetime: {
-    label: '日期时间', category: 'form', icon: 'Calendar',
+    label: '日期时间',
+    category: 'form',
+    icon: 'Calendar',
+    defaultProps: { componentProps: { format: 'YYYY-MM-DD HH:mm', showTime: true } },
     eventDeclarations: datePickerEventDeclarations,
   },
   time: {
-    label: '时间', category: 'form', icon: 'Clock',
+    label: '时间',
+    category: 'form',
+    icon: 'Clock',
+    defaultProps: { componentProps: { format: 'HH:mm' } },
     eventDeclarations: datePickerEventDeclarations,
   },
   upload: {
-    label: '上传', category: 'form', icon: 'Upload',
+    label: '上传',
+    category: 'form',
+    icon: 'Upload',
     eventDeclarations: uploadEventDeclarations,
   },
   cascader: {
-    label: '级联选择', category: 'form', icon: 'GitBranch',
+    label: '级联选择',
+    category: 'form',
+    icon: 'GitBranch',
     defaultProps: { componentProps: { options: DEFAULT_CASCADER_OPTIONS } },
     eventDeclarations: cascaderEventDeclarations,
   },
   'tree-select': {
-    label: '树选择', category: 'form', icon: 'FolderOpen',
+    label: '树选择',
+    category: 'form',
+    icon: 'FolderOpen',
     defaultProps: { componentProps: { options: DEFAULT_CASCADER_OPTIONS } },
     eventDeclarations: treeSelectEventDeclarations,
   },
 
   // ── 容器组件 ─────────────────────────────────────
   grid: {
-    label: '栅格布局', category: 'container', icon: 'Grid',
+    label: '栅格布局',
+    category: 'container',
+    icon: 'Grid',
     defaultProps: {
       componentProps: {
-        colSpans: [{ id: 'col_1', span: 12 }, { id: 'col_2', span: 12 }],
+        colSpans: [
+          { id: 'col_1', span: 12 },
+          { id: 'col_2', span: 12 },
+        ],
         gap: 16,
       },
     },
     eventDeclarations: [],
   },
   flex: {
-    label: '弹性布局', category: 'container', icon: 'Layout',
-    defaultProps: { componentProps: { direction: 'horizontal', gap: 16 } },
+    label: '弹性布局',
+    category: 'container',
+    icon: 'Layout',
+    defaultProps: { componentProps: { direction: 'row', gap: 16 } },
     eventDeclarations: [],
   },
   collapse: {
-    label: '折叠面板', category: 'container', icon: 'FolderOpen',
+    label: '折叠面板',
+    category: 'container',
+    icon: 'FolderOpen',
     defaultProps: {
       componentProps: {
         panels: [
@@ -254,7 +289,9 @@ export const componentRegistry = {
     eventDeclarations: [],
   },
   tabs: {
-    label: '标签页', category: 'container', icon: 'Minus',
+    label: '标签页',
+    category: 'container',
+    icon: 'Minus',
     defaultProps: {
       componentProps: {
         tabs: [
@@ -266,7 +303,9 @@ export const componentRegistry = {
     eventDeclarations: [],
   },
   table: {
-    label: '子表单', category: 'container', icon: 'Table',
+    label: '子表单',
+    category: 'container',
+    icon: 'Table',
     defaultProps: {
       componentProps: {
         columns: [
@@ -279,10 +318,16 @@ export const componentRegistry = {
     eventDeclarations: [],
   },
   card: {
-    label: '卡片', category: 'container', icon: 'Layout',
+    label: '卡片',
+    category: 'container',
+    icon: 'Layout',
     defaultProps: {
       componentProps: {
-        title: '卡片标题', bodyPadding: 16, bodyGap: 8, bordered: true, size: 'default',
+        title: '卡片标题',
+        bodyPadding: 16,
+        bodyGap: 8,
+        bordered: true,
+        size: 'default',
       },
     },
     eventDeclarations: [],
@@ -290,33 +335,45 @@ export const componentRegistry = {
 
   // ── 展示组件 ─────────────────────────────────────
   text: {
-    label: '文本展示', category: 'display', icon: 'Type',
+    label: '文本展示',
+    category: 'display',
+    icon: 'Type',
     defaultProps: { componentProps: { content: '文本内容' } },
     eventDeclarations: [],
   },
   title: {
-    label: '标题', category: 'display', icon: 'Type',
+    label: '标题',
+    category: 'display',
+    icon: 'Type',
     defaultProps: { componentProps: { level: 1, content: '标题内容' } },
     eventDeclarations: [],
   },
   image: {
-    label: '图片展示', category: 'display', icon: 'Image',
+    label: '图片展示',
+    category: 'display',
+    icon: 'Image',
     defaultProps: { componentProps: { alt: '图片描述', src: '' } },
     eventDeclarations: [],
   },
   divider: {
-    label: '分割线', category: 'display', icon: 'Minus',
+    label: '分割线',
+    category: 'display',
+    icon: 'Minus',
     eventDeclarations: [],
   },
   alert: {
-    label: '警告提示', category: 'display', icon: 'Circle',
+    label: '警告提示',
+    category: 'display',
+    icon: 'Circle',
     defaultProps: {
       componentProps: { type: 'info', content: '提示内容', showIcon: true, closable: false },
     },
     eventDeclarations: alertEventDeclarations,
   },
   segment: {
-    label: '分段控制器', category: 'display', icon: 'ToggleLeft',
+    label: '分段控制器',
+    category: 'display',
+    icon: 'ToggleLeft',
     defaultProps: {
       componentProps: {
         options: [
@@ -333,7 +390,9 @@ export const componentRegistry = {
 
   // ── 按钮组件 ─────────────────────────────────────
   button: {
-    label: '按钮', category: 'button', icon: 'Square',
+    label: '按钮',
+    category: 'button',
+    icon: 'Square',
     defaultProps: { componentProps: { children: '按钮' } },
     eventDeclarations: buttonEventDeclarations,
   },
@@ -346,9 +405,7 @@ export const componentRegistry = {
 /**
  * EVENT_DECLARATION_MAP（从 registry 派生）
  */
-const EVENT_DECLARATION_MAP: Record<string, EventDeclaration[]> = Object.fromEntries(
-  Object.entries(componentRegistry).map(([type, reg]) => [type, reg.eventDeclarations]),
-)
+const EVENT_DECLARATION_MAP: Record<string, EventDeclaration[]> = Object.fromEntries(Object.entries(componentRegistry).map(([type, reg]) => [type, reg.eventDeclarations]))
 
 /** 按 FieldType 查询该组件支持的事件声明 */
 export function getEventDeclarations(type: string): EventDeclaration[] {

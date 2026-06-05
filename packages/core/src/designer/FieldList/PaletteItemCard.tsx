@@ -1,0 +1,53 @@
+import { useDraggable } from '@dnd-kit/core'
+import React, { useState } from 'react'
+import { useStyle } from '../../styles'
+import type { PaletteItemCardProps } from './types'
+import { getIcon } from './utils'
+
+export const PaletteItemCard: React.FC<PaletteItemCardProps> = React.memo(({ item }) => {
+  const [hovered, setHovered] = useState(false)
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `palette-${item.type}`,
+    data: {
+      source: 'palette',
+      fieldType: item.type,
+      label: item.label,
+      defaultProps: item.defaultProps || {},
+      extraData: item.extraData || {},
+    },
+  })
+  const { token } = useStyle()
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      title={item.label}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 'var(--fe-spacing-xs) var(--fe-spacing-sm)',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderRadius: token('borderRadiusSm'),
+        cursor: 'grab',
+        fontSize: token('widgetPaletteFontSize'),
+        color: 'var(--fe-text-secondary)',
+        background: isDragging ? 'var(--fe-primary-bg)' : hovered ? 'var(--fe-canvas-field-hover-bg)' : 'var(--fe-bg-primary)',
+        borderColor: isDragging ? 'var(--fe-primary-border)' : hovered ? 'var(--fe-canvas-field-hover-border)' : 'var(--fe-border-light)',
+        userSelect: 'none',
+        transition: 'all 0.2s',
+        gap: token('spacingSm'),
+        opacity: isDragging ? 0.5 : 1,
+      }}
+    >
+      <span style={{ display: 'inline-flex', alignItems: 'center' }}>{getIcon(item, token)}</span>
+      <span>{item.label}</span>
+    </div>
+  )
+})
+PaletteItemCard.displayName = 'PaletteItemCard'

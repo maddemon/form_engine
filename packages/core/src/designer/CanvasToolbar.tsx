@@ -20,23 +20,6 @@ interface CanvasToolbarProps {
   showTree: boolean
 }
 
-/** Toolbar 通用按钮（提取自重复的 button JSX） */
-const ToolbarButton: React.FC<{
-  label: string
-  onClick: () => void
-  disabled?: boolean
-  active?: boolean
-  children: React.ReactNode
-}> = React.memo(({ label, onClick, disabled, active, children }) => {
-  const { token } = useStyle()
-  return (
-    <WidgetButton onClick={onClick} disabled={disabled} size="sm">
-      {children}
-    </WidgetButton>
-  )
-})
-ToolbarButton.displayName = 'ToolbarButton'
-
 export const CanvasToolbar: React.FC<CanvasToolbarProps> = React.memo(({ scene, onSceneChange, canUndo, canRedo, onUndo, onRedo, onTreeClick, showTree }) => {
   const { token } = useStyle()
 
@@ -54,15 +37,15 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = React.memo(({ scene, 
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
-        <ToolbarButton label="组件树" onClick={onTreeClick} active={showTree}>
+        <WidgetButton label="组件树" onClick={onTreeClick} size="sm">
           ☰
-        </ToolbarButton>
-        <ToolbarButton label="撤销" onClick={onUndo} disabled={!canUndo}>
+        </WidgetButton>
+        <WidgetButton label="撤销" onClick={onUndo} disabled={!canUndo} size="sm">
           ↩
-        </ToolbarButton>
-        <ToolbarButton label="重做" onClick={onRedo} disabled={!canRedo}>
+        </WidgetButton>
+        <WidgetButton label="重做" onClick={onRedo} disabled={!canRedo} size="sm">
           ↪
-        </ToolbarButton>
+        </WidgetButton>
       </div>
 
       <WidgetButtonGroup

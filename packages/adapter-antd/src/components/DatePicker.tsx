@@ -4,11 +4,20 @@
  */
 
 import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
 import React from 'react'
 import { DatePicker as AntDatePicker, TimePicker as AntTimePicker } from 'antd'
+import zhCN from 'antd/es/date-picker/locale/zh_CN'
 import type { DatePickerProps, DateRangeProps } from '@form-engine/core'
 
 const { RangePicker } = AntDatePicker
+
+dayjs.locale('zh-cn')
+
+/** 根据 format 字符串自动判断是否包含时间部分 */
+function isTimeFormat(fmt: string): boolean {
+  return /\b(H{1,2}|m{1,2}|s{1,2})\b/.test(fmt)
+}
 
 function toDayjs(value: string | undefined): dayjs.Dayjs | undefined {
   return value ? dayjs(value) : undefined
@@ -34,7 +43,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   value,
   onChange,
   format = 'YYYY-MM-DD',
-  showTime,
+  showTime: explicitShowTime,
   picker = 'date',
   placeholder,
   allowClear = true,
@@ -45,6 +54,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   id,
   ...rest
 }) => {
+  const showTime = explicitShowTime ?? isTimeFormat(format)
   const handleChange = (_date: dayjs.Dayjs | null, dateString: string) => {
     onChange?.(dateString || undefined)
   }
@@ -55,6 +65,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   return (
     <AntDatePicker
+      locale={zhCN}
       value={toDayjs(value)}
       onChange={handleChange}
       format={format}
@@ -79,7 +90,7 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
   value,
   onChange,
   format = 'YYYY-MM-DD',
-  showTime,
+  showTime: explicitShowTime,
   picker = 'date',
   placeholder,
   allowClear = true,
@@ -90,6 +101,7 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
   id,
   ...rest
 }) => {
+  const showTime = explicitShowTime ?? isTimeFormat(format)
   const handleChange = (_dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null, dateStrings: [string, string]) => {
     onChange?.(dateStrings || undefined)
   }
@@ -142,6 +154,7 @@ export const TimePicker: React.FC<DatePickerProps> = ({
 
   return (
     <AntTimePicker
+      locale={zhCN}
       value={toTimeDayjs(value)}
       onChange={handleChange}
       format={resolvedFormat}

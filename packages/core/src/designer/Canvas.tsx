@@ -5,7 +5,7 @@ import { useStyle } from '../styles'
 import type { FormFieldSchema } from '../types/schema'
 import { CanvasToolbar } from './CanvasToolbar'
 import { ComponentTree, type TreeItem } from './ComponentTree'
-import { useDesignerContext } from './DesignerContext'
+import { useDesignerDispatch, useDesignerSelection, useDesignerConfig } from './DesignerContext'
 import { RootFields } from './RootFields'
 
 export const CANVAS_ROOT_ID = 'canvas-root'
@@ -50,7 +50,9 @@ function buildTreeData(fields: FormFieldSchema[]): TreeItem[] {
 }
 
 export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange, canUndo = false, canRedo = false }) => {
-  const { dispatch, selectedFieldId, onSelectField, scene, formConfig } = useDesignerContext()
+  const dispatch = useDesignerDispatch()
+  const { selectedFieldId, onSelectField } = useDesignerSelection()
+  const { scene, formConfig } = useDesignerConfig()
   const [showTree, setShowTree] = useState(false)
 
   const treeData = useMemo(() => buildTreeData(fields), [fields])
