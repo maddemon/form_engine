@@ -12,6 +12,25 @@ const LABEL_ALIGN_OPTIONS = [
   { label: '右对齐', value: 'right' },
 ]
 
+const LAYOUT_OPTIONS = [
+  { label: '水平', value: 'horizontal' },
+  { label: '垂直', value: 'vertical' },
+  { label: '内联', value: 'inline' },
+]
+
+const VARIANT_OPTIONS = [
+  { label: '外边框', value: 'outlined' },
+  { label: '填充', value: 'filled' },
+  { label: '无边框', value: 'borderless' },
+  { label: '下划线', value: 'underlined' },
+]
+
+const REQUIRED_MARK_OPTIONS = [
+  { label: '默认', value: 'true' },
+  { label: '选填标记', value: 'optional' },
+  { label: '隐藏', value: 'false' },
+]
+
 interface FormConfigPanelProps {
   formConfig: FormConfig
   dispatch: React.Dispatch<DesignerAction>
@@ -30,19 +49,10 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
     const num = Number(v)
     dispatch({
       type: 'UPDATE_FORM_CONFIG',
-      patch: { [key]: { span: num } },
-    })
-  }
-
-  const handleMobileColChange = (key: 'labelCol' | 'wrapperCol', v: string | undefined) => {
-    if (v === undefined) return
-    const num = Number(v)
-    dispatch({
-      type: 'UPDATE_FORM_CONFIG',
       patch: {
         scenes: {
           ...formConfig.scenes,
-          mobile: { ...formConfig.scenes.mobile, [key]: { span: num } },
+          desktop: { ...formConfig.scenes.desktop, [key]: { span: num } },
         },
       },
     })
@@ -63,8 +73,6 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
 
   const desktopLabelColSpan = formConfig.scenes.desktop.labelCol.span
   const desktopWrapperColSpan = formConfig.scenes.desktop.wrapperCol.span
-  const mobileLabelColSpan = formConfig.scenes.mobile.labelCol.span
-  const mobileWrapperColSpan = formConfig.scenes.mobile.wrapperCol.span
 
   const desktopPageBg = formConfig.pageBackground?.desktop ?? ''
   const mobilePageBg = formConfig.pageBackground?.mobile ?? ''
@@ -125,12 +133,23 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
         表单配置
       </h4>
 
+      <FieldItem label="布局模式">
+        <w.Select value={formConfig.layout} onChange={(v) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { layout: v as 'horizontal' | 'vertical' | 'inline' } })} options={LAYOUT_OPTIONS} />
+      </FieldItem>
+
       <FieldItem label="显示冒号">
         <w.Switch checked={!!formConfig.colon} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { colon: v } })} />
       </FieldItem>
 
       <FieldItem label="标签对齐">
         <w.Select value={formConfig.labelAlign || 'right'} onChange={(v) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { labelAlign: v as 'left' | 'right' } })} options={LABEL_ALIGN_OPTIONS} />
+      </FieldItem>
+
+      <FieldItem label="必填标记">
+        <w.Select value={formConfig.requiredMark === undefined ? 'true' : formConfig.requiredMark === false ? 'false' : formConfig.requiredMark === true ? 'true' : 'optional'} onChange={(v) => {
+          const val = v === 'true' ? true : v === 'false' ? false : 'optional'
+          dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { requiredMark: val } })
+        }} options={REQUIRED_MARK_OPTIONS} />
       </FieldItem>
 
       <div
@@ -151,6 +170,9 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
         桌面端配置
       </h4>
       {renderPageBgField('desktop', desktopPageBg)}
+      <FieldItem label="控件变体">
+        <w.Select value={formConfig.variant || 'outlined'} onChange={(v) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { variant: v as 'outlined' | 'borderless' | 'filled' | 'underlined' } })} options={VARIANT_OPTIONS} />
+      </FieldItem>
       {renderColSection('控件宽度', desktopLabelColSpan, desktopWrapperColSpan, handleDesktopColChange)}
 
       <div style={{ width: '100%', background: 'var(--fe-border-primary)', margin: `${token('spacingMd')} 0` }} />
@@ -165,7 +187,6 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
         移动端配置
       </h4>
       {renderPageBgField('mobile', mobilePageBg)}
-      {renderColSection('控件宽度', mobileLabelColSpan, mobileWrapperColSpan, handleMobileColChange)}
     </>
   )
 }

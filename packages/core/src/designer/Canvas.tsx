@@ -52,7 +52,9 @@ function buildTreeData(fields: FormFieldSchema[]): TreeItem[] {
 export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange, canUndo = false, canRedo = false }) => {
   const dispatch = useDesignerDispatch()
   const { selectedFieldId, onSelectField } = useDesignerSelection()
-  const { scene, formConfig } = useDesignerConfig()
+  const { scene, formConfig, adapter } = useDesignerConfig()
+
+  const FormWrapper = adapter?.FormWrapper
   const [showTree, setShowTree] = useState(false)
 
   const treeData = useMemo(() => buildTreeData(fields), [fields])
@@ -123,7 +125,13 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
           )}
 
           <CanvasRootHead />
-          <RootFields fields={fields} />
+          {FormWrapper ? (
+            <FormWrapper formConfig={formConfig} scene={scene} onSubmit={() => {}}>
+              <RootFields fields={fields} />
+            </FormWrapper>
+          ) : (
+            <RootFields fields={fields} />
+          )}
         </CanvasDroppable>
       </div>
     </div>

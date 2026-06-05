@@ -46,6 +46,16 @@ export interface OptionItem {
 }
 
 // ============================
+// 校验结果
+// ============================
+
+export interface ValidateResult {
+  valid: boolean
+  /** 错误信息列表，按 field.name 索引 */
+  errors: Record<string, string[]>
+}
+
+// ============================
 // 校验规则
 // ============================
 
@@ -106,6 +116,8 @@ export interface FormFieldSchema {
   label?: string
   placeholder?: string
   tooltip?: string
+  /** 静态帮助文本，始终显示在字段下方（映射到 antd Form.Item extra） */
+  help?: string
   defaultValue?: unknown
   hidden?: boolean | string
   disabled?: boolean | string
@@ -144,7 +156,8 @@ export interface FormConfig {
   labelAlign: 'left' | 'right'
   disabled?: boolean
   autoComplete?: string
-  requiredMark?: boolean
+  variant?: 'outlined' | 'borderless' | 'filled' | 'underlined'
+  requiredMark?: boolean | 'optional'
   /** 页面背景色（desktop/mobile 分别配置） */
   pageBackground?: {
     desktop?: string

@@ -44,9 +44,15 @@ import { TreeSelectField } from './components/TreeSelect'
 import { UploadField } from './components/Upload'
 import { ButtonField } from './components/Button'
 import { AntdMobileBridgeProvider } from './themeBridge'
+import { AntdMobileFormWrapper } from './components/FormWrapper'
+import { AntdMobileFormItem } from './components/FormItem'
 
 // Theme Bridge
 export { AntdMobileBridgeProvider } from './themeBridge'
+
+// Form / FormItem
+export { AntdMobileFormWrapper } from './components/FormWrapper'
+export { AntdMobileFormItem } from './components/FormItem'
 
 // ============================
 // 兜底渲染
@@ -119,6 +125,8 @@ export const antdMobileAdapter: FormEngineAdapter = {
 
   default: DefaultField,
   bridgeProvider: AntdMobileBridgeProvider,
+  FormWrapper: AntdMobileFormWrapper,
+  FormItem: AntdMobileFormItem,
   // designerWidgets: 不提供 — PropertyPanel 是 desktop 渲染器，
   // 移动端适配器无 widgets 覆盖时自动回退到 core 的 defaultDesignerWidgets。
 }

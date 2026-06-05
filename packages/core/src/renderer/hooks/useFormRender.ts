@@ -3,6 +3,7 @@ import type { FormSchema, OptionItem } from '../../types/schema'
 import type { EventContext } from '../../events'
 import type { EventCallbacks, $Form } from '../../types/events'
 import type { DataSourceResolver } from '../../types/render'
+import type { ValidateFn } from '../../types/adapter'
 import { validateForm } from '../validate'
 import { useFormValues } from './useFormValues'
 import { useFormValidation } from './useFormValidation'
@@ -16,6 +17,12 @@ export interface UseFormRenderOptions {
   onChange?: (values: Record<string, unknown>) => void
   dataSourceResolver?: DataSourceResolver
   callbacks?: EventCallbacks
+  /** adapter 的校验函数，由 FormRenderInner 传入 resolvedAdapter?.validate */
+  adapterValidate?: ValidateFn
+  /** 提交前钩子 */
+  beforeSubmit?: (values: Record<string, unknown>) => Record<string, unknown> | false | void
+  /** 提交后钩子 */
+  afterSubmit?: (values: Record<string, unknown>, success: boolean) => void
 }
 
 export interface UseFormRenderResult {
@@ -37,6 +44,7 @@ export interface UseFormRenderResult {
 export function useFormRender({
   schema, initialValues, onSubmit, onChange,
   dataSourceResolver, callbacks = {},
+  adapterValidate, beforeSubmit, afterSubmit,
 }: UseFormRenderOptions): UseFormRenderResult {
   const formSchema = useMemo(() => schema, [schema])
 
@@ -71,20 +79,46 @@ export function useFormRender({
 
   const validate = useCallback(
     async (name?: string): Promise<boolean> => {
-      return validateRaw(formSchema.fields, formValues, name)
+      const doValidate = adapterValidate ?? validateForm
+      const result = await Promise.resolve(doValidate(formSchema.fields, formValues, name))
+      if (!result.valid) {
+        console.warn('[form-engine] 校验失败:', result.errors)
+      }
+      return result.valid
     },
-    [validateRaw, formSchema.fields, formValues],
+    [adapterValidate, formSchema.fields, formValues],
   )
 
   const handleSubmit = useCallback(() => {
-    const result = validateForm(visibleFields, formValuesRef.current)
-    if (!result.valid) {
-      setFieldErrors(result.errors)
-      return
+    // 1. beforeSubmit 钩子
+    let submitValues_ = formValuesRef.current
+    if (beforeSubmit) {
+      const result = beforeSubmit(formValuesRef.current)
+      if (result === false) return // 阻止提交
+      // 返回对象时转换数据（后续校验和提交使用转换后的值）
+      if (result && typeof result === 'object') {
+        submitValues_ = result
+      }
     }
-    setFieldErrors({})
-    submitValues(onSubmit)
-  }, [visibleFields, formValuesRef, setFieldErrors, submitValues, onSubmit])
+
+    // 2. 校验（adapter.validate 优先，内置兜底）
+    const doValidate = adapterValidate ?? validateForm
+    Promise.resolve(doValidate(visibleFields, submitValues_))
+      .then((result) => {
+        if (!result.valid) {
+          setFieldErrors(result.errors)
+          afterSubmit?.(submitValues_, false)
+          return
+        }
+        // 3. 校验成功，提交
+        setFieldErrors({})
+        if (onSubmit) onSubmit(submitValues_)
+        afterSubmit?.(submitValues_, true)
+      })
+      .catch((err) => {
+        console.error('[form-engine] 校验异常:', err)
+      })
+  }, [visibleFields, formValuesRef, setFieldErrors, onSubmit, adapterValidate, beforeSubmit, afterSubmit])
 
   const $form: $Form = useMemo(() => ({
     get values() { return formValuesRef.current },

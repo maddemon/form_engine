@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { getEventDeclarations } from '../components'
 import { resolveEvents, type EventContext } from '../events'
 import { useStyle } from '../styles'
-import type { ComponentRenderFn, FieldComponentProps, FormEngineAdapter } from '../types/adapter'
+import type { ComponentRenderFn, FieldComponentProps, FormEngineAdapter, FormItemProps } from '../types/adapter'
 import { isFormComponent } from '../types/component-category'
 import type { $Self, ResolvedEventHandler } from '../types/events'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
@@ -29,6 +29,89 @@ export interface FieldRendererProps {
   formConfig: FormConfig
 }
 
+// ============================
+// 内置默认 FormItem
+// ============================
+
+/**
+ * 内置默认 FormItem — 从 FieldRenderer 原有逻辑提取
+ *
+ * 术语注意：
+ * - FormItemProps.help = 静态帮助文本（始终显示在字段下方）
+ * - FormItemProps.errors = 校验错误信息（仅校验失败时传入）
+ * 两者互不干扰，有错误时显示错误，无错误时显示 help
+ */
+const DefaultFormItem: React.FC<FormItemProps> = React.memo(function DefaultFormItem({
+  label, required, validateStatus, errors, help, tooltip, formConfig, scene, children,
+}) {
+  const { token } = useStyle()
+  const { labelCol, wrapperCol } = formConfig.scenes[scene]
+  const labelColSpan = labelCol.span
+  const wrapperColSpan = wrapperCol.span
+  const isHorizontal = !(labelColSpan === 24 && wrapperColSpan === 24)
+  const colon = formConfig.colon
+  const labelText = label ? label + (colon ? '：' : '') : null
+  const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
+
+  const labelStyle = useMemo(
+    () => ({
+      ...(isHorizontal
+        ? {
+            display: 'inline-block',
+            lineHeight: token('inputHeightMd') as string,
+          }
+        : {
+            display: 'block',
+            marginBottom: 'var(--fe-spacing-xs, 4px)',
+          }),
+      fontWeight: required ? 'var(--fe-font-weight-semibold, 600)' : 'var(--fe-font-weight-regular, 400)',
+      color: token('textPrimary') as string,
+    }),
+    [required, token, isHorizontal],
+  )
+
+  const labelNode = !label ? null : (
+    <label className="fe-field-label" style={labelStyle}>
+      {required && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
+      {labelText}
+      {tooltip && (
+        <span title={tooltip} style={{ marginLeft: 'var(--fe-spacing-xs, 4px)', cursor: 'help', color: token('textTertiary') as string }}>
+          ?
+        </span>
+      )}
+    </label>
+  )
+
+  const content = (
+    <>
+      {children}
+      {errorMsg && <div style={{ color: token('error') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{errorMsg}</div>}
+      {help && !errorMsg && <div style={{ color: token('textTertiary') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{help}</div>}
+    </>
+  )
+
+  if (!label || !isHorizontal) {
+    return (
+      <div>
+        {labelNode}
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: token('spacingSm') }}>
+      <div style={{ width: `${(labelColSpan / 24) * 100}%`, flexShrink: 0, textAlign: formConfig.labelAlign }}>{labelNode}</div>
+      <div style={{ width: `${(wrapperColSpan / 24) * 100}%` }}>{content}</div>
+    </div>
+  )
+})
+DefaultFormItem.displayName = 'DefaultFormItem'
+
+// ============================
+// 单字段渲染器
+// ============================
+
 /**
  * 单字段渲染器
  *
@@ -41,8 +124,6 @@ export interface FieldRendererProps {
  * 内置 props < componentProps < 事件处理器（events 解析结果）
  */
 export const FieldRenderer = React.memo(function FieldRenderer({ field, value, onChange, options, disabled, adapter, components = {}, eventContext, errors, formConfig }: FieldRendererProps) {
-  const { token } = useStyle()
-
   // 表达式计算（disabled / required）
   const { exprDisabled, exprRequired } = useFieldExpression(field, value)
 
@@ -52,33 +133,11 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
   // 判断是否必填
   const isRequired = field.rules?.some((r) => r.required) || exprRequired
 
-  // label 渲染（仅表单组件显示 label）
-  const showLabel = isFormComponent(field.type) && field.label
-  const colon = formConfig.colon
-  const labelText = field.label + (colon ? '：' : '')
-  const labelStyle = useMemo(
-    () => ({
-      display: 'block',
-      marginBottom: 'var(--fe-spacing-xs, 4px)',
-      fontWeight: isRequired ? 'var(--fe-font-weight-semibold, 600)' : 'var(--fe-font-weight-regular, 400)',
-      color: token('textPrimary') as string,
-    }),
-    [isRequired, token],
-  )
-  const label = !showLabel ? null : (
-    <label className="fe-field-label" style={labelStyle}>
-      {isRequired && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
-      {labelText}
-      {field.tooltip && (
-        <span title={field.tooltip} style={{ marginLeft: 'var(--fe-spacing-xs, 4px)', cursor: 'help', color: token('textTertiary') as string }}>
-          ?
-        </span>
-      )}
-    </label>
-  )
-
   // 通用 props
-  const resolvedOptions: OptionItem[] = field.mock?.options?.length ? field.mock.options : options.length ? options : field.dataSource?.type === 'static' ? field.dataSource.static.options : []
+  const resolvedOptions = useMemo<OptionItem[]>(
+    () => (field.mock?.options?.length ? field.mock.options : options.length ? options : field.dataSource?.type === 'static' ? field.dataSource.static.options : []),
+    [field.mock?.options, options, field.dataSource],
+  )
 
   // 解析事件处理器（memo 避免每次渲染重建 handler 闭包）
   const $self: $Self = useMemo(
@@ -92,10 +151,13 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
         placeholder: field.placeholder,
       },
     }),
-    [field.name, value, field, isDisabled, field.readOnly, field.placeholder],
+    [value, field, isDisabled],
   )
 
-  const eventHandlers: Record<string, ResolvedEventHandler> = useMemo(() => (eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}), [eventContext, field.events, field.type, $self])
+  const eventHandlers: Record<string, ResolvedEventHandler> = useMemo(
+    () => (eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}),
+    [eventContext, field.events, field.type, $self],
+  )
 
   // onChange 包装：先更新当前字段值，再执行用户事件
   // IME 组合输入由各 adapter 通过 nativeEvent.isComposing 自行拦截
@@ -139,41 +201,40 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
     // 3. 兜底
     adapter.default
 
-  const { labelCol, wrapperCol } = formConfig.scenes[adapter.scene]
-  const labelColSpan = labelCol.span
-  const wrapperColSpan = wrapperCol.span
-  const isHorizontal = !(labelColSpan === 24 && wrapperColSpan === 24)
+  // FormItem 选择：adapter.FormItem 优先，否则使用内置 DefaultFormItem
+  const FormItemTag = adapter.FormItem ?? DefaultFormItem
 
-  const fieldContent = (
-    <>
-      <FieldSchemaContext.Provider value={field}>
-        <AdapterContext.Provider value={adapter}>
-          {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
-            其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
-            Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
-          <React.Suspense fallback={null}>
-            {}
-            {React.createElement(renderFn, fieldProps)}
-          </React.Suspense>
-        </AdapterContext.Provider>
-      </FieldSchemaContext.Provider>
-      {errorMsg && <div style={{ color: token('error') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{errorMsg}</div>}
-    </>
+  const formItemProps: Omit<FormItemProps, 'children'> = useMemo(
+    () => ({
+      name: field.name,
+      label: isFormComponent(field.type) ? field.label : undefined,
+      rules: field.rules,
+      required: isRequired,
+      validateStatus: errorMsg ? 'error' as const : undefined,
+      errors,
+      help: field.help,
+      tooltip: field.tooltip,
+      formConfig,
+      scene: adapter.scene,
+    }),
+    [field.name, field.label, field.type, field.rules, field.help, field.tooltip, isRequired, errorMsg, errors, formConfig, adapter.scene],
   )
 
-  if (!showLabel || !isHorizontal) {
-    return (
-      <div className="fe-field" style={!renderFn ? { padding: `${token('spacingSm')} 0`, color: token('textTertiary') as string } : undefined}>
-        {label}
-        {fieldContent}
-      </div>
-    )
-  }
-
   return (
-    <div className="fe-field" style={{ display: 'flex', gap: token('spacingSm'), alignItems: 'flex-start' }}>
-      <div style={{ width: `${(labelColSpan / 24) * 100}%`, flexShrink: 0, textAlign: formConfig.labelAlign }}>{label}</div>
-      <div style={{ width: `${(wrapperColSpan / 24) * 100}%` }}>{fieldContent}</div>
+    <div className="fe-field" style={!renderFn ? { padding: 'var(--fe-spacing-sm, 8px) 0', color: 'var(--fe-text-tertiary)' } : undefined}>
+      <FormItemTag {...formItemProps}>
+        <FieldSchemaContext.Provider value={field}>
+          <AdapterContext.Provider value={adapter}>
+            {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
+              其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
+              Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
+            <React.Suspense fallback={null}>
+              {}
+              {React.createElement(renderFn, fieldProps)}
+            </React.Suspense>
+          </AdapterContext.Provider>
+        </FieldSchemaContext.Provider>
+      </FormItemTag>
     </div>
   )
 })

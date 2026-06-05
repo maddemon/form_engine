@@ -5,7 +5,7 @@ import type { EventContext } from '../events'
 import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
 import type { PartialThemeTokens } from '../styles/types'
 import type { ThemeMode, SizeMode } from '../styles/StyleProvider'
-import type { ComponentRenderFn, FormEngineAdapter } from '../types/adapter'
+import type { ComponentRenderFn, FormEngineAdapter, FormWrapperProps } from '../types/adapter'
 import { isContainerComponent } from '../types/component-category'
 import type { DataSourceResolver } from '../types/render'
 import { pickAdapter } from '../utils'
@@ -46,6 +46,19 @@ export interface FormRenderProps {
   sizeMode?: SizeMode
   /** 主题覆盖，透传给 StyleProvider */
   theme?: PartialThemeTokens
+  /**
+   * 提交前钩子
+   * - 返回修改后的 values 可转换提交数据
+   * - 返回 false 可阻止提交
+   * - 返回 void 或 undefined 继续提交
+   */
+  beforeSubmit?: (values: Record<string, unknown>) => Record<string, unknown> | false | void
+  /**
+   * 提交后钩子
+   * - success=true 表示提交成功
+   * - success=false 表示校验失败
+   */
+  afterSubmit?: (values: Record<string, unknown>, success: boolean) => void
 }
 
 /**
@@ -55,7 +68,7 @@ export interface FormRenderProps {
  */
 export const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {}, themeMode, sizeMode, theme }, ref) => {
+export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {}, themeMode, sizeMode, theme, beforeSubmit, afterSubmit }, ref) => {
   const hasStyleProvider = useHasStyleProvider()
   const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
   const bridgeProvider = resolvedAdapter?.bridgeProvider
@@ -75,6 +88,8 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({
       initialValues={initialValues}
       loading={loading}
       callbacks={callbacks}
+      beforeSubmit={beforeSubmit}
+      afterSubmit={afterSubmit}
     />
   )
 
@@ -96,8 +111,15 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({
 })
 FormRender.displayName = 'FormRender'
 
+/** 内置默认 Form 容器 — 使用原生 <form> 元素 */
+const DefaultFormWrapper: React.FC<FormWrapperProps> = ({ onSubmit, children, className, style }) => (
+  <form onSubmit={(e) => { e.preventDefault(); onSubmit?.() }} className={className} style={style}>
+    {children}
+  </form>
+)
+
 /** FormRender 内部实现，在 StyleProvider + BridgeProvider 内部渲染 */
-const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps, 'themeMode' | 'sizeMode' | 'theme'>>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {} }, ref) => {
+const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps, 'themeMode' | 'sizeMode' | 'theme'>>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {}, beforeSubmit, afterSubmit }, ref) => {
   useEnsureDefaultTheme()
   const { token } = useStyle()
 
@@ -109,14 +131,15 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
     fieldErrors, fieldOptions,
     handleFieldChange, handleSubmit,
     $form, eventContext, reset, validate,
-  } = useFormRender({ schema, initialValues, onSubmit, onChange, dataSourceResolver, callbacks })
+  } = useFormRender({ schema, initialValues, onSubmit, onChange, dataSourceResolver, callbacks, adapterValidate: resolvedAdapter?.validate, beforeSubmit, afterSubmit })
 
   React.useImperativeHandle(ref, () => ({ submit: handleSubmit, reset, validate }), [handleSubmit, reset, validate])
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleFormSubmit = () => {
     handleSubmit()
   }
+
+  const FormTag = resolvedAdapter?.FormWrapper ?? DefaultFormWrapper
 
   const engineCtx = useMemo<FormEngineContextValue>(() => ({
     adapter: resolvedAdapter,
@@ -135,7 +158,7 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
     <FormConfigContext.Provider value={formConfig}>
       <FormEngineContext.Provider value={engineCtx}>
         <FormStateContext.Provider value={stateCtx}>
-          <form onSubmit={handleFormSubmit} className="fe-form">
+          <FormTag formConfig={formConfig} scene={resolvedAdapter?.scene ?? 'desktop'} onSubmit={handleFormSubmit} className="fe-form">
             <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
               {visibleFields.map((field) => (
                 <div key={field.id} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
@@ -143,7 +166,7 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
                 </div>
               ))}
             </div>
-          </form>
+          </FormTag>
         </FormStateContext.Provider>
       </FormEngineContext.Provider>
     </FormConfigContext.Provider>

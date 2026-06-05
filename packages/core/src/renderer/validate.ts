@@ -11,13 +11,10 @@
  * - 异步校验
  */
 
-import type { FormFieldSchema, FormSchema, FormRule } from '../types/schema'
+import type { FormFieldSchema, FormSchema, FormRule, ValidateResult } from '../types/schema'
 
-export interface ValidateResult {
-  valid: boolean
-  /** 错误信息列表，按 field.name 索引 */
-  errors: Record<string, string[]>
-}
+// 重新导出 ValidateResult 以保持向后兼容
+export type { ValidateResult } from '../types/schema'
 
 /**
  * 执行单条规则

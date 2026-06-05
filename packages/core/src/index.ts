@@ -31,6 +31,7 @@ export type {
   DataSourceType,
   FieldDataSource,
   FormRule,
+  ValidateResult,
   VisibleWhen,
   FormConfig,
   CustomComponent,
@@ -104,6 +105,9 @@ export type {
   DesignerWidgets,
   FieldRendererFn,
   FieldComponentProps,
+  FormWrapperProps,
+  FormItemProps,
+  ValidateFn,
 } from './types/adapter'
 
 // Adapter 值导出（DeviceScene 既是类型也是值）
