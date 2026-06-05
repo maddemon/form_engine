@@ -43,6 +43,7 @@ import { TitleField } from './components/Title'
 import { TreeSelectField } from './components/TreeSelect'
 import { UploadField } from './components/Upload'
 import { ButtonField } from './components/Button'
+import { AntdMobileBridgeProvider } from './themeBridge'
 
 // Theme Bridge
 export { AntdMobileBridgeProvider } from './themeBridge'
@@ -117,6 +118,7 @@ export const antdMobileAdapter: FormEngineAdapter = {
   },
 
   default: DefaultField,
+  bridgeProvider: AntdMobileBridgeProvider,
   // designerWidgets: 不提供 — PropertyPanel 是 desktop 渲染器，
   // 移动端适配器无 widgets 覆盖时自动回退到 core 的 defaultDesignerWidgets。
 }

@@ -1,6 +1,6 @@
 import { antdAdapter } from '@form-engine/adapter-antd'
 import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
-import type { FormFieldSchema, FormSchema, PropertyPanelTab, PropertyPanelTabContentProps, SidePanelTab, SidePanelTabContentProps } from '@form-engine/core'
+import type { FormFieldSchema, FormSchema, PropertyPanelTab, PropertyPanelTabContentProps, SidePanelTab, SidePanelTabContentProps, ThemeMode } from '@form-engine/core'
 import { Designer } from '@form-engine/core'
 import { Card, Typography } from 'antd'
 import React, { useMemo } from 'react'
@@ -23,7 +23,9 @@ const FieldStatsTab: React.FC<SidePanelTabContentProps> = ({ fields }) => {
 
   return (
     <div style={{ padding: 16 }}>
-      <Typography.Title level={5} style={{ margin: '0 0 12px' }}>字段统计</Typography.Title>
+      <Typography.Title level={5} style={{ margin: '0 0 12px' }}>
+        字段统计
+      </Typography.Title>
       <Typography.Text style={{ display: 'block', marginBottom: 12 }}>共 {stats.total} 个字段</Typography.Text>
       {Object.entries(stats.countByType).map(([type, count]) => (
         <div key={type} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
@@ -46,7 +48,12 @@ const sidePanelTabs: SidePanelTab[] = [
 
 // ---------- 自定义属性面板 Tab：JSON 查看 ----------
 const JsonViewTab: React.FC<PropertyPanelTabContentProps> = ({ field }) => {
-  if (!field) return <div style={{ padding: 16 }}><Typography.Text type="secondary">请选择一个字段</Typography.Text></div>
+  if (!field)
+    return (
+      <div style={{ padding: 16 }}>
+        <Typography.Text type="secondary">请选择一个字段</Typography.Text>
+      </div>
+    )
   return (
     <div style={{ padding: 8 }}>
       <Card title="字段 Schema (JSON)" size="small">
@@ -68,20 +75,22 @@ const propertyPanelTabs: PropertyPanelTab[] = [
 interface Props {
   schema: FormSchema
   onSchemaChange: (schema: FormSchema) => void
+  themeMode?: ThemeMode
 }
 
-const DesignerPage: React.FC<Props> = ({ schema, onSchemaChange }) => {
+const DesignerPage: React.FC<Props> = ({ schema, onSchemaChange, themeMode }) => {
   return (
     <div style={{ height: '100%' }}>
       <Designer
-        schema={schema}
-        onSchemaChange={onSchemaChange}
+        value={schema}
+        onChange={onSchemaChange}
         desktopAdapter={antdAdapter}
         mobileAdapter={antdMobileAdapter}
         panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }}
         excludeTypes={['date-range']}
         sidePanelTabs={sidePanelTabs}
         propertyPanelTabs={propertyPanelTabs}
+        themeMode={themeMode}
       />
     </div>
   )

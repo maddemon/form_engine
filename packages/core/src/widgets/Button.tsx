@@ -12,11 +12,12 @@ export const WidgetButton: React.FC<{
   const { token } = useStyle()
 
   // sm 适用于 PropertyPanel 等紧凑场景；md 适用于 Modal footer / 通用区域
-  const sizeStyle: React.CSSProperties = size === 'sm'
-    ? { padding: '1px 8px', lineHeight: '20px', fontSize: token('fontSizeXs') as string }
-    : { padding: '4px 12px', lineHeight: '22px', fontSize: token('fontSizeSm') as string }
+  const sizeStyle: React.CSSProperties = size === 'sm' ? { padding: '1px 8px', lineHeight: '20px', fontSize: token('fontSizeXs') as string } : { padding: '4px 12px', lineHeight: '22px', fontSize: token('fontSizeSm') as string }
 
   const base: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: token('borderRadiusSm') as string,
     borderWidth: 1,
     borderStyle: 'solid',

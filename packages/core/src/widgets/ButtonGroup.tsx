@@ -4,7 +4,7 @@ import { useStyle } from '../styles'
 export const WidgetButtonGroup: React.FC<{
   value?: string
   onChange?: (v: string) => void
-  options: { label: string; value: string }[]
+  options: { label: React.ReactNode; value: string }[]
   disabled?: boolean
   style?: React.CSSProperties
 }> = ({ value, onChange, options, disabled, style }) => {

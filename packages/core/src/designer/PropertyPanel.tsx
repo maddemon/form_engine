@@ -70,9 +70,9 @@ function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPane
     <>
       {activeTab === PROPERTIES_DEFAULT_TAB_KEY ? (
         <>
-          <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500 }}>
+          <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500, color: token('textSecondary') as string }}>
             {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
-            <span style={{ marginLeft: token('spacingXs'), color: 'var(--fe-text-muted)', fontWeight: 400 }}>({field.type})</span>
+            <span style={{ marginLeft: token('spacingXs'), color: token('textTertiary') as string, fontWeight: 400 }}>({field.type})</span>
           </h4>
           <DefaultPropertyContent field={field} w={w} dispatch={dispatch} isForm={isForm} isContainer={isContainer} isButton={isButton} ComponentPropsRender={ComponentPropsRender} customConfig={customConfig ?? null} allFields={allFields} />
         </>

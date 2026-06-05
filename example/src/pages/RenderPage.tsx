@@ -1,84 +1,9 @@
 import { antdAdapter } from '@form-engine/adapter-antd'
-import { antdMobileAdapter, AntdMobileBridgeProvider } from '@form-engine/adapter-antd-mobile'
+import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
 import type { FormRenderHandle, FormSchema } from '@form-engine/core'
 import { FormRender, type DeviceScene } from '@form-engine/core'
-import { Button, Card, Empty, Space, Typography } from 'antd'
+import { Button, Card, Empty, Flex, Segmented } from 'antd'
 import React, { useCallback, useRef, useState } from 'react'
-
-interface Props {
-  isDark: boolean
-  schema: FormSchema
-}
-
-const RenderPage: React.FC<Props> = ({ isDark, schema }) => {
-  const [scene, setScene] = useState<DeviceScene>('desktop')
-  const formRef = useRef<FormRenderHandle>(null)
-
-  const handleSubmit = useCallback((values: Record<string, unknown>) => {
-    console.log('提交:', values)
-    alert('提交成功！\n' + JSON.stringify(values, null, 2))
-  }, [])
-
-  const handleChange = useCallback((values: Record<string, unknown>) => {
-    console.log('变化:', values)
-  }, [])
-
-  return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* 场景切换 */}
-      <div style={{ padding: '8px 24px', borderBottom: `1px solid ${isDark ? '#303030' : '#f0f0f0'}`, background: isDark ? '#1f1f1f' : '#fff', flexShrink: 0 }}>
-        <Space>
-          <Button
-            type={scene === 'desktop' ? 'primary' : 'default'}
-            size="small"
-            onClick={() => setScene('desktop')}
-            icon={<DesktopIcon />}
-          >
-            桌面端
-          </Button>
-          <Button
-            type={scene === 'mobile' ? 'primary' : 'default'}
-            size="small"
-            onClick={() => setScene('mobile')}
-            icon={<MobileIcon />}
-          >
-            移动端
-          </Button>
-        </Space>
-      </div>
-
-      {/* 渲染预览 */}
-      <div style={{ flex: 1, overflow: 'auto', padding: 32, background: isDark ? '#1f1f1f' : '#f5f5f5' }}>
-        <PreviewFrame scene={scene} isDark={isDark}>
-          {schema.fields.length === 0 ? (
-            <Card>
-              <Empty description="暂无字段，请先到「设计器」页面添加字段" />
-            </Card>
-          ) : (
-            <AntdMobileBridgeProvider key={scene}>
-              <FormRender
-                ref={formRef}
-                schema={schema}
-                onSubmit={handleSubmit}
-                onChange={handleChange}
-                desktopAdapter={antdAdapter}
-                mobileAdapter={antdMobileAdapter}
-                scene={scene}
-              />
-              <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
-                <Button type="primary" onClick={() => formRef.current?.submit()}>
-                  提交
-                </Button>
-                <Button onClick={() => formRef.current?.reset()}>重置</Button>
-              </div>
-            </AntdMobileBridgeProvider>
-          )}
-        </PreviewFrame>
-      </div>
-    </div>
-  )
-}
-
 /** 桌面图标 */
 const DesktopIcon: React.FC = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: -2 }}>
@@ -96,31 +21,94 @@ const MobileIcon: React.FC = () => (
   </svg>
 )
 
+interface Props {
+  schema: FormSchema
+}
+
+const sceneOptions = [
+  { label: '桌面端', value: 'desktop' as const, icon: <DesktopIcon /> },
+  { label: '移动端', value: 'mobile' as const, icon: <MobileIcon /> },
+]
+
+const RenderPage: React.FC<Props> = ({ schema }) => {
+  const [scene, setScene] = useState<DeviceScene>('desktop')
+  const formRef = useRef<FormRenderHandle>(null)
+
+  const handleSubmit = useCallback((values: Record<string, unknown>) => {
+    console.log('提交:', values)
+    alert('提交成功！\n' + JSON.stringify(values, null, 2))
+  }, [])
+
+  const handleChange = useCallback((values: Record<string, unknown>) => {
+    console.log('变化:', values)
+  }, [])
+
+  return (
+    <Flex vertical gap={0} style={{ height: '100%' }}>
+      <Card size="small" styles={{ body: { padding: '8px 24px' } }} style={{ borderRadius: 0, flexShrink: 0 }}>
+        <Segmented
+          size="small"
+          value={scene}
+          onChange={(v) => setScene(v as DeviceScene)}
+          options={sceneOptions.map((opt) => ({
+            label:
+              opt.icon && opt.label ? (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  {opt.icon}
+                  {opt.label}
+                </span>
+              ) : (
+                opt.label
+              ),
+            value: opt.value,
+          }))}
+        />
+      </Card>
+
+      <Card size="small" style={{ flex: 1, overflow: 'auto', borderRadius: 0 }}>
+        <PreviewFrame scene={scene}>
+          {schema.fields.length === 0 ? (
+            <Empty description="暂无字段，请先到「设计器」页面添加字段" />
+          ) : (
+            <>
+              <FormRender ref={formRef} schema={schema} onSubmit={handleSubmit} onChange={handleChange} desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} scene={scene} />
+              <Flex gap={8} style={{ marginTop: 24 }}>
+                <Button type="primary" onClick={() => formRef.current?.submit()}>
+                  提交
+                </Button>
+                <Button onClick={() => formRef.current?.reset()}>重置</Button>
+              </Flex>
+            </>
+          )}
+        </PreviewFrame>
+      </Card>
+    </Flex>
+  )
+}
+
 /** 预览框 */
-const PreviewFrame: React.FC<{ scene: DeviceScene; isDark: boolean; children: React.ReactNode }> = ({ scene, isDark, children }) => {
+const PreviewFrame: React.FC<{ scene: DeviceScene; children: React.ReactNode }> = ({ scene, children }) => {
   if (scene === 'mobile') {
     return (
-      <div
+      <Card
+        styles={{ body: { padding: 16 } }}
         style={{
           width: 375,
           maxWidth: '100%',
           margin: '0 auto',
-          background: isDark ? '#141414' : '#fff',
-          borderRadius: 24,
-          border: '8px solid #222',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-          padding: 16,
           minHeight: 600,
+          border: '8px solid #222',
+          borderRadius: 24,
         }}
       >
         {children}
-      </div>
+      </Card>
     )
   }
   return (
-    <div style={{ maxWidth: 640, margin: '0 auto', background: isDark ? '#141414' : '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+    <Card styles={{ body: { padding: 32 } }} style={{ maxWidth: 640, margin: '0 auto' }}>
       {children}
-    </div>
+    </Card>
   )
 }
 

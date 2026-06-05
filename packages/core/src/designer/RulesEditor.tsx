@@ -45,19 +45,22 @@ export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
   )
 
   // 防抖输入
-  const [messageValue, handleMessageChange] = useDebouncedInput<string | number>(
-    rule.message || '',
-    (v) => updateRule({ message: String(v) || undefined }),
-  )
+  const [messageValue, handleMessageChange] = useDebouncedInput<string | number>(rule.message || '', (v) => updateRule({ message: String(v) || undefined }))
 
-  const [patternValue, handlePatternChange] = useDebouncedInput<string | number>(
-    rule.pattern || '',
-    (v) => updateRule({ pattern: String(v) || undefined }),
-  )
+  const [patternValue, handlePatternChange] = useDebouncedInput<string | number>(rule.pattern || '', (v) => updateRule({ pattern: String(v) || undefined }))
 
   return (
     <>
-      <div style={{ fontSize: token('fontSizeSm'), fontWeight: 500, marginBottom: token('spacingSm') }}>校验规则</div>
+      <div
+        style={{
+          fontSize: token('fontSizeSm'),
+          fontWeight: 500,
+          marginBottom: token('spacingSm'),
+          color: token('textSecondary'),
+        }}
+      >
+        校验规则
+      </div>
       <FieldItem label="必填">
         <w.Switch checked={!!rule.required} onChange={(v: boolean) => updateRule({ required: v || undefined })} />
       </FieldItem>

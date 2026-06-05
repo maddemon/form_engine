@@ -146,7 +146,7 @@ function ComponentLibContent({ groups }: { groups: PaletteGroup[] }) {
     <>
       {groups.map(group => (
         <div key={group.groupName} style={{ marginBottom: 'var(--fe-spacing-md)' }}>
-          <div style={{ fontSize: 'var(--fe-font-size-xs)', color: 'var(--fe-text-muted)', fontWeight: 500, padding: 'var(--fe-spacing-xs) var(--fe-spacing-xs) var(--fe-spacing-sm)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+          <div style={{ fontSize: 'var(--fe-font-size-xs)', color: 'var(--fe-text-tertiary)', fontWeight: 500, padding: 'var(--fe-spacing-xs) var(--fe-spacing-xs) var(--fe-spacing-sm)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
             {group.groupName}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--fe-spacing-xs)' }}>

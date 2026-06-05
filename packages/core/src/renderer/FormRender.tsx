@@ -2,7 +2,9 @@ import React, { useCallback, useMemo } from 'react'
 import { type FormFieldSchema, type FormSchema, type OptionItem } from '../types/schema'
 import type { EventCallbacks } from '../types/events'
 import type { EventContext } from '../events'
-import { useEnsureDefaultTheme, useStyle } from '../styles'
+import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
+import type { PartialThemeTokens } from '../styles/types'
+import type { ThemeMode, SizeMode } from '../styles/StyleProvider'
 import type { ComponentRenderFn, FormEngineAdapter } from '../types/adapter'
 import { isContainerComponent } from '../types/component-category'
 import type { DataSourceResolver } from '../types/render'
@@ -38,6 +40,12 @@ export interface FormRenderProps {
    * key 为回调名，value 为函数；运行时会按 name 查表
    */
   callbacks?: EventCallbacks
+  /** 主题模式，透传给 StyleProvider */
+  themeMode?: ThemeMode
+  /** 尺寸模式，透传给 StyleProvider */
+  sizeMode?: SizeMode
+  /** 主题覆盖，透传给 StyleProvider */
+  theme?: PartialThemeTokens
 }
 
 /**
@@ -47,7 +55,49 @@ export interface FormRenderProps {
  */
 export const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {} }, ref) => {
+export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {}, themeMode, sizeMode, theme }, ref) => {
+  const hasStyleProvider = useHasStyleProvider()
+  const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
+  const bridgeProvider = resolvedAdapter?.bridgeProvider
+
+  // 内层内容
+  const inner = (
+    <FormRenderInner
+      ref={ref}
+      schema={schema}
+      onSubmit={onSubmit}
+      onChange={onChange}
+      dataSourceResolver={dataSourceResolver}
+      components={components}
+      desktopAdapter={desktopAdapter}
+      mobileAdapter={mobileAdapter}
+      scene={scene}
+      initialValues={initialValues}
+      loading={loading}
+      callbacks={callbacks}
+    />
+  )
+
+  // 包裹 BridgeProvider（adapter 提供）
+  const withBridge = bridgeProvider
+    ? React.createElement(bridgeProvider, null, inner)
+    : inner
+
+  // 包裹 StyleProvider（如果外层没有）
+  if (hasStyleProvider) {
+    return withBridge as React.ReactElement
+  }
+
+  return (
+    <StyleProvider themeMode={themeMode} sizeMode={sizeMode} theme={theme}>
+      {withBridge}
+    </StyleProvider>
+  ) as React.ReactElement
+})
+FormRender.displayName = 'FormRender'
+
+/** FormRender 内部实现，在 StyleProvider + BridgeProvider 内部渲染 */
+const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps, 'themeMode' | 'sizeMode' | 'theme'>>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {} }, ref) => {
   useEnsureDefaultTheme()
   const { token } = useStyle()
 
@@ -99,7 +149,7 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({
     </FormConfigContext.Provider>
   )
 })
-FormRender.displayName = 'FormRender'
+FormRenderInner.displayName = 'FormRenderInner'
 
 // ── NestedFieldRenderer（递归字段渲染器，含 React.memo）─────────────
 

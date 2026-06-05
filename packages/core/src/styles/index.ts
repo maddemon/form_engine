@@ -71,6 +71,7 @@ export type { CssVarMapping, ThemeBridgeConfig, BridgeProviderProps } from './th
 export {
   StyleProvider,
   useStyleContext,
+  useHasStyleProvider,
   useTheme,
   useToken,
 } from './StyleProvider'

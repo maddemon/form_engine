@@ -96,9 +96,9 @@ export interface PanelWidths {
  */
 export interface DesignerProps {
   /** 当前编辑的 schema（受控） */
-  schema?: FormSchema
+  value: FormSchema
   /** schema 变化回调 */
-  onSchemaChange?: (schema: FormSchema) => void
+  onChange?: (schema: FormSchema) => void
   /** 可选：自定义控件库分组（覆盖默认） */
   groups?: PaletteGroup[]
   /** 可选：排除的调色板组件类型列表（用于屏蔽系统自带组件，如 ['cascader', 'tree-select']） */
@@ -132,6 +132,14 @@ export interface DesignerProps {
    * - 缺省：按 token 默认值 + 容器尺寸自动收敛
    */
   panelWidths?: PanelWidths
+  /** 可选：场景变化回调 */
+  onSceneChange?: (scene: import('../types/adapter').DeviceScene) => void
+  /** 主题模式，透传给 StyleProvider */
+  themeMode?: import('../styles/StyleProvider').ThemeMode
+  /** 尺寸模式，透传给 StyleProvider */
+  sizeMode?: import('../styles/StyleProvider').SizeMode
+  /** 主题覆盖，透传给 StyleProvider */
+  theme?: import('../styles/types').PartialThemeTokens
 }
 
 /**

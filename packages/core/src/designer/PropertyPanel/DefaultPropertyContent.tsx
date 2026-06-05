@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { FieldItem, PropsRenderMap } from '../../propRenders'
+import { FieldItem } from '../../propRenders'
 import CustomPropsRender from '../../propRenders/CustomPropsRender'
 import type { PropsRenderProps } from '../../propRenders/types'
-import { customComponentRegistry } from '../../registry/customComponentRegistry'
 import { useStyle } from '../../styles'
 import type { DesignerWidgets } from '../../types/adapter'
 import type { CustomComponentConfig } from '../../types/custom-component'
@@ -17,7 +16,14 @@ import { EventEditor } from './EventEditor'
 // ── helpers ────────────────────────────────────────────────────────
 
 export function hasAdvancedConfig(field: FormFieldSchema): boolean {
-  return !!((typeof field.hidden === 'boolean' && field.hidden) || (typeof field.hidden === 'string' && field.hidden) || field.disabled || field.readOnly || field.requiredIfExpr || (field.rules && field.rules.length > 0))
+  return !!(
+    (typeof field.hidden === 'boolean' && field.hidden) ||
+    (typeof field.hidden === 'string' && field.hidden) ||
+    field.disabled ||
+    field.readOnly ||
+    field.requiredIfExpr ||
+    (field.rules && field.rules.length > 0)
+  )
 }
 
 // ── DefaultPropertyContent ─────────────────────────────────────────
@@ -43,9 +49,13 @@ export function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer
 
   const [labelValue, handleLabelChange] = useDebouncedInput<string | number>(field.label || '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { label: String(v) || undefined } }))
 
-  const [defaultValueValue, handleDefaultValueChange] = useDebouncedInput<string | number>(field.defaultValue != null ? String(field.defaultValue) : '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { defaultValue: v || undefined } }))
+  const [defaultValueValue, handleDefaultValueChange] = useDebouncedInput<string | number>(field.defaultValue != null ? String(field.defaultValue) : '', (v) =>
+    dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { defaultValue: v || undefined } }),
+  )
 
-  const [hiddenValue, handleHiddenChange] = useDebouncedInput<string | number>(typeof field.hidden === 'string' ? field.hidden : '', (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { hidden: (v as string) || undefined } }))
+  const [hiddenValue, handleHiddenChange] = useDebouncedInput<string | number>(typeof field.hidden === 'string' ? field.hidden : '', (v) =>
+    dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { hidden: (v as string) || undefined } }),
+  )
 
   const [colSpanValue, handleColSpanChange] = useDebouncedInput<number>(field.colSpan || 24, (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { colSpan: Number(v) } }))
 
@@ -118,9 +128,17 @@ export function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer
         </FieldItem>
       )}
 
-      {isContainer && <div style={{ fontSize: token('fontSizeSm'), color: 'var(--fe-text-muted)', padding: `${token('spacingXs')} 0`, marginBottom: token('spacingSm') }}>容器组件支持拖入子组件</div>}
+      {isContainer && <div style={{ fontSize: token('fontSizeSm'), color: token('textTertiary') as string, padding: `${token('spacingXs')} 0`, marginBottom: token('spacingSm') }}>容器组件支持拖入子组件</div>}
 
-      {(ComponentPropsRender || customConfig?.propertyConfig?.length) && <div style={{ borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm'), marginTop: token('spacingSm') }}>{ComponentPropsRender ? <ComponentPropsRender widgets={w} values={localComponentProps} onChange={handleComponentPropsChange} /> : customConfig?.propertyConfig ? <CustomPropsRender configs={customConfig.propertyConfig} widgets={w} values={localComponentProps} onChange={handleComponentPropsChange} /> : null}</div>}
+      {(ComponentPropsRender || customConfig?.propertyConfig?.length) && (
+        <div style={{ borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm'), marginTop: token('spacingSm') }}>
+          {ComponentPropsRender ? (
+            <ComponentPropsRender widgets={w} values={localComponentProps} onChange={handleComponentPropsChange} />
+          ) : customConfig?.propertyConfig ? (
+            <CustomPropsRender configs={customConfig.propertyConfig} widgets={w} values={localComponentProps} onChange={handleComponentPropsChange} />
+          ) : null}
+        </div>
+      )}
 
       <CollapsibleSection title="高级属性" defaultCollapsed={true} forceExpand={hasAdvanced}>
         {isForm && (
@@ -139,7 +157,12 @@ export function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer
         )}
 
         <FieldItem label="是否隐藏">
-          <w.ExpressionInput value={hiddenValue as string | undefined} onChange={handleHiddenChange} placeholder="如：form.type !== 'admin'" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
+          <w.ExpressionInput
+            value={hiddenValue as string | undefined}
+            onChange={handleHiddenChange}
+            placeholder="如：form.type !== 'admin'"
+            style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties}
+          />
         </FieldItem>
       </CollapsibleSection>
 

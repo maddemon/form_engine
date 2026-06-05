@@ -43,6 +43,7 @@ import { Card } from './components/Card'
 import { Alert } from './components/Alert'
 import { Segment } from './components/Segment'
 import { designerWidgets } from './widgets'
+import { AntdBridgeProvider } from './themeBridge'
 
 // 组件导出
 export { Button } from './components/Button'
@@ -145,6 +146,7 @@ export const antdAdapter: FormEngineAdapter = {
 
   default: DefaultField,
   designerWidgets,
+  bridgeProvider: AntdBridgeProvider,
 }
 
 export default antdAdapter

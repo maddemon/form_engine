@@ -343,12 +343,12 @@ Palette 图标渲染处通过 `adapter.iconMap[registry[type].icon]` 获取图�
 - **现状**：已从 `./hooks/useFormRender` 导入 `useFormRender`（111 行），内部使用 `useFormValues`、`useFormValidation`、`useDataSource`、`useVisibility` 等子 hook。`FormRender` 主组件仅负责组装 Context Provider + 递归渲染。
 - **方案**：已完成。
 
-### 6.4 Adapter 主题自动映射 ⬜
+### 6.4 Adapter 主题自动映射 ✅
 
 - **问题**：当前消费者需要手动包裹 `StyleProvider` + `AntdBridgeProvider` 才能让主题生效，违反了"Adapter 接管一切"原则。
 
   ```tsx
-  // ❌ 当前：三层包裹
+  // ❌ 之前：三层包裹
   <StyleProvider themeMode={themeMode}>
     <ConfigProvider theme={{ algorithm }}>
       <AntdBridgeProvider>
@@ -361,18 +361,26 @@ Palette 图标渲染处通过 `adapter.iconMap[registry[type].icon]` 获取图�
 - **目标**：消费者只需调用 `Designer` 或 `FormRender`，零额外包裹。
 
   ```tsx
-  // ✅ 目标
-  <Designer adapter={antdAdapter} />
-  // <FormRender adapter={antdAdapter} />
+  // ✅ 现在
+  <ConfigProvider theme={{ algorithm }}>
+    <Designer adapter={antdAdapter} />
+  </ConfigProvider>
   ```
 
 - **方案**：
-  - 将 `StyleProvider` 和 `BridgeProvider` 的逻辑**合入 adapter 内部初始化**，`Designer`/`FormRender` 入口处自动执行。
-  - **adapter-antd**：内部通过 `theme.useToken()` 读取 antd Token，同步到 `var(--fe-*)`。
-  - **adapter-antd-mobile**：内部读取 `--adm-*` CSS 变量，同步到 `var(--fe-*)`；也可选择与 antd 走同一路径。
-  - 对外不再导出 `AntdBridgeProvider`、`AntdMobileBridgeProvider`、`StyleProvider`（或保留但标记为 deprecated）。
-  - 消费者仍可自行使用 `ConfigProvider` 配置 antd 主题，适配器自动跟随。
-- **验证**：example 中移除所有 Provider 包裹后，`Designer`/`FormRender` 的主题、图标、样式均正常工作。
+  - `FormEngineAdapter` 接口新增 `bridgeProvider?: React.ComponentType<BridgeProviderProps>` 字段，adapter 可选声明自己的主题桥接 Provider。
+  - `Designer` / `FormRender` 内部自动包裹 `StyleProvider` + adapter 的 `bridgeProvider`：
+    - 若消费者已在外层包裹 `StyleProvider`（通过 `useHasStyleProvider` 检测），则内部不再重复包裹。
+    - `Designer` 的 `bridgeProvider` 在 `DesignerInner` 内部根据当前 scene 动态选择（双 adapter 场景下切换到 mobile 时自动使用 `mobileAdapter.bridgeProvider`）。
+    - `FormRender` 的 `bridgeProvider` 根据 `scene` 解析的 adapter 选择。
+  - `Designer` / `FormRender` 新增 `themeMode` / `sizeMode` / `theme` props，透传给 `StyleProvider`。
+  - `adapter-antd` 声明 `bridgeProvider: AntdBridgeProvider`。
+  - `adapter-antd-mobile` 声明 `bridgeProvider: AntdMobileBridgeProvider`。
+  - `AntdBridgeProvider` / `AntdMobileBridgeProvider` 仍保留导出（向后兼容），但消费者不再需要手动使用。
+  - `StyleProvider` 保留导出（消费者仍可手动包裹以控制主题，如暗色/紧凑模式）。
+- **验证**：
+  - example 更新为只包 `ConfigProvider`，移除 `StyleProvider` 和 `AntdBridgeProvider`。
+  - 编译通过，测试通过。
 
 ---
 
@@ -422,7 +430,7 @@ Palette 图标渲染处通过 `adapter.iconMap[registry[type].icon]` 获取图�
 | 三（Context 拆分） | 3.1（DesignerContext 拆分）、3.3（NestedFieldRenderer）、3.4（eventContext）、3.5（filter 缓存） | — | 3.2（memo 🟡 部分完成，FieldRenderer/CanvasToolbar 已加，PropertyPanelInner 等后续补） |
 | 四（职责拆分） | 4.3（表达式独立 hook）、4.4（容器注册表）、4.5（reducer 拆分） | — | 4.1（PropertyPanel 🟡 主文件已拆至 126 行，6 个文件抽出，componentProps 防抖模式保留）、4.2（Designer 🟡 主文件已拆至 148 行，Dnd/useDesignerSync 抽出） |
 | 五（去重清理） | 5.1（ToolbarButton）、5.3（useAdaptiveAdapter） | — | 5.2（collectFieldNames 🔽 低优先级） |
-| 六（耦合解耦） | 6.2（Context Provider 提升）、6.3（FormRender 状态提取） | 6.4（Adapter 主题自动映射 — 当前 Provider 方案是过渡，需改为 adapter 内部自动注入，消除消费者手动包裹） | 6.1（Designer-Renderer 解耦 🔽 低优先级） |
+| 六（耦合解耦） | 6.2（Context Provider 提升）、6.3（FormRender 状态提取）、6.4（Adapter 主题自动映射 — Designer/FormRender 内部自动包裹 StyleProvider + bridgeProvider） | — | 6.1（Designer-Renderer 解耦 🔽 低优先级） |
 | 七（any 清理） | 7.1、7.2 大部分已清理（Table/Tabs/Collapse/DatePicker/InputNumber/Button/Flex/Select/ButtonGroup 等），剩余 antd API 边界 as any 已标注 | — | — |
 
 ---

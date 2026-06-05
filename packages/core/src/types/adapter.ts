@@ -11,6 +11,7 @@
 
 import * as React from 'react'
 import type { FormFieldSchema, FormRule, OptionItem } from './schema'
+import type { BridgeProviderProps } from '../styles/themeBridge'
 
 // ============================
 // 字段渲染相关类型
@@ -116,6 +117,24 @@ export interface FormEngineAdapter {
 
   /** 设计器属性面板小组件 */
   designerWidgets?: DesignerWidgets
+
+  /**
+   * 主题桥接 Provider
+   *
+   * adapter 可选提供，用于将宿主 UI 库的主题 Token 同步到 Form Engine 的 --fe-* CSS 变量。
+   * Designer / FormRender 会在内部自动包裹此 Provider，消费者无需手动处理。
+   *
+   * @example
+   * ```ts
+   * // adapter-antd 内部
+   * import { AntdBridgeProvider } from './themeBridge'
+   * export const antdAdapter: FormEngineAdapter = {
+   *   bridgeProvider: AntdBridgeProvider,
+   *   // ...
+   * }
+   * ```
+   */
+  bridgeProvider?: React.ComponentType<BridgeProviderProps>
 }
 
 // ============================

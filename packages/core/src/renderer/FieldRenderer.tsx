@@ -61,8 +61,9 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
       display: 'block',
       marginBottom: 'var(--fe-spacing-xs, 4px)',
       fontWeight: isRequired ? 'var(--fe-font-weight-semibold, 600)' : 'var(--fe-font-weight-regular, 400)',
+      color: token('textPrimary') as string,
     }),
-    [isRequired],
+    [isRequired, token],
   )
   const label = !showLabel ? null : (
     <label className="fe-field-label" style={labelStyle}>

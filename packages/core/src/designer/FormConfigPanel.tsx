@@ -88,8 +88,22 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
   )
 
   const renderColSection = (title: string, labelColSpan: number, wrapperColSpan: number, onColChange: (key: 'labelCol' | 'wrapperCol', v: string | undefined) => void) => (
-    <div style={{ marginTop: token('spacingMd'), paddingTop: token('spacingSm') }}>
-      <div style={{ fontSize: token('fontSizeSm'), fontWeight: 500, marginBottom: token('spacingSm'), color: 'var(--fe-text-secondary)' }}>{title}</div>
+    <div
+      style={{
+        marginTop: token('spacingMd'),
+        paddingTop: token('spacingSm'),
+      }}
+    >
+      <div
+        style={{
+          fontSize: token('fontSizeSm'),
+          fontWeight: 500,
+          marginBottom: token('spacingSm'),
+          color: token('textSecondary') as string,
+        }}
+      >
+        {title}
+      </div>
       <FieldItem label="标签宽度">
         <w.Select value={String(labelColSpan)} onChange={(v) => onColChange('labelCol', v)} options={COL_SPAN_OPTIONS} />
       </FieldItem>
@@ -101,7 +115,15 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
 
   return (
     <>
-      <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd') }}>表单配置</h4>
+      <h4
+        style={{
+          margin: `0 0 ${token('spacingMd')} 0`,
+          fontSize: token('fontSizeMd'),
+          color: token('textSecondary') as string,
+        }}
+      >
+        表单配置
+      </h4>
 
       <FieldItem label="显示冒号">
         <w.Switch checked={!!formConfig.colon} onChange={(v: boolean) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { colon: v } })} />
@@ -111,15 +133,37 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
         <w.Select value={formConfig.labelAlign || 'right'} onChange={(v) => dispatch({ type: 'UPDATE_FORM_CONFIG', patch: { labelAlign: v as 'left' | 'right' } })} options={LABEL_ALIGN_OPTIONS} />
       </FieldItem>
 
-      <div style={{ width: '100%', background: 'var(--fe-border-primary)', margin: `${token('spacingMd')} 0` }} />
+      <div
+        style={{
+          width: '100%',
+          background: 'var(--fe-border-primary)',
+          margin: `${token('spacingMd')} 0`,
+        }}
+      />
 
-      <h4 style={{ margin: `${token('spacingMd')} 0 ${token('spacingSm')} 0`, fontSize: token('fontSizeSm'), color: 'var(--fe-text-secondary)' }}>桌面端配置</h4>
+      <h4
+        style={{
+          margin: `${token('spacingMd')} 0 ${token('spacingSm')} 0`,
+          fontSize: token('fontSizeSm'),
+          color: token('textTertiary') as string,
+        }}
+      >
+        桌面端配置
+      </h4>
       {renderPageBgField('desktop', desktopPageBg)}
       {renderColSection('控件宽度', desktopLabelColSpan, desktopWrapperColSpan, handleDesktopColChange)}
 
       <div style={{ width: '100%', background: 'var(--fe-border-primary)', margin: `${token('spacingMd')} 0` }} />
 
-      <h4 style={{ margin: `${token('spacingMd')} 0 ${token('spacingSm')} 0`, fontSize: token('fontSizeSm'), color: 'var(--fe-text-secondary)' }}>移动端配置</h4>
+      <h4
+        style={{
+          margin: `${token('spacingMd')} 0 ${token('spacingSm')} 0`,
+          fontSize: token('fontSizeSm'),
+          color: token('textTertiary') as string,
+        }}
+      >
+        移动端配置
+      </h4>
       {renderPageBgField('mobile', mobilePageBg)}
       {renderColSection('控件宽度', mobileLabelColSpan, mobileWrapperColSpan, handleMobileColChange)}
     </>

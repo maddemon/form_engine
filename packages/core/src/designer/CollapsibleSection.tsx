@@ -31,7 +31,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           borderBottom: '1px solid var(--fe-border-light)',
           fontSize: token('fontSizeSm'),
           fontWeight: 500,
-          color: 'var(--fe-text-secondary)',
+          color: token('textSecondary') as string,
         }}
       >
         <span>{title}</span>
@@ -39,7 +39,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           <span
             style={{
               fontSize: token('widgetInputFontSizeXxs'),
-              color: 'var(--fe-text-muted)',
+              color: token('textTertiary') as string,
               transition: 'transform 0.2s',
               transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
             }}
