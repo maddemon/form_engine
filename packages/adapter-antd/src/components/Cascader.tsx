@@ -10,7 +10,7 @@ export const Cascader: React.FC<CascaderProps> = ({
   onChange,
   options = [],
   placeholder,
-  allowClear = true,
+  allowClear,
   showSearch = false,
   expandTrigger = 'click',
   style,

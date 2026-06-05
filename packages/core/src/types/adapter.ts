@@ -285,6 +285,13 @@ export interface DesignerWidgets {
     disabled?: boolean
     style?: React.CSSProperties
   }>
+  /** 树形数据编辑器（用于 cascader/tree-select 等） */
+  TreeDataEditor: React.ComponentType<{
+    value?: OptionItem[]
+    onChange?: (v: OptionItem[]) => void
+    disabled?: boolean
+    style?: React.CSSProperties
+  }>
   /** 按钮组（用于少量选项的平铺选择，替代 Select） */
   ButtonGroup: React.ComponentType<{
     value?: string
@@ -301,6 +308,15 @@ export interface DesignerWidgets {
     disabled?: boolean
     /** 已存在的字段名称列表，弹窗中点击可插入光标位置 */
     fieldNames?: string[]
+    style?: React.CSSProperties
+  }>
+  /** 颜色选择器 */
+  ColorPicker: React.ComponentType<{
+    value?: string
+    onChange?: (v: string) => void
+    placeholder?: string
+    disabled?: boolean
+    allowClear?: boolean
     style?: React.CSSProperties
   }>
 }

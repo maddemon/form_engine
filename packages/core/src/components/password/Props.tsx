@@ -4,6 +4,9 @@ import type { PropsRenderProps } from '../../propRenders/types'
 export default function PasswordPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
+      <FieldItem label="允许清除">
+        <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
+      </FieldItem>
       <FieldItem label="占位文本">
         <w.Input value={(values.placeholder as string) ?? ''} onChange={(v) => onChange('placeholder', v)} placeholder="请输入密码" />
       </FieldItem>

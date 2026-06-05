@@ -9,6 +9,9 @@ const MODE_OPTIONS = [
 export default function SelectPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
+      <FieldItem label="允许清除">
+        <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
+      </FieldItem>
       <FieldItem label="选项" variant="group">
         <w.OptionsEditor value={values.options as { label: string; value: string }[]} onChange={(v) => onChange('options', v)} />
       </FieldItem>

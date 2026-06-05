@@ -10,7 +10,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = ({
   onChange,
   options = [],
   placeholder,
-  allowClear = true,
+  allowClear,
   multiple = false,
   treeCheckable = false,
   showSearch = false,

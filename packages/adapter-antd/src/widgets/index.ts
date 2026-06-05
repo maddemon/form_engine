@@ -7,6 +7,7 @@
 
 export { ButtonGroup } from './ButtonGroup'
 export { Checkbox } from './Checkbox'
+export { ColorPicker } from './ColorPicker'
 export { Input } from './Input'
 export { NumberInput } from './NumberInput'
 export { Select } from './Select'
@@ -15,6 +16,7 @@ export { Switch } from './Switch'
 import type { DesignerWidgets } from '@form-engine/core/types/adapter'
 import { ButtonGroup } from './ButtonGroup'
 import { Checkbox } from './Checkbox'
+import { ColorPicker } from './ColorPicker'
 import { Input } from './Input'
 import { NumberInput } from './NumberInput'
 import { Select } from './Select'
@@ -30,4 +32,5 @@ export const designerWidgets: DesignerWidgets = {
   Switch,
   NumberInput,
   ButtonGroup,
+  ColorPicker,
 }

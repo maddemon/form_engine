@@ -3,6 +3,9 @@ import { FieldItem, PropsRenderProps } from '../../propRenders'
 export default function InputPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
+      <FieldItem label="允许清除">
+        <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
+      </FieldItem>
       <FieldItem label="最大长度">
         <w.NumberInput value={(values.maxLength as number) ?? 0} onChange={(v) => onChange('maxLength', v)} min={0} />
       </FieldItem>

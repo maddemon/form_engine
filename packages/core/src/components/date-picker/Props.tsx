@@ -21,6 +21,9 @@ const PICKER_OPTIONS = [
 export default function DatePickerPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
+      <FieldItem label="允许清除">
+        <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
+      </FieldItem>
       <FieldItem label="格式">
         <w.Input value={(values.format as string) ?? 'YYYY-MM-DD'} onChange={(v) => onChange('format', v)} />
       </FieldItem>

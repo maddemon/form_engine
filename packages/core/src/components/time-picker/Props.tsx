@@ -4,6 +4,9 @@ import type { PropsRenderProps } from '../../propRenders/types'
 export default function TimePickerPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
+      <FieldItem label="允许清除">
+        <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
+      </FieldItem>
       <FieldItem label="格式">
         <w.Input value={(values.format as string) ?? 'HH:mm'} onChange={(v) => onChange('format', v)} placeholder="如：HH:mm" />
       </FieldItem>

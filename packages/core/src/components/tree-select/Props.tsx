@@ -4,6 +4,12 @@ import type { PropsRenderProps } from '../../propRenders/types'
 export default function TreeSelectPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   return (
     <>
+      <FieldItem label="选项数据" variant="group">
+        <w.TreeDataEditor
+          value={values.options as { label: string; value: string; children?: unknown }[]}
+          onChange={(v) => onChange('options', v)}
+        />
+      </FieldItem>
       <FieldItem label="占位文本">
         <w.Input value={(values.placeholder as string) ?? ''} onChange={(v) => onChange('placeholder', v)} placeholder="请选择" />
       </FieldItem>

@@ -79,19 +79,7 @@ export const FormConfigPanel: React.FC<FormConfigPanelProps> = ({ formConfig, di
 
   const renderPageBgField = (scene: 'desktop' | 'mobile', bgValue: string) => (
     <FieldItem label={`页面背景色`}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
-        <div
-          style={{
-            width: token('spacingXl'),
-            height: token('spacingXl'),
-            borderRadius: 'var(--fe-border-radius-sm)',
-            border: '1px solid var(--fe-border)',
-            background: bgValue || 'var(--fe-bg-primary)',
-            flexShrink: 0,
-          }}
-        />
-        <w.Input value={bgValue} onChange={(v) => handlePageBgChange(scene, v)} placeholder={'var(--fe-bg-primary)'} />
-      </div>
+      <w.ColorPicker value={bgValue} onChange={(v) => handlePageBgChange(scene, v)} placeholder={'var(--fe-bg-primary)'} allowClear />
     </FieldItem>
   )
 

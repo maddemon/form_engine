@@ -8,7 +8,7 @@ export default function TextPropsRender({ widgets: w, values, onChange }: PropsR
         <w.TextArea value={(values.content as string) ?? ''} onChange={(v) => onChange('content', v)} placeholder="输入文本内容" />
       </FieldItem>
       <FieldItem label="类型">
-        <w.ButtonGroup
+        <w.Select
           value={(values.type as string) ?? ''}
           onChange={(v) => onChange('type', v || undefined)}
           options={[
