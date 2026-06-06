@@ -11,9 +11,11 @@ import React from 'react'
 export const AntdMobileFormWrapper: React.FC<FormWrapperProps> = ({
   formConfig, scene, onSubmit, children, className, style,
 }) => {
+  const mobileLayout = formConfig.mobile.layout === 'horizontal' ? 'horizontal' : 'vertical'
+
   return (
     <Form
-      layout={formConfig.layout === 'inline' ? 'horizontal' : formConfig.layout}
+      layout={mobileLayout}
       footer={null}
       onFinish={() => onSubmit?.()}
       className={className}

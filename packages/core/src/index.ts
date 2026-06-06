@@ -84,8 +84,8 @@ export type {
   CollapsePanelConfig,
   TabsProps,
   TabPaneConfig,
-  TableProps,
-  TableColumnConfig,
+  SubFormProps,
+  SubFormColumnConfig,
   CascaderProps,
   TreeSelectProps,
   CardProps,
@@ -211,6 +211,8 @@ export {
   useVisibility,
   useFormValues,
   useFormValidation,
+  InsideContainerContext,
+  useInsideContainer,
 } from './renderer'
 
 // ============================

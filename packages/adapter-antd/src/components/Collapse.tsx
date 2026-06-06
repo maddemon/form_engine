@@ -43,16 +43,17 @@ export const Collapse: React.FC<CollapseProps> = ({
       ghost={ghost}
       style={style}
       className={className}
-      id={id}
       {...rest}
     >
       {panelConfigs.map((panel, idx) => {
-        const panelChildren = childrenArray.filter((child: React.ReactNode) =>
-          (child as React.ReactElement)?.props?.field?.regionKey === panel.key ||
-          Number((child as React.ReactElement)?.props?.field?.columnIndex ?? -1) === idx
-        )
+        const panelChildren = childrenArray.filter((child) => {
+          const el = child as React.ReactElement<Record<string, unknown>>
+          const props = el.props ?? {}
+          const field = props.field as Record<string, unknown> | undefined
+          return field?.regionKey === panel.key || Number(field?.columnIndex ?? -1) === idx
+        })
         return (
-          <AntPanel key={panel.key} header={panel.header} disabled={panel.disabled}>
+          <AntPanel key={panel.key} header={panel.header}>
             {panelChildren}
           </AntPanel>
         )

@@ -1,12 +1,16 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import React from 'react'
-import { FieldRenderer } from '../renderer/FieldRenderer'
+import { FieldRenderer, DefaultFormItem } from '../renderer/FieldRenderer'
 import { isContainerComponent } from '../types/component-category'
+import type { FormItemProps } from '../types/adapter'
 import type { FormFieldSchema } from '../types/schema'
 import { ContainerPreview } from './ContainerPreview'
 import { FieldItem } from './FieldItem'
 import { useDesignerConfig, useDesignerSelection } from './DesignerContext'
+
+/** 这些容器的 ContainerContent 内部已自行调用 FieldRenderer，外层无需重复包 label */
+const SELF_RENDERED = new Set(['card', 'collapse', 'tabs'])
 
 interface NestedFieldProps {
   field: FormFieldSchema
@@ -31,6 +35,15 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
     <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
   )
 
+  const needsLabel = isContainer && !SELF_RENDERED.has(field.type)
+  const containerLabelProps: FormItemProps = {
+    label: field.label,
+    labelHidden: field.labelHidden,
+    formConfig,
+    scene: adapter.scene,
+    children: content,
+  }
+
   return (
     <FieldItem
       field={field}
@@ -45,7 +58,7 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
         opacity: isDragging ? 0 : 1,
       }}
     >
-      {content}
+      {needsLabel ? React.createElement(adapter.FormItem ?? DefaultFormItem, containerLabelProps) : content}
     </FieldItem>
   )
 })

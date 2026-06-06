@@ -10,7 +10,9 @@ export interface CollapsePanelConfig {
 
 export interface CollapseProps extends BaseLayoutComponentProps {
   panels: CollapsePanelConfig[]
+  activeKey?: string | string[]
   defaultActiveKey?: string | string[]
+  onChange?: (key: string | string[]) => void
   accordion?: boolean
   ghost?: boolean
 }

@@ -304,9 +304,9 @@ export const componentRegistry = {
     },
     eventDeclarations: [],
   },
-  table: {
+  'sub-form': {
     label: '子表单',
-    category: 'container',
+    category: 'form',
     icon: 'Table',
     defaultProps: {
       componentProps: {

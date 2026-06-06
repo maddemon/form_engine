@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import type { FormFieldSchema, FormSchema } from '../../../types/schema'
 import { useVisibility } from '../useVisibility'
-import type { FormSchema, FormFieldSchema } from '../../../types/schema'
 
 const createField = (overrides: Partial<FormFieldSchema>): FormFieldSchema => ({
   id: `field_${Math.random().toString(36).slice(2, 8)}`,
@@ -12,7 +13,19 @@ const createField = (overrides: Partial<FormFieldSchema>): FormFieldSchema => ({
 })
 
 const createSchema = (fields: FormFieldSchema[]): FormSchema => ({
-  form: { colon: false, labelAlign: 'right', scenes: { desktop: { labelCol: { span: 6 }, wrapperCol: { span: 18 } }, mobile: { labelCol: { span: 24 }, wrapperCol: { span: 24 } } } },
+  form: {
+    colon: false,
+    size: 'middle',
+    desktop: {
+      layout: 'horizontal',
+      labelAlign: 'right',
+      labelCol: { span: 6 },
+      wrapperCol: { span: 18 },
+    },
+    mobile: {
+      layout: 'vertical',
+    },
+  },
   fields,
 })
 
@@ -59,10 +72,9 @@ describe('useVisibility', () => {
 
   it('formValues 变化时重新计算', () => {
     const schema = createSchema([createField({ name: 'a', visibleIfExpr: 'show === true' })])
-    const { result, rerender } = renderHook(
-      (values: Record<string, unknown>) => useVisibility(schema, values),
-      { initialProps: { show: false } },
-    )
+    const { result, rerender } = renderHook((values: Record<string, unknown>) => useVisibility(schema, values), {
+      initialProps: { show: false },
+    })
     expect(result.current.visibleFields).toHaveLength(0)
 
     rerender({ show: true })

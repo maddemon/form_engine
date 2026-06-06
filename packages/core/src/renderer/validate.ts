@@ -106,15 +106,27 @@ function checkRule(value: unknown, rule: FormRule): string | null {
  *
  * 返回 { valid, errors }，valid=true 表示全部通过
  */
+function collectFields(nodes: FormFieldSchema[]): FormFieldSchema[] {
+  const result: FormFieldSchema[] = []
+  for (const node of nodes) {
+    result.push(node)
+    if (node.children.length) {
+      result.push(...collectFields(node.children))
+    }
+  }
+  return result
+}
+
 export function validateForm(
   fields: FormFieldSchema[],
   formValues: Record<string, unknown>,
   name?: string,
 ): ValidateResult {
   const errors: Record<string, string[]> = {}
+  const allFields = collectFields(fields)
   const targets = name
-    ? fields.filter(f => f.name === name)
-    : fields
+    ? allFields.filter(f => f.name === name)
+    : allFields
 
   for (const field of targets) {
     if (!field.rules || field.rules.length === 0) continue

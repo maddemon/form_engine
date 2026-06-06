@@ -1,6 +1,6 @@
-import React from 'react'
+import type { OptionItem, SelectProps } from '@form-engine/core'
 import { Select as AntdSelect } from 'antd'
-import type { SelectProps, OptionItem } from '@form-engine/core'
+import React from 'react'
 
 /**
  * Antd Select 组件
@@ -25,32 +25,28 @@ export const Select: React.FC<SelectProps> = ({
   id,
   ...rest
 }) => {
-  const handleChange = (val: string | string[]) => {
+  const handleChange = (val?: string | string[] | null) => {
     onChange?.(val)
   }
-  
-  const selectProps = {
-    value: value as any || undefined,
-    onChange: handleChange,
-    placeholder,
-    disabled,
-    mode: mode === 'multiple' ? 'multiple' : mode === 'tags' ? 'tags' : undefined,
-    showSearch,
-    filterOption,
-    allowClear,
-    maxTagCount,
-    placement,
-    onSearch,
-    notFoundContent,
-    style: { width: '100%', ...style },
-    className,
-    id,
-    ...rest
-  }
-  
+
   return (
     <AntdSelect
-      {...selectProps}
+      value={value}
+      onChange={handleChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      mode={mode}
+      showSearch={showSearch}
+      filterOption={filterOption}
+      allowClear={allowClear}
+      maxTagCount={maxTagCount}
+      placement={placement}
+      onSearch={onSearch}
+      notFoundContent={notFoundContent}
+      style={{ width: '100%', ...style }}
+      className={className}
+      id={id}
+      {...rest}
     >
       {options.map((opt: OptionItem) => (
         <AntdSelect.Option key={String(opt.value)} value={String(opt.value)} disabled={opt.disabled}>

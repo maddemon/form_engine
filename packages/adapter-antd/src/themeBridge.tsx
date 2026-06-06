@@ -39,7 +39,7 @@ import React, { useLayoutEffect, useMemo } from 'react'
  * 部分 token（如 spacing、fontSize、borderRadius）antd 不直接提供，
  * 从 antd token 的派生 token 读取，缺失时用 defaultTheme 兜底
  */
-function buildMapped(antd: ReturnType<typeof useAntdToken>[0]): Record<string, string> {
+function buildMapped(antd: ReturnType<typeof antdTheme.useToken>['token']): Record<string, string> {
   const t = antd as unknown as Record<string, unknown>
 
   // 颜色类 token

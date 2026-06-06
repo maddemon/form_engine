@@ -12,7 +12,7 @@
  * ```
  */
 
-import type { FieldComponentProps, FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
+import type { DesignerWidgets, FieldComponentProps, FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
 
 // 静态导入所有组件
 import { Alert } from './components/Alert'
@@ -36,7 +36,7 @@ import { Segment } from './components/Segment'
 import { Select } from './components/Select'
 import { Slider } from './components/Slider'
 import { Switch as SwitchField } from './components/Switch'
-import { Table } from './components/Table'
+import { SubForm } from './components/SubForm'
 import { Tabs } from './components/Tabs'
 import { Text } from './components/Text'
 import { TextArea } from './components/TextArea'
@@ -66,7 +66,7 @@ export { Segment } from './components/Segment'
 export { Select } from './components/Select'
 export { Slider } from './components/Slider'
 export { Switch } from './components/Switch'
-export { Table } from './components/Table'
+export { SubForm } from './components/SubForm'
 export { TabPane, Tabs } from './components/Tabs'
 export { Text } from './components/Text'
 export { TextArea } from './components/TextArea'
@@ -137,7 +137,7 @@ export const antdAdapter: FormEngineAdapter = {
     flex: Flex,
     collapse: Collapse,
     tabs: Tabs,
-    table: Table,
+    'sub-form': SubForm,
     card: Card,
     // 展示组件
     text: Text,
@@ -147,10 +147,10 @@ export const antdAdapter: FormEngineAdapter = {
     alert: Alert,
     segment: Segment,
     button: Button,
-  },
+  } as unknown as Record<string, FieldRendererFn>,
 
   default: DefaultField,
-  designerWidgets,
+  designerWidgets: designerWidgets as DesignerWidgets,
   bridgeProvider: AntdBridgeProvider,
   FormWrapper: AntdFormWrapper,
   FormItem: AntdFormItem,

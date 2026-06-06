@@ -134,12 +134,15 @@ function App() {
   version: '0.1',
   name: '我的表单',
   form: {
-    layout: 'vertical',     // horizontal | vertical | inline
     size: 'middle',         // small | middle | large
-    labelAlign: 'right',
-    scenes: {
-      desktop: { labelCol: { span: 5 }, wrapperCol: { span: 15 } },
-      mobile:  { labelCol: { span: 24 }, wrapperCol: { span: 24 } },
+    desktop: {
+      layout: 'horizontal', // horizontal | vertical | inline
+      labelAlign: 'right',
+      labelCol: { span: 5 },
+      wrapperCol: { span: 15 },
+    },
+    mobile: {
+      layout: 'vertical',   // horizontal | vertical
     },
   },
   fields: [

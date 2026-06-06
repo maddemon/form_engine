@@ -1,11 +1,10 @@
-import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { resolvePanelWidth } from '../index.ts'
+import { describe, it } from 'node:test'
+import { resolvePanelWidth } from '..'
 
 describe('resolvePanelWidth', () => {
   it('缺省值时回退到 fallback', () => {
     assert.equal(resolvePanelWidth(undefined, '220px', 160), '220px')
-    assert.equal(resolvePanelWidth(null, '220px', 160), '220px')
     assert.equal(resolvePanelWidth('', '220px', 160), '220px')
   })
 

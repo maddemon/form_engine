@@ -4,9 +4,9 @@
  * 使用 Ant Design 的 Divider 组件
  */
 
-import React from 'react'
-import { Divider as AntDivider } from 'antd'
 import type { DividerProps } from '@form-engine/core'
+import { Divider as AntDivider } from 'antd'
+import React from 'react'
 
 /**
  * Divider 组件
@@ -14,7 +14,7 @@ import type { DividerProps } from '@form-engine/core'
 export const Divider: React.FC<DividerProps> = ({
   children,
   type = 'horizontal',
-  orientation = 'center',
+  textPlacement = 'center',
   plain = false,
   color,
   thickness,
@@ -30,12 +30,11 @@ export const Divider: React.FC<DividerProps> = ({
   }
   return (
     <AntDivider
-      type={type}
-      orientation={orientation}
+      orientation={type}
+      titlePlacement={textPlacement}
       plain={plain}
       style={mergedStyle}
       className={className}
-      id={id}
       {...rest}
     >
       {children}

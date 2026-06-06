@@ -11,7 +11,7 @@ export interface SliderProps extends BaseFormComponentProps<number | [number, nu
   dots?: boolean
   included?: boolean
   range?: boolean
-  tooltip?: { formatter?: (value: number) => React.ReactNode }
+  tooltip?: { formatter?: (value?: number) => React.ReactNode | null }
   vertical?: boolean
 }
 

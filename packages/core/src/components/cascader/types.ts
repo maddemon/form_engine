@@ -1,11 +1,11 @@
 import type { OptionItem } from '../../types/schema'
 import type { EventDeclaration } from '../../types/events'
+import type { BaseFormComponentProps } from '../../types/base-props'
 
-export interface CascaderProps {
+export interface CascaderProps extends BaseFormComponentProps<string[]> {
   value?: string[]
   onChange?: (value: string[]) => void
   options?: OptionItem[]
-  placeholder?: string
   allowClear?: boolean
   showSearch?: boolean
   expandTrigger?: 'click' | 'hover'

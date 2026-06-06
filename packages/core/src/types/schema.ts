@@ -3,8 +3,8 @@
  * 对应 schema-spec.md 规范 v0.1
  */
 
-import type { FormFieldEvents } from './events'
 import type { componentRegistry } from '../components'
+import type { FormFieldEvents } from './events'
 
 // ============================
 // 数据源
@@ -104,10 +104,7 @@ export interface FieldMock {
 // ============================
 
 /** 字段类型（内置类型从 componentRegistry 派生，支持 custom / custom:xxx 扩展） */
-export type FieldType =
-  | keyof typeof componentRegistry
-  | 'custom'
-  | `custom:${string}`
+export type FieldType = keyof typeof componentRegistry | 'custom' | `custom:${string}`
 
 export interface FormFieldSchema {
   id: string
@@ -122,6 +119,8 @@ export interface FormFieldSchema {
   hidden?: boolean | string
   disabled?: boolean | string
   readOnly?: boolean
+  /** 是否隐藏标签 */
+  labelHidden?: boolean
   colSpan?: number
   order?: number
   newline?: boolean
@@ -150,22 +149,22 @@ export interface FormFieldSchema {
 // ============================
 
 export interface FormConfig {
-  layout: 'horizontal' | 'vertical' | 'inline'
   colon: boolean
   size: 'small' | 'middle' | 'large'
-  labelAlign: 'left' | 'right'
   disabled?: boolean
   autoComplete?: string
-  variant?: 'outlined' | 'borderless' | 'filled' | 'underlined'
   requiredMark?: boolean | 'optional'
-  /** 页面背景色（desktop/mobile 分别配置） */
-  pageBackground?: {
-    desktop?: string
-    mobile?: string
+  desktop: {
+    layout: 'horizontal' | 'vertical' | 'inline'
+    labelAlign: 'left' | 'right'
+    labelCol: { span: number }
+    wrapperCol: { span: number }
+    variant?: 'outlined' | 'borderless' | 'filled' | 'underlined'
+    pageBackground?: string
   }
-  scenes: {
-    desktop: { labelCol: { span: number }; wrapperCol: { span: number } }
-    mobile: { labelCol: { span: number }; wrapperCol: { span: number } }
+  mobile: {
+    layout: 'horizontal' | 'vertical'
+    pageBackground?: string
   }
 }
 

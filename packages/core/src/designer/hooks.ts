@@ -55,7 +55,7 @@ export function useFormDesigner(form: FormSchema) {
     /** 字段列表 */
     fields: state.schema.fields,
     /** 表单配置 */
-    formConfig: state.schema.form || { layout: 'vertical', size: 'middle' },
+    formConfig: state.schema.form || { size: 'middle', desktop: { layout: 'horizontal', labelAlign: 'right', labelCol: { span: 6 }, wrapperCol: { span: 18 } }, mobile: { layout: 'vertical' } },
     // 操作方法
     selectField,
     addField,

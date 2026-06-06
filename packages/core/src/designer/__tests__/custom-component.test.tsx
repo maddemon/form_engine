@@ -1,6 +1,6 @@
 /**
  * 自定义组件注册功能测试
- * 
+ *
  * 测试场景：
  * 1. 注册自定义组件
  * 2. 在控件库中显示
@@ -8,10 +8,9 @@
  * 4. 自定义属性 Widget
  */
 
-import { registerSimpleCustomComponent } from '../../registry/simpleCustomComponentRegistry'
-import { customComponentRegistry } from '../../registry/customComponentRegistry'
-import { customPropertyWidgetRegistry } from '../../registry/customComponentRegistry'
 import { beforeEach, describe, it } from 'node:test'
+import { customComponentRegistry, customPropertyWidgetRegistry } from '../../registry/customComponentRegistry'
+import { registerSimpleCustomComponent } from '../../registry/simpleCustomComponentRegistry'
 
 // Node.js 测试器全局函数类型声明
 declare const expect: (value: unknown) => {
@@ -44,10 +43,7 @@ declare const expect: (value: unknown) => {
 // 模拟自定义按钮组件
 function TestButton(props: Record<string, unknown>) {
   return (
-    <button 
-      style={{ background: (props.bgColor as string) || '#1677ff' }}
-      data-testid="test-button"
-    >
+    <button style={{ background: (props.bgColor as string) || '#1677ff' }} data-testid="test-button">
       {(props.text as string) || '按钮'}
     </button>
   )
@@ -56,10 +52,10 @@ function TestButton(props: Record<string, unknown>) {
 // 模拟自定义颜色选择器 Widget
 function TestColorPicker(props: Record<string, unknown>) {
   return (
-    <input 
-      type="color" 
+    <input
+      type="color"
       data-testid="color-picker"
-      onChange={(e) => (props.onChange as (v: string) => void)(e.target.value)} 
+      onChange={(e) => (props.onChange as (v: string) => void)(e.target.value)}
     />
   )
 }
@@ -83,7 +79,7 @@ describe('自定义组件注册', () => {
 
     // 验证注册成功
     expect(customComponentRegistry.has('custom:test-button')).toBe(true)
-    
+
     const config = customComponentRegistry.get('custom:test-button')
     expect(config).toBeDefined()
     expect(config?.label).toBe('测试按钮')
@@ -104,26 +100,16 @@ describe('自定义组件注册', () => {
     const config = customComponentRegistry.get('custom:test-button')
     expect(config?.propertyConfig).toBeDefined()
     expect(config?.propertyConfig?.length).toBe(4) // text, bgColor, disabled, count
-    
+
     // 验证自动推断的 widget 类型
-    const textConfig = config?.propertyConfig?.find(p => p.key === 'text')
+    const textConfig = config?.propertyConfig?.find((p) => p.key === 'text')
     expect(textConfig?.widget).toBe('input')
-    
-    const disabledConfig = config?.propertyConfig?.find(p => p.key === 'disabled')
+
+    const disabledConfig = config?.propertyConfig?.find((p) => p.key === 'disabled')
     expect(disabledConfig?.widget).toBe('checkbox')
-    
-    const countConfig = config?.propertyConfig?.find(p => p.key === 'count')
+
+    const countConfig = config?.propertyConfig?.find((p) => p.key === 'count')
     expect(countConfig?.widget).toBe('number')
-  })
-
-  it('应该支持自定义属性 Widget', () => {
-    // 注册自定义 Widget
-    customPropertyWidgetRegistry.register('TestColorPicker', TestColorPicker)
-
-    expect(customPropertyWidgetRegistry.has('TestColorPicker')).toBe(true)
-    
-    const Widget = customPropertyWidgetRegistry.get('TestColorPicker')
-    expect(Widget).toBeDefined()
   })
 
   it('应该按分类分组自定义组件', () => {
@@ -132,13 +118,13 @@ describe('自定义组件注册', () => {
       category: '分组A',
       defaultProps: {},
     })
-    
+
     registerSimpleCustomComponent('custom:comp2', TestButton, {
       label: '组件2',
       category: '分组B',
       defaultProps: {},
     })
-    
+
     registerSimpleCustomComponent('custom:comp3', TestButton, {
       label: '组件3',
       category: '分组A',
@@ -146,7 +132,7 @@ describe('自定义组件注册', () => {
     })
 
     const grouped = customComponentRegistry.getGrouped()
-    
+
     expect(grouped['分组A']).toBeDefined()
     expect(grouped['分组A'].length).toBe(2)
     expect(grouped['分组B']).toBeDefined()

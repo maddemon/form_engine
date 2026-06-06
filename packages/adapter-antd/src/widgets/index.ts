@@ -25,7 +25,7 @@ import { Switch } from './Switch'
 /**
  * Antd 适配器的 PropertyPanel 小组件集合
  */
-export const designerWidgets: DesignerWidgets = {
+export const designerWidgets: Partial<DesignerWidgets> = {
   Input,
   Select,
   Checkbox,

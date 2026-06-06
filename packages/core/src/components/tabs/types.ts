@@ -10,7 +10,9 @@ export interface TabPaneConfig {
 
 export interface TabsProps extends BaseLayoutComponentProps {
   tabs: TabPaneConfig[]
+  activeKey?: string
   defaultActiveKey?: string
+  onChange?: (key: string) => void
   type?: 'line' | 'card' | 'editable-card'
   size?: 'small' | 'middle' | 'large'
   tabPosition?: 'top' | 'right' | 'bottom' | 'left'

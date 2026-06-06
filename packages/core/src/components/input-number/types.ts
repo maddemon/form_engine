@@ -9,8 +9,8 @@ export interface InputNumberProps extends BaseFormComponentProps<number | undefi
   step?: number
   precision?: number
   decimalSeparator?: string
-  formatter?: (value: number | string) => string
-  parser?: (displayValue: string) => number | string
+  formatter?: (value: number | string | undefined, info?: { userTyping: boolean; input: string }) => string
+  parser?: (displayValue: string | undefined) => number | string
   prefix?: React.ReactNode
   suffix?: React.ReactNode
   addonBefore?: React.ReactNode

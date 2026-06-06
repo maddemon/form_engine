@@ -34,7 +34,7 @@ import { SegmentField } from './components/Segment'
 import { SelectField } from './components/Select'
 import { SliderField } from './components/Slider'
 import { SwitchField } from './components/Switch'
-import { TableField } from './components/Table'
+import { SubFormField } from './components/SubForm'
 import { TabsField } from './components/Tabs'
 import { TextField } from './components/Text'
 import { TextAreaField } from './components/TextArea'
@@ -110,7 +110,7 @@ export const antdMobileAdapter: FormEngineAdapter = {
     flex: FlexField,
     collapse: CollapseField,
     tabs: TabsField,
-    table: TableField,
+    'sub-form': SubFormField,
     card: CardField,
     // 按钮组件
     button: ButtonField,

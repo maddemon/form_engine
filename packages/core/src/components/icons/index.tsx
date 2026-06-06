@@ -149,12 +149,22 @@ export const ImageIcon = createIcon(
 )
 
 export const Bold = createIcon(
-  <><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" /><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" /></>,
+  <><path d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z" /><path d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" /></>,
   '0 0 24 24'
 )
 
-// 新增图标：表格
-export const TableIcon = createIcon(
+export const EyeIcon = createIcon(
+  <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></>,
+  '0 0 24 24'
+)
+
+export const EyeOffIcon = createIcon(
+  <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" /><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" /><line x1="1" y1="1" x2="23" y2="23" /></>,
+  '0 0 24 24'
+)
+
+// 新增图标：子表单
+export const SubFormIcon = createIcon(
   <><path d="M3 3h18v18H3z" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="3" y1="15" x2="21" y2="15" /><line x1="9" y1="3" x2="9" y2="21" /><line x1="15" y1="3" x2="15" y2="21" /></>,
   '0 0 24 24'
 )
@@ -178,7 +188,7 @@ export const iconMap: Record<string, React.FC<IconProps>> = {
   Grid: GridIcon,
   Monitor,
   Smartphone,
-  Table: TableIcon,
+  Table: SubFormIcon,
   Layout,
   Columns,
   Square,

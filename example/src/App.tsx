@@ -9,7 +9,11 @@ const CustomCard: React.FC<any> = (props) => {
   const { value, onChange, fieldSchema, ...rest } = props
   return (
     <Card size="small" title={rest.label || '自定义卡片'}>
-      <Input value={value ?? ''} onChange={(e) => onChange?.(e.target.value)} placeholder={rest.placeholder || '请输入'} />
+      <Input
+        value={value ?? ''}
+        onChange={(e) => onChange?.(e.target.value)}
+        placeholder={rest.placeholder || '请输入'}
+      />
     </Card>
   )
 }
@@ -69,13 +73,16 @@ const App: React.FC = () => {
     name: '未命名表单',
     fields: [],
     form: {
-      layout: 'vertical' as const,
       size: 'middle' as const,
-      labelAlign: 'right' as const,
       colon: false,
-      scenes: {
-        desktop: { labelCol: { span: 5 }, wrapperCol: { span: 15 } },
-        mobile: { labelCol: { span: 24 }, wrapperCol: { span: 24 } },
+      desktop: {
+        layout: 'horizontal' as const,
+        labelAlign: 'right' as const,
+        labelCol: { span: 5 },
+        wrapperCol: { span: 15 },
+      },
+      mobile: {
+        layout: 'vertical' as const,
       },
     },
   })
@@ -97,7 +104,12 @@ const App: React.FC = () => {
               Form Engine
             </Typography.Title>
             {navItems.map((item) => (
-              <Button key={item.key} type={pageKey === item.key ? 'primary' : 'text'} size="small" onClick={() => setPageKey(item.key)}>
+              <Button
+                key={item.key}
+                type={pageKey === item.key ? 'primary' : 'text'}
+                size="small"
+                onClick={() => setPageKey(item.key)}
+              >
                 {item.label}
               </Button>
             ))}
@@ -109,7 +121,13 @@ const App: React.FC = () => {
             </a>
             <Space.Compact>
               {themeOptions.map((opt) => (
-                <Button size="small" key={opt.key} type={themeMode === opt.key ? 'primary' : 'default'} onClick={() => setThemeMode(opt.key)} title={opt.title}>
+                <Button
+                  size="small"
+                  key={opt.key}
+                  type={themeMode === opt.key ? 'primary' : 'default'}
+                  onClick={() => setThemeMode(opt.key)}
+                  title={opt.title}
+                >
                   {opt.label}
                 </Button>
               ))}

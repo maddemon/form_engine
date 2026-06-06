@@ -3,19 +3,15 @@ import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 export const GridField: FieldRendererFn = (props: FieldComponentProps) => {
   const { fieldSchema, children, style } = props
-  const colSpans = fieldSchema.componentProps?.colSpans ?? []
   const gap = fieldSchema.componentProps?.gap ?? 8
+  const childrenArray = React.Children.toArray(children)
 
+  // 移动端 Grid 无视列数，直接垂直平铺
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap, ...style }}>
-      {React.Children.map(children, (child, i) => {
-        const span = colSpans[i]?.span ?? Math.floor(24 / (colSpans.length || 1))
-        return (
-          <div key={i} style={{ flex: `0 0 ${(span / 24) * 100}%`, boxSizing: 'border-box' }}>
-            {child}
-          </div>
-        )
-      })}
+    <div style={{ width: '100%', ...style }}>
+      {childrenArray.map((child, i) => (
+        <div key={i} style={{ width: '100%', marginBottom: i < childrenArray.length - 1 ? gap : 0 }}>{child}</div>
+      ))}
     </div>
   )
 }

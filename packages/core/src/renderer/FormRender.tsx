@@ -12,6 +12,7 @@ import { pickAdapter } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import { useFormRender } from './hooks/useFormRender'
 import { FormConfigContext, useFormConfig } from './FormConfigContext'
+import { InsideContainerContext } from './InsideContainerContext'
 import { FormEngineContext, useFormEngine, type FormEngineContextValue } from './FormEngineContext'
 import { FormStateContext, useFormState, type FormStateContextValue } from './FormStateContext'
 
@@ -192,7 +193,11 @@ const NestedFieldRenderer: React.FC<NestedFieldRendererProps> = React.memo(({ fi
 
   const enhancedField: FormFieldSchema = useMemo(() => {
     if (!isContainer || !field.children.length) return field
-    const childNodes = field.children.map((child) => <NestedFieldRenderer key={child.id} field={child} onFieldChange={onFieldChange} />)
+    const childNodes = field.children.map((child) => (
+      <InsideContainerContext.Provider key={child.id} value={true}>
+        <NestedFieldRenderer field={child} onFieldChange={onFieldChange} />
+      </InsideContainerContext.Provider>
+    ))
     return { ...field, componentProps: { ...field.componentProps, children: childNodes } }
   }, [field, isContainer, onFieldChange])
 

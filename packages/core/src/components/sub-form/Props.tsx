@@ -1,9 +1,9 @@
 import { FieldItem, ItemListEditor, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
-import type { TableColumnConfig } from './types'
+import type { SubFormColumnConfig } from './types'
 
-export default function TablePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
-  const columns = (values.columns as TableColumnConfig[]) ?? []
+export default function SubFormPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+  const columns = (values.columns as SubFormColumnConfig[]) ?? []
   const rowMode = (values.rowMode as string) ?? 'dynamic'
 
   return (
@@ -24,7 +24,7 @@ export default function TablePropsRender({ widgets: w, values, onChange }: Props
         </FieldItem>
       )}
       <FieldItem label="列管理" variant="group">
-        <ItemListEditor<TableColumnConfig>
+        <ItemListEditor<SubFormColumnConfig>
           value={columns}
           onChange={(v) => onChange('columns', v)}
           fields={[

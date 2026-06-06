@@ -8,6 +8,7 @@ import type { $Self, ResolvedEventHandler } from '../types/events'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
 import { AdapterContext } from './AdapterContext'
 import { FieldSchemaContext } from './FieldSchemaContext'
+import { useInsideContainer } from './InsideContainerContext'
 import { useFieldExpression } from './hooks/useFieldExpression'
 
 export interface FieldRendererProps {
@@ -42,12 +43,13 @@ export interface FieldRendererProps {
  * 两者互不干扰，有错误时显示错误，无错误时显示 help
  */
 const DefaultFormItem: React.FC<FormItemProps> = React.memo(function DefaultFormItem({
-  label, required, validateStatus, errors, help, tooltip, formConfig, scene, children,
+  label, labelHidden, required, validateStatus, errors, help, tooltip, formConfig, scene, children,
 }) {
   const { token } = useStyle()
-  const { labelCol, wrapperCol } = formConfig.scenes[scene]
-  const labelColSpan = labelCol.span
-  const wrapperColSpan = wrapperCol.span
+  const insideContainer = useInsideContainer()
+  const isFullWidth = scene === 'mobile' || insideContainer
+  const labelColSpan = isFullWidth ? 24 : formConfig.desktop.labelCol.span
+  const wrapperColSpan = isFullWidth ? 24 : formConfig.desktop.wrapperCol.span
   const isHorizontal = !(labelColSpan === 24 && wrapperColSpan === 24)
   const colon = formConfig.colon
   const labelText = label ? label + (colon ? '：' : '') : null
@@ -70,7 +72,7 @@ const DefaultFormItem: React.FC<FormItemProps> = React.memo(function DefaultForm
     [required, token, isHorizontal],
   )
 
-  const labelNode = !label ? null : (
+  const labelNode = !label || labelHidden ? null : (
     <label className="fe-field-label" style={labelStyle}>
       {required && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
       {labelText}
@@ -99,14 +101,18 @@ const DefaultFormItem: React.FC<FormItemProps> = React.memo(function DefaultForm
     )
   }
 
+  const labelAlign = scene === 'desktop' && !insideContainer ? formConfig.desktop.labelAlign : 'left'
+
   return (
     <div style={{ display: 'flex', gap: token('spacingSm') }}>
-      <div style={{ width: `${(labelColSpan / 24) * 100}%`, flexShrink: 0, textAlign: formConfig.labelAlign }}>{labelNode}</div>
+      <div style={{ width: `${(labelColSpan / 24) * 100}%`, flexShrink: 0, textAlign: labelAlign }}>{labelNode}</div>
       <div style={{ width: `${(wrapperColSpan / 24) * 100}%` }}>{content}</div>
     </div>
   )
 })
 DefaultFormItem.displayName = 'DefaultFormItem'
+
+export { DefaultFormItem }
 
 // ============================
 // 单字段渲染器
@@ -212,7 +218,8 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
   const formItemProps: Omit<FormItemProps, 'children'> = useMemo(
     () => ({
       name: field.name,
-      label: isFormComponent(field.type) ? field.label : undefined,
+      label: field.label,
+      labelHidden: field.labelHidden,
       rules: field.rules,
       required: isRequired,
       validateStatus: errorMsg ? 'error' as const : undefined,
@@ -222,7 +229,7 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
       formConfig,
       scene: adapter.scene,
     }),
-    [field.name, field.label, field.type, field.rules, field.help, field.tooltip, isRequired, errorMsg, errors, formConfig, adapter.scene],
+    [field.name, field.label, field.labelHidden, field.rules, field.help, field.tooltip, isRequired, errorMsg, errors, formConfig, adapter.scene],
   )
 
   return (

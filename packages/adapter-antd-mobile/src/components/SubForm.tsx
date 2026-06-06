@@ -3,19 +3,19 @@ import type { FormFieldSchema } from '@form-engine/core'
 import { Button, Card } from 'antd-mobile'
 import React from 'react'
 
-interface TableColumnConfig {
+interface SubFormColumnConfig {
   id: string
   label: string
   width?: number
   key?: string
 }
 
-export const TableField: FieldRendererFn = (props: FieldComponentProps) => {
+export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, fieldSchema, disabled } = props
   const adapter = useAdapter()
   const rows: Record<string, unknown>[] = (value ?? []) as Record<string, unknown>[]
   const children: FormFieldSchema[] = fieldSchema.children ?? []
-  const columns: TableColumnConfig[] = (fieldSchema.componentProps?.columns as TableColumnConfig[]) ?? []
+  const columns: SubFormColumnConfig[] = (fieldSchema.componentProps?.columns as SubFormColumnConfig[]) ?? []
   const rowMode = fieldSchema.componentProps?.rowMode ?? 'dynamic'
 
   // 按 regionKey 分组列字段

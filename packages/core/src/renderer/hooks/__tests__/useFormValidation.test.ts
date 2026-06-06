@@ -1,6 +1,7 @@
-import { renderHook, act } from '@testing-library/react'
-import { useFormValidation } from '../useFormValidation'
+import { act, renderHook } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 import type { FormFieldSchema } from '../../../types/schema'
+import { useFormValidation } from '../useFormValidation'
 
 describe('useFormValidation', () => {
   it('初始状态为空', () => {
@@ -33,7 +34,14 @@ describe('useFormValidation', () => {
   it('validate 返回 boolean', async () => {
     const { result } = renderHook(() => useFormValidation())
     const fields: FormFieldSchema[] = [
-      { id: 'field_1', type: 'input', name: 'name', label: '姓名', children: [], rules: [{ required: true, message: '必填' }] },
+      {
+        id: 'field_1',
+        type: 'input',
+        name: 'name',
+        label: '姓名',
+        children: [],
+        rules: [{ required: true, message: '必填' }],
+      },
     ]
     const valid = await result.current.validate(fields, {})
     expect(valid).toBe(false)
@@ -45,7 +53,14 @@ describe('useFormValidation', () => {
   it('validate 不传 name 校验全部字段', async () => {
     const { result } = renderHook(() => useFormValidation())
     const fields: FormFieldSchema[] = [
-      { id: 'field_a', type: 'input', name: 'a', label: 'A', children: [], rules: [{ required: true, message: '必填' }] },
+      {
+        id: 'field_a',
+        type: 'input',
+        name: 'a',
+        label: 'A',
+        children: [],
+        rules: [{ required: true, message: '必填' }],
+      },
       { id: 'field_b', type: 'input', name: 'b', label: 'B', children: [] },
     ]
     const valid = await result.current.validate(fields, { a: 'x' })
@@ -55,7 +70,14 @@ describe('useFormValidation', () => {
   it('validateRaw 返回完整 ValidateResult', async () => {
     const { result } = renderHook(() => useFormValidation())
     const fields: FormFieldSchema[] = [
-      { id: 'field_2', type: 'input', name: 'name', label: '姓名', children: [], rules: [{ required: true, message: '必填' }] },
+      {
+        id: 'field_2',
+        type: 'input',
+        name: 'name',
+        label: '姓名',
+        children: [],
+        rules: [{ required: true, message: '必填' }],
+      },
     ]
     const res = await result.current.validateRaw(fields, {})
     expect(res.valid).toBe(false)

@@ -1,3 +1,3 @@
 export { palette } from './palette'
-export type { TableProps, TableColumnConfig } from './types'
+export type { SubFormProps, SubFormColumnConfig } from './types'
 export { default as Props } from './Props'

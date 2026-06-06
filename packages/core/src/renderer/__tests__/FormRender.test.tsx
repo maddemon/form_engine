@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import type { FormEngineAdapter, FormFieldSchema, FormSchema } from '../../types'
 import { FormRender } from '../FormRender'
-import type { FormSchema, FormFieldSchema, FormEngineAdapter } from '../../types'
 
 const createTextField = (overrides: Partial<FormFieldSchema> = {}): FormFieldSchema => ({
   id: `field_${Math.random().toString(36).slice(2, 8)}`,
@@ -24,11 +24,20 @@ const mockAdapter: FormEngineAdapter = {
 
 describe('FormRender — 回归基线', () => {
   const baseSchema: FormSchema = {
-    form: { colon: true, labelAlign: 'right', scenes: { desktop: { labelCol: { span: 6 }, wrapperCol: { span: 18 } }, mobile: { labelCol: { span: 24 }, wrapperCol: { span: 24 } } } },
-    fields: [
-      createTextField({ name: 'name', label: '姓名' }),
-      createTextField({ name: 'email', label: '邮箱' }),
-    ],
+    form: {
+      colon: true,
+      size: 'middle',
+      desktop: {
+        layout: 'horizontal',
+        labelAlign: 'right',
+        labelCol: { span: 6 },
+        wrapperCol: { span: 18 },
+      },
+      mobile: {
+        layout: 'vertical',
+      },
+    },
+    fields: [createTextField({ name: 'name', label: '姓名' }), createTextField({ name: 'email', label: '邮箱' })],
   }
 
   it('渲染所有可见字段', () => {
@@ -70,7 +79,15 @@ describe('FormRender — 回归基线', () => {
   it('重置恢复初始值', () => {
     const onChange = vi.fn()
     const ref = React.createRef<{ submit(): void; reset(): void; validate(name?: string): Promise<boolean> }>()
-    render(<FormRender schema={baseSchema} desktopAdapter={mockAdapter} initialValues={{ name: '初始值' }} onChange={onChange} ref={ref} />)
+    render(
+      <FormRender
+        schema={baseSchema}
+        desktopAdapter={mockAdapter}
+        initialValues={{ name: '初始值' }}
+        onChange={onChange}
+        ref={ref}
+      />,
+    )
     ref.current!.reset()
     expect(onChange).toHaveBeenCalledWith({ name: '初始值', email: undefined })
   })
@@ -80,9 +97,7 @@ describe('FormRender — 回归基线', () => {
     const ref = React.createRef<{ submit(): void; reset(): void; validate(name?: string): Promise<boolean> }>()
     const schema: FormSchema = {
       ...baseSchema,
-      fields: [
-        createTextField({ name: 'name', label: '姓名', rules: [{ required: true, message: '请输入姓名' }] }),
-      ],
+      fields: [createTextField({ name: 'name', label: '姓名', rules: [{ required: true, message: '请输入姓名' }] })],
     }
     render(<FormRender schema={schema} desktopAdapter={mockAdapter} onSubmit={onSubmit} ref={ref} />)
     ref.current!.submit()
@@ -92,7 +107,15 @@ describe('FormRender — 回归基线', () => {
   it('校验通过时提交并清除 errors', () => {
     const onSubmit = vi.fn()
     const ref = React.createRef<{ submit(): void; reset(): void; validate(name?: string): Promise<boolean> }>()
-    render(<FormRender schema={baseSchema} desktopAdapter={mockAdapter} initialValues={{ name: 'test', email: 'test@test.com' }} onSubmit={onSubmit} ref={ref} />)
+    render(
+      <FormRender
+        schema={baseSchema}
+        desktopAdapter={mockAdapter}
+        initialValues={{ name: 'test', email: 'test@test.com' }}
+        onSubmit={onSubmit}
+        ref={ref}
+      />,
+    )
     ref.current!.submit()
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
@@ -101,9 +124,7 @@ describe('FormRender — 回归基线', () => {
     const ref = React.createRef<{ submit(): void; reset(): void; validate(name?: string): Promise<boolean> }>()
     const schema: FormSchema = {
       ...baseSchema,
-      fields: [
-        createTextField({ name: 'name', label: '姓名', rules: [{ required: true, message: '请输入姓名' }] }),
-      ],
+      fields: [createTextField({ name: 'name', label: '姓名', rules: [{ required: true, message: '请输入姓名' }] })],
     }
     render(<FormRender schema={schema} desktopAdapter={mockAdapter} ref={ref} />)
     const valid = await ref.current!.validate()

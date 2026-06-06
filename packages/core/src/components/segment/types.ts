@@ -14,6 +14,8 @@ export interface SegmentProps extends BaseComponentProps {
   size?: 'large' | 'middle' | 'small'
   /** 块级（宽度撑满） */
   block?: boolean
+  /** 选中变化回调 */
+  onChange?: (value: string | number) => void
 }
 
 export const segmentEventDeclarations: EventDeclaration[] = [

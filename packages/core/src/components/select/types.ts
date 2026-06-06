@@ -7,7 +7,7 @@ export interface SelectProps extends BaseFormComponentProps<string | string[] | 
   options?: OptionItem[]
   mode?: 'multiple' | 'tags'
   showSearch?: boolean
-  filterOption?: boolean | ((input: string, option: OptionItem) => boolean)
+  filterOption?: boolean | ((input: string, option?: OptionItem) => boolean)
   allowClear?: boolean
   maxTagCount?: number
   placement?: 'bottomLeft' | 'bottomRight' | 'topLeft' | 'topRight'

@@ -19,13 +19,13 @@ function isTimeFormat(fmt: string): boolean {
   return /\b(H{1,2}|m{1,2}|s{1,2})\b/.test(fmt)
 }
 
-function toDayjs(value: string | undefined): dayjs.Dayjs | undefined {
-  return value ? dayjs(value) : undefined
+function toDayjs(value: string | undefined): dayjs.Dayjs | null {
+  return value ? dayjs(value) : null
 }
 
 /** TimePicker 的值是纯时间字符串，需拼接固定日期才能生成有效 dayjs */
-function toTimeDayjs(value: string | undefined): dayjs.Dayjs | undefined {
-  return value ? dayjs(`2000-01-01 ${value}`) : undefined
+function toTimeDayjs(value: string | undefined): dayjs.Dayjs | null {
+  return value ? dayjs(`2000-01-01 ${value}`) : null
 }
 
 function toDayjsRange(value: [string, string] | undefined): [dayjs.Dayjs | null, dayjs.Dayjs | null] | undefined {
@@ -55,7 +55,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   ...rest
 }) => {
   const showTime = explicitShowTime ?? isTimeFormat(format)
-  const handleChange = (_date: dayjs.Dayjs | null, dateString: string) => {
+  const handleChange = (_date: dayjs.Dayjs | null, dateString: string | null) => {
     onChange?.(dateString || undefined)
   }
 
@@ -78,7 +78,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       style={{ width: '100%', ...style }}
       className={className}
       id={id}
-      {...rest}
     />
   )
 }
@@ -103,7 +102,8 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
 }) => {
   const showTime = explicitShowTime ?? isTimeFormat(format)
   const handleChange = (_dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null, dateStrings: [string, string]) => {
-    onChange?.(dateStrings || undefined)
+    const cb = onChange as ((value: string[] | undefined) => void) | undefined
+    cb?.(dateStrings || undefined)
   }
 
   const resolvedDisabledDate = disabledDate
@@ -119,12 +119,11 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
       picker={picker}
       placeholder={placeholder as [string, string]}
       allowClear={allowClear}
-      disabled={disabled}
+      disabled={disabled as boolean | undefined}
       disabledDate={resolvedDisabledDate}
-      style={{ width: '100%', ...style }}
-      className={className}
-      id={id}
-      {...rest}
+      style={{ width: '100%', ...(style as React.CSSProperties | undefined) }}
+      className={className as string | undefined}
+      id={id as string | undefined}
     />
   )
 }
@@ -144,7 +143,7 @@ export const TimePicker: React.FC<DatePickerProps> = ({
   id,
   ...rest
 }) => {
-  const handleChange = (_time: dayjs.Dayjs | null, timeString: string) => {
+  const handleChange = (_time: dayjs.Dayjs | null, timeString: string | null) => {
     onChange?.(timeString || undefined)
   }
 
@@ -165,7 +164,6 @@ export const TimePicker: React.FC<DatePickerProps> = ({
       style={{ width: '100%', ...style }}
       className={className}
       id={id}
-      {...rest}
     />
   )
 }

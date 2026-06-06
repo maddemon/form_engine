@@ -1,6 +1,6 @@
-import React from 'react'
-import { Cascader as AntdCascader } from 'antd'
 import type { CascaderProps } from '@form-engine/core'
+import { Cascader as AntdCascader } from 'antd'
+import React from 'react'
 
 /**
  * Antd Cascader 组件
@@ -14,8 +14,7 @@ export const Cascader: React.FC<CascaderProps> = ({
   showSearch = false,
   expandTrigger = 'click',
   style,
-  className,
-  id,
+
   ...rest
 }) => {
   const handleChange = (val: (string | number)[]) => {
@@ -29,11 +28,16 @@ export const Cascader: React.FC<CascaderProps> = ({
       options={options as any}
       placeholder={placeholder}
       allowClear={allowClear}
-      showSearch={showSearch ? { filter: (inputValue: string, path: any[]) => path.some((option: any) => String(option.label).toLowerCase().includes(inputValue.toLowerCase())) } : undefined}
+      showSearch={
+        showSearch
+          ? {
+              filter: (inputValue: string, path: any[]) =>
+                path.some((option: any) => String(option.label).toLowerCase().includes(inputValue.toLowerCase())),
+            }
+          : undefined
+      }
       changeOnSelect={expandTrigger === 'hover'}
       style={{ width: '100%', ...style }}
-      className={className}
-      id={id}
       {...rest}
     />
   )

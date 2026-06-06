@@ -1,11 +1,11 @@
 import type { OptionItem } from '../../types/schema'
 import type { EventDeclaration } from '../../types/events'
+import type { BaseFormComponentProps } from '../../types/base-props'
 
-export interface TreeSelectProps {
+export interface TreeSelectProps extends BaseFormComponentProps<string | string[]> {
   value?: string | string[]
   onChange?: (value: string | string[]) => void
   options?: OptionItem[]
-  placeholder?: string
   allowClear?: boolean
   multiple?: boolean
   treeCheckable?: boolean

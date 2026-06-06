@@ -1,9 +1,9 @@
 import type { ComponentPalette } from '../../types/palette'
-import { TableIcon } from '../icons'
+import { SubFormIcon } from '../icons'
 export const palette: ComponentPalette = {
   label: '子表单',
-  category: 'container',
-  icon: <TableIcon />,
+  category: 'form',
+  icon: <SubFormIcon />,
   defaultProps: {
     componentProps: {
       columns: [

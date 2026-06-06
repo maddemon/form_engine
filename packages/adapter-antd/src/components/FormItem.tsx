@@ -1,6 +1,7 @@
 import { Form } from 'antd'
 import type { FormItemProps } from '@form-engine/core'
 import React from 'react'
+import { useInsideContainer } from '@form-engine/core'
 
 /**
  * Antd FormItem 包裹组件
@@ -14,21 +15,35 @@ import React from 'react'
  * - FormItemProps.tooltip → antd Form.Item tooltip
  */
 export const AntdFormItem: React.FC<FormItemProps> = ({
-  label, required, rules, validateStatus, help, tooltip, formConfig, scene, children,
+  label, labelHidden, required, rules, validateStatus, help, tooltip, formConfig, scene, children,
 }) => {
-  const labelText = label && formConfig.colon ? label.replace(/[:|：]\s*$/, '') + '：' : label
+  const insideContainer = useInsideContainer()
+  const resolvedLabel = labelHidden ? undefined : (label && formConfig.colon ? label.replace(/[:|：]\s*$/, '') + '：' : label)
+
+  const antdRules = rules?.map(r => {
+    const { type, validator, ...rest } = r
+    return {
+      ...rest,
+      pattern: typeof rest.pattern === 'string' ? new RegExp(rest.pattern) : rest.pattern,
+      type: type === 'phone' ? undefined : type,
+    }
+  })
+
+  const isFullWidth = scene !== 'desktop' || insideContainer
+  const colProps = isFullWidth
+    ? { labelCol: { span: 24 }, wrapperCol: { span: 24 } }
+    : { labelCol: formConfig.desktop.labelCol, wrapperCol: formConfig.desktop.wrapperCol }
 
   return (
     <Form.Item
-      label={labelText}
+      label={resolvedLabel}
       required={required}
-      rules={rules}
+      rules={antdRules}
       validateStatus={validateStatus}
       help={help}
       tooltip={tooltip || undefined}
-      labelCol={formConfig.scenes[scene]?.labelCol}
-      wrapperCol={formConfig.scenes[scene]?.wrapperCol}
       colon={false}
+      {...colProps}
     >
       {children}
     </Form.Item>

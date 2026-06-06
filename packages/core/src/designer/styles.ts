@@ -1,4 +1,3 @@
-import type React from 'react'
 import type { ThemeTokens } from '../styles/defaultTheme'
 
 // ============================
@@ -15,24 +14,24 @@ export function createDesignerStyles(t: ThemeTokens) {
       zIndex: 30,
       display: 'flex',
       alignItems: 'center',
-      gap: t.fieldHandleGap,
+      gap: t.spacingSm,
       background: t.primary,
       borderRadius: `0 ${t.borderRadiusSm} 0 ${t.borderRadiusSm}`,
-      padding: t.toolbarButtonPadding,
+      padding: t.spacingXs,
       lineHeight: 1,
     },
     iconBtn: {
       color: t.bgPrimary,
-      fontSize: t.fieldHandleIconSize,
+      fontSize: t.fontSizeXs,
       cursor: 'pointer',
-      padding: t.fieldHandlePadding,
+      padding: t.btnPaddingMd,
       userSelect: 'none' as const,
     },
     dragHandle: {
       color: t.bgPrimary,
-      fontSize: t.fieldHandleFontSize,
+      fontSize: t.fontSizeXs,
       cursor: 'grab',
-      padding: t.fieldHandlePadding,
+      padding: t.btnPaddingMd,
       userSelect: 'none' as const,
       whiteSpace: 'nowrap' as const,
     },
@@ -48,9 +47,9 @@ export function createDesignerStyles(t: ThemeTokens) {
     containerPreview: (isOver: boolean) => ({
       minHeight: t.containerMinHeight,
       position: 'relative' as const,
-      border: isOver ? t.containerDndBorder : `1px dashed ${t.borderPrimary}`,
+      border: isOver ? t.borderSecondary : `1px dashed ${t.borderPrimary}`,
       borderRadius: t.borderRadiusSm,
-      background: isOver ? t.containerDndBg : t.bgTertiary,
+      background: isOver ? t.bgSecondary : t.bgTertiary,
       padding: t.spacingSm,
     }),
     canvasScroll: {

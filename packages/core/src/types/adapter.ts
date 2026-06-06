@@ -85,6 +85,8 @@ export interface FormItemProps {
   name?: string
   /** 标签文本 */
   label?: string
+  /** 是否隐藏标签 */
+  labelHidden?: boolean
   /** 校验规则（仅用于 FormItem 展示用途，如 antd 的校验样式标记；实际校验由引擎 validate 机制执行） */
   rules?: FormRule[]
   /** 是否必填（显示必填标记） */

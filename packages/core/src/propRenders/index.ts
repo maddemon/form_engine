@@ -21,7 +21,7 @@ import SegmentPropsRender from '../components/segment/Props'
 import SelectPropsRender from '../components/select/Props'
 import SliderPropsRender from '../components/slider/Props'
 import SwitchPropsRender from '../components/switch/Props'
-import TablePropsRender from '../components/table/Props'
+import SubFormPropsRender from '../components/sub-form/Props'
 import TabsPropsRender from '../components/tabs/Props'
 import TextPropsRender from '../components/text/Props'
 import TextAreaPropsRender from '../components/textarea/Props'
@@ -59,7 +59,7 @@ export const PropsRenderMap: Record<string, ComponentType<PropsRenderProps>> = {
   flex: FlexPropsRender,
   collapse: CollapsePropsRender,
   tabs: TabsPropsRender,
-  table: TablePropsRender,
+  'sub-form': SubFormPropsRender,
   text: TextPropsRender,
   image: ImagePropsRender,
   divider: DividerPropsRender,

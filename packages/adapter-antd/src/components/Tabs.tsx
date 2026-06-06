@@ -49,12 +49,14 @@ export const Tabs: React.FC<TabsProps> = ({
       {...rest}
     >
       {tabConfigs.map((tab, idx) => {
-        const tabChildren = childrenArray.filter((child: React.ReactNode) =>
-          (child as React.ReactElement)?.props?.field?.regionKey === tab.key ||
-          Number((child as React.ReactElement)?.props?.field?.columnIndex ?? -1) === idx
-        )
+        const tabChildren = childrenArray.filter((child) => {
+          const el = child as React.ReactElement<Record<string, unknown>>
+          const props = el.props ?? {}
+          const field = props.field as Record<string, unknown> | undefined
+          return field?.regionKey === tab.key || Number(field?.columnIndex ?? -1) === idx
+        })
         return (
-          <AntTabs.TabPane key={tab.key} tab={tab.title} disabled={tab.disabled}>
+          <AntTabs.TabPane key={tab.key} tab={tab.title}>
             {tabChildren}
           </AntTabs.TabPane>
         )

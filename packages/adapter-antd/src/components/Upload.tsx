@@ -31,7 +31,16 @@ export const Upload: React.FC<UploadProps> = ({
       thumbUrl: file.thumbUrl,
       percent: file.percent,
     }))
-    onChange?.(fileList)
+    const currentFile: UploadFile = {
+      uid: info.file.uid,
+      name: info.file.name,
+      status: info.file.status as UploadFile['status'],
+      response: info.file.response,
+      url: info.file.url,
+      thumbUrl: info.file.thumbUrl,
+      percent: info.file.percent,
+    }
+    onChange?.({ file: currentFile, fileList })
   }
 
   const isCard = listType === 'picture-card'
@@ -52,7 +61,7 @@ export const Upload: React.FC<UploadProps> = ({
       onChange={handleChange}
       {...rest}
     >
-      {children || (isCard ? (
+      {(children as React.ReactNode) || (isCard ? (
         <div
           style={{
             width: '100%',

@@ -21,6 +21,9 @@ export interface BaseComponentProps {
   disabled?: boolean
   hidden?: boolean
   readOnly?: boolean
+
+  /** 是否隐藏标签 */
+  labelHidden?: boolean
   
   // 事件
   onClick?: (event: React.MouseEvent) => void

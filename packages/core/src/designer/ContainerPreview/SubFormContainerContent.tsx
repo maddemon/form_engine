@@ -6,8 +6,8 @@ import { RegionPreview } from '../RegionPreview'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import type { ContainerContentProps } from './types'
 
-/** Table container */
-export const TableContainerContent: React.FC<ContainerContentProps> = React.memo(({ field, scene }) => {
+/** sub-form container */
+export const SubFormContainerContent: React.FC<ContainerContentProps> = React.memo(({ field, scene }) => {
   const { token } = useStyle()
   const columns = ((field.componentProps?.columns as Array<{ id: string; label: string; width: number }>) ?? []).filter(Boolean)
 
@@ -49,4 +49,4 @@ export const TableContainerContent: React.FC<ContainerContentProps> = React.memo
     </div>
   )
 })
-TableContainerContent.displayName = 'TableContainerContent'
+SubFormContainerContent.displayName = 'SubFormContainerContent'

@@ -1,3 +1,4 @@
+import { EyeIcon, EyeOffIcon } from '../../components/icons'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FieldItem } from '../../propRenders'
 import CustomPropsRender from '../../propRenders/CustomPropsRender'
@@ -120,7 +121,16 @@ export function DefaultPropertyContent({ field, w, dispatch, isForm, isContainer
         </div>
       </FieldItem>
       <FieldItem label="标签">
-        <w.Input value={labelValue} onChange={handleLabelChange} placeholder="字段标签" />
+        <div style={{ display: 'flex', gap: token('spacingXs'), alignItems: 'center', flex: 1 }}>
+          <w.Input value={labelValue} onChange={handleLabelChange} placeholder="字段标签" style={{ flex: 1 }} />
+          <span
+            onClick={() => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { labelHidden: !field.labelHidden } })}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', color: field.labelHidden ? 'var(--fe-text-tertiary)' : 'var(--fe-primary)', flexShrink: 0 }}
+            title={field.labelHidden ? '显示标签' : '隐藏标签'}
+          >
+            {field.labelHidden ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+          </span>
+        </div>
       </FieldItem>
       {isForm && (
         <FieldItem label="默认值">

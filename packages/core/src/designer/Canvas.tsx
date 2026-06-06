@@ -63,8 +63,8 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
   // Page background: from formConfig, default to white
   const defaultBg = 'var(--fe-bg-primary)'
   const pageBg = (scene === 'mobile'
-    ? formConfig.pageBackground?.mobile
-    : formConfig.pageBackground?.desktop) ?? defaultBg
+    ? formConfig.mobile.pageBackground
+    : formConfig.desktop.pageBackground) ?? defaultBg
 
   const { token } = useStyle()
 

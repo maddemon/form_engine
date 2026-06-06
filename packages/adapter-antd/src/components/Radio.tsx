@@ -1,5 +1,6 @@
 import React from 'react'
 import { Radio as AntRadio, Flex } from 'antd'
+import type { RadioChangeEvent } from 'antd'
 import type { RadioProps } from '@form-engine/core'
 
 const { Group } = AntRadio
@@ -17,7 +18,11 @@ export const Radio: React.FC<RadioProps> = ({
   id,
   ...rest
 }) => {
-  const handleChange = (e: { target: { value: string } }) => {
+  const handleGroupChange = (e: RadioChangeEvent) => {
+    onChange?.(e.target.value)
+  }
+
+  const handleChange = (e: RadioChangeEvent) => {
     onChange?.(e.target.value)
   }
 
@@ -40,7 +45,7 @@ export const Radio: React.FC<RadioProps> = ({
     return (
       <Group
         value={value}
-        onChange={handleChange}
+        onChange={handleGroupChange}
         buttonStyle={buttonStyle}
         disabled={disabled}
         style={style}

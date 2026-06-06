@@ -7,10 +7,12 @@
 import React from 'react'
 import { Row, Col } from 'antd'
 import type { GridProps } from '@form-engine/core'
+import { useAdapter } from '@form-engine/core'
 
 /**
  * Grid 组件
  * 提供栅格布局
+ * 移动端无视列数，直接垂直平铺
  */
 export const Grid: React.FC<GridProps> = ({
   children,
@@ -21,12 +23,24 @@ export const Grid: React.FC<GridProps> = ({
   id,
   ...rest
 }) => {
+  const adapter = useAdapter()
+  const isMobile = adapter?.scene === 'mobile'
   const childrenArray = React.Children.toArray(children)
+
+  if (isMobile) {
+    return (
+      <div style={{ width: '100%', ...style }} className={className} id={id}>
+        {childrenArray.map((child, index) => (
+          <div key={index} style={{ width: '100%', marginBottom: index < childrenArray.length - 1 ? gap : 0 }}>{child}</div>
+        ))}
+      </div>
+    )
+  }
+
   const spans = colSpans?.filter(Boolean) ?? []
   const totalSpan = spans.reduce((s, c) => s + (c.span || 0), 0) || 24
 
   if (spans.length === 0) {
-    // 无配置时兜底：等分
     const childCount = childrenArray.length || 1
     const colSpan = Math.floor(24 / childCount)
     return (

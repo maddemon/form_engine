@@ -33,7 +33,6 @@ export const Switch: React.FC<SwitchProps> = ({
       style={style}
       className={className}
       id={id}
-      {...rest}
     />
   )
 }

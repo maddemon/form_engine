@@ -7,9 +7,9 @@
 import React from 'react'
 import { Table as AntTable } from 'antd'
 import { useAdapter } from '@form-engine/core'
-import type { TableColumnConfig, FormFieldSchema } from '@form-engine/core'
+import type { SubFormColumnConfig, FormFieldSchema } from '@form-engine/core'
 
-export const Table: React.FC<{
+export const SubForm: React.FC<{
   value?: Record<string, unknown>[]
   onChange?: (val: Record<string, unknown>[]) => void
   fieldSchema: FormFieldSchema
@@ -25,7 +25,7 @@ export const Table: React.FC<{
   const field = fieldSchema
   const adapter = useAdapter()
   const children = field.children ?? []
-  const columns = ((field.componentProps?.columns as TableColumnConfig[]) || []).filter(Boolean)
+  const columns = ((field.componentProps?.columns as SubFormColumnConfig[]) || []).filter(Boolean)
 
   if (columns.length === 0) {
     return (
@@ -52,8 +52,8 @@ export const Table: React.FC<{
         onChange?.(newRows)
       },
       disabled: !!disabled,
-      fieldSchema: child,
-    })
+      fieldSchema: child as unknown as FormFieldSchema,
+    } as React.ComponentProps<typeof renderFn>)
   }
 
   const handleAddRow = () => {
@@ -76,14 +76,14 @@ export const Table: React.FC<{
         c => (c.columnIndex ?? Number(c.regionKey ?? -1)) === columns.indexOf(col)
       )
       return {
-        title: col.label,
-        key: col.key,
+        title: (col as SubFormColumnConfig).label,
+        key: (col as unknown as Record<string, unknown>).key as string | undefined,
         width: col.width,
         render: (_: unknown, _row: Record<string, unknown>, rowIndex: number) => (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {colChildren.map(child => (
+              {colChildren.map(child => (
               <div key={child.id as string}>
-                {renderCell(child, value[rowIndex] || {}, rowIndex)}
+                {renderCell(child as unknown as Record<string, unknown>, value[rowIndex] || {}, rowIndex)}
               </div>
             ))}
           </div>

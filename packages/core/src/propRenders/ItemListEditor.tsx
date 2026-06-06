@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo } from 'react'
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import React, { useCallback, useMemo } from 'react'
 import { useStyle } from '../styles'
 
 export interface ItemListField<T> {
@@ -37,7 +37,7 @@ export interface ItemListEditorProps<T extends { id: string }> {
 
 const SORTABLE_PREFIX = '__ileditor_'
 
-function SortableRow<T extends { id: string }>({
+function SortableRow({
   id,
   sortable,
   dragHandle,
@@ -82,33 +82,27 @@ function arrayMove<T>(arr: T[], from: number, to: number): T[] {
   return copy
 }
 
-function ItemListEditorInner<T extends { id: string }>(
-  {
-    value = [],
-    onChange,
-    fields,
-    newItem,
-    validateTotal,
-    validateUnique,
-    minItems = 0,
-    addLabel,
-    disabled = false,
-    sortable = true,
-  }: ItemListEditorProps<T>,
-) {
+function ItemListEditorInner<T extends { id: string }>({
+  value = [],
+  onChange,
+  fields,
+  newItem,
+  validateTotal,
+  validateUnique,
+  minItems = 0,
+  addLabel,
+  disabled = false,
+  sortable = true,
+}: ItemListEditorProps<T>) {
   const { token } = useStyle()
 
   const items = value
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  )
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
   const handleFieldChange = useCallback(
     (index: number, fieldKey: string, fieldValue: unknown) => {
-      const next = items.map((item, i) =>
-        i === index ? { ...item, [fieldKey]: fieldValue } : item,
-      )
+      const next = items.map((item, i) => (i === index ? { ...item, [fieldKey]: fieldValue } : item))
       onChange?.(next as T[])
     },
     [items, onChange],
@@ -128,11 +122,11 @@ function ItemListEditorInner<T extends { id: string }>(
   }, [items, onChange, newItem])
 
   const handleSortEnd = useCallback(
-    (event: { active: { id: string }; over: { id: string } | null }) => {
+    (event: DragEndEvent) => {
       const { active, over } = event
       if (!over || active.id === over.id) return
-      const oldIndex = items.findIndex((item) => `${SORTABLE_PREFIX}${item.id}` === active.id)
-      const newIndex = items.findIndex((item) => `${SORTABLE_PREFIX}${item.id}` === over.id)
+      const oldIndex = items.findIndex((item) => `${SORTABLE_PREFIX}${item.id}` === String(active.id))
+      const newIndex = items.findIndex((item) => `${SORTABLE_PREFIX}${item.id}` === String(over.id))
       if (oldIndex !== -1 && newIndex !== -1) {
         onChange?.(arrayMove(items, oldIndex, newIndex))
       }
@@ -174,136 +168,131 @@ function ItemListEditorInner<T extends { id: string }>(
   }
 
   const labelStyle: React.CSSProperties = {
-    fontSize: token('fontSizeXxs'),
+    fontSize: token('fontSizeXs'),
     color: 'var(--fe-text-tertiary)',
     lineHeight: 1.3,
   }
 
-  const sortableIds = useMemo(
-    () => items.map((item) => `${SORTABLE_PREFIX}${item.id}`),
-    [items],
-  )
+  const sortableIds = useMemo(() => items.map((item) => `${SORTABLE_PREFIX}${item.id}`), [items])
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSortEnd}>
       <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
         <div>
           {items.map((item, index) => {
-            const dragHandleNode = sortable ? (
-              <div style={dragHandleStyle}>
-                ⋮⋮
-              </div>
-            ) : null
+            const dragHandleNode = sortable ? <div style={dragHandleStyle}>⋮⋮</div> : null
             return (
-            <SortableRow key={item.id} id={item.id} sortable={sortable} dragHandle={dragHandleNode}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: token('spacingXs'),
-                  marginBottom: token('spacingXs'),
-                  background: 'var(--fe-bg-primary)',
-                  padding: '2px 4px',
-                  borderRadius: 'var(--fe-border-radius-sm)',
-                }}
-              >
-                {/* 字段列表 */}
-                {fields.map((field) => {
-                  let fieldFlex = field.flex ?? 1
-                  // number 类型默认更窄
-                  if (field.kind === 'number' && field.flex == null) {
-                    fieldFlex = 0.6
-                  }
-                  if (field.kind === 'switch') {
-                    return (
-                      <label
-                        key={String(field.key)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: token('spacingXs'),
-                          flex: fieldFlex,
-                          fontSize: token('fontSizeSm'),
-                          whiteSpace: 'nowrap',
-                          cursor: disabled ? 'not-allowed' : 'pointer',
-                        }}
-                      >
-                        <span>{field.label}</span>
-                        <input
-                          type="checkbox"
-                          checked={!!(item as Record<string, unknown>)[String(field.key)]}
-                          disabled={disabled}
-                          onChange={(e) => handleFieldChange(index, String(field.key), e.target.checked)}
-                        />
-                      </label>
-                    )
-                  }
-                  return (
-                    <div key={String(field.key)} style={{ flex: fieldFlex, minWidth: 0 }}>
-                      <div style={labelStyle}>{field.label}</div>
-                      <input
-                        type={field.kind === 'number' ? 'number' : 'text'}
-                        value={(item as Record<string, unknown>)[String(field.key)] ?? ''}
-                        disabled={disabled}
-                        min={field.min}
-                        max={field.max}
-                        step={field.step ?? (field.kind === 'number' ? 1 : undefined)}
-                        placeholder={field.placeholder}
-                        onChange={(e) => {
-                          if (field.kind === 'number') {
-                            const val = e.target.value === '' ? '' : Number(e.target.value) || 0
-                            handleFieldChange(
-                              index,
-                              String(field.key),
-                              field.min !== undefined ? Math.max(field.min, val as number) : val,
-                            )
-                          } else {
-                            handleFieldChange(index, String(field.key), e.target.value)
-                          }
-                        }}
-                        style={inputBaseStyle}
-                      />
-                    </div>
-                  )
-                })}
-
-                {/* 删除按钮 */}
-                <button
-                  type="button"
-                  disabled={disabled || items.length <= minItems}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleRemove(index)
-                  }}
-                  title={items.length <= minItems ? `至少保留 ${minItems} 项` : '删除'}
+              <SortableRow key={item.id} id={item.id} sortable={sortable} dragHandle={dragHandleNode}>
+                <div
                   style={{
-                    flexShrink: 0,
-                    width: token('itemListRemoveButtonSize'),
-                    height: token('itemListRemoveButtonSize'),
-                    padding: token('itemListRemoveButtonPadding'),
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'var(--fe-text-tertiary)',
-                    cursor: (disabled || items.length <= minItems) ? 'not-allowed' : 'pointer',
-                    fontSize: token('fontSizeXs'),
-                    lineHeight: 1,
-                    opacity: (disabled || items.length <= minItems) ? 0.3 : 0.6,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: token('spacingXs'),
+                    marginBottom: token('spacingXs'),
+                    background: 'var(--fe-bg-primary)',
+                    padding: '2px 4px',
+                    borderRadius: 'var(--fe-border-radius-sm)',
                   }}
                 >
-                  ✕
-                </button>
-              </div>
-            </SortableRow>
+                  {/* 字段列表 */}
+                  {fields.map((field) => {
+                    let fieldFlex = field.flex ?? 1
+                    // number 类型默认更窄
+                    if (field.kind === 'number' && field.flex == null) {
+                      fieldFlex = 0.6
+                    }
+                    if (field.kind === 'switch') {
+                      return (
+                        <label
+                          key={String(field.key)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: token('spacingXs'),
+                            flex: fieldFlex,
+                            fontSize: token('fontSizeSm'),
+                            whiteSpace: 'nowrap',
+                            cursor: disabled ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          <span>{field.label}</span>
+                          <input
+                            type="checkbox"
+                            checked={!!(item as Record<string, unknown>)[String(field.key)]}
+                            disabled={disabled}
+                            onChange={(e) => handleFieldChange(index, String(field.key), e.target.checked)}
+                          />
+                        </label>
+                      )
+                    }
+                    return (
+                      <div key={String(field.key)} style={{ flex: fieldFlex, minWidth: 0 }}>
+                        <div style={labelStyle}>{field.label}</div>
+                        <input
+                          type={field.kind === 'number' ? 'number' : 'text'}
+                          value={String((item as Record<string, unknown>)[String(field.key)] ?? '')}
+                          disabled={disabled}
+                          min={field.min}
+                          max={field.max}
+                          step={field.step ?? (field.kind === 'number' ? 1 : undefined)}
+                          placeholder={field.placeholder}
+                          onChange={(e) => {
+                            if (field.kind === 'number') {
+                              const val = e.target.value === '' ? '' : Number(e.target.value) || 0
+                              handleFieldChange(
+                                index,
+                                String(field.key),
+                                field.min !== undefined ? Math.max(field.min, val as number) : val,
+                              )
+                            } else {
+                              handleFieldChange(index, String(field.key), e.target.value)
+                            }
+                          }}
+                          style={inputBaseStyle}
+                        />
+                      </div>
+                    )
+                  })}
+
+                  {/* 删除按钮 */}
+                  <button
+                    type="button"
+                    disabled={disabled || items.length <= minItems}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleRemove(index)
+                    }}
+                    title={items.length <= minItems ? `至少保留 ${minItems} 项` : '删除'}
+                    style={{
+                      flexShrink: 0,
+                      width: token('itemListRemoveButtonSize'),
+                      height: token('itemListRemoveButtonSize'),
+                      padding: token('itemListRemoveButtonPadding'),
+                      border: 'none',
+                      background: 'transparent',
+                      color: 'var(--fe-text-tertiary)',
+                      cursor: disabled || items.length <= minItems ? 'not-allowed' : 'pointer',
+                      fontSize: token('fontSizeXs'),
+                      lineHeight: 1,
+                      opacity: disabled || items.length <= minItems ? 0.3 : 0.6,
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </SortableRow>
             )
           })}
 
           {/* 错误提示 */}
           {errorMsg && (
-            <div style={{
-              color: 'var(--fe-error)',
-              fontSize: token('fontSizeXs'),
-              marginBottom: token('spacingXs'),
-            }}>
+            <div
+              style={{
+                color: 'var(--fe-error)',
+                fontSize: token('fontSizeXs'),
+                marginBottom: token('spacingXs'),
+              }}
+            >
               {errorMsg}
             </div>
           )}
@@ -327,8 +316,12 @@ function ItemListEditorInner<T extends { id: string }>(
               textAlign: 'center',
               transition: 'background 0.2s',
             }}
-            onMouseEnter={(e) => { if (!disabled) (e.currentTarget.style.background = 'var(--fe-primary-hover-bg)') }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+            onMouseEnter={(e) => {
+              if (!disabled) e.currentTarget.style.background = 'var(--fe-primary-hover-bg)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+            }}
           >
             + {addLabel ?? '添加'}
           </button>

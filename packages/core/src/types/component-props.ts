@@ -30,7 +30,7 @@ import type { GridProps } from '../components/grid/types'
 import type { FlexProps } from '../components/flex/types'
 import type { CollapseProps, CollapsePanelConfig } from '../components/collapse/types'
 import type { TabsProps, TabPaneConfig } from '../components/tabs/types'
-import type { TableProps, TableColumnConfig } from '../components/table/types'
+import type { SubFormProps, SubFormColumnConfig } from '../components/sub-form/types'
 import type { CascaderProps } from '../components/cascader/types'
 import type { TreeSelectProps } from '../components/tree-select/types'
 import type { CardProps } from '../components/card/types'
@@ -66,8 +66,8 @@ export type {
   CollapsePanelConfig,
   TabsProps,
   TabPaneConfig,
-  TableProps,
-  TableColumnConfig,
+  SubFormProps,
+  SubFormColumnConfig,
   CascaderProps,
   TreeSelectProps,
   CardProps,
@@ -132,7 +132,7 @@ export interface ComponentPropsMap {
   'Flex': FlexProps
   'Collapse': CollapseProps
   'Tabs': TabsProps
-  'Table': TableProps
+  'SubForm': SubFormProps
   'Button': ButtonProps
   'Card': CardProps
   'Alert': AlertProps

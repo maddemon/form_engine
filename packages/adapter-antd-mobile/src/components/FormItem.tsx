@@ -10,17 +10,18 @@ import React from 'react'
  * 错误信息通过 description prop 显式传入，并用 error token 着色。
  */
 export const AntdMobileFormItem: React.FC<FormItemProps> = ({
-  label, required, errors, help, formConfig, scene, children, name,
+  label, labelHidden, required, errors, help, formConfig, scene, children, name,
 }) => {
   const { token } = useStyle()
   const errorMsg = errors?.[0]
+  const description = errorMsg ? <span style={{ color: token('error') }}>{errorMsg}</span> : help
 
   return (
     <Form.Item
       name={name}
-      label={label}
+      label={labelHidden ? undefined : label}
       required={required}
-      description={errorMsg ? <span style={{ color: token('error') }}>{errorMsg}</span> : help}
+      {...(description ? { description } : {})}
     >
       {children}
     </Form.Item>

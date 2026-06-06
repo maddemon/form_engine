@@ -7,7 +7,7 @@ import type { ContainerContentProps } from './types'
 import { FlexContainerContent } from './FlexContainerContent'
 import { GenericContainerContent } from './GenericContainerContent'
 import { GridContainerContent } from './GridContainerContent'
-import { TableContainerContent } from './TableContainerContent'
+import { SubFormContainerContent } from './SubFormContainerContent'
 import { TabsContainerContent } from './TabsContainerContent'
 
 // ── Container renderer registry ─────────────────────────────────────
@@ -15,7 +15,7 @@ import { TabsContainerContent } from './TabsContainerContent'
 const containerRendererRegistry: Record<string, React.FC<ContainerContentProps>> = {
   card: CardContainerContent,
   grid: GridContainerContent,
-  table: TableContainerContent,
+  'sub-form': SubFormContainerContent,
   collapse: CollapseContainerContent,
   tabs: TabsContainerContent,
   flex: FlexContainerContent,

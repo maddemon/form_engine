@@ -45,9 +45,13 @@ export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
   )
 
   // 防抖输入
-  const [messageValue, handleMessageChange] = useDebouncedInput<string | number>(rule.message || '', (v) => updateRule({ message: String(v) || undefined }))
+  const [messageValue, handleMessageChange] = useDebouncedInput<string | number>(rule.message || '', (v) =>
+    updateRule({ message: String(v) || undefined }),
+  )
 
-  const [patternValue, handlePatternChange] = useDebouncedInput<string | number>(rule.pattern || '', (v) => updateRule({ pattern: String(v) || undefined }))
+  const [patternValue, handlePatternChange] = useDebouncedInput<string | number>(rule.pattern || '', (v) =>
+    updateRule({ pattern: String(v) || undefined }),
+  )
 
   return (
     <>
@@ -68,10 +72,19 @@ export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
         <w.Input value={messageValue} onChange={handleMessageChange} placeholder="此字段为必填" />
       </FieldItem>
       <FieldItem label="正则验证">
-        <w.Input value={patternValue} onChange={handlePatternChange} placeholder="输入正则表达式" style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties} />
+        <w.Input
+          value={patternValue}
+          onChange={handlePatternChange}
+          placeholder="输入正则表达式"
+          style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties}
+        />
       </FieldItem>
       <FieldItem label="常用正则预设">
-        <w.Select value={COMMON_PATTERNS.some((p) => p.value === rule.pattern) ? rule.pattern || '' : ''} onChange={handlePatternSelect} options={COMMON_PATTERNS} />
+        <w.Select
+          value={COMMON_PATTERNS.some((p) => p.value === rule.pattern) ? rule.pattern || '' : ''}
+          onChange={(v) => handlePatternSelect(v as string)}
+          options={COMMON_PATTERNS}
+        />
       </FieldItem>
     </>
   )

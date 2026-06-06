@@ -1,6 +1,6 @@
-import React from 'react'
-import { Checkbox as AntCheckbox, Flex } from 'antd'
 import type { CheckboxProps } from '@form-engine/core'
+import { Checkbox as AntCheckbox, Flex } from 'antd'
+import React from 'react'
 
 const { Group } = AntCheckbox
 
@@ -28,23 +28,17 @@ export const Checkbox: React.FC<CheckboxProps> = ({
     ))
 
     return (
-      <Group
-        value={value || []}
-        onChange={handleChange}
-        disabled={disabled}
-        style={style}
-        className={className}
-        id={id}
-        {...rest}
-      >
-        {direction === 'vertical' ? (
-          <Flex vertical gap={8}>
-            {items}
-          </Flex>
-        ) : (
-          items
-        )}
-      </Group>
+      <div style={style} className={className} id={id}>
+        <Group value={value || []} onChange={handleChange} disabled={disabled} {...rest}>
+          {direction === 'vertical' ? (
+            <Flex vertical gap={8}>
+              {items}
+            </Flex>
+          ) : (
+            items
+          )}
+        </Group>
+      </div>
     )
   }
 
@@ -58,9 +52,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       className={className}
       id={id}
       {...rest}
-    >
-      {rest.children}
-    </AntCheckbox>
+    />
   )
 }
 
