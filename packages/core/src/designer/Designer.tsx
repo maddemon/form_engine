@@ -42,6 +42,7 @@ export const Designer: React.FC<DesignerProps> = ({
   panelWidths,
   sidePanelTabs,
   propertyPanelTabs,
+  propertySlots,
   themeMode,
   sizeMode,
   theme,
@@ -62,6 +63,7 @@ export const Designer: React.FC<DesignerProps> = ({
       panelWidths={panelWidths}
       sidePanelTabs={sidePanelTabs}
       propertyPanelTabs={propertyPanelTabs}
+      propertySlots={propertySlots}
     />
   )
 
@@ -95,6 +97,7 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
   panelWidths,
   sidePanelTabs,
   propertyPanelTabs,
+  propertySlots,
 }) => {
   useEnsureDefaultTheme()
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
@@ -194,6 +197,7 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
               designerWidgets={widgetsAdapter?.designerWidgets}
               width={panelWidths?.properties}
               propertyPanelTabs={propertyPanelTabs}
+              propertySlots={propertySlots}
               allFields={state.schema.fields}
             />
           </div>

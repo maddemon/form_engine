@@ -1,5 +1,6 @@
 import type { FormFieldSchema, FormSchema, FormConfig } from './schema'
 import type { FormEngineAdapter, DesignerWidgets } from './adapter'
+import type { PropertySlots } from './property-slot'
 import type React from 'react'
 
 /**
@@ -140,6 +141,8 @@ export interface DesignerProps {
   sizeMode?: import('../styles/StyleProvider').SizeMode
   /** 主题覆盖，透传给 StyleProvider */
   theme?: import('../styles/types').PartialThemeTokens
+  /** 属性编辑器 Slot（运行时注入，优先级最高） */
+  propertySlots?: PropertySlots
 }
 
 /**

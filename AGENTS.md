@@ -67,3 +67,13 @@
 - 命名建议带时间戳，避免多次运行相互覆盖
 - 若必须保存到仓库内其他位置，请放进对应子目录的 `tmp/`，不要直接放根目录
 - 调试完立即 `Remove-Item ./tmp/*` 清理，避免长期堆积
+
+---
+
+## 禁止通过 AI Sandbox 执行 `git stash`
+
+**在 Trae IDE 的 AI sandbox 终端中禁止执行 `git stash`**。已确认该操作会导致 `.git` 目录被删除（sandbox bug：当 `git stash` 因 dangling object 等原因失败时，sandbox 的错误恢复逻辑会错误地删除整个 `.git` 目录）。
+
+- ❌ 禁止：`git stash`、`git stash pop`、`git stash apply` 等 stash 相关命令
+- ✅ 替代方案：使用 IDE 内置的 Git 操作面板，或在系统原生终端中执行 stash 命令
+- 其他 git 命令（`git status`、`git diff`、`git add`、`git commit`、`git log` 等）不受影响

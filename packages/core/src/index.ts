@@ -185,6 +185,14 @@ export {
   type CustomPropertyWidgetRegistry,
 } from './registry/customComponentRegistry'
 
+// Property Slot 注册表
+export {
+  propertySlotRegistry,
+  resolveSlot,
+  defaultSlotFallbacks,
+  PropertySlotRegistry,
+} from './registry/propertySlotRegistry'
+
 // 导出自定义组件类型
 export type {
   CustomComponentConfig,
@@ -193,6 +201,13 @@ export type {
   PropertyWidgetProps,
   PropertyWidgetComponentProps,
 } from './types/custom-component'
+
+// Property Slot 类型
+export type {
+  SlotName,
+  PropertySlotProps,
+  PropertySlots,
+} from './types/property-slot'
 
 // ============================
 // 渲染器

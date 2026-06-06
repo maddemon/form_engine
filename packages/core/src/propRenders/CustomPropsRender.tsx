@@ -1,8 +1,10 @@
 import React from 'react'
 import { customPropertyWidgetRegistry } from '../registry/customComponentRegistry'
+import { resolveSlot } from '../registry/propertySlotRegistry'
 import { useStyle } from '../styles'
 import type { DesignerWidgets } from '../types/adapter'
 import type { PropertyConfigItem } from '../types/custom-component'
+import type { PropertySlots } from '../types/property-slot'
 import { FieldItem } from './shared'
 
 interface CustomPropsRenderProps {
@@ -10,10 +12,14 @@ interface CustomPropsRenderProps {
   widgets: DesignerWidgets
   values: Record<string, unknown>
   onChange: (key: string, value: unknown) => void
+  slots?: PropertySlots
 }
 
-export default function CustomPropsRender({ configs, widgets: w, values, onChange }: CustomPropsRenderProps) {
+export default function CustomPropsRender({ configs, widgets: w, values, onChange, slots }: CustomPropsRenderProps) {
   const { token } = useStyle()
+
+  const ExpressionEditorSlot = resolveSlot('expressionEditor', slots, w)
+  const JsonEditorSlot = resolveSlot('jsonEditor', slots)
 
   const renderWidget = (config: PropertyConfigItem, value: unknown, onValueChange: (value: unknown) => void): React.ReactNode => {
     const { widget, widgetProps } = config
@@ -55,33 +61,21 @@ export default function CustomPropsRender({ configs, widgets: w, values, onChang
 
       case 'json':
         return (
-          <textarea
-            value={typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
-            onChange={(e) => {
-              try {
-                onValueChange(JSON.parse(e.target.value))
-              } catch {
-                onValueChange(e.target.value)
-              }
-            }}
+          <JsonEditorSlot
+            value={value}
+            onChange={onValueChange}
             placeholder={widgetProps?.placeholder}
-            rows={6}
-            style={{
-              width: '100%',
-              padding: token('spacingXs'),
-              border: '1px solid var(--fe-border-primary)',
-              borderRadius: 'var(--fe-border-radius-sm)',
-              fontFamily: 'monospace',
-              fontSize: token('fontSizeXs'),
-            }}
           />
         )
 
       case 'expression':
-        return w.ExpressionInput ? (
-          <w.ExpressionInput value={(value as string) ?? ''} onChange={(v) => onValueChange(v)} placeholder={widgetProps?.placeholder} fieldNames={widgetProps?.fieldNames} />
-        ) : (
-          <w.Input value={(value as string) ?? ''} onChange={(v) => onValueChange(v)} placeholder={widgetProps?.placeholder} />
+        return (
+          <ExpressionEditorSlot
+            value={(value as string) ?? ''}
+            onChange={(v) => onValueChange(v)}
+            fieldNames={widgetProps?.fieldNames}
+            placeholder={widgetProps?.placeholder}
+          />
         )
 
       case 'custom': {

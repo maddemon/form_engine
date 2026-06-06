@@ -4,6 +4,7 @@ import { customComponentRegistry } from '../../registry/customComponentRegistry'
 import type { DesignerWidgets } from '../../types/adapter'
 import type { DesignerAction } from '../../types/designer'
 import type { EventDeclaration, FormFieldEvents } from '../../types/events'
+import type { PropertySlots } from '../../types/property-slot'
 import type { FormFieldSchema } from '../../types/schema'
 import { CollapsibleSection } from '../CollapsibleSection'
 import { EventHandlerEditor } from '../EventHandlerEditor'
@@ -20,9 +21,10 @@ interface EventEditorProps {
   field: FormFieldSchema
   w: DesignerWidgets
   dispatch: React.Dispatch<DesignerAction>
+  slots?: PropertySlots
 }
 
-export function EventEditor({ field, w, dispatch }: EventEditorProps) {
+export function EventEditor({ field, w, dispatch, slots }: EventEditorProps) {
   const eventDeclarations = getFieldEventDeclarations(field)
   if (eventDeclarations.length === 0) return null
 
@@ -38,6 +40,7 @@ export function EventEditor({ field, w, dispatch }: EventEditorProps) {
           eventName={decl.name}
           value={field.events?.[decl.name]}
           widgets={w}
+          slots={slots}
           onChange={(handler) => {
             const next: FormFieldEvents = { ...(field.events || {}) }
             if (handler) {

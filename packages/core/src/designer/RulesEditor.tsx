@@ -1,8 +1,10 @@
 import React, { useCallback } from 'react'
 import { FieldItem } from '../propRenders/shared'
+import { resolveSlot } from '../registry/propertySlotRegistry'
 import { useStyle } from '../styles'
 import type { DesignerWidgets } from '../types/adapter'
 import type { DesignerAction } from '../types/designer'
+import type { PropertySlots } from '../types/property-slot'
 import type { FormFieldSchema, FormRule } from '../types/schema'
 import { useDebouncedInput } from './useDebouncedInput'
 
@@ -18,10 +20,12 @@ interface RulesEditorProps {
   field: FormFieldSchema
   widgets: DesignerWidgets
   dispatch: React.Dispatch<DesignerAction>
+  slots?: PropertySlots
 }
 
-export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
+export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorProps) {
   const { token } = useStyle()
+  const CodeEditorSlot = resolveSlot('codeEditor', slots, w)
   const rule: FormRule = field.rules?.[0] ?? {}
 
   const updateRule = useCallback(
@@ -72,11 +76,11 @@ export function RulesEditor({ field, widgets: w, dispatch }: RulesEditorProps) {
         <w.Input value={messageValue} onChange={handleMessageChange} placeholder="此字段为必填" />
       </FieldItem>
       <FieldItem label="正则验证">
-        <w.Input
+        <CodeEditorSlot
           value={patternValue}
           onChange={handlePatternChange}
+          field={field}
           placeholder="输入正则表达式"
-          style={{ fontSize: token('widgetInputFontSizeXs') } as React.CSSProperties}
         />
       </FieldItem>
       <FieldItem label="常用正则预设">

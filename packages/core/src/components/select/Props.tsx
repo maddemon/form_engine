@@ -1,4 +1,5 @@
 import { FieldItem, PropsRenderProps } from '../../propRenders'
+import { resolveSlot } from '../../registry/propertySlotRegistry'
 
 const MODE_OPTIONS = [
   { label: '默认', value: '' },
@@ -6,17 +7,18 @@ const MODE_OPTIONS = [
   { label: '标签', value: 'tags' },
 ]
 
-export default function SelectPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange }: PropsRenderProps) {
+export default function SelectPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange, slots }: PropsRenderProps) {
+  const DataSourceEditorSlot = resolveSlot('dataSourceEditor', slots, w)
   return (
     <>
       <FieldItem label="允许清除">
         <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
       </FieldItem>
       <FieldItem label="选项数据" variant="group">
-        <w.DataSourceEditor
+        <DataSourceEditorSlot
           value={dataSource}
-          onChange={(v) => onDataSourceChange?.(v)}
-          optionsType="flat"
+          onChange={(v) => onDataSourceChange?.(v as import('../../types/schema').FieldDataSource)}
+          context={{ optionsType: 'flat' }}
         />
       </FieldItem>
       <FieldItem label="模式">

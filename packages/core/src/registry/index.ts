@@ -17,3 +17,11 @@ export {
   unregisterCustomComponent,
   type SimpleCustomComponentOptions,
 } from './simpleCustomComponentRegistry'
+
+// Property Slot 注册表
+export {
+  propertySlotRegistry,
+  resolveSlot,
+  defaultSlotFallbacks,
+  PropertySlotRegistry,
+} from './propertySlotRegistry'

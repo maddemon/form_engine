@@ -3,17 +3,19 @@
  *
  * 在设计器属性面板中为单个事件渲染配置界面：
  * - 选择处理类型（未配置 / expression / action / callback）
- * - expression：多行文本框
- * - action：下拉选择（actions 注册表）
+ * - expression：expressionEditor slot
+ * - action：下拉选择（actions 注册表）+ jsonEditor slot（参数）
  * - callback：回调名输入
  */
 
 import React, { useState } from 'react'
 import { listActionNames } from '../events'
+import { resolveSlot } from '../registry/propertySlotRegistry'
 import { FieldItem } from '../propRenders/shared'
 import { useStyle } from '../styles/useStyle'
 import type { DesignerWidgets } from '../types/adapter'
 import type { EventHandler, EventHandlerType } from '../types/events'
+import type { PropertySlots } from '../types/property-slot'
 
 /** EventHandlerEditor 所需的 widgets 子集（TextArea 为必选） */
 type RequiredWidgets = Omit<DesignerWidgets, 'TextArea'> & {
@@ -29,6 +31,8 @@ export interface EventHandlerEditorProps {
   eventName: string
   /** 设计器小组件（由 PropertyPanel 注入，必须包含 TextArea） */
   widgets: RequiredWidgets
+  /** 属性编辑器 Slot */
+  slots?: PropertySlots
 }
 
 const HANDLER_TYPE_OPTIONS: { label: string; value: EventHandlerType | '' }[] = [
@@ -38,9 +42,12 @@ const HANDLER_TYPE_OPTIONS: { label: string; value: EventHandlerType | '' }[] = 
   { label: '回调（callback）', value: 'callback' },
 ]
 
-export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, onChange, eventName, widgets: w }) => {
+export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, onChange, eventName, widgets: w, slots }) => {
   const { token } = useStyle()
   const [type, setType] = useState<EventHandlerType | ''>(value?.type ?? '')
+
+  const ExpressionEditorSlot = resolveSlot('expressionEditor', slots, w)
+  const JsonEditorSlot = resolveSlot('jsonEditor', slots)
 
   const containerStyle: React.CSSProperties = {
     marginBottom: token('spacingSm') as string,
@@ -72,7 +79,11 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
 
       {type === 'expression' && value?.type === 'expression' && (
         <FieldItem label="表达式" variant="group">
-          <w.TextArea value={value.expression || ''} onChange={(v) => onChange({ ...value, expression: v })} placeholder={`如：$form.setFieldValue('other', $event)`} rows={3} />
+          <ExpressionEditorSlot
+            value={value.expression || ''}
+            onChange={(v) => onChange({ ...value, expression: v as string })}
+            placeholder={`如：$form.setFieldValue('other', $event)`}
+          />
           <div style={{ fontSize: token('fontSizeXs') as string, color: token('textTertiary') as React.CSSProperties['color'], marginTop: 2 }}>可用变量：$self（当前字段）、$form（表单 API）、$event（事件对象）</div>
         </FieldItem>
       )}
@@ -83,22 +94,10 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
             <w.Select value={value.action || ''} onChange={(v) => onChange({ ...value, action: v })} options={listActionNames().map((name) => ({ label: name, value: name }))} />
           </FieldItem>
           <FieldItem label="参数（JSON）">
-            <w.TextArea
-              value={value.params ? JSON.stringify(value.params, null, 2) : ''}
-              onChange={(v) => {
-                const text = (v || '').trim()
-                if (!text) {
-                  onChange({ ...value, params: undefined })
-                  return
-                }
-                try {
-                  onChange({ ...value, params: JSON.parse(text) })
-                } catch {
-                  // 解析失败时保留原值，不更新
-                }
-              }}
+            <JsonEditorSlot
+              value={value.params}
+              onChange={(v) => onChange({ ...value, params: v as Record<string, unknown> | undefined })}
               placeholder='如：{ "name": "other", "value": "x" }'
-              rows={3}
             />
           </FieldItem>
         </>
