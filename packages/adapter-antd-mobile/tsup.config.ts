@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup'
 export default defineConfig({
   entry: ['src/index.tsx'],
   format: ['cjs', 'esm'],
-  dts: false,  // Disable DTS build to avoid type errors
+  dts: true,
   splitting: true,
   clean: true,
   treeshake: true,

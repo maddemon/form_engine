@@ -13,7 +13,7 @@ export { NumberInput } from './NumberInput'
 export { Select } from './Select'
 export { Switch } from './Switch'
 
-import type { DesignerWidgets } from '@form-engine/core/types/adapter'
+import type { DesignerWidgets } from '@form-engine/core/designer'
 import { ButtonGroup } from './ButtonGroup'
 import { Checkbox } from './Checkbox'
 import { ColorPicker } from './ColorPicker'

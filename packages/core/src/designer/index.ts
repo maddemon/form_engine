@@ -21,4 +21,5 @@ export { defaultPaletteGroups as defaultPalette } from './paletteData'
 
 // 导出类型定义
 export type { DesignerAction, DesignerProps, PaletteGroup, PaletteItem, PanelWidths, SelectedFieldId } from '../types/designer'
+export type { DesignerWidgets } from '../types/adapter'
 

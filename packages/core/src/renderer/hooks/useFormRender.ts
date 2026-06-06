@@ -131,8 +131,9 @@ export function useFormRender({
   }), [setFieldValue, setFieldsValue, getFieldValue, submitValues, reset, validate, onSubmit])
 
   const eventContext: EventContext = useMemo(
-    () => ({ formValues, $form, callbacks }),
-    [formValues, $form, callbacks],
+    () => ({ formValues: formValuesRef.current, $form, callbacks }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [$form, callbacks],
   )
 
   return {

@@ -40,6 +40,11 @@
         "import": "./dist/designer/index.mjs",
         "require": "./dist/designer/index.js",
         "types": "./dist/designer/index.d.ts"
+      },
+      "./styles": {
+        "import": "./dist/styles/index.mjs",
+        "require": "./dist/styles/index.js",
+        "types": "./dist/styles/index.d.ts"
       }
     }
   },
@@ -71,6 +76,10 @@
     "./designer": {
       "import": "./src/designer/index.ts",
       "types": "./src/designer/index.ts"
+    },
+    "./styles": {
+      "import": "./src/styles/index.ts",
+      "types": "./src/styles/index.ts"
     }
   },
   "dependencies": {

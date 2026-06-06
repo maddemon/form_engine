@@ -13,16 +13,17 @@ export const AntdFormWrapper: React.FC<FormWrapperProps> = ({
 }) => {
   const sceneConfig = formConfig[scene]
   const isDesktop = scene === 'desktop'
+  const desktopConfig = isDesktop ? formConfig.desktop : undefined
 
   return (
     <Form
       layout={sceneConfig?.layout}
       colon={formConfig.colon}
       size={formConfig.size}
-      labelAlign={isDesktop ? sceneConfig?.labelAlign : undefined}
-      labelCol={isDesktop ? sceneConfig?.labelCol : undefined}
-      wrapperCol={isDesktop ? sceneConfig?.wrapperCol : undefined}
-      variant={isDesktop ? sceneConfig?.variant : undefined}
+      labelAlign={desktopConfig?.labelAlign}
+      labelCol={desktopConfig?.labelCol}
+      wrapperCol={desktopConfig?.wrapperCol}
+      variant={desktopConfig?.variant}
       requiredMark={formConfig.requiredMark}
       onFinish={() => onSubmit?.()}
       className={className}

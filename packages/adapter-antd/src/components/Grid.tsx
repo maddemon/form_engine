@@ -26,12 +26,13 @@ export const Grid: React.FC<GridProps> = ({
   const adapter = useAdapter()
   const isMobile = adapter?.scene === 'mobile'
   const childrenArray = React.Children.toArray(children)
+  const gapValue = typeof gap === 'number' ? gap : 8
 
   if (isMobile) {
     return (
       <div style={{ width: '100%', ...style }} className={className} id={id}>
         {childrenArray.map((child, index) => (
-          <div key={index} style={{ width: '100%', marginBottom: index < childrenArray.length - 1 ? gap : 0 }}>{child}</div>
+          <div key={index} style={{ width: '100%', marginBottom: index < childrenArray.length - 1 ? gapValue : 0 }}>{child}</div>
         ))}
       </div>
     )

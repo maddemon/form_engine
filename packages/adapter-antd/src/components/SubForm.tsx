@@ -4,7 +4,7 @@
  * 使用 Ant Design 的 Table 组件
  */
 
-import type { FormFieldSchema, SubFormColumnConfig } from '@form-engine/core'
+import type { FormFieldSchema, SubFormColumnConfig, OptionItem } from '@form-engine/core'
 import { useAdapter } from '@form-engine/core'
 import { Table as AntTable } from 'antd'
 import React from 'react'

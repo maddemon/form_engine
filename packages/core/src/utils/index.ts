@@ -19,8 +19,31 @@ export function replaceTemplateVars(
 ): string {
   return template.replace(/\{([^}]+)\}/g, (_, path) => {
     const val = getNested(context as Record<string, unknown>, path)
-    return val != null ? String(val) : ''
+    return val != null ? encodeURIComponent(String(val)) : ''
   })
+}
+
+// ── evalExpr 安全黑名单 ────────────────────────────────────────────
+
+/** 危险标识符正则：匹配单词边界，避免误伤子字符串。
+ * 使用 (?<!\$) 负向后顾排除 `$self` 等合法上下文变量 */
+const DANGEROUS_REGEX = /\b(?<!\$)(fetch|document|window|globalThis|self|top|parent|XMLHttpRequest|WebSocket|EventSource|import|eval|Function|setTimeout|setInterval|localStorage|sessionStorage|indexedDB|location|history|alert|confirm|prompt|process|require)\b/g
+
+/**
+ * 检查表达式是否包含危险标识符
+ */
+function hasDangerousGlobals(expr: string): boolean {
+  DANGEROUS_REGEX.lastIndex = 0
+  return DANGEROUS_REGEX.test(expr)
+}
+
+// ── evalExpr LRU 缓存 ──────────────────────────────────────────────
+
+const MAX_CACHE_SIZE = 200
+const exprCache = new Map<string, (...args: unknown[]) => unknown>()
+
+function getCacheKey(expr: string, keys: string[]): string {
+  return `${keys.sort().join(',')}::${expr}`
 }
 
 /**
@@ -28,10 +51,28 @@ export function replaceTemplateVars(
  * 安全执行字符串表达式，返回计算结果
  */
 export function evalExpr(expr: string, context: Record<string, unknown>): unknown {
+  // 安全校验：禁止危险 API
+  if (hasDangerousGlobals(expr)) {
+    console.warn(`[form-engine] 表达式包含危险标识符，已拦截: ${expr}`)
+    return false
+  }
+
   try {
     const keys = Object.keys(context)
     const values = Object.values(context)
-    const fn = new Function(...keys, `return (${expr})`)
+
+    // LRU 缓存：按 (keys + expr) 缓存编译结果，避免同名表达式跨上下文复用
+    const cacheKey = getCacheKey(expr, keys)
+    let fn = exprCache.get(cacheKey)
+    if (!fn) {
+      fn = new Function(...keys, `return (${expr})`) as (...args: unknown[]) => unknown
+      if (exprCache.size >= MAX_CACHE_SIZE) {
+        const firstKey = exprCache.keys().next().value
+        if (firstKey !== undefined) exprCache.delete(firstKey)
+      }
+      exprCache.set(cacheKey, fn)
+    }
+
     return fn(...values)
   } catch {
     console.warn(`[form-engine] 表达式执行失败: ${expr}`)

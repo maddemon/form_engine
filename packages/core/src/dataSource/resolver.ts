@@ -112,6 +112,11 @@ async function executeRemote(
   const url = replaceTemplateVars(String(config.url || ''), formValues)
   if (!url) throw new Error('[form-engine] remote dataSource 缺少 url')
 
+  // 2. URL 安全校验：仅允许同源相对路径（以 / 开头）
+  if (!url.startsWith('/')) {
+    throw new Error(`[form-engine] remote dataSource url 必须以 "/" 开头（仅允许同源相对路径）: ${url}`)
+  }
+
   const method = (config.method as string || 'GET').toUpperCase()
   const resultPath = config.resultPath as string | undefined
   const labelField = config.labelField as string | undefined
@@ -119,14 +124,14 @@ async function executeRemote(
   const cacheTTL = (config.cacheTTL as number | undefined) || 0
   const skipEmpty = !!config.skipEmpty
 
-  // 2. 缓存读取
+  // 3. 缓存读取
   if (cacheTTL > 0) {
     const key = getCacheKey(config, formValues)
     const cached = readCache(key)
     if (cached) return cached
   }
 
-  // 3. 发请求
+  // 4. 发请求
   const fetchOptions: RequestInit = { method }
   if (method === 'POST' && config.body) {
     fetchOptions.headers = { 'Content-Type': 'application/json' }
@@ -142,7 +147,7 @@ async function executeRemote(
   const extracted = extractByPath(json, resultPath || '')
   const options = mapRawItems(extracted, labelField, valueField)
 
-  // 4. 写入缓存
+  // 5. 写入缓存
   if (cacheTTL > 0) {
     const key = getCacheKey(config, formValues)
     writeCache(key, options, cacheTTL)
