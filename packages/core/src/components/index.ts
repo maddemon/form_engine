@@ -26,8 +26,8 @@ import iconMap from './icons'
 export interface ComponentRegistration {
   /** 显示名称 */
   label: string
-  /** 组件分类（form / display / container / button） */
-  category: ComponentCategory
+  /** 组件分类（form / display / container / button），支持数组表示同时属于多个分类 */
+  category: ComponentCategory | ComponentCategory[]
   /** 图标名称（纯字符串，通过 icons/iconMap 查找实际 SVG 组件） */
   icon: string
   /** 拖入画布时的默认 Schema（合并到 field） */
@@ -306,7 +306,7 @@ export const componentRegistry = {
   },
   'sub-form': {
     label: '子表单',
-    category: 'form',
+    category: ['form', 'container'],
     icon: 'Table',
     defaultProps: {
       componentProps: {
@@ -424,10 +424,18 @@ export function getComponentLabel(type: string): string {
 }
 
 /** 获取组件分类（支持 custom / custom:xxx） */
-export function getComponentCategory(type: string): ComponentCategory | null {
+export function getComponentCategory(type: string): ComponentCategory | ComponentCategory[] | null {
   if (type.startsWith('custom:')) return 'form'
   if (type === 'custom') return 'form'
   return (componentRegistry as Record<string, ComponentRegistration>)[type]?.category ?? null
+}
+
+/** 判断组件是否属于指定分类 */
+function hasCategory(type: string, cat: ComponentCategory): boolean {
+  const c = getComponentCategory(type)
+  if (!c) return false
+  if (Array.isArray(c)) return c.includes(cat)
+  return c === cat
 }
 
 /** 获取组件图标名称（字符串） */
@@ -451,14 +459,14 @@ export function getComponentDefaultProps(type: string): Partial<FormFieldSchema>
 /** 获取所有表单组件类型 */
 export function getFormFieldTypes(): string[] {
   return Object.entries(componentRegistry)
-    .filter(([_, reg]) => reg.category === 'form')
+    .filter(([type]) => hasCategory(type, 'form'))
     .map(([type]) => type)
 }
 
 /** 获取所有容器组件类型 */
 export function getContainerFieldTypes(): string[] {
   return Object.entries(componentRegistry)
-    .filter(([_, reg]) => reg.category === 'container')
+    .filter(([type]) => hasCategory(type, 'container'))
     .map(([type]) => type)
 }
 

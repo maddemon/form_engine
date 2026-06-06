@@ -46,9 +46,11 @@ export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorP
     updateRule({ message: String(v) || undefined }),
   )
 
-  const [patternValue, handlePatternChange, cancelPatternPending] = useDebouncedInput<string | number>(rule.pattern || '', (v) =>
-    updateRule({ pattern: String(v) || undefined }),
+  const [patternValue, handlePatternChange, cancelPatternPending] = useDebouncedInput<string | number>(
+    rule.pattern || '',
+    (v) => updateRule({ pattern: String(v) || undefined }),
   )
+  const handlePatternChangeTyped = handlePatternChange as (value: unknown) => void
 
   const handlePatternSelect = useCallback(
     (v: string) => {
@@ -70,7 +72,7 @@ export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorP
       <FieldItem label="正则验证">
         <CodeEditorSlot
           value={patternValue}
-          onChange={handlePatternChange}
+          onChange={handlePatternChangeTyped}
           field={field}
           placeholder="输入正则表达式"
         />

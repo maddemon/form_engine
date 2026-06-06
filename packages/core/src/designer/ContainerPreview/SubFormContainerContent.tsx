@@ -23,7 +23,9 @@ export const SubFormContainerContent: React.FC<ContainerContentProps> = React.me
     return map
   }, [field.children])
 
-  if (columns.length === 0) return <EmptyContainerPlaceholder containerId={field.id} />
+  if (columns.length === 0) {
+    return <EmptyContainerPlaceholder containerId={field.id} />
+  }
 
   if (scene === 'mobile') {
     return (

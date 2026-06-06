@@ -19,7 +19,6 @@ export const Title: React.FC<TitleProps> = ({
   disabled = false,
   ellipsis = false,
   textAlign,
-  color,
   style,
   className,
   id,
@@ -27,7 +26,6 @@ export const Title: React.FC<TitleProps> = ({
 }) => {
   const mergedStyle: React.CSSProperties = {
     ...(textAlign ? { textAlign } : {}),
-    ...(color ? { color } : {}),
     ...style,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

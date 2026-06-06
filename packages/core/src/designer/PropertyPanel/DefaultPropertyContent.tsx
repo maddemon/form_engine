@@ -75,6 +75,7 @@ export function DefaultPropertyContent({
     field.defaultValue != null ? String(field.defaultValue) : '',
     (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { defaultValue: v || undefined } }),
   )
+  const handleDefaultValueChangeTyped = handleDefaultValueChange as (value: unknown) => void
 
   const [colSpanValue, handleColSpanChange] = useDebouncedInput<number>(field.colSpan || 24, (v) =>
     dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { colSpan: Number(v) } }),
@@ -163,7 +164,7 @@ export function DefaultPropertyContent({
         <FieldItem label="默认值">
           <ExpressionEditorSlot
             value={defaultValueValue}
-            onChange={handleDefaultValueChange}
+            onChange={handleDefaultValueChangeTyped}
             field={field}
             fieldNames={allFields.map((f) => f.name).filter(Boolean)}
             placeholder="静态值或动态表达式"

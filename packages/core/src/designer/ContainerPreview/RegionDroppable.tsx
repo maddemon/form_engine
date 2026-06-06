@@ -22,7 +22,7 @@ export const RegionDroppable: React.FC<RegionDroppableProps> = ({ parentId, regi
   const droppableStyle = useDroppableStyle(isOver, items.length > 0)
 
   return (
-    <div ref={setNodeRef} style={droppableStyle}>
+    <div ref={setNodeRef} style={{ ...droppableStyle, pointerEvents: 'auto' }}>
       {items.length > 0 ? (
         <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
           {items.map((child, index) => (
@@ -30,7 +30,7 @@ export const RegionDroppable: React.FC<RegionDroppableProps> = ({ parentId, regi
           ))}
         </SortableContext>
       ) : (
-        <EmptyContainerPlaceholder containerId={`${fieldId}__region_${regionKey}`} />
+        <EmptyContainerPlaceholder containerId={`${fieldId}__region_${regionKey}`} skipDroppable />
       )}
     </div>
   )

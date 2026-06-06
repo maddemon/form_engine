@@ -138,8 +138,15 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
 
   // 通用 props
   const resolvedOptions = useMemo<OptionItem[]>(
-    () => (field.mock?.options?.length ? field.mock.options : options.length ? options : field.dataSource?.type === 'static' ? field.dataSource.static.options : []),
-    [field.mock?.options, options, field.dataSource],
+    () => {
+      if (field.mock?.options?.length) return field.mock.options
+      if (options.length) return options
+      if (field.dataSource?.type === 'static') return field.dataSource.static.options
+      const cpOptions = field.componentProps?.options as OptionItem[] | undefined
+      if (cpOptions?.length) return cpOptions
+      return []
+    },
+    [field.mock?.options, options, field.dataSource, field.componentProps?.options],
   )
 
   // 解析事件处理器（memo 避免每次渲染重建 handler 闭包）

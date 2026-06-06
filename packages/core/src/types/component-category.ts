@@ -9,24 +9,36 @@ import {
 
 export type ComponentCategory = 'form' | 'display' | 'container' | 'button'
 
-export function getComponentCategory(type: string): ComponentCategory | null {
+export function getComponentCategory(type: string): ComponentCategory | ComponentCategory[] | null {
   return _getComponentCategory(type)
 }
 
 export function isFormComponent(type: string): boolean {
-  return getComponentCategory(type) === 'form'
+  const c = getComponentCategory(type)
+  if (!c) return false
+  if (Array.isArray(c)) return c.includes('form')
+  return c === 'form'
 }
 
 export function isDisplayComponent(type: string): boolean {
-  return getComponentCategory(type) === 'display'
+  const c = getComponentCategory(type)
+  if (!c) return false
+  if (Array.isArray(c)) return c.includes('display')
+  return c === 'display'
 }
 
 export function isContainerComponent(type: string): boolean {
-  return getComponentCategory(type) === 'container'
+  const c = getComponentCategory(type)
+  if (!c) return false
+  if (Array.isArray(c)) return c.includes('container')
+  return c === 'container'
 }
 
 export function isButtonComponent(type: string): boolean {
-  return getComponentCategory(type) === 'button'
+  const c = getComponentCategory(type)
+  if (!c) return false
+  if (Array.isArray(c)) return c.includes('button')
+  return c === 'button'
 }
 
 export function getFormFieldTypes(): FieldType[] {

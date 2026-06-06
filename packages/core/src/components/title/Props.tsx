@@ -20,6 +20,19 @@ export default function TitlePropsRender({ widgets: w, values, onChange }: Props
           ]}
         />
       </FieldItem>
+      <FieldItem label="类型">
+        <w.Select
+          value={(values.type as string) ?? ''}
+          onChange={(v) => onChange('type', v || undefined)}
+          options={[
+            { label: '默认', value: '' },
+            { label: '次要', value: 'secondary' },
+            { label: '成功', value: 'success' },
+            { label: '警告', value: 'warning' },
+            { label: '危险', value: 'danger' },
+          ]}
+        />
+      </FieldItem>
       <FieldItem label="对齐方式">
         <w.ButtonGroup
           value={(values.textAlign as string) ?? 'left'}
@@ -30,9 +43,6 @@ export default function TitlePropsRender({ widgets: w, values, onChange }: Props
             { label: '右', value: 'right' },
           ]}
         />
-      </FieldItem>
-      <FieldItem label="颜色">
-        <w.Input value={(values.color as string) ?? ''} onChange={(v) => onChange('color', v)} placeholder="如: #333" />
       </FieldItem>
       <FieldItem label="加粗">
         <w.Switch checked={!!values.strong} onChange={(v) => onChange('strong', v)} />

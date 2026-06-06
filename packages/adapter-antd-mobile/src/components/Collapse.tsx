@@ -10,18 +10,41 @@ interface PanelConfig {
 }
 
 export const CollapseField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { fieldSchema } = props
+  const { fieldSchema, children: reactChildren } = props
   const adapter = useAdapter()
   const panels: PanelConfig[] = (fieldSchema.componentProps?.panels as PanelConfig[]) ?? []
   const accordion = fieldSchema.componentProps?.accordion as boolean | undefined ?? false
-  const children: FormFieldSchema[] = fieldSchema.children ?? []
+  const schemaChildren: FormFieldSchema[] = fieldSchema.children ?? []
   const activeKey = fieldSchema.componentProps?.activeKey as string | string[] | undefined
   const defaultActiveKey = fieldSchema.componentProps?.defaultActiveKey as string | string[] | undefined
 
+  // 当有 react children（设计器注入的 RegionDroppable）时，按 regionKey 分配到各 panel
+  if (reactChildren) {
+    const childrenArray = React.Children.toArray(reactChildren)
+    return (
+      <Collapse accordion={accordion} activeKey={activeKey} defaultActiveKey={defaultActiveKey}>
+        {panels.map((panel) => {
+          const panelReactChildren = childrenArray.filter((child) => {
+            const el = child as React.ReactElement<Record<string, unknown>>
+            const elProps = el.props ?? {}
+            const field = elProps.field as Record<string, unknown> | undefined
+            return field?.regionKey === panel.key
+          })
+          return (
+            <Collapse.Panel key={panel.key} title={panel.header}>
+              {panelReactChildren}
+            </Collapse.Panel>
+          )
+        })}
+      </Collapse>
+    )
+  }
+
+  // 无 react children（运行时渲染）：按 fieldSchema.children 渲染
   return (
     <Collapse accordion={accordion} activeKey={activeKey} defaultActiveKey={defaultActiveKey}>
       {panels.map((panel) => {
-        const panelChildren = children.filter((c) => c.regionKey === panel.key)
+        const panelChildren = schemaChildren.filter((c) => c.regionKey === panel.key)
         return (
           <Collapse.Panel key={panel.key} title={panel.header}>
             {panelChildren.map((child) => {

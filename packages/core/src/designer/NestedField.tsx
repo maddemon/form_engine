@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import React from 'react'
 import { FieldRenderer, DefaultFormItem } from '../renderer/FieldRenderer'
-import { isContainerComponent } from '../types/component-category'
+import { isContainerComponent, isFormComponent } from '../types/component-category'
 import type { FormEngineAdapter } from '../types/adapter'
 import type { FormItemProps } from '../types/adapter'
 import type { FormConfig, FormFieldSchema } from '../types/schema'
@@ -49,9 +49,11 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
   )
 
   const needsLabel = isContainer && !SELF_RENDERED.has(field.type)
+  const isFormLike = isFormComponent(field.type)
   const containerLabelProps: FormItemProps = {
     label: field.label,
     labelHidden: field.labelHidden,
+    required: isFormLike ? field.rules?.some((r) => r.required) : undefined,
     formConfig,
     scene: adapter.scene,
     children: content,

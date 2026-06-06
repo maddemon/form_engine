@@ -102,7 +102,7 @@ export const RegionPreview: React.FC<RegionPreviewProps> = ({
             ))}
           </SortableContext>
         ) : (
-          <EmptyContainerPlaceholder containerId={`${parent.id}__region_${regionKey}`} />
+          <EmptyContainerPlaceholder containerId={`${parent.id}__region_${regionKey}`} skipDroppable />
         )}
       </div>
     </div>

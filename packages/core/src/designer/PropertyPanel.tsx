@@ -48,9 +48,9 @@ function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPane
   const ComponentPropsRender = PropsRenderMap[field.type]
   const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
   const category = getComponentCategory(field.type)
-  const isForm = category === 'form'
-  const isContainer = category === 'container'
-  const isButton = category === 'button'
+  const isForm = Array.isArray(category) ? category.includes('form') : category === 'form'
+  const isContainer = Array.isArray(category) ? category.includes('container') : category === 'container'
+  const isButton = Array.isArray(category) ? category.includes('button') : category === 'button'
 
   const onUpdateProp = useCallback(
     (key: string, value: unknown) => {

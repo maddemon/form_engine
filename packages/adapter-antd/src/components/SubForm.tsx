@@ -4,10 +4,10 @@
  * 使用 Ant Design 的 Table 组件
  */
 
-import React from 'react'
-import { Table as AntTable } from 'antd'
+import type { FormFieldSchema, SubFormColumnConfig } from '@form-engine/core'
 import { useAdapter } from '@form-engine/core'
-import type { SubFormColumnConfig, FormFieldSchema } from '@form-engine/core'
+import { Table as AntTable } from 'antd'
+import React from 'react'
 
 export const SubForm: React.FC<{
   value?: Record<string, unknown>[]
@@ -15,13 +15,7 @@ export const SubForm: React.FC<{
   fieldSchema: FormFieldSchema
   disabled?: boolean
   readOnly?: boolean
-}> = ({
-  value = [],
-  onChange,
-  fieldSchema,
-  disabled,
-  ...rest
-}) => {
+}> = ({ value = [], onChange, fieldSchema, disabled, ...rest }) => {
   const field = fieldSchema
   const adapter = useAdapter()
   const children = field.children ?? []
@@ -35,15 +29,22 @@ export const SubForm: React.FC<{
     )
   }
 
+  const resolveChildOptions = (child: FormFieldSchema): OptionItem[] => {
+    if (child.mock?.options?.length) return child.mock.options
+    if (child.dataSource?.type === 'static' && child.dataSource.static.options?.length)
+      return child.dataSource.static.options
+    const cpOptions = child.componentProps?.options as OptionItem[] | undefined
+    if (cpOptions?.length) return cpOptions
+    return []
+  }
+
   const renderCell = (child: Record<string, unknown>, row: Record<string, unknown>, rowIndex: number) => {
+    const childSchema = child as unknown as FormFieldSchema
     const renderFn = adapter?.components[child.type as string]
     if (!renderFn) {
-      return (
-        <span style={{ color: 'var(--fe-text-tertiary)', fontSize: 12 }}>
-          未知类型: {String(child.type)}
-        </span>
-      )
+      return <span style={{ color: 'var(--fe-text-tertiary)', fontSize: 12 }}>未知类型: {String(child.type)}</span>
     }
+    const { options: _ignored, ...restComponentProps } = childSchema.componentProps ?? {}
     return React.createElement(renderFn, {
       value: row[child.name as string],
       onChange: (newValue: unknown) => {
@@ -52,13 +53,15 @@ export const SubForm: React.FC<{
         onChange?.(newRows)
       },
       disabled: !!disabled,
-      fieldSchema: child as unknown as FormFieldSchema,
+      fieldSchema: childSchema,
+      options: resolveChildOptions(childSchema),
+      ...restComponentProps,
     } as React.ComponentProps<typeof renderFn>)
   }
 
   const handleAddRow = () => {
     const newRow: Record<string, unknown> = {}
-    children.forEach(child => {
+    children.forEach((child) => {
       newRow[child.name as string] = child.defaultValue ?? ''
     })
     onChange?.([...value, newRow])
@@ -70,18 +73,16 @@ export const SubForm: React.FC<{
 
   // 表格列定义
   const antdColumns = [
-    ...columns.map(col => {
+    ...columns.map((col) => {
       // 找这一列下的子字段
-      const colChildren = children.filter(
-        c => (c.columnIndex ?? Number(c.regionKey ?? -1)) === columns.indexOf(col)
-      )
+      const colChildren = children.filter((c) => (c.columnIndex ?? Number(c.regionKey ?? -1)) === columns.indexOf(col))
       return {
         title: (col as SubFormColumnConfig).label,
         key: (col as unknown as Record<string, unknown>).key as string | undefined,
         width: col.width,
         render: (_: unknown, _row: Record<string, unknown>, rowIndex: number) => (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {colChildren.map(child => (
+            {colChildren.map((child) => (
               <div key={child.id as string}>
                 {renderCell(child as unknown as Record<string, unknown>, value[rowIndex] || {}, rowIndex)}
               </div>
@@ -96,10 +97,7 @@ export const SubForm: React.FC<{
       width: 60,
       fixed: 'right' as const,
       render: (_: unknown, _row: Record<string, unknown>, rowIndex: number) => (
-        <a
-          style={{ color: 'var(--fe-error)' }}
-          onClick={() => handleRemoveRow(rowIndex)}
-        >
+        <a style={{ color: 'var(--fe-error)' }} onClick={() => handleRemoveRow(rowIndex)}>
           删除
         </a>
       ),

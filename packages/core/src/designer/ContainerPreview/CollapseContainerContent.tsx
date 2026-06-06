@@ -1,13 +1,12 @@
 import { useDroppable } from '@dnd-kit/core'
 import React, { useMemo } from 'react'
 import type { CollapsePanelConfig } from '../../components/collapse/types'
-import type { FormFieldSchema } from '../../types/schema'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import { RegionDroppable } from './RegionDroppable'
 import { SelfRenderedContainer } from './SelfRenderedContainer'
 import type { ContainerContentProps } from './types'
 
-/** Collapse container */
+/** Collapse container — desktop/mobile 均通过 SelfRenderedContainer 渲染，适配器负责处理 children */
 export const CollapseContainerContent: React.FC<ContainerContentProps> = React.memo(({ field, formConfig, adapter }) => {
   const panels = ((field.componentProps?.panels as CollapsePanelConfig[]) ?? []).filter(Boolean)
 

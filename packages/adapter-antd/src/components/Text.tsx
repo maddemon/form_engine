@@ -28,7 +28,6 @@ export const Text: React.FC<TextProps> = ({
   ellipsis = false,
   textAlign,
   fontSize,
-  color,
   style,
   className,
   id,
@@ -36,9 +35,9 @@ export const Text: React.FC<TextProps> = ({
 }) => {
   // 构建 Typography.Text 的 props
   const mergedStyle: React.CSSProperties = {
+    whiteSpace: 'pre-wrap',
     ...(textAlign ? { textAlign } : {}),
     ...(fontSize ? { fontSize } : {}),
-    ...(color ? { color } : {}),
     ...style,
   }
   const textProps: any = {

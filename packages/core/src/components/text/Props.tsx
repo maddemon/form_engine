@@ -23,9 +23,6 @@ export default function TextPropsRender({ widgets: w, values, onChange }: PropsR
       <FieldItem label="字号">
         <w.Input value={(values.fontSize as string) ?? ''} onChange={(v) => onChange('fontSize', v ? Number(v) : undefined)} placeholder="如: 16" />
       </FieldItem>
-      <FieldItem label="颜色">
-        <w.Input value={(values.color as string) ?? ''} onChange={(v) => onChange('color', v)} placeholder="如: #333" />
-      </FieldItem>
       <FieldItem label="对齐方式">
         <w.ButtonGroup
           value={(values.textAlign as string) ?? 'left'}

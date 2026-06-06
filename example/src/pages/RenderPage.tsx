@@ -6,7 +6,17 @@ import { Button, Card, Empty, Flex, Segmented } from 'antd'
 import React, { useCallback, useRef, useState } from 'react'
 /** 桌面图标 */
 const DesktopIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: -2 }}>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ verticalAlign: -2 }}
+  >
     <rect x="2" y="3" width="20" height="14" rx="2" />
     <line x1="8" y1="21" x2="16" y2="21" />
     <line x1="12" y1="17" x2="12" y2="21" />
@@ -15,7 +25,17 @@ const DesktopIcon: React.FC = () => (
 
 /** 手机图标 */
 const MobileIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: -2 }}>
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ verticalAlign: -2 }}
+  >
     <rect x="6" y="2" width="12" height="20" rx="2" />
     <line x1="12" y1="18" x2="12" y2="18" />
   </svg>
@@ -75,6 +95,7 @@ const RenderPage: React.FC<Props> = ({ schema, themeMode }) => {
                 schema={schema}
                 onSubmit={handleSubmit}
                 onChange={handleChange}
+                desktopAdapter={antdAdapter}
                 mobileAdapter={antdMobileAdapter}
                 scene={scene}
                 themeMode={themeMode}

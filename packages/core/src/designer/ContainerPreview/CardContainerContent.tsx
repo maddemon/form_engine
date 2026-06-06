@@ -13,17 +13,17 @@ export const CardContainerContent: React.FC<ContainerContentProps> = React.memo(
   const childIds = useMemo(() => field.children.map((c) => c.id), [field.children])
   const droppableStyle = useDroppableStyle(isOver, field.children.length > 0)
 
-  if (field.children.length === 0) {
-    return <EmptyContainerPlaceholder containerId={field.id} />
-  }
-
-  const cardBody = (
+  const cardBody = field.children.length > 0 ? (
     <div ref={setNodeRef} style={droppableStyle}>
       <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
         {field.children.map((child, index) => (
           <NestedField key={child.id} field={child} parentContainerId={field.id} childIndex={index} />
         ))}
       </SortableContext>
+    </div>
+  ) : (
+    <div ref={setNodeRef} style={droppableStyle}>
+      <EmptyContainerPlaceholder containerId={field.id} skipDroppable />
     </div>
   )
 

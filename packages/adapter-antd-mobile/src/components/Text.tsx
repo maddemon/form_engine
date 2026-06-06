@@ -13,10 +13,10 @@ export const TextField: FieldRendererFn = (props: FieldComponentProps) => {
   const type = props.type
 
   const typeColorMap: Record<string, string> = {
-    secondary: '#999',
-    success: '#52c41a',
-    warning: '#faad14',
-    danger: '#ff4d4f',
+    secondary: 'var(--fe-text-tertiary)',
+    success: 'var(--fe-success)',
+    warning: 'var(--fe-warning)',
+    danger: 'var(--fe-error)',
   }
 
   let el: React.ReactNode = content
@@ -29,7 +29,7 @@ export const TextField: FieldRendererFn = (props: FieldComponentProps) => {
   if (strong) el = <strong>{el}</strong>
 
   return (
-    <span style={{ color: type ? typeColorMap[type] : undefined, ...style }}>
+    <span style={{ whiteSpace: 'pre-wrap', color: type ? typeColorMap[type] : undefined, ...style }}>
       {el}
     </span>
   )

@@ -1,5 +1,5 @@
+import type { FormFieldSchema, OptionItem } from '@form-engine/core'
 import { useAdapter, type FieldComponentProps, type FieldRendererFn } from '@form-engine/core'
-import type { FormFieldSchema } from '@form-engine/core'
 import { Button, Card } from 'antd-mobile'
 import React from 'react'
 
@@ -19,10 +19,16 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
   const rowMode = fieldSchema.componentProps?.rowMode ?? 'dynamic'
 
   // 按 regionKey 分组列字段
-  const columnChildren = columns.map((_col, colIdx) => children.filter((child) => (child.columnIndex ?? Number(child.regionKey ?? colIdx)) === colIdx))
+  const columnChildren = columns.map((_col, colIdx) =>
+    children.filter((child) => (child.columnIndex ?? Number(child.regionKey ?? colIdx)) === colIdx),
+  )
 
   if (columns.length === 0) {
-    return <div style={{ padding: 16, textAlign: 'center', color: 'var(--fe-text-tertiary)' }}>请先在「表格属性」中配置列</div>
+    return (
+      <div style={{ padding: 16, textAlign: 'center', color: 'var(--fe-text-tertiary)' }}>
+        请先在「表格属性」中配置列
+      </div>
+    )
   }
 
   const handleCellChange = (rowIndex: number, fieldName: string, cellValue: unknown) => {
@@ -44,8 +50,17 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
     onChange?.([...rows, newRow])
   }
 
+  const resolveChildOptions = (child: FormFieldSchema): OptionItem[] => {
+    if (child.mock?.options?.length) return child.mock.options
+    if (child.dataSource?.type === 'static' && child.dataSource.static.options?.length)
+      return child.dataSource.static.options
+    const cpOptions = child.componentProps?.options as OptionItem[] | undefined
+    if (cpOptions?.length) return cpOptions
+    return []
+  }
+
   return (
-    <div>
+    <>
       {rows.map((row, rowIndex) => (
         <Card key={rowIndex} style={{ marginBottom: 12, position: 'relative' }}>
           {rowMode === 'dynamic' && !disabled && (
@@ -60,8 +75,8 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
                 height: 24,
                 borderRadius: '50%',
                 border: 'none',
-                background: 'rgba(255, 77, 79, 0.1)',
-                color: '#ff4d4f',
+                background: 'var(--fe-error-bg)',
+                color: 'var(--fe-error)',
                 fontSize: 14,
                 lineHeight: '24px',
                 cursor: 'pointer',
@@ -73,7 +88,16 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
               }}
               title="删除"
             >
-              <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width={12}
+                height={12}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
               </svg>
@@ -81,10 +105,15 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
           )}
           {columnChildren.map((colChildren, colIdx) => (
             <div key={colIdx}>
-              {columns[colIdx] && <div style={{ fontSize: 13, fontWeight: 600, color: '#333', marginBottom: 6 }}>{columns[colIdx].label}</div>}
+              {columns[colIdx] && (
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#333', marginBottom: 6 }}>
+                  {columns[colIdx].label}
+                </div>
+              )}
               {colChildren.map((child) => {
                 const cellValue = row[child.name]
                 const renderFn = adapter?.components[child.type]
+                const { options: _ignored, ...restComponentProps } = child.componentProps ?? {}
                 return (
                   <div key={child.name} style={{ marginBottom: 10 }}>
                     <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>{child.label}</div>
@@ -94,6 +123,8 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
                         onChange: (v: unknown) => handleCellChange(rowIndex, child.name, v),
                         fieldSchema: child,
                         disabled,
+                        options: resolveChildOptions(child),
+                        ...restComponentProps,
                       })
                     ) : (
                       <div style={{ color: '#ccc', fontSize: 12, padding: '6px 0' }}>未知类型: {child.type}</div>
@@ -110,6 +141,6 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
           + 添加行
         </Button>
       )}
-    </div>
+    </>
   )
 }
