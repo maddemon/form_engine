@@ -1,5 +1,5 @@
 import React from 'react'
-import { BASE_STYLE, FOCUS_STYLE } from './shared'
+import { getInputControlStyle } from './shared'
 
 interface WidgetTextAreaProps {
   value?: string
@@ -23,15 +23,7 @@ export const WidgetTextArea = React.forwardRef<HTMLTextAreaElement, WidgetTextAr
         rows={rows}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        style={{
-          ...BASE_STYLE,
-          resize: 'vertical',
-          minHeight: 36,
-          ...(focused ? FOCUS_STYLE : {}),
-          opacity: disabled ? 0.5 : 1,
-          cursor: disabled ? 'not-allowed' : 'text',
-          ...style,
-        }}
+        style={getInputControlStyle({ focused, disabled, style: { resize: 'vertical', minHeight: 36, ...style } })}
       />
     )
   },

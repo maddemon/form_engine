@@ -1,5 +1,5 @@
 import React from 'react'
-import { BASE_STYLE, FOCUS_STYLE } from './shared'
+import { getInputControlStyle } from './shared'
 
 export const WidgetInput: React.FC<{
   value?: string | number
@@ -18,13 +18,7 @@ export const WidgetInput: React.FC<{
       disabled={disabled}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
-      style={{
-        ...BASE_STYLE,
-        ...(focused ? FOCUS_STYLE : {}),
-        opacity: disabled ? 0.5 : 1,
-        cursor: disabled ? 'not-allowed' : 'text',
-        ...style,
-      }}
+      style={getInputControlStyle({ focused, disabled, style })}
     />
   )
 }

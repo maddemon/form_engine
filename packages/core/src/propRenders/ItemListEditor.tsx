@@ -1,8 +1,10 @@
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import React, { useCallback, useMemo } from 'react'
 import { useStyle } from '../styles'
+import { ErrorMessage } from '../designer/UIPrimitives'
+import { WidgetButton } from '../widgets/Button'
+import { arrayMove, SortableRow, DragHandleIcon, InlineDeleteButton, getInputBaseStyle, getLabelStyle, getSortableRowContentStyle } from '../widgets/sortableListShared'
 
 export interface ItemListField<T> {
   key: keyof T | string
@@ -36,51 +38,6 @@ export interface ItemListEditorProps<T extends { id: string }> {
 }
 
 const SORTABLE_PREFIX = '__ileditor_'
-
-function SortableRow({
-  id,
-  sortable,
-  dragHandle,
-  children,
-}: {
-  id: string
-  sortable: boolean
-  dragHandle: React.ReactNode
-  children: React.ReactNode
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: sortable ? `${SORTABLE_PREFIX}${id}` : id,
-    disabled: !sortable,
-  })
-
-  const style: React.CSSProperties = sortable
-    ? {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.4 : 1,
-      }
-    : {}
-
-  return (
-    <div ref={setNodeRef} style={style}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'inherit' }}>
-        {sortable && (
-          <div {...attributes} {...listeners} style={{ touchAction: 'none', display: 'flex' }}>
-            {dragHandle}
-          </div>
-        )}
-        {children}
-      </div>
-    </div>
-  )
-}
-
-function arrayMove<T>(arr: T[], from: number, to: number): T[] {
-  const copy = [...arr]
-  const [moved] = copy.splice(from, 1)
-  copy.splice(to, 0, moved)
-  return copy
-}
 
 function ItemListEditorInner<T extends { id: string }>({
   value = [],
@@ -139,39 +96,8 @@ function ItemListEditorInner<T extends { id: string }>({
   const minError = items.length < minItems ? `至少保留 ${minItems} 项` : null
   const errorMsg = totalError || uniqueError || minError
 
-  const dragHandleStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    width: token('itemListDragHandleWidthLg'),
-    height: token('itemListDragHandleHeightLg'),
-    cursor: disabled || !sortable ? 'default' : 'grab',
-    color: 'var(--fe-text-secondary)',
-    fontSize: token('fontSizeMd'),
-    lineHeight: 1,
-    userSelect: 'none',
-    touchAction: 'none',
-    borderRadius: 'var(--fe-border-radius-sm)',
-    background: 'var(--fe-bg-tertiary)',
-  }
-
-  const inputBaseStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '1px 0',
-    border: 'none',
-    outline: 'none',
-    fontSize: token('fontSizeXs'),
-    boxSizing: 'border-box',
-    background: 'transparent',
-    color: disabled ? 'var(--fe-disabled-color)' : 'inherit',
-  }
-
-  const labelStyle: React.CSSProperties = {
-    fontSize: token('fontSizeXs'),
-    color: 'var(--fe-text-tertiary)',
-    lineHeight: 1.3,
-  }
+  const inputBaseStyle = getInputBaseStyle(token, disabled)
+  const labelStyle = getLabelStyle(token)
 
   const sortableIds = useMemo(() => items.map((item) => `${SORTABLE_PREFIX}${item.id}`), [items])
 
@@ -180,20 +106,10 @@ function ItemListEditorInner<T extends { id: string }>({
       <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
         <div>
           {items.map((item, index) => {
-            const dragHandleNode = sortable ? <div style={dragHandleStyle}>⋮⋮</div> : null
+            const dragHandleNode = sortable ? <DragHandleIcon disabled={disabled} sortable={sortable} /> : null
             return (
-              <SortableRow key={item.id} id={item.id} sortable={sortable} dragHandle={dragHandleNode}>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: token('spacingXs'),
-                    marginBottom: token('spacingXs'),
-                    background: 'var(--fe-bg-primary)',
-                    padding: '2px 4px',
-                    borderRadius: 'var(--fe-border-radius-sm)',
-                  }}
-                >
+              <SortableRow key={item.id} id={`${SORTABLE_PREFIX}${item.id}`} sortable={sortable} dragHandle={dragHandleNode}>
+                <div style={getSortableRowContentStyle(token)}>
                   {/* 字段列表 */}
                   {fields.map((field) => {
                     let fieldFlex = field.flex ?? 1
@@ -255,30 +171,11 @@ function ItemListEditorInner<T extends { id: string }>({
                   })}
 
                   {/* 删除按钮 */}
-                  <button
-                    type="button"
+                  <InlineDeleteButton
                     disabled={disabled || items.length <= minItems}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleRemove(index)
-                    }}
+                    onClick={(e) => { e.stopPropagation(); handleRemove(index) }}
                     title={items.length <= minItems ? `至少保留 ${minItems} 项` : '删除'}
-                    style={{
-                      flexShrink: 0,
-                      width: token('itemListRemoveButtonSize'),
-                      height: token('itemListRemoveButtonSize'),
-                      padding: token('itemListRemoveButtonPadding'),
-                      border: 'none',
-                      background: 'transparent',
-                      color: 'var(--fe-text-tertiary)',
-                      cursor: disabled || items.length <= minItems ? 'not-allowed' : 'pointer',
-                      fontSize: token('fontSizeXs'),
-                      lineHeight: 1,
-                      opacity: disabled || items.length <= minItems ? 0.3 : 0.6,
-                    }}
-                  >
-                    ✕
-                  </button>
+                  />
                 </div>
               </SortableRow>
             )
@@ -286,45 +183,19 @@ function ItemListEditorInner<T extends { id: string }>({
 
           {/* 错误提示 */}
           {errorMsg && (
-            <div
-              style={{
-                color: 'var(--fe-error)',
-                fontSize: token('fontSizeXs'),
-                marginBottom: token('spacingXs'),
-              }}
-            >
-              {errorMsg}
-            </div>
+            <ErrorMessage>{errorMsg}</ErrorMessage>
           )}
 
           {/* 添加按钮 */}
-          <button
-            type="button"
-            disabled={disabled}
+          <WidgetButton
+            type="dashed"
+            size="sm"
             onClick={handleAdd}
-            style={{
-              width: '100%',
-              padding: '4px 0',
-              border: '1px dashed var(--fe-primary)',
-              borderRadius: 'var(--fe-border-radius-sm)',
-              background: 'transparent',
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              fontSize: token('fontSizeXs'),
-              fontWeight: 500,
-              color: 'var(--fe-primary)',
-              opacity: disabled ? 0.4 : 1,
-              textAlign: 'center',
-              transition: 'background 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              if (!disabled) e.currentTarget.style.background = 'var(--fe-primary-hover-bg)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent'
-            }}
+            disabled={disabled}
+            style={{ width: '100%', textAlign: 'center' as const, color: 'var(--fe-primary)', borderColor: 'var(--fe-primary)' }}
           >
             + {addLabel ?? '添加'}
-          </button>
+          </WidgetButton>
         </div>
       </SortableContext>
     </DndContext>

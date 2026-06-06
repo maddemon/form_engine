@@ -6,6 +6,7 @@ import type { ComponentRenderFn, FieldComponentProps, FormEngineAdapter, FormIte
 import { isFormComponent } from '../types/component-category'
 import type { $Self, ResolvedEventHandler } from '../types/events'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
+import { TooltipIcon, ErrorMessage } from '../designer/UIPrimitives'
 import { AdapterContext } from './AdapterContext'
 import { FieldSchemaContext } from './FieldSchemaContext'
 import { useInsideContainer } from './InsideContainerContext'
@@ -76,18 +77,14 @@ const DefaultFormItem: React.FC<FormItemProps> = React.memo(function DefaultForm
     <label className="fe-field-label" style={labelStyle}>
       {required && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
       {labelText}
-      {tooltip && (
-        <span title={tooltip} style={{ marginLeft: 'var(--fe-spacing-xs, 4px)', cursor: 'help', color: token('textTertiary') as string }}>
-          ?
-        </span>
-      )}
+      {tooltip && <TooltipIcon tooltip={tooltip} />}
     </label>
   )
 
   const content = (
     <>
       {children}
-      {errorMsg && <div style={{ color: token('error') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{errorMsg}</div>}
+      {errorMsg && <ErrorMessage margin="top">{errorMsg}</ErrorMessage>}
       {help && !errorMsg && <div style={{ color: token('textTertiary') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{help}</div>}
     </>
   )

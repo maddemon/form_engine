@@ -6,6 +6,7 @@ import type { DesignerWidgets } from '../types/adapter'
 import type { DesignerAction } from '../types/designer'
 import type { PropertySlots } from '../types/property-slot'
 import type { FormFieldSchema, FormRule } from '../types/schema'
+import { SectionTitle } from './UIPrimitives'
 import { useDebouncedInput } from './useDebouncedInput'
 
 export const COMMON_PATTERNS: { label: string; value: string }[] = [
@@ -41,34 +42,25 @@ export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorP
     [rule, dispatch, field.id],
   )
 
-  const handlePatternSelect = useCallback(
-    (v: string) => {
-      updateRule({ pattern: v || undefined })
-    },
-    [updateRule],
-  )
-
-  // 防抖输入
   const [messageValue, handleMessageChange] = useDebouncedInput<string | number>(rule.message || '', (v) =>
     updateRule({ message: String(v) || undefined }),
   )
 
-  const [patternValue, handlePatternChange] = useDebouncedInput<string | number>(rule.pattern || '', (v) =>
+  const [patternValue, handlePatternChange, cancelPatternPending] = useDebouncedInput<string | number>(rule.pattern || '', (v) =>
     updateRule({ pattern: String(v) || undefined }),
+  )
+
+  const handlePatternSelect = useCallback(
+    (v: string) => {
+      cancelPatternPending()
+      updateRule({ pattern: v || undefined })
+    },
+    [updateRule, cancelPatternPending],
   )
 
   return (
     <>
-      <div
-        style={{
-          fontSize: token('fontSizeSm'),
-          fontWeight: 500,
-          marginBottom: token('spacingSm'),
-          color: token('textSecondary'),
-        }}
-      >
-        校验规则
-      </div>
+      <SectionTitle variant="primary">校验规则</SectionTitle>
       <FieldItem label="必填">
         <w.Switch checked={!!rule.required} onChange={(v: boolean) => updateRule({ required: v || undefined })} />
       </FieldItem>

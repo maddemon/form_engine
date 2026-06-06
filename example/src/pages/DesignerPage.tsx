@@ -1,6 +1,14 @@
-import { antdAdapter } from '@form-engine/adapter-antd'
+//import { antdAdapter } from '@form-engine/adapter-antd'
 import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
-import type { FormFieldSchema, FormSchema, PropertyPanelTab, PropertyPanelTabContentProps, SidePanelTab, SidePanelTabContentProps, ThemeMode } from '@form-engine/core'
+import type {
+  FormFieldSchema,
+  FormSchema,
+  PropertyPanelTab,
+  PropertyPanelTabContentProps,
+  SidePanelTab,
+  SidePanelTabContentProps,
+  ThemeMode,
+} from '@form-engine/core'
 import { Designer } from '@form-engine/core'
 import { Card, Typography } from 'antd'
 import React, { useMemo } from 'react'
@@ -57,7 +65,9 @@ const JsonViewTab: React.FC<PropertyPanelTabContentProps> = ({ field }) => {
   return (
     <div style={{ padding: 8 }}>
       <Card title="字段 Schema (JSON)" size="small">
-        <pre style={{ maxHeight: 200, overflow: 'auto', fontSize: 12, lineHeight: 1.4 }}>{JSON.stringify(field, null, 2)}</pre>
+        <pre style={{ maxHeight: 200, overflow: 'auto', fontSize: 12, lineHeight: 1.4 }}>
+          {JSON.stringify(field, null, 2)}
+        </pre>
       </Card>
     </div>
   )
@@ -84,7 +94,7 @@ const DesignerPage: React.FC<Props> = ({ schema, onSchemaChange, themeMode }) =>
       <Designer
         value={schema}
         onChange={onSchemaChange}
-        desktopAdapter={antdAdapter}
+        //desktopAdapter={antdAdapter}
         mobileAdapter={antdMobileAdapter}
         panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }}
         excludeTypes={['date-range']}

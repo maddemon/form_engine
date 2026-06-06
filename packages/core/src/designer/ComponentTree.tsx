@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useStyle } from '../styles'
+import { WidgetButton } from '../widgets/Button'
 
 export interface TreeItem {
   id: string
@@ -79,19 +80,7 @@ export const ComponentTree: React.FC<ComponentTreeProps> = ({ items, selectedId,
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: token('spacingSm') }}>
         <strong style={{ fontSize: token('fontSizeSm') }}>组件树</strong>
-        <button
-          onClick={onClose}
-          style={{
-            border: 'none',
-            background: 'none',
-            cursor: 'pointer',
-            color: 'var(--fe-text-muted)',
-            fontSize: token('fontSizeMd'),
-            padding: '0 2px',
-          }}
-        >
-          ✕
-        </button>
+        <WidgetButton type="text" size="sm" onClick={onClose} label="关闭" style={{ padding: '0 2px', lineHeight: 1 }}>✕</WidgetButton>
       </div>
       {items.map(item => (
         <TreeNode key={item.id} item={item} selectedId={selectedId} onSelect={onSelect} depth={0} />

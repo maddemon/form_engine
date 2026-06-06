@@ -1,5 +1,6 @@
 import React from 'react'
 import { useStyle } from '../styles'
+import { TooltipIcon } from '../designer/UIPrimitives'
 
 interface FieldItemProps {
   label: string
@@ -15,11 +16,7 @@ export const FieldItem: React.FC<FieldItemProps> = ({ label, children, variant =
   const labelNode = (
     <>
       {label}
-      {tooltip && (
-        <span title={tooltip} style={{ marginLeft: 'var(--fe-spacing-xs, 4px)', cursor: 'help', color: token('textTertiary') as string }}>
-          ?
-        </span>
-      )}
+      {tooltip && <TooltipIcon tooltip={tooltip} />}
     </>
   )
 

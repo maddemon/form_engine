@@ -11,6 +11,7 @@ import React, { useMemo } from 'react'
 import type { FormFieldSchema } from '../types/schema'
 import { useStyle } from '../styles'
 import { NestedField } from './NestedField'
+import { EmptyContainerPlaceholder } from './ContainerPreview/EmptyContainerPlaceholder'
 
 export interface RegionPreviewProps {
   parent: FormFieldSchema
@@ -101,14 +102,7 @@ export const RegionPreview: React.FC<RegionPreviewProps> = ({
             ))}
           </SortableContext>
         ) : (
-          <div style={{
-            color: 'var(--fe-text-muted)',
-            fontSize: token('fontSizeXs'),
-            textAlign: 'center',
-            padding: token('spacingSm'),
-          }}>
-            拖拽组件到此处
-          </div>
+          <EmptyContainerPlaceholder containerId={`${parent.id}__region_${regionKey}`} />
         )}
       </div>
     </div>

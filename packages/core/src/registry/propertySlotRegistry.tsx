@@ -40,9 +40,15 @@ export const propertySlotRegistry = new PropertySlotRegistry()
 
 // ── Widget 适配器：将 DesignerWidgets 中的组件适配为 PropertySlotProps ──
 
+/** 缓存适配后的组件，避免每次渲染创建新组件类型导致 React 卸载/重挂载 */
+const expressionInputCache = new WeakMap<React.ComponentType<any>, React.ComponentType<PropertySlotProps>>()
+const dataSourceEditorCache = new WeakMap<React.ComponentType<any>, React.ComponentType<PropertySlotProps>>()
+
 /** 将 w.ExpressionInput 适配为 PropertySlotProps */
 function adaptExpressionInput(w: DesignerWidgets): React.ComponentType<PropertySlotProps> | null {
   if (!w.ExpressionInput) return null
+  const cached = expressionInputCache.get(w.ExpressionInput)
+  if (cached) return cached
   const ExpressionInput = w.ExpressionInput
   const Adapted: React.FC<PropertySlotProps> = ({ value, onChange, placeholder, fieldNames }) => (
     <ExpressionInput
@@ -53,12 +59,15 @@ function adaptExpressionInput(w: DesignerWidgets): React.ComponentType<PropertyS
     />
   )
   Adapted.displayName = 'AdaptedExpressionInput'
+  expressionInputCache.set(w.ExpressionInput, Adapted)
   return Adapted
 }
 
 /** 将 w.DataSourceEditor 适配为 PropertySlotProps */
 function adaptDataSourceEditor(w: DesignerWidgets): React.ComponentType<PropertySlotProps> | null {
   if (!w.DataSourceEditor) return null
+  const cached = dataSourceEditorCache.get(w.DataSourceEditor)
+  if (cached) return cached
   const DataSourceEditor = w.DataSourceEditor
   const Adapted: React.FC<PropertySlotProps> = ({ value, onChange, context }) => (
     <DataSourceEditor
@@ -68,6 +77,7 @@ function adaptDataSourceEditor(w: DesignerWidgets): React.ComponentType<Property
     />
   )
   Adapted.displayName = 'AdaptedDataSourceEditor'
+  dataSourceEditorCache.set(w.DataSourceEditor, Adapted)
   return Adapted
 }
 
@@ -88,13 +98,31 @@ function getWidgetFallback(name: SlotName, widgets?: DesignerWidgets): React.Com
 
 // ── 核心 fallback 组件（最简实现，不依赖任何 UI 库） ──
 
+/** fallback textarea 公共样式：复用主题变量，响应暗色主题 */
+const FALLBACK_TEXTAREA_STYLE: React.CSSProperties = {
+  width: '100%',
+  padding: '1px 6px',
+  borderRadius: 'var(--fe-border-radius-sm)',
+  borderWidth: 1,
+  borderStyle: 'solid',
+  borderColor: 'var(--fe-border-primary)',
+  fontSize: 'var(--fe-font-size-sm)',
+  lineHeight: '18px',
+  outline: 'none',
+  boxSizing: 'border-box',
+  background: 'var(--fe-bg-primary)',
+  color: 'var(--fe-text-primary)',
+  fontFamily: 'monospace',
+  resize: 'vertical',
+}
+
 const FallbackExpressionEditor: React.FC<PropertySlotProps> = ({ value, onChange }) => (
   <textarea
     value={typeof value === 'string' ? value : ''}
     onChange={(e) => onChange(e.target.value)}
     placeholder="输入表达式"
     rows={2}
-    style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fe-border-primary)', borderRadius: 'var(--fe-border-radius-sm)', fontSize: 'var(--fe-font-size-xs)', fontFamily: 'monospace', resize: 'vertical' }}
+    style={FALLBACK_TEXTAREA_STYLE}
   />
 )
 
@@ -110,7 +138,7 @@ const FallbackJsonEditor: React.FC<PropertySlotProps> = ({ value, onChange }) =>
     }}
     placeholder="输入 JSON"
     rows={4}
-    style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fe-border-primary)', borderRadius: 'var(--fe-border-radius-sm)', fontSize: 'var(--fe-font-size-xs)', fontFamily: 'monospace', resize: 'vertical' }}
+    style={FALLBACK_TEXTAREA_STYLE}
   />
 )
 
@@ -120,7 +148,7 @@ const FallbackCodeEditor: React.FC<PropertySlotProps> = ({ value, onChange }) =>
     onChange={(e) => onChange(e.target.value)}
     placeholder="输入代码"
     rows={2}
-    style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fe-border-primary)', borderRadius: 'var(--fe-border-radius-sm)', fontSize: 'var(--fe-font-size-xs)', fontFamily: 'monospace', resize: 'vertical' }}
+    style={FALLBACK_TEXTAREA_STYLE}
   />
 )
 
@@ -136,7 +164,7 @@ const FallbackDataSourceEditor: React.FC<PropertySlotProps> = ({ value, onChange
     }}
     placeholder="数据源配置（JSON）"
     rows={4}
-    style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fe-border-primary)', borderRadius: 'var(--fe-border-radius-sm)', fontSize: 'var(--fe-font-size-xs)', fontFamily: 'monospace', resize: 'vertical' }}
+    style={FALLBACK_TEXTAREA_STYLE}
   />
 )
 

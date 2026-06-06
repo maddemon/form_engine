@@ -5,6 +5,7 @@ import { useStyle } from '../styles'
 import type { DesignerWidgets } from '../types/adapter'
 import type { PropertyConfigItem } from '../types/custom-component'
 import type { PropertySlots } from '../types/property-slot'
+import { BASE_STYLE } from '../widgets/shared'
 import { FieldItem } from './shared'
 
 interface CustomPropsRenderProps {
@@ -37,13 +38,7 @@ export default function CustomPropsRender({ configs, widgets: w, values, onChang
             onChange={(e) => onValueChange(e.target.value)}
             placeholder={widgetProps?.placeholder}
             rows={4}
-            style={{
-              width: '100%',
-              padding: token('spacingXs'),
-              border: '1px solid var(--fe-border-primary)',
-              borderRadius: 'var(--fe-border-radius-sm)',
-              fontSize: token('fontSizeXs'),
-            }}
+            style={{ ...BASE_STYLE, resize: 'vertical', minHeight: 36 }}
           />
         )
 

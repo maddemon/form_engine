@@ -8,7 +8,7 @@
  * - callback：回调名输入
  */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { listActionNames } from '../events'
 import { resolveSlot } from '../registry/propertySlotRegistry'
 import { FieldItem } from '../propRenders/shared'
@@ -45,6 +45,11 @@ const HANDLER_TYPE_OPTIONS: { label: string; value: EventHandlerType | '' }[] = 
 export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, onChange, eventName, widgets: w, slots }) => {
   const { token } = useStyle()
   const [type, setType] = useState<EventHandlerType | ''>(value?.type ?? '')
+
+  // 外部 value 变化时同步本地 type 状态
+  useEffect(() => {
+    setType(value?.type ?? '')
+  }, [value?.type])
 
   const ExpressionEditorSlot = resolveSlot('expressionEditor', slots, w)
   const JsonEditorSlot = resolveSlot('jsonEditor', slots)

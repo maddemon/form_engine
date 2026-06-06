@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
  * @param delay - 防抖延迟（毫秒），默认 300ms
  * @returns [localValue, handleChange] - 本地值与变更处理器
  */
-export function useDebouncedInput<T>(externalValue: T, onChange: (value: T) => void, delay: number = 300): [T, (value: T) => void] {
+export function useDebouncedInput<T>(externalValue: T, onChange: (value: T) => void, delay: number = 300): [T, (value: T) => void, () => void] {
   const [localValue, setLocalValue] = useState<T>(externalValue)
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const isEditingRef = useRef(false)
@@ -39,6 +39,15 @@ export function useDebouncedInput<T>(externalValue: T, onChange: (value: T) => v
     [delay],
   )
 
+  /** 取消挂起的防抖计时器并重置编辑状态，供外部直接更新值时调用 */
+  const cancelPending = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = undefined
+    }
+    isEditingRef.current = false
+  }, [])
+
   // 组件卸载时清理 timer
   useEffect(() => {
     return () => {
@@ -46,5 +55,5 @@ export function useDebouncedInput<T>(externalValue: T, onChange: (value: T) => v
     }
   }, [])
 
-  return [localValue, handleChange]
+  return [localValue, handleChange, cancelPending]
 }

@@ -75,7 +75,6 @@ const RenderPage: React.FC<Props> = ({ schema, themeMode }) => {
                 schema={schema}
                 onSubmit={handleSubmit}
                 onChange={handleChange}
-                desktopAdapter={antdAdapter}
                 mobileAdapter={antdMobileAdapter}
                 scene={scene}
                 themeMode={themeMode}

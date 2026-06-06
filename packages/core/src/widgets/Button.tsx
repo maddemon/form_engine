@@ -1,16 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useStyle } from '../styles'
 
 export const WidgetButton: React.FC<{
   label?: string
   children?: React.ReactNode
-  onClick?: () => void
-  type?: 'default' | 'primary' | 'danger' | 'dashed'
+  onClick?: (e: React.MouseEvent) => void
+  type?: 'default' | 'primary' | 'danger' | 'dashed' | 'text'
   size?: 'sm' | 'md'
   disabled?: boolean
   style?: React.CSSProperties
 }> = ({ label, children, onClick, type = 'default', size = 'md', disabled, style }) => {
   const { token } = useStyle()
+  const [hovered, setHovered] = useState(false)
 
   // sm 适用于 PropertyPanel 等紧凑场景；md 适用于 Modal footer / 通用区域
   const sizeStyle: React.CSSProperties =
@@ -42,10 +43,20 @@ export const WidgetButton: React.FC<{
     base.borderColor = token('error') as string
   } else if (type === 'dashed') {
     base.borderStyle = 'dashed'
+  } else if (type === 'text') {
+    base.border = 'none'
+    base.background = hovered ? 'var(--fe-bg-secondary)' : 'transparent'
   }
 
   return (
-    <button onClick={onClick} disabled={disabled} style={base} title={label}>
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      style={base}
+      title={label}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       {children}
     </button>
   )

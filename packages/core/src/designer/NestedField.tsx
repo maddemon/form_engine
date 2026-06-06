@@ -3,8 +3,9 @@ import { CSS } from '@dnd-kit/utilities'
 import React from 'react'
 import { FieldRenderer, DefaultFormItem } from '../renderer/FieldRenderer'
 import { isContainerComponent } from '../types/component-category'
+import type { FormEngineAdapter } from '../types/adapter'
 import type { FormItemProps } from '../types/adapter'
-import type { FormFieldSchema } from '../types/schema'
+import type { FormConfig, FormFieldSchema } from '../types/schema'
 import { ContainerPreview } from './ContainerPreview'
 import { FieldItem } from './FieldItem'
 import { useDesignerConfig, useDesignerSelection } from './DesignerContext'
@@ -16,17 +17,29 @@ interface NestedFieldProps {
   field: FormFieldSchema
   parentContainerId?: string
   childIndex?: number
+  /** 根级字段模式下通过 props 传入，覆盖 Context */
+  selectedFieldId?: string | null
+  formConfig?: FormConfig
+  adapter?: FormEngineAdapter
 }
 
-export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, parentContainerId, childIndex }) => {
-  const { selectedFieldId } = useDesignerSelection()
-  const { formConfig, adapter } = useDesignerConfig()
+export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, parentContainerId, childIndex, selectedFieldId: selectedFieldIdProp, formConfig: formConfigProp, adapter: adapterProp }) => {
+  const { selectedFieldId: selectedFieldIdCtx } = useDesignerSelection()
+  const { formConfig: formConfigCtx, adapter: adapterCtx } = useDesignerConfig()
+
+  const selectedFieldId = selectedFieldIdProp ?? selectedFieldIdCtx
+  const formConfig = formConfigProp ?? formConfigCtx
+  const adapter = adapterProp ?? adapterCtx
+
   const isContainer = isContainerComponent(field.type)
+
+  // 根级字段（无 parentContainerId）始终可排序；嵌套字段需要完整的父级信息才可排序
+  const isRootMode = parentContainerId === undefined && childIndex === undefined
 
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
     data: { source: 'canvas', fieldId: field.id },
-    disabled: parentContainerId === undefined || childIndex === undefined,
+    disabled: isRootMode ? false : (parentContainerId === undefined || childIndex === undefined),
   })
 
   const content = isContainer ? (

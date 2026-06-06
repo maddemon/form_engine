@@ -1,10 +1,10 @@
 import { useDroppable } from '@dnd-kit/core'
 import React, { useMemo } from 'react'
 import type { TabPaneConfig } from '../../components/tabs/types'
-import { FieldRenderer } from '../../renderer/FieldRenderer'
 import type { FormFieldSchema } from '../../types/schema'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import { RegionDroppable } from './RegionDroppable'
+import { SelfRenderedContainer } from './SelfRenderedContainer'
 import type { ContainerContentProps } from './types'
 
 /** Tabs container */
@@ -27,12 +27,10 @@ export const TabsContainerContent: React.FC<ContainerContentProps> = React.memo(
 
   if (tabs.length === 0) return <EmptyContainerPlaceholder containerId={field.id} />
 
-  const enhancedField: FormFieldSchema = { ...field, componentProps: { ...field.componentProps, children: tabChildren } }
-
   return (
-    <div style={{ pointerEvents: 'auto' }}>
-      <FieldRenderer field={enhancedField} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
-    </div>
+    <SelfRenderedContainer field={field} adapter={adapter} formConfig={formConfig}>
+      {tabChildren}
+    </SelfRenderedContainer>
   )
 })
 TabsContainerContent.displayName = 'TabsContainerContent'

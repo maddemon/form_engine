@@ -1,8 +1,10 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState, useEffect } from 'react'
 import { useStyle } from '../styles'
 import { BASE_STYLE, FOCUS_STYLE } from './shared'
 import { WidgetModal } from './Modal'
 import { WidgetTextArea } from './TextArea'
+import { InputOverlayButton } from './InputOverlayButton'
+import { TagLabel } from './TagLabel'
 
 /** 表达式编辑弹窗 */
 function ExpressionModal({
@@ -24,7 +26,7 @@ function ExpressionModal({
   const prevOpenRef = useRef(false)
 
   // 仅在 open 从 false→true 时同步 value
-  React.useEffect(() => {
+  useEffect(() => {
     if (open && !prevOpenRef.current) {
       setText(value)
     }
@@ -76,19 +78,9 @@ function ExpressionModal({
                 key={name}
                 type="button"
                 onClick={() => insertFieldName(name)}
-                style={{
-                  padding: '1px 6px',
-                  border: `1px solid var(--fe-border-primary)`,
-                  borderRadius: token('borderRadiusSm'),
-                  background: 'var(--fe-bg-tertiary)',
-                  cursor: 'pointer',
-                  fontSize: token('fontSizeXs'),
-                  fontFamily: 'monospace',
-                  color: 'var(--fe-primary)',
-                  lineHeight: '18px',
-                }}
+                style={{ cursor: 'pointer', lineHeight: '18px', border: 'none', background: 'transparent' }}
               >
-                {name}
+                <TagLabel fontFamily="monospace">{name}</TagLabel>
               </button>
             ))}
           </div>
@@ -106,23 +98,35 @@ export const WidgetExpressionInput: React.FC<{
   /** 已存在的字段名称列表，弹窗中点击可插入光标位置 */
   fieldNames?: string[]
   style?: React.CSSProperties
-}> = ({ value, onChange, placeholder, disabled, fieldNames = [], style }) => {
+}> = React.memo(({ value, onChange, placeholder, disabled, fieldNames = [], style }) => {
   const { token } = useStyle()
   const [focused, setFocused] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
+
+  // 非受控输入：父组件 external value 变化时同步到 input
+  // focused 时不覆盖，避免打断用户输入
+  useEffect(() => {
+    if (inputRef.current && !focused && inputRef.current.value !== (value ?? '')) {
+      inputRef.current.value = value ?? ''
+    }
+  }, [value, focused])
 
   const handleModalConfirm = useCallback((v: string) => {
-    onChange?.(v)
+    onChangeRef.current?.(v)
     setModalOpen(false)
-  }, [onChange])
+  }, [])
 
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', position: 'relative', ...style }}>
         <input
+          ref={inputRef}
           type="text"
-          value={value ?? ''}
-          onChange={e => onChange?.(e.target.value)}
+          defaultValue={value ?? ''}
+          onChange={e => onChangeRef.current?.(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
           onFocus={() => setFocused(true)}
@@ -136,30 +140,14 @@ export const WidgetExpressionInput: React.FC<{
             width: '100%',
           }}
         />
-        <button
-          type="button"
+        <InputOverlayButton
           onClick={() => setModalOpen(true)}
-          onMouseDown={e => e.preventDefault()}
           disabled={disabled}
           title="编辑表达式"
-          style={{
-            position: 'absolute',
-            right: 1,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            border: 'none',
-            background: 'transparent',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            color: focused ? 'var(--fe-primary)' : 'var(--fe-text-tertiary)',
-            fontSize: token('fontSizeSm'),
-            padding: `0 ${token('spacingXs')}`,
-            lineHeight: 1,
-            display: 'flex',
-            alignItems: 'center',
-          }}
+          style={{ color: focused ? 'var(--fe-primary)' : 'var(--fe-text-tertiary)', fontSize: token('fontSizeSm') as string }}
         >
           ƒ
-        </button>
+        </InputOverlayButton>
       </div>
 
       <ExpressionModal
@@ -171,4 +159,4 @@ export const WidgetExpressionInput: React.FC<{
       />
     </>
   )
-}
+})

@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
 import type { FieldDataSource, OptionItem } from '../types/schema'
+import { BASE_STYLE } from './shared'
+import { TagLabel } from './TagLabel'
 import { WidgetButton } from './Button'
 import { WidgetButtonGroup } from './ButtonGroup'
 import { WidgetModal } from './Modal'
@@ -54,15 +56,7 @@ function RemoteConfigModal({
     prevOpenRef.current = open
   }, [open, config])
 
-  const baseInputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '3px 6px',
-    fontSize: token('fontSizeXs'),
-    border: '1px solid var(--fe-border-primary)',
-    borderRadius: token('borderRadiusSm'),
-    outline: 'none',
-    boxSizing: 'border-box',
-  }
+  const baseInputStyle: React.CSSProperties = { ...BASE_STYLE, padding: '3px 6px' }
 
   const handleConfirm = () => {
     onConfirm({ url, resultPath, labelField, valueField })
@@ -81,7 +75,7 @@ function RemoteConfigModal({
             style={baseInputStyle}
           />
           <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginTop: '2px' }}>
-            用 <code>{'\{fieldName\}'}</code> 引用其他字段的值作为参数
+            用 <code>{`{fieldName}`}</code> 引用其他字段的值作为参数
           </div>
         </div>
 
@@ -90,19 +84,7 @@ function RemoteConfigModal({
             <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-secondary)', marginBottom: token('spacingXs') }}>依赖字段</div>
             <div style={{ display: 'flex', gap: token('spacingXs'), flexWrap: 'wrap' }}>
               {deps.map((dep) => (
-                <span
-                  key={dep}
-                  style={{
-                    fontSize: token('fontSizeXs'),
-                    background: 'var(--fe-bg-tertiary)',
-                    color: 'var(--fe-text-secondary)',
-                    padding: '1px 6px',
-                    borderRadius: token('borderRadiusSm'),
-                    border: '1px solid var(--fe-border-primary)',
-                  }}
-                >
-                  {dep}
-                </span>
+                <TagLabel key={dep} variant="secondary">{dep}</TagLabel>
               ))}
             </div>
             <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginTop: '2px' }}>

@@ -2,8 +2,9 @@ import { useDroppable } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import React, { useMemo } from 'react'
 import { NestedField } from '../NestedField'
-import { useDroppableStyle, useEmptyContainerStyle } from '../useDroppableStyle'
+import { useDroppableStyle } from '../useDroppableStyle'
 import type { ContainerContentProps } from './types'
+import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 
 /** Generic container (non-special-cased type) */
 export const GenericContainerContent: React.FC<ContainerContentProps> = React.memo(({ field }) => {
@@ -11,7 +12,6 @@ export const GenericContainerContent: React.FC<ContainerContentProps> = React.me
   const childIds = useMemo(() => field.children.map((c) => c.id), [field.children])
   const hasChildren = field.children.length > 0
   const droppableStyle = useDroppableStyle(isOver, hasChildren)
-  const emptyStyle = useEmptyContainerStyle(isOver)
 
   const rawLayout = (field.componentProps?.layout as string) ?? 'vertical'
   const isHorizontal = rawLayout === 'horizontal'
@@ -19,8 +19,8 @@ export const GenericContainerContent: React.FC<ContainerContentProps> = React.me
 
   if (!hasChildren) {
     return (
-      <div ref={setNodeRef} style={{ ...emptyStyle, pointerEvents: 'auto' }}>
-        拖入组件
+      <div ref={setNodeRef} style={{ pointerEvents: 'auto' }}>
+        <EmptyContainerPlaceholder containerId={field.id} skipDroppable />
       </div>
     )
   }

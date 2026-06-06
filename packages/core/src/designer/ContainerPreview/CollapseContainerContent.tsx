@@ -1,10 +1,10 @@
 import { useDroppable } from '@dnd-kit/core'
 import React, { useMemo } from 'react'
 import type { CollapsePanelConfig } from '../../components/collapse/types'
-import { FieldRenderer } from '../../renderer/FieldRenderer'
 import type { FormFieldSchema } from '../../types/schema'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import { RegionDroppable } from './RegionDroppable'
+import { SelfRenderedContainer } from './SelfRenderedContainer'
 import type { ContainerContentProps } from './types'
 
 /** Collapse container */
@@ -27,12 +27,10 @@ export const CollapseContainerContent: React.FC<ContainerContentProps> = React.m
 
   if (panels.length === 0) return <EmptyContainerPlaceholder containerId={field.id} />
 
-  const enhancedField: FormFieldSchema = { ...field, componentProps: { ...field.componentProps, children: panelChildren } }
-
   return (
-    <div style={{ pointerEvents: 'auto' }}>
-      <FieldRenderer field={enhancedField} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
-    </div>
+    <SelfRenderedContainer field={field} adapter={adapter} formConfig={formConfig}>
+      {panelChildren}
+    </SelfRenderedContainer>
   )
 })
 CollapseContainerContent.displayName = 'CollapseContainerContent'

@@ -10,6 +10,7 @@ import type { FormConfig, FormFieldSchema } from '../types/schema'
 import { resolvePanelWidth } from '../utils'
 import { defaultDesignerWidgets } from '../widgets'
 import { FormConfigPanel } from './FormConfigPanel'
+import { SectionTitle, PANEL_BORDER } from './UIPrimitives'
 import { DefaultPropertyContent } from './PropertyPanel/DefaultPropertyContent'
 import { PropertyPanelTabs } from './PropertyPanel/PropertyPanelTabs'
 
@@ -73,10 +74,10 @@ function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPane
     <>
       {activeTab === PROPERTIES_DEFAULT_TAB_KEY ? (
         <>
-          <h4 style={{ margin: `0 0 ${token('spacingMd')} 0`, fontSize: token('fontSizeMd'), fontWeight: 500, color: token('textSecondary') as string }}>
+          <SectionTitle>
             {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
             <span style={{ marginLeft: token('spacingXs'), color: token('textTertiary') as string, fontWeight: 400 }}>({field.type})</span>
-          </h4>
+          </SectionTitle>
           <DefaultPropertyContent field={field} w={w} dispatch={dispatch} isForm={isForm} isContainer={isContainer} isButton={isButton} ComponentPropsRender={ComponentPropsRender} customConfig={customConfig ?? null} slots={propertySlots} allFields={allFields} />
         </>
       ) : (
@@ -120,7 +121,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
   }
 
   return (
-    <div style={{ width: resolvedWidth, borderLeft: '1px solid var(--fe-border-light)', overflow: 'auto', height: '100%' }}>
+    <div style={{ width: resolvedWidth, ...PANEL_BORDER, overflow: 'auto', height: '100%' }}>
       {hasTabs && <PropertyPanelTabs allTabs={allTabs} activeTab={activeTab} setActiveTab={setActiveTab} />}
 
       <div style={{ padding: token('spacingMd') }}>{field ? <PropertyPanelInner field={field} w={w} token={token} activeTab={activeTab} dispatch={dispatch} propertyPanelTabs={propertyPanelTabs} propertySlots={propertySlots} allFields={allFields || []} /> : renderNoFieldContent()}</div>

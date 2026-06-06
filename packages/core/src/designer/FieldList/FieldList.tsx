@@ -4,6 +4,8 @@ import { useStyle } from '../../styles'
 import type { FormFieldSchema } from '../../types/schema'
 import type { SidePanelTabContentProps } from '../../types/designer'
 import { resolvePanelWidth } from '../../utils'
+import { WidgetButton } from '../../widgets/Button'
+import { PANEL_BORDER_RIGHT } from '../UIPrimitives'
 import { ComponentLibContent } from './ComponentLibContent'
 import { DefaultIcon } from './DefaultIcon'
 import { COMPONENT_LIB_TAB_KEY, MIN_PALETTE_WIDTH, type FieldListProps } from './types'
@@ -25,7 +27,7 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, widt
       <div
         style={{
           width: resolvedWidth,
-          borderRight: '1px solid var(--fe-border-light)',
+          ...PANEL_BORDER_RIGHT,
           padding: `${token('spacingSm')} ${token('spacingMd')}`,
           overflow: 'auto',
           height: '100%',
@@ -38,30 +40,26 @@ export const FieldList: React.FC<FieldListProps> = ({ groups, excludeTypes, widt
   }
 
   return (
-    <div style={{ width: resolvedWidth, borderRight: '1px solid var(--fe-border-light)', display: 'flex', height: '100%', background: 'var(--fe-bg-tertiary)' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--fe-border-light)', padding: `${token('spacingXs')} 0`, gap: token('spacingXs'), flexShrink: 0 }}>
+    <div style={{ width: resolvedWidth, ...PANEL_BORDER_RIGHT, display: 'flex', height: '100%', background: 'var(--fe-bg-tertiary)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', ...PANEL_BORDER_RIGHT, padding: `${token('spacingXs')} 0`, gap: token('spacingXs'), flexShrink: 0 }}>
         {allTabs.map((tab) => (
-          <button
+          <WidgetButton
             key={tab.key}
-            title={tab.title}
+            type="text"
+            size="sm"
             onClick={() => setActiveTab(tab.key)}
+            label={tab.title}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               width: token('spacing2xl') as string,
               height: token('spacing2xl') as string,
-              border: 'none',
-              background: activeTab === tab.key ? 'var(--fe-primary-bg)' : 'transparent',
               color: activeTab === tab.key ? 'var(--fe-primary)' : 'var(--fe-text-muted)',
-              cursor: 'pointer',
-              borderRadius: token('borderRadiusSm'),
-              fontSize: token('fontSizeMd'),
+              background: activeTab === tab.key ? 'var(--fe-primary-bg)' : 'transparent',
+              fontSize: token('fontSizeMd') as string,
               margin: `0 ${token('spacingXs')}`,
             }}
           >
             {tab.icon}
-          </button>
+          </WidgetButton>
         ))}
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: `${token('spacingSm')} ${token('spacingMd')}` }}>

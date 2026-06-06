@@ -1,11 +1,11 @@
 import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
-import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
 import { WidgetButton } from './Button'
 import { WidgetModal } from './Modal'
 import { WidgetTextArea } from './TextArea'
+import { arrayMove, SortableRow, DragHandleIcon, InlineDeleteButton, getInputBaseStyle, getLabelStyle, getSortableRowContentStyle } from './sortableListShared'
 
 const SORTABLE_PREFIX = '__opteditor_'
 
@@ -13,13 +13,6 @@ const SORTABLE_PREFIX = '__opteditor_'
 let _nextId = 1
 function newId(): string {
   return `opt_${_nextId++}`
-}
-
-function arrayMove<T>(arr: T[], from: number, to: number): T[] {
-  const copy = [...arr]
-  const [moved] = copy.splice(from, 1)
-  copy.splice(to, 0, moved)
-  return copy
 }
 
 interface OptionItem {
@@ -35,47 +28,6 @@ function toInternal(items: { label: string; value: string }[]): OptionItem[] {
 
 function fromInternal(items: OptionItem[]): { label: string; value: string }[] {
   return items.map(({ label, value }) => ({ label, value }))
-}
-
-function SortableRow({ id, children }: { id: string; children: React.ReactNode }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: `${SORTABLE_PREFIX}${id}`,
-  })
-  const { token } = useStyle()
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  }
-  return (
-    <div ref={setNodeRef} style={style}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'inherit' }}>
-        <div {...attributes} {...listeners} style={{ touchAction: 'none', display: 'flex' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              width: token('itemListDragHandleWidthLg'),
-              height: token('itemListDragHandleHeightLg'),
-              cursor: 'grab',
-              color: 'var(--fe-text-secondary)',
-              fontSize: token('fontSizeMd'),
-              lineHeight: 1,
-              userSelect: 'none',
-              touchAction: 'none',
-              borderRadius: token('borderRadiusSm'),
-              background: 'var(--fe-bg-tertiary)',
-            }}
-          >
-            ⋮⋮
-          </div>
-        </div>
-        {children}
-      </div>
-    </div>
-  )
 }
 
 /** 批量编辑弹窗 */
@@ -207,41 +159,16 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
 
   const sortableIds = useMemo(() => options.map((o) => `${SORTABLE_PREFIX}${o._id}`), [options])
 
-  const inputBaseStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '1px 0',
-    border: 'none',
-    outline: 'none',
-    fontSize: token('fontSizeXs'),
-    boxSizing: 'border-box',
-    background: 'transparent',
-    color: disabled ? 'var(--fe-disabled-color)' : 'inherit',
-  }
-
-  const labelStyle: React.CSSProperties = {
-    fontSize: token('widgetInputFontSizeXxs'),
-    color: 'var(--fe-text-tertiary)',
-    lineHeight: 1.3,
-  }
+  const inputBaseStyle = getInputBaseStyle(token, disabled)
+  const labelStyle = getLabelStyle(token)
 
   return (
     <div style={{ ...style }}>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSortEnd}>
         <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
           {options.map((opt, idx) => (
-            <SortableRow key={opt._id} id={opt._id}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: token('spacingXs'),
-                  marginBottom: token('spacingXs'),
-                  background: 'var(--fe-bg-primary)',
-                  padding: '2px 4px',
-                  borderRadius: token('borderRadiusSm'),
-                  flex: 1,
-                }}
-              >
+            <SortableRow key={opt._id} id={`${SORTABLE_PREFIX}${opt._id}`} dragHandle={<DragHandleIcon />}>
+              <div style={getSortableRowContentStyle(token, { flex: 1 })}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={labelStyle}>标签</div>
                   <input type="text" value={opt.label} placeholder="标签" onChange={(e) => update(idx, { label: e.target.value })} disabled={disabled} style={inputBaseStyle} />
@@ -250,30 +177,10 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
                   <div style={labelStyle}>值</div>
                   <input type="text" value={opt.value} placeholder="值" onChange={(e) => update(idx, { value: e.target.value })} disabled={disabled} style={inputBaseStyle} />
                 </div>
-                <button
-                  type="button"
+                <InlineDeleteButton
                   disabled={disabled}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    remove(idx)
-                  }}
-                  title="删除"
-                  style={{
-                    flexShrink: 0,
-                    width: token('itemListRemoveButtonSize'),
-                    height: token('itemListRemoveButtonSize'),
-                    padding: token('itemListRemoveButtonPadding'),
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'var(--fe-text-tertiary)',
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    fontSize: token('fontSizeXs'),
-                    lineHeight: 1,
-                    opacity: disabled ? 0.3 : 0.6,
-                  }}
-                >
-                  ✕
-                </button>
+                  onClick={(e) => { e.stopPropagation(); remove(idx) }}
+                />
               </div>
             </SortableRow>
           ))}

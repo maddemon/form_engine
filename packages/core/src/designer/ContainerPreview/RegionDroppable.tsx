@@ -1,10 +1,10 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import React, { useMemo } from 'react'
-import { useStyle } from '../../styles'
 import type { FormFieldSchema } from '../../types/schema'
 import { NestedField } from '../NestedField'
 import { useDroppableStyle } from '../useDroppableStyle'
+import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 
 interface RegionDroppableProps {
   parentId: string
@@ -18,7 +18,6 @@ export const RegionDroppable: React.FC<RegionDroppableProps> = ({ parentId, regi
     id: `${fieldId}__region_${regionKey}`,
     data: { parentId, regionKey },
   })
-  const { token } = useStyle()
   const childIds = useMemo(() => items.map((c) => c.id), [items])
   const droppableStyle = useDroppableStyle(isOver, items.length > 0)
 
@@ -31,7 +30,7 @@ export const RegionDroppable: React.FC<RegionDroppableProps> = ({ parentId, regi
           ))}
         </SortableContext>
       ) : (
-        <div style={{ color: 'var(--fe-text-muted)', fontSize: token('fontSizeXs'), textAlign: 'center', padding: token('spacingSm') }}>拖拽组件到此处</div>
+        <EmptyContainerPlaceholder containerId={`${fieldId}__region_${regionKey}`} />
       )}
     </div>
   )

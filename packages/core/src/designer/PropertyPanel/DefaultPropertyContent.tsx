@@ -10,11 +10,14 @@ import type { CustomComponentConfig } from '../../types/custom-component'
 import type { DesignerAction } from '../../types/designer'
 import type { PropertySlots } from '../../types/property-slot'
 import type { FieldDataSource, FormFieldSchema } from '../../types/schema'
+import { WidgetButton } from '../../widgets/Button'
 import { CollapsibleSection } from '../CollapsibleSection'
 import { RulesEditor } from '../RulesEditor'
 import { useDebouncedInput } from '../useDebouncedInput'
 import { useFieldNameValidation } from '../useFieldNameValidation'
+import { ErrorMessage } from '../UIPrimitives'
 import { EventEditor } from './EventEditor'
+import { StaticExpressionToggle } from './StaticExpressionToggle'
 
 // ── helpers ────────────────────────────────────────────────────────
 
@@ -73,41 +76,12 @@ export function DefaultPropertyContent({
     (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { defaultValue: v || undefined } }),
   )
 
-  const [hiddenValue, handleHiddenChange] = useDebouncedInput<string | number>(
-    typeof field.hidden === 'string' ? field.hidden : '',
-    (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { hidden: (v as string) || undefined } }),
-  )
-
   const [colSpanValue, handleColSpanChange] = useDebouncedInput<number>(field.colSpan || 24, (v) =>
     dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { colSpan: Number(v) } }),
   )
 
   // ===== disabled/readOnly 模式切换 =====
-  // Schema 支持 boolean | string，boolean 时用 Switch，string（表达式）时用 expressionEditor slot
-  const [disabledMode, setDisabledMode] = useState<'static' | 'expression'>(
-    typeof field.disabled === 'string' ? 'expression' : 'static',
-  )
-  const [readOnlyMode, setReadOnlyMode] = useState<'static' | 'expression'>(
-    typeof field.readOnly === 'string' ? 'expression' : 'static',
-  )
-
-  // 同步外部状态变更（如 undo/redo）
-  useEffect(() => {
-    setDisabledMode(typeof field.disabled === 'string' ? 'expression' : 'static')
-  }, [field.disabled])
-  useEffect(() => {
-    setReadOnlyMode(typeof field.readOnly === 'string' ? 'expression' : 'static')
-  }, [field.readOnly])
-
-  const [disabledExprValue, handleDisabledExprChange] = useDebouncedInput<string | number>(
-    typeof field.disabled === 'string' ? field.disabled : '',
-    (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { disabled: (v as string) || false } }),
-  )
-
-  const [readOnlyExprValue, handleReadOnlyExprChange] = useDebouncedInput<string | number>(
-    typeof field.readOnly === 'string' ? field.readOnly : '',
-    (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { readOnly: (v as string) || false } }),
-  )
+  // 已抽取为 StaticExpressionToggle 组件
 
   // 字段名防抖（含重复校验，setNameDirty 立即执行）
   const [nameValue, handleNameChangeRaw] = useDebouncedInput<string | number>(field.name, (v) => {
@@ -166,27 +140,23 @@ export function DefaultPropertyContent({
       <FieldItem label="字段名">
         <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingXs'), flex: 1 }}>
           <w.Input value={nameValue} onChange={handleNameChange} />
-          {nameError && <span style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-error)' }}>{nameError}</span>}
+          {nameError && <ErrorMessage>{nameError}</ErrorMessage>}
         </div>
       </FieldItem>
       <FieldItem label="标签">
         <div style={{ display: 'flex', gap: token('spacingXs'), alignItems: 'center', flex: 1 }}>
           <w.Input value={labelValue} onChange={handleLabelChange} placeholder="字段标签" style={{ flex: 1 }} />
-          <span
+          <WidgetButton
+            type="text"
+            size="sm"
             onClick={() =>
               dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { labelHidden: !field.labelHidden } })
             }
-            style={{
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              color: field.labelHidden ? 'var(--fe-text-tertiary)' : 'var(--fe-primary)',
-              flexShrink: 0,
-            }}
-            title={field.labelHidden ? '显示标签' : '隐藏标签'}
+            label={field.labelHidden ? '显示标签' : '隐藏标签'}
+            style={{ color: field.labelHidden ? 'var(--fe-text-tertiary)' : 'var(--fe-primary)', flexShrink: 0, padding: '0 2px' }}
           >
             {field.labelHidden ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
-          </span>
+          </WidgetButton>
         </div>
       </FieldItem>
       {isForm && (
@@ -252,100 +222,37 @@ export function DefaultPropertyContent({
               <w.NumberInput value={colSpanValue} onChange={handleColSpanChange} min={1} max={24} />
             </FieldItem>
             <RulesEditor field={field} widgets={w} dispatch={dispatch} slots={slots} />
-            <FieldItem label="禁用">
-              <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs'), flex: 1 }}>
-                {disabledMode === 'static' ? (
-                  <w.Switch
-                    checked={!!field.disabled}
-                    onChange={(v: boolean) =>
-                      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { disabled: v } })
-                    }
-                  />
-                ) : (
-                  <ExpressionEditorSlot
-                    value={disabledExprValue}
-                    onChange={handleDisabledExprChange}
-                    field={field}
-                    fieldNames={allFields.map((f) => f.name).filter(Boolean)}
-                    placeholder="如：form.status === 'locked'"
-                  />
-                )}
-                <span
-                  onClick={() => {
-                    if (disabledMode === 'static') {
-                      setDisabledMode('expression')
-                      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { disabled: '' } })
-                    } else {
-                      setDisabledMode('static')
-                      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { disabled: false } })
-                    }
-                  }}
-                  style={{
-                    cursor: 'pointer',
-                    fontSize: token('fontSizeXs'),
-                    color: 'var(--fe-primary)',
-                    flexShrink: 0,
-                    whiteSpace: 'nowrap',
-                  }}
-                  title={disabledMode === 'static' ? '切换为表达式' : '切换为静态'}
-                >
-                  {disabledMode === 'static' ? 'ƒ' : '≡'}
-                </span>
-              </div>
-            </FieldItem>
-            <FieldItem label="只读">
-              <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs'), flex: 1 }}>
-                {readOnlyMode === 'static' ? (
-                  <w.Switch
-                    checked={!!field.readOnly}
-                    onChange={(v: boolean) =>
-                      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { readOnly: v } })
-                    }
-                  />
-                ) : (
-                  <ExpressionEditorSlot
-                    value={readOnlyExprValue}
-                    onChange={handleReadOnlyExprChange}
-                    field={field}
-                    fieldNames={allFields.map((f) => f.name).filter(Boolean)}
-                    placeholder="如：form.status === 'locked'"
-                  />
-                )}
-                <span
-                  onClick={() => {
-                    if (readOnlyMode === 'static') {
-                      setReadOnlyMode('expression')
-                      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { readOnly: '' } })
-                    } else {
-                      setReadOnlyMode('static')
-                      dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { readOnly: false } })
-                    }
-                  }}
-                  style={{
-                    cursor: 'pointer',
-                    fontSize: token('fontSizeXs'),
-                    color: 'var(--fe-primary)',
-                    flexShrink: 0,
-                    whiteSpace: 'nowrap',
-                  }}
-                  title={readOnlyMode === 'static' ? '切换为表达式' : '切换为静态'}
-                >
-                  {readOnlyMode === 'static' ? 'ƒ' : '≡'}
-                </span>
-              </div>
-            </FieldItem>
+            <StaticExpressionToggle
+              field={field}
+              propKey="disabled"
+              label="禁用"
+              w={w}
+              dispatch={dispatch}
+              ExpressionEditorSlot={ExpressionEditorSlot}
+              fieldNames={allFields.map((f) => f.name).filter(Boolean)}
+            />
+            <StaticExpressionToggle
+              field={field}
+              propKey="readOnly"
+              label="只读"
+              w={w}
+              dispatch={dispatch}
+              ExpressionEditorSlot={ExpressionEditorSlot}
+              fieldNames={allFields.map((f) => f.name).filter(Boolean)}
+            />
           </>
         )}
 
-        <FieldItem label="是否隐藏">
-          <ExpressionEditorSlot
-            value={hiddenValue as string | undefined}
-            onChange={handleHiddenChange}
-            field={field}
-            fieldNames={allFields.map((f) => f.name).filter(Boolean)}
-            placeholder="如：form.type !== 'admin'"
-          />
-        </FieldItem>
+        <StaticExpressionToggle
+          field={field}
+          propKey="hidden"
+          label="是否隐藏"
+          w={w}
+          dispatch={dispatch}
+          ExpressionEditorSlot={ExpressionEditorSlot}
+          fieldNames={allFields.map((f) => f.name).filter(Boolean)}
+          placeholder="如：form.type !== 'admin'"
+        />
       </CollapsibleSection>
 
       <EventEditor field={field} w={w} dispatch={dispatch} slots={slots} />

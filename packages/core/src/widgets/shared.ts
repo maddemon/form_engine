@@ -1,5 +1,4 @@
 import React from 'react'
-import { useStyle } from '../styles'
 
 export const BASE_STYLE: React.CSSProperties = {
   width: '100%',
@@ -19,4 +18,19 @@ export const BASE_STYLE: React.CSSProperties = {
 export const FOCUS_STYLE: React.CSSProperties = {
   borderColor: 'var(--fe-primary)',
   boxShadow: '0 0 0 2px var(--fe-primary-bg)',
+}
+
+/** 输入控件样式合并工具：统一 BASE_STYLE + FOCUS_STYLE + disabled 逻辑 */
+export function getInputControlStyle(options: {
+  focused?: boolean
+  disabled?: boolean
+  style?: React.CSSProperties
+}): React.CSSProperties {
+  return {
+    ...BASE_STYLE,
+    ...(options.focused ? FOCUS_STYLE : {}),
+    opacity: options.disabled ? 0.5 : 1,
+    cursor: options.disabled ? 'not-allowed' : 'text',
+    ...options.style,
+  }
 }

@@ -7,6 +7,7 @@ import { CanvasToolbar } from './CanvasToolbar'
 import { ComponentTree, type TreeItem } from './ComponentTree'
 import { useDesignerDispatch, useDesignerSelection, useDesignerConfig } from './DesignerContext'
 import { RootFields } from './RootFields'
+import { EmptyContainerPlaceholder } from './ContainerPreview/EmptyContainerPlaceholder'
 
 export const CANVAS_ROOT_ID = 'canvas-root'
 export const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
@@ -110,18 +111,7 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
           }}
         >
           {fields.length === 0 && !activeId && (
-            <div
-              style={{
-                color: token('textTertiary'),
-                fontSize: token('fontSizeSm'),
-                padding: token('spacingXl'),
-                textAlign: 'center',
-                border: '1px dashed var(--fe-border-light)',
-                borderRadius: 'var(--fe-border-radius-sm)',
-              }}
-            >
-              从左侧拖拽控件到此处
-            </div>
+            <EmptyContainerPlaceholder containerId={CANVAS_ROOT_ID} variant="dashed" text="从左侧拖拽控件到此处" />
           )}
 
           <CanvasRootHead />
