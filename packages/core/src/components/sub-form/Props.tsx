@@ -1,5 +1,6 @@
-import { FieldItem, ItemListEditor, genId } from '../../propRenders'
+import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
+import { SortableTableEditor } from '../../widgets'
 import type { SubFormColumnConfig } from './types'
 
 export default function SubFormPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -20,22 +21,44 @@ export default function SubFormPropsRender({ widgets: w, values, onChange }: Pro
       </FieldItem>
       {rowMode === 'fixed' && (
         <FieldItem label="固定行数">
-          <w.NumberInput value={(values.fixedRowCount as number) ?? 3} onChange={(v) => onChange('fixedRowCount', v)} min={1} max={100} />
+          <w.NumberInput
+            value={(values.fixedRowCount as number) ?? 3}
+            onChange={(v) => onChange('fixedRowCount', v)}
+            min={1}
+            max={100}
+          />
         </FieldItem>
       )}
       <FieldItem label="列管理" variant="group">
-        <ItemListEditor<SubFormColumnConfig>
+        <SortableTableEditor<SubFormColumnConfig>
           value={columns}
           onChange={(v) => onChange('columns', v)}
-          fields={[
-            { key: 'label', label: '列标题', kind: 'text', placeholder: '列标题' },
-            { key: 'width', label: '宽度(px)', kind: 'number', min: 20, max: 2000, step: 10, placeholder: 'px' },
+          columns={[
+            {
+              key: 'label',
+              label: '列标题',
+              render: ({ value, onChange: onValChange, disabled: d }) => (
+                <w.Input value={String(value ?? '')} disabled={d} variant="filled" onChange={(v) => onValChange(v)} />
+              ),
+            },
+            {
+              key: 'width',
+              label: '宽度(px)',
+              render: ({ value, onChange: onValChange, disabled: d }) => (
+                <w.NumberInput
+                  value={value as number | undefined}
+                  disabled={d}
+                  min={20}
+                  max={2000}
+                  variant="filled"
+                  onChange={(v) => onValChange(v)}
+                />
+              ),
+            },
           ]}
           newItem={() => ({ id: genId('col'), label: `列${(columns?.length || 0) + 1}`, width: 120 })}
           minItems={1}
           addLabel="添加列"
-          layout="table"
-          widgets={{ Input: w.Input, NumberInput: w.NumberInput, Switch: w.Switch }}
         />
       </FieldItem>
     </>

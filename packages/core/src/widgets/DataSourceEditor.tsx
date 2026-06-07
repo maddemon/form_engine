@@ -1,12 +1,13 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
 import type { FieldDataSource, OptionItem } from '../types/schema'
+import { genId } from '../utils/id'
 import { WidgetButton } from './Button'
 import { WidgetButtonGroup } from './ButtonGroup'
 import { Divider } from './Divider'
 import { WidgetInput } from './Input'
 import { WidgetModal } from './Modal'
-import { WidgetOptionsEditor } from './OptionsEditor'
+import { SortableTableEditor } from './SortableTableEditor'
 import { Space } from './Space'
 import { TagLabel } from './TagLabel'
 import { Text } from './Text'
@@ -187,6 +188,24 @@ function WidgetDataSourceEditorInner({
     [onChange],
   )
 
+  interface TableOptionItem {
+    id: string
+    label: string
+    value: string | number
+  }
+
+  const tableItems = useMemo<TableOptionItem[]>(
+    () => staticOptions.map((o, i) => ({ ...o, id: String(i) })),
+    [staticOptions],
+  )
+
+  const handleTableChange = useCallback(
+    (items: TableOptionItem[]) => {
+      handleStaticChange(items.map(({ id: _, ...opt }) => opt))
+    },
+    [handleStaticChange],
+  )
+
   const handleTypeChange = useCallback(
     (v: string) => {
       const newType = v as 'static' | 'remote'
@@ -254,9 +273,37 @@ function WidgetDataSourceEditorInner({
         (optionsType === 'tree' ? (
           <WidgetTreeDataEditor value={staticOptions} onChange={handleStaticChange} disabled={disabled} />
         ) : (
-          <WidgetOptionsEditor
-            value={staticOptions as { label: string; value: string }[]}
-            onChange={handleStaticChange as (v: { label: string; value: string }[]) => void}
+          <SortableTableEditor<TableOptionItem>
+            value={tableItems}
+            onChange={handleTableChange}
+            columns={[
+              {
+                key: 'label' as keyof TableOptionItem,
+                label: '标签',
+                render: ({ value, onChange: onValChange, disabled: d }) => (
+                  <WidgetInput
+                    value={String(value ?? '')}
+                    disabled={d}
+                    variant="filled"
+                    onChange={(v) => onValChange(v)}
+                  />
+                ),
+              },
+              {
+                key: 'value' as keyof TableOptionItem,
+                label: '值',
+                render: ({ value, onChange: onValChange, disabled: d }) => (
+                  <WidgetInput
+                    value={String(value ?? '')}
+                    disabled={d}
+                    variant="filled"
+                    onChange={(v) => onValChange(v)}
+                  />
+                ),
+              },
+            ]}
+            newItem={() => ({ id: genId('opt'), label: '', value: '' })}
+            addLabel="添加选项"
             disabled={disabled}
           />
         ))}

@@ -32,8 +32,6 @@ import UploadPropsRender from '../components/upload/UploadPropsRender'
 import type { PropsRenderProps } from './types'
 
 export { genId } from '../utils/id'
-export { ItemListEditor } from './ItemListEditor'
-export type { ItemListEditorProps, ItemListField } from './ItemListEditor'
 export { FieldItem, DataSourceEditorField } from './shared'
 export type { PropsRenderProps } from './types'
 

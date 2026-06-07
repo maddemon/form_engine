@@ -291,13 +291,6 @@ export interface DesignerWidgets {
     disabled?: boolean
     style?: React.CSSProperties
   }>
-  /** 选项编辑器（用于 select/radio/checkbox 等） */
-  OptionsEditor: React.ComponentType<{
-    value?: { label: string; value: string }[]
-    onChange?: (v: { label: string; value: string }[]) => void
-    disabled?: boolean
-    style?: React.CSSProperties
-  }>
   /** 树形数据编辑器（用于 cascader/tree-select 等） */
   TreeDataEditor: React.ComponentType<{
     value?: OptionItem[]

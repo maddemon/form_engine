@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
-import { FieldItem, ItemListEditor, genId } from '../../propRenders'
+import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
+import { SortableTableEditor } from '../../widgets'
 import type { TabPaneConfig } from './types'
 
 export default function TabsPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
@@ -9,13 +10,10 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
 
   const handleTabsChange = useCallback(
     (newTabs: TabPaneConfig[]) => {
-      // defaultActiveKey 同步
       if (defaultActiveKey && !newTabs.some((t) => t.key === defaultActiveKey)) {
-        // defaultActiveKey 指向的 key 已被删除，清空
         onChange('tabs', newTabs)
         onChange('defaultActiveKey', undefined)
       } else {
-        // 未设置或仍匹配，不动
         onChange('tabs', newTabs)
       }
     },
@@ -62,13 +60,32 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
         <w.Switch checked={!!values.centered} onChange={(v) => onChange('centered', v)} />
       </FieldItem>
       <FieldItem label="标签页管理" variant="group">
-        <ItemListEditor<TabPaneConfig>
+        <SortableTableEditor<TabPaneConfig>
           value={tabs}
           onChange={handleTabsChange}
-          fields={[
-            { key: 'title', label: '标题', kind: 'text', placeholder: '标签标题' },
-            { key: 'key', label: 'Key', kind: 'text', placeholder: '唯一标识', unique: true },
-            { key: 'disabled', label: '禁用', kind: 'switch', flex: 0 },
+          columns={[
+            {
+              key: 'title',
+              label: '标题',
+              render: ({ value, onChange: onValChange, disabled: d }) => (
+                <w.Input value={String(value ?? '')} disabled={d} variant="filled" onChange={(v) => onValChange(v)} />
+              ),
+            },
+            {
+              key: 'key',
+              label: 'Key',
+              render: ({ value, onChange: onValChange, disabled: d }) => (
+                <w.Input value={String(value ?? '')} disabled={d} variant="filled" onChange={(v) => onValChange(v)} />
+              ),
+            },
+            {
+              key: 'disabled',
+              label: '禁用',
+              width: 40,
+              render: ({ value, onChange: onValChange, disabled: d }) => (
+                <w.Switch checked={!!value} disabled={d} onChange={(v) => onValChange(v)} />
+              ),
+            },
           ]}
           newItem={() => ({
             id: genId('tab'),
@@ -76,15 +93,8 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
             title: `标签页${(tabs?.length || 0) + 1}`,
             disabled: false,
           })}
-          validateUnique={(items) => {
-            const keys = items.map((x) => x.key).filter(Boolean)
-            const dup = keys.find((k, i) => keys.indexOf(k) !== i)
-            return dup ? `标签页 key "${dup}" 重复，请保证唯一` : null
-          }}
           minItems={1}
           addLabel="添加标签页"
-          layout="table"
-          widgets={{ Input: w.Input, NumberInput: w.NumberInput, Switch: w.Switch }}
         />
       </FieldItem>
     </>

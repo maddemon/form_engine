@@ -8,7 +8,7 @@ import { WidgetInput } from './Input'
 import { WidgetModal } from './Modal'
 import { WidgetNumberInput } from './NumberInput'
 import { WidgetDataSourceEditor } from './DataSourceEditor'
-import { WidgetOptionsEditor } from './OptionsEditor'
+import { SortableTableEditor } from './SortableTableEditor'
 import { WidgetTreeDataEditor } from './TreeDataEditor'
 import { WidgetSelect } from './Select'
 import { WidgetSwitch } from './Switch'
@@ -27,7 +27,7 @@ export {
   WidgetModal,
   WidgetNumberInput,
   WidgetDataSourceEditor,
-  WidgetOptionsEditor,
+  SortableTableEditor,
   WidgetTreeDataEditor,
   WidgetSelect,
   WidgetSwitch,
@@ -46,7 +46,6 @@ export const defaultDesignerWidgets: DesignerWidgets = {
   Switch: WidgetSwitch,
   Button: WidgetButton,
   DataSourceEditor: WidgetDataSourceEditor,
-  OptionsEditor: WidgetOptionsEditor,
   TreeDataEditor: WidgetTreeDataEditor,
   ButtonGroup: WidgetButtonGroup,
   ExpressionInput: WidgetExpressionInput,

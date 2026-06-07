@@ -377,12 +377,17 @@ export const componentRegistry = {
     category: 'display',
     icon: 'ToggleLeft',
     defaultProps: {
+      dataSource: {
+        type: 'static',
+        static: {
+          options: [
+            { label: '选项1', value: 'option_1' },
+            { label: '选项2', value: 'option_2' },
+            { label: '选项3', value: 'option_3' },
+          ],
+        },
+      },
       componentProps: {
-        options: [
-          { label: '选项1', value: 'option_1' },
-          { label: '选项2', value: 'option_2' },
-          { label: '选项3', value: 'option_3' },
-        ],
         size: 'middle',
         block: false,
       },
