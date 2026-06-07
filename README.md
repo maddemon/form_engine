@@ -98,3 +98,12 @@ pnpm lint           # Lint
 ## License
 
 MIT
+
+---
+
+> 沉舟侧畔千帆过，病树前头万木春。
+>
+> Beside the sunken boat a thousand sails glide past,
+> Before the withered tree ten thousand blooms spring forth.
+>
+> — Liu Yuxi, *To Bai Juyi Met at the First Banquet in Yangzhou*
