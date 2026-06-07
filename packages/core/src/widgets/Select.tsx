@@ -1,5 +1,6 @@
 import React from 'react'
 import { useStyle } from '../styles'
+import { InputOverlayButton } from './InputOverlayButton'
 import { BASE_STYLE, FOCUS_STYLE } from './shared'
 
 export const WidgetSelect: React.FC<{
@@ -13,13 +14,11 @@ export const WidgetSelect: React.FC<{
   const [open, setOpen] = React.useState(false)
   const [focused, setFocused] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement>(null)
-  const triggerRef = React.useRef<HTMLDivElement>(null)
   const onChangeRef = React.useRef(onChange)
   onChangeRef.current = onChange
 
   const { token } = useStyle()
 
-  const selectedOption = options.find((o) => o.value === value)
   const hasValue = value !== undefined && value !== ''
 
   // 点击外部关闭下拉
@@ -61,14 +60,12 @@ export const WidgetSelect: React.FC<{
     [disabled],
   )
 
+  const selectedOption = options.find((o) => o.value === value)
+
   return (
-    <div
-      ref={containerRef}
-      style={{ position: 'relative', ...style }}
-    >
+    <div ref={containerRef} style={{ position: 'relative', ...style }}>
       {/* trigger */}
       <div
-        ref={triggerRef}
         tabIndex={disabled ? -1 : 0}
         role="combobox"
         aria-expanded={open}
@@ -80,18 +77,16 @@ export const WidgetSelect: React.FC<{
         style={{
           ...BASE_STYLE,
           ...(focused ? FOCUS_STYLE : {}),
+          position: 'relative',
           opacity: disabled ? 0.5 : 1,
           cursor: disabled ? 'not-allowed' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
           minHeight: 22,
           userSelect: 'none',
-          gap: token('spacingXs') as unknown as number,
+          paddingRight: token('spacingLg'),
         }}
       >
         <span
           style={{
-            flex: 1,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -100,49 +95,43 @@ export const WidgetSelect: React.FC<{
         >
           {selectedOption ? selectedOption.label : '请选择'}
         </span>
-        {/* clear / arrow — 在 trigger 内部，不覆盖点击区域 */}
-        {allowClear && hasValue && !disabled ? (
+
+        {/* 箭头图标：有值可清除时隐藏，由清除按钮占据同一位置 */}
+        {!(allowClear && hasValue && !disabled) && (
           <span
-            role="button"
-            aria-label="清除"
-            onClick={handleClear}
-            onMouseDown={(e) => e.stopPropagation()}
             style={{
-              flexShrink: 0,
+              position: 'absolute',
+              right: 1,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: token('inputActionSize') as string,
+              height: token('inputActionSize') as string,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: token('fontSizeXs') as string,
-              color: 'var(--fe-text-tertiary)',
-              cursor: 'pointer',
-              lineHeight: 1,
-              padding: '0 2px',
-              borderRadius: token('borderRadiusSm') as string,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--fe-text-secondary)'
-              e.currentTarget.style.background = 'var(--fe-bg-secondary)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--fe-text-tertiary)'
-              e.currentTarget.style.background = 'transparent'
-            }}
-          >
-            ✕
-          </span>
-        ) : (
-          <span
-            style={{
-              flexShrink: 0,
+              pointerEvents: 'none',
               fontSize: token('widgetInputFontSizeXxs') as string,
               color: 'var(--fe-text-tertiary)',
               transition: 'transform 0.2s',
-              transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-              lineHeight: 1,
             }}
           >
-            ▼
+            <span
+              style={{
+                transition: 'transform 0.2s',
+                transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+                display: 'inline-block',
+              }}
+            >
+              ▼
+            </span>
           </span>
+        )}
+
+        {/* 清除按钮：绝对定位，占据箭头同一位置 */}
+        {allowClear && hasValue && !disabled && (
+          <InputOverlayButton onClick={handleClear} onMouseDown={(e) => e.stopPropagation()} title="清除">
+            ✕
+          </InputOverlayButton>
         )}
       </div>
 

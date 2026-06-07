@@ -37,6 +37,7 @@ export interface ThemeTokens {
   textTertiary: string
   textQuaternary: string
   textPlaceholder: string
+  textOnPrimary: string
 
   // Background
   bgPrimary: string
@@ -145,6 +146,9 @@ export interface ThemeTokens {
   widgetSwitchThumbActiveOffset: string
   widgetSwitchShadow: string
 
+  // Widget 输入框内操作按钮（清除、表达式等）
+  inputActionSize: string
+
   // Widget 微调
   widgetCheckboxMargin: string
   widgetInputFontSizeXs: string
@@ -195,6 +199,7 @@ export const defaultTheme: ThemeTokens = {
   textTertiary: 'rgba(0, 0, 0, 0.45)',
   textQuaternary: 'rgba(0, 0, 0, 0.25)',
   textPlaceholder: 'rgba(0, 0, 0, 0.25)',
+  textOnPrimary: '#ffffff',
 
   // Background
   bgPrimary: '#ffffff',
@@ -303,6 +308,8 @@ export const defaultTheme: ThemeTokens = {
   widgetSwitchThumbActiveOffset: '18px',
   widgetSwitchShadow: '0 1px 2px var(--fe-bg-mask)',
 
+  inputActionSize: '16px',
+
   // Widget 微调
   widgetCheckboxMargin: '0',
   widgetInputFontSizeXs: '11px',
@@ -353,6 +360,7 @@ export const darkTheme: Partial<ThemeTokens> = {
   textQuaternary: 'rgba(255, 255, 255, 0.25)',
   textPlaceholder: 'rgba(255, 255, 255, 0.25)',
   textMuted: 'rgba(255, 255, 255, 0.25)',
+  textOnPrimary: '#ffffff',
 
   bgPrimary: '#141414',
   bgSecondary: '#1f1f1f',

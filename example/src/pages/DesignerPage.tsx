@@ -1,4 +1,4 @@
-import { antdAdapter } from '@form-engine/adapter-antd'
+//import { antdAdapter } from '@form-engine/adapter-antd'
 import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
 import type {
   FormFieldSchema,
@@ -94,7 +94,7 @@ const DesignerPage: React.FC<Props> = ({ schema, onSchemaChange, themeMode }) =>
       <Designer
         value={schema}
         onChange={onSchemaChange}
-        desktopAdapter={antdAdapter}
+        //desktopAdapter={antdAdapter}
         mobileAdapter={antdMobileAdapter}
         panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }}
         excludeTypes={['date-range']}

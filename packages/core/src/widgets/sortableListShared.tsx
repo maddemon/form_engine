@@ -3,6 +3,7 @@ import { CSS } from '@dnd-kit/utilities'
 import React from 'react'
 import { useStyle } from '../styles'
 import { WidgetButton } from './Button'
+import { Space } from './Space'
 
 /** 数组元素移动工具 */
 export function arrayMove<T>(arr: T[], from: number, to: number): T[] {
@@ -16,10 +17,9 @@ export function arrayMove<T>(arr: T[], from: number, to: number): T[] {
 export const DragHandleIcon: React.FC<{ disabled?: boolean; sortable?: boolean }> = ({ disabled, sortable = true }) => {
   const { token } = useStyle()
   return (
-    <div
+    <Space.Compact
+      align="center"
       style={{
-        display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
         width: token('itemListDragHandleWidthLg'),
@@ -35,7 +35,7 @@ export const DragHandleIcon: React.FC<{ disabled?: boolean; sortable?: boolean }
       }}
     >
       ⋮⋮
-    </div>
+    </Space.Compact>
   )
 }
 
@@ -69,30 +69,26 @@ export function getInputBaseStyle(
   }
 }
 
-/** 列表行内标签样式 */
-export function getLabelStyle(token: ReturnType<typeof useStyle>['token']): React.CSSProperties {
-  return {
-    fontSize: token('fontSizeXs'),
-    color: 'var(--fe-text-tertiary)',
-    lineHeight: 1.3,
-  }
-}
-
-/** 可排序列表行内容容器样式 */
-export function getSortableRowContentStyle(
-  token: ReturnType<typeof useStyle>['token'],
-  extra?: React.CSSProperties,
-): React.CSSProperties {
-  return {
-    display: 'flex',
-    alignItems: 'center',
-    gap: token('spacingXs'),
-    marginBottom: token('spacingXs'),
-    background: 'var(--fe-bg-primary)',
-    padding: '2px 4px',
-    borderRadius: token('borderRadiusSm'),
-    ...extra,
-  }
+/** 可排序列表行内容容器 */
+export const SortableRowContent: React.FC<{
+  extra?: React.CSSProperties
+  children?: React.ReactNode
+}> = ({ extra, children }) => {
+  const { token } = useStyle()
+  return (
+    <Space
+      gap="xs"
+      style={{
+        marginBottom: token('spacingXs'),
+        background: 'var(--fe-bg-primary)',
+        padding: '2px 4px',
+        borderRadius: token('borderRadiusSm'),
+        ...extra,
+      }}
+    >
+      {children}
+    </Space>
+  )
 }
 
 /** 可排序行组件 */
@@ -117,14 +113,14 @@ export const SortableRow: React.FC<{
 
   return (
     <div ref={setNodeRef} style={style}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'inherit' }}>
+      <Space align="center" style={{ gap: 'inherit' }}>
         {sortable && dragHandle && (
           <div {...attributes} {...listeners} style={{ touchAction: 'none', display: 'flex' }}>
             {dragHandle}
           </div>
         )}
         {children}
-      </div>
+      </Space>
     </div>
   )
 }

@@ -13,6 +13,9 @@ import { WidgetTreeDataEditor } from './TreeDataEditor'
 import { WidgetSelect } from './Select'
 import { WidgetSwitch } from './Switch'
 import { WidgetTextArea } from './TextArea'
+import { Space } from './Space'
+import { Divider } from './Divider'
+import { Text } from './Text'
 
 export {
   WidgetButton,
@@ -29,6 +32,9 @@ export {
   WidgetSelect,
   WidgetSwitch,
   WidgetTextArea,
+  Space,
+  Divider,
+  Text,
 }
 
 export const defaultDesignerWidgets: DesignerWidgets = {

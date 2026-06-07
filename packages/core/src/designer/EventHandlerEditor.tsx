@@ -13,6 +13,7 @@ import { listActionNames } from '../events'
 import { resolveSlot } from '../registry/propertySlotRegistry'
 import { FieldItem } from '../propRenders/shared'
 import { useStyle } from '../styles/useStyle'
+import { Text } from '../widgets/Text'
 import type { DesignerWidgets } from '../types/adapter'
 import type { EventHandler, EventHandlerType } from '../types/events'
 import type { PropertySlots } from '../types/property-slot'
@@ -89,7 +90,7 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
             onChange={(v) => onChange({ ...value, expression: v as string })}
             placeholder={`如：$form.setFieldValue('other', $event)`}
           />
-          <div style={{ fontSize: token('fontSizeXs') as string, color: token('textTertiary') as React.CSSProperties['color'], marginTop: 2 }}>可用变量：$self（当前字段）、$form（表单 API）、$event（事件对象）</div>
+          <Text type="tertiary" style={{ marginTop: 2 }}>可用变量：$self（当前字段）、$form（表单 API）、$event（事件对象）</Text>
         </FieldItem>
       )}
 

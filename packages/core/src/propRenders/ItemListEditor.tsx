@@ -8,12 +8,13 @@ import type { DesignerWidgets } from '../types/adapter'
 import { WidgetButton } from '../widgets/Button'
 import { WidgetInput } from '../widgets/Input'
 import { WidgetNumberInput } from '../widgets/NumberInput'
+import { Space } from '../widgets/Space'
 import { WidgetSwitch } from '../widgets/Switch'
+import { Text } from '../widgets/Text'
 import {
   arrayMove,
   DragHandleIcon,
-  getLabelStyle,
-  getSortableRowContentStyle,
+  SortableRowContent,
   InlineDeleteButton,
   SortableRow,
 } from '../widgets/sortableListShared'
@@ -246,7 +247,6 @@ function ItemListEditorInner<T extends { id: string }>({
   const minError = items.length < minItems ? `至少保留 ${minItems} 项` : null
   const errorMsg = totalError || uniqueError || minError
 
-  const labelStyle = getLabelStyle(token)
   const sortableIds = useMemo(() => items.map((item) => `${SORTABLE_PREFIX}${item.id}`), [items])
 
   /** Inline 模式：单个字段块（含 label + 控件） */
@@ -257,26 +257,24 @@ function ItemListEditorInner<T extends { id: string }>({
     }
     if (field.kind === 'switch') {
       return (
-        <label
-          key={String(field.key)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: token('spacingXs'),
-            flex: fieldFlex,
-            fontSize: token('fontSizeSm'),
-            whiteSpace: 'nowrap',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-          }}
-        >
-          <span>{field.label}</span>
-          {renderFieldControl({ field, item, index, disabled, widgets, onChange: handleFieldChange })}
-        </label>
-      )
+      <Space
+        key={String(field.key)}
+        gap="xs"
+        style={{
+          flex: fieldFlex,
+          fontSize: token('fontSizeSm'),
+          whiteSpace: 'nowrap',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+        }}
+      >
+        <span>{field.label}</span>
+        {renderFieldControl({ field, item, index, disabled, widgets, onChange: handleFieldChange })}
+      </Space>
+    )
     }
     return (
       <div key={String(field.key)} style={{ flex: fieldFlex, minWidth: 0 }}>
-        <div style={labelStyle}>{field.label}</div>
+        <Text type="tertiary" style={{ lineHeight: 1.3 }}>{field.label}</Text>
         {renderFieldControl({ field, item, index, disabled, widgets, onChange: handleFieldChange })}
       </div>
     )
@@ -397,7 +395,7 @@ function ItemListEditorInner<T extends { id: string }>({
                   sortable={sortable}
                   dragHandle={dragHandleNode}
                 >
-                  <div style={getSortableRowContentStyle(token)}>
+                  <SortableRowContent>
                     {fields.map((field) => renderInlineField(field, item, index))}
                     <InlineDeleteButton
                       disabled={disabled || items.length <= minItems}
@@ -407,7 +405,7 @@ function ItemListEditorInner<T extends { id: string }>({
                       }}
                       title={items.length <= minItems ? `至少保留 ${minItems} 项` : '删除'}
                     />
-                  </div>
+                  </SortableRowContent>
                 </SortableRow>
               )
             })

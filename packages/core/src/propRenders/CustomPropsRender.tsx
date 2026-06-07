@@ -6,6 +6,7 @@ import type { DesignerWidgets } from '../types/adapter'
 import type { PropertyConfigItem } from '../types/custom-component'
 import type { PropertySlots } from '../types/property-slot'
 import { BASE_STYLE } from '../widgets/shared'
+import { Space } from '../widgets/Space'
 import { FieldItem } from './shared'
 
 interface CustomPropsRenderProps {
@@ -101,10 +102,10 @@ export default function CustomPropsRender({ configs, widgets: w, values, onChang
 
         if (isToggle) {
           return (
-            <label key={config.key} style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs'), marginBottom: token('spacingXs'), fontSize: token('fontSizeXs'), cursor: 'pointer' }}>
+            <Space key={config.key} gap="xs" style={{ marginBottom: token('spacingXs'), fontSize: token('fontSizeXs'), cursor: 'pointer' }}>
               {renderWidget(config, value, handleChange)}
               <span>{config.label}</span>
-            </label>
+            </Space>
           )
         }
 

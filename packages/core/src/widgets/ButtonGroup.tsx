@@ -33,7 +33,7 @@ export const WidgetButtonGroup: React.FC<{
               borderRightWidth: isLast ? 1 : 0,
               borderRightStyle: isLast ? 'solid' : 'none',
               background: isActive ? (token('primary') as string) : (token('bgPrimary') as string),
-              color: isActive ? '#' + 'fff' : (token('textPrimary') as string),
+              color: isActive ? (token('textOnPrimary') as string) : (token('textPrimary') as string),
               cursor: disabled ? 'not-allowed' : 'pointer',
               opacity: disabled ? 0.5 : 1,
               borderRadius: isFirst ? (token('borderRadiusSm') as string) : 0,

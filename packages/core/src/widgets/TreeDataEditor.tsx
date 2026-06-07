@@ -3,6 +3,8 @@ import { useStyle } from '../styles'
 import type { OptionItem } from '../types/schema'
 import { WidgetButton } from './Button'
 import { WidgetModal } from './Modal'
+import { Space } from './Space'
+import { Text } from './Text'
 import { WidgetTextArea } from './TextArea'
 
 function toTreeLines(options: OptionItem[]): string {
@@ -127,20 +129,14 @@ function BatchEditModal({
 
   return (
     <WidgetModal open={open} title="编辑树形数据" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
-      <div
-        style={{
-          fontSize: token('fontSizeXs'),
-          color: 'var(--fe-text-tertiary)',
-          marginBottom: token('spacingSm'),
-        }}
-      >
+      <Text type="tertiary" style={{ marginBottom: token('spacingSm') }}>
         每行一个叶子路径，层级用 <code style={{ background: 'var(--fe-bg-tertiary)', padding: '0 2px' }}>&gt;</code> 分隔：
         <div style={{ marginTop: token('spacingXs'), lineHeight: 1.6 }}>
           广东 &gt; 广州 &gt; 天河区<br />
           广东 &gt; 广州 &gt; 越秀区<br />
           广东 &gt; 深圳 &gt; 南山区
         </div>
-      </div>
+      </Text>
       <WidgetTextArea value={text} onChange={setText} rows={12} />
     </WidgetModal>
   )
@@ -175,36 +171,24 @@ function WidgetTreeDataEditorInner({
   return (
     <div style={{ ...style }}>
       {totalNodes > 0 ? (
-        <div
-          style={{
-            fontSize: token('fontSizeXs'),
-            color: 'var(--fe-text-secondary)',
-            marginBottom: token('spacingXs'),
-            lineHeight: 1.5,
-          }}
-        >
+        <Text type="secondary" style={{ marginBottom: token('spacingXs'), lineHeight: 1.5 }}>
           <div>{summary}</div>
-          <div style={{ color: 'var(--fe-text-tertiary)' }}>
+          <Text type="tertiary">
             共 {totalNodes} 个节点
             {depthInfo ? ` / ${depthInfo}` : ''}
-          </div>
-        </div>
+          </Text>
+        </Text>
       ) : (
-        <div
-          style={{
-            fontSize: token('fontSizeXs'),
-            color: 'var(--fe-text-tertiary)',
-            marginBottom: token('spacingXs'),
-          }}
-        >
+        <Text type="tertiary" style={{ marginBottom: token('spacingXs') }}>
           暂无数据
-        </div>
+        </Text>
       )}
 
-      <div style={{ display: 'flex', gap: token('spacingXs') }}>
+      <Space gap="xs">
         <WidgetButton
           type="dashed"
           size="sm"
+          color="primary"
           onClick={() => setBatchOpen(true)}
           disabled={disabled}
           style={{
@@ -214,7 +198,7 @@ function WidgetTreeDataEditorInner({
         >
           批量编辑
         </WidgetButton>
-      </div>
+      </Space>
 
       <BatchEditModal
         open={batchOpen}

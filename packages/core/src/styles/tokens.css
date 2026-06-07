@@ -60,6 +60,7 @@
   --fe-text-tertiary: rgba(0, 0, 0, 0.45);
   --fe-text-quaternary: rgba(0, 0, 0, 0.25);
   --fe-text-placeholder: rgba(0, 0, 0, 0.25);
+  --fe-text-on-primary: #ffffff;
 
   --fe-text-muted: #bbb;
 
@@ -292,6 +293,9 @@
   --fe-widget-switch-thumb-active-offset: 18px;
   --fe-widget-switch-shadow: 0 1px 2px var(--fe-bg-mask);
 
+  /* Widget 输入框内操作按钮 */
+  --fe-input-action-size: 16px;
+
   /* Widget 微调 - 物理特殊值 */
   --fe-widget-checkbox-margin: 0;
   --fe-widget-input-font-size-xs: 11px;
@@ -333,6 +337,7 @@
   --fe-text-tertiary: rgba(255, 255, 255, 0.45);
   --fe-text-quaternary: rgba(255, 255, 255, 0.25);
   --fe-text-placeholder: rgba(255, 255, 255, 0.25);
+  --fe-text-on-primary: #ffffff;
 
   --fe-text-muted: rgba(255, 255, 255, 0.25);
 

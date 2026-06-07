@@ -4,6 +4,8 @@ import { WidgetButton } from './Button'
 import { InputOverlayButton } from './InputOverlayButton'
 import { WidgetModal } from './Modal'
 import { BASE_STYLE, FOCUS_STYLE } from './shared'
+import { Space } from './Space'
+import { Text } from './Text'
 import { WidgetTextArea } from './TextArea'
 
 /** 表达式编辑弹窗 */
@@ -57,22 +59,16 @@ function ExpressionModal({
 
       {fieldNames.length > 0 && (
         <div style={{ marginTop: token('spacingSm') }}>
-          <div
-            style={{
-              fontSize: token('fontSizeXs'),
-              color: 'var(--fe-text-tertiary)',
-              marginBottom: token('spacingXs'),
-            }}
-          >
+          <Text type="tertiary" style={{ marginBottom: token('spacingXs') }}>
             可用字段（点击插入）
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingXs'), maxHeight: 120, overflow: 'auto' }}>
+          </Text>
+          <Space wrap gap="xs" style={{ maxHeight: 120, overflow: 'auto' }}>
             {fieldNames.map((name) => (
               <WidgetButton key={name} size="sm" onClick={() => insertFieldName(name)}>
                 {name}
               </WidgetButton>
             ))}
-          </div>
+          </Space>
         </div>
       )}
     </WidgetModal>
@@ -110,7 +106,7 @@ export const WidgetExpressionInput: React.FC<{
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', position: 'relative', ...style }}>
+      <Space.Compact style={{ position: 'relative', ...style }}>
         <input
           ref={inputRef}
           type="text"
@@ -136,11 +132,12 @@ export const WidgetExpressionInput: React.FC<{
           style={{
             color: focused ? 'var(--fe-primary)' : 'var(--fe-text-tertiary)',
             fontSize: token('fontSizeSm') as string,
+            background: 'transparent',
           }}
         >
           ƒ
         </InputOverlayButton>
-      </div>
+      </Space.Compact>
 
       <ExpressionModal
         open={modalOpen}

@@ -5,8 +5,10 @@ import { useStyle } from '../styles'
 import { WidgetButton } from './Button'
 import { WidgetInput } from './Input'
 import { WidgetModal } from './Modal'
+import { Space } from './Space'
+import { Text } from './Text'
 import { WidgetTextArea } from './TextArea'
-import { arrayMove, SortableRow, DragHandleIcon, InlineDeleteButton, getLabelStyle, getSortableRowContentStyle } from './sortableListShared'
+import { arrayMove, DragHandleIcon, InlineDeleteButton, SortableRow, SortableRowContent } from './sortableListShared'
 
 const SORTABLE_PREFIX = '__opteditor_'
 
@@ -32,22 +34,27 @@ function fromInternal(items: OptionItem[]): { label: string; value: string }[] {
 }
 
 /** 批量编辑弹窗 */
-function BatchEditModal({ open, options, onConfirm, onCancel }: { open: boolean; options: { label: string; value: string }[]; onConfirm: (v: { label: string; value: string }[]) => void; onCancel: () => void }) {
+function BatchEditModal({
+  open,
+  options,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean
+  options: { label: string; value: string }[]
+  onConfirm: (v: { label: string; value: string }[]) => void
+  onCancel: () => void
+}) {
   const { token } = useStyle()
   const [text, setText] = useState('')
   const prevOpenRef = useRef(false)
 
   // 计算"自动生成 value"：与 handleConfirm 中生成逻辑保持一致
-  const autoValue = (label: string, index: number) =>
-    label.replace(/\s+/g, '_').toLowerCase() || `option_${index + 1}`
+  const autoValue = (label: string, index: number) => label.replace(/\s+/g, '_').toLowerCase() || `option_${index + 1}`
 
   React.useEffect(() => {
     if (open && !prevOpenRef.current) {
-      setText(
-        options
-          .map((o, i) => (o.value === autoValue(o.label, i) ? o.label : `${o.label} ${o.value}`))
-          .join('\n'),
-      )
+      setText(options.map((o, i) => (o.value === autoValue(o.label, i) ? o.label : `${o.label} ${o.value}`)).join('\n'))
     }
     prevOpenRef.current = open
   }, [open, options])
@@ -73,14 +80,25 @@ function BatchEditModal({ open, options, onConfirm, onCancel }: { open: boolean;
 
   return (
     <WidgetModal open={open} title="批量编辑选项" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
-      <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: token('spacingSm') }}>每行一个选项，格式：`label value`，不写 value 时与 label 相同</div>
+      <Text type="tertiary" style={{ marginBottom: token('spacingSm') }}>
+        每行一个选项，格式：`label value`，不写 value 时与 label 相同
+      </Text>
       <WidgetTextArea value={text} onChange={setText} rows={10} />
     </WidgetModal>
   )
 }
 
-function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?: { label: string; value: string }[]; onChange?: (v: { label: string; value: string }[]) => void; disabled?: boolean; style?: React.CSSProperties }) {
-  const { token } = useStyle()
+function WidgetOptionsEditorInner({
+  value,
+  onChange,
+  disabled,
+  style,
+}: {
+  value?: { label: string; value: string }[]
+  onChange?: (v: { label: string; value: string }[]) => void
+  disabled?: boolean
+  style?: React.CSSProperties
+}) {
   const [batchOpen, setBatchOpen] = useState(false)
 
   // 维护带 _id 的内部列表
@@ -160,35 +178,52 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
 
   const sortableIds = useMemo(() => options.map((o) => `${SORTABLE_PREFIX}${o._id}`), [options])
 
-  const labelStyle = getLabelStyle(token)
-
   return (
     <div style={{ ...style }}>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSortEnd}>
         <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
           {options.map((opt, idx) => (
             <SortableRow key={opt._id} id={`${SORTABLE_PREFIX}${opt._id}`} dragHandle={<DragHandleIcon />}>
-              <div style={getSortableRowContentStyle(token, { flex: 1 })}>
+              <SortableRowContent extra={{ flex: 1 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={labelStyle}>标签</div>
-                  <WidgetInput value={opt.label} placeholder="标签" onChange={(v) => update(idx, { label: v as string })} disabled={disabled} variant="borderless" />
+                  <Text type="tertiary" style={{ lineHeight: 1.3 }}>
+                    标签
+                  </Text>
+                  <WidgetInput
+                    value={opt.label}
+                    placeholder="标签"
+                    onChange={(v) => update(idx, { label: v as string })}
+                    disabled={disabled}
+                    variant="borderless"
+                  />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={labelStyle}>值</div>
-                  <WidgetInput value={opt.value} placeholder="值" onChange={(v) => update(idx, { value: v as string })} disabled={disabled} variant="borderless" />
+                  <Text type="tertiary" style={{ lineHeight: 1.3 }}>
+                    值
+                  </Text>
+                  <WidgetInput
+                    value={opt.value}
+                    placeholder="值"
+                    onChange={(v) => update(idx, { value: v as string })}
+                    disabled={disabled}
+                    variant="borderless"
+                  />
                 </div>
                 <InlineDeleteButton
                   disabled={disabled}
-                  onClick={(e) => { e.stopPropagation(); remove(idx) }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    remove(idx)
+                  }}
                 />
-              </div>
+              </SortableRowContent>
             </SortableRow>
           ))}
         </SortableContext>
       </DndContext>
 
       {/* 底部按钮组 */}
-      <div style={{ display: 'flex', gap: token('spacingXs') }}>
+      <Space gap="xs">
         <WidgetButton
           type="dashed"
           color="primary"
@@ -201,6 +236,7 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
         </WidgetButton>
         <WidgetButton
           type="dashed"
+          color="primary"
           size="sm"
           onClick={() => setBatchOpen(true)}
           disabled={disabled}
@@ -208,9 +244,14 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
         >
           批量编辑
         </WidgetButton>
-      </div>
+      </Space>
 
-      <BatchEditModal open={batchOpen} options={fromInternal(options)} onConfirm={handleBatchConfirm} onCancel={() => setBatchOpen(false)} />
+      <BatchEditModal
+        open={batchOpen}
+        options={fromInternal(options)}
+        onConfirm={handleBatchConfirm}
+        onCancel={() => setBatchOpen(false)}
+      />
     </div>
   )
 }

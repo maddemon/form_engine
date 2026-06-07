@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useStyle } from '../styles'
 
 export type WidgetButtonType = 'primary' | 'default' | 'dashed' | 'text' | 'link'
 export type WidgetButtonColor = 'default' | 'primary' | 'danger' | 'warning'
 
 const COLOR_MAP: Record<WidgetButtonColor, { main: string; text?: string }> = {
-  default: { main: '--fe-border-primary' },
-  primary: { main: '--fe-primary', text: '#' + 'fff' },
+  default: { main: '--fe-text-primary' },
+  primary: { main: '--fe-primary', text: '--fe-text-on-primary' },
   danger: { main: '--fe-error' },
   warning: { main: '--fe-warning' },
 }
@@ -20,17 +20,35 @@ export const WidgetButton: React.FC<{
   size?: 'sm' | 'md'
   disabled?: boolean
   style?: React.CSSProperties
-}> = ({ label, children, onClick, type = 'default', color = 'default', size = 'md', disabled, style }) => {
+}> = ({ label, children, onClick, type = 'default', color, size = 'md', disabled, style }) => {
   const { token } = useStyle()
   const [hovered, setHovered] = useState(false)
 
+  const finalColor = useMemo(() => {
+    if (type === 'primary') {
+      return 'primary'
+    }
+    return color || 'default'
+  }, [type, color])
+
   // sm 适用于 PropertyPanel 等紧凑场景；md 适用于 Modal footer / 通用区域
   const sizeStyle: React.CSSProperties =
-    size === 'sm' ? { padding: '1px 8px', lineHeight: '20px', fontSize: token('fontSizeXs') as string } : { padding: '4px 12px', lineHeight: '22px', fontSize: token('fontSizeSm') as string }
+    size === 'sm'
+      ? { padding: '1px 8px', lineHeight: '20px', fontSize: token('fontSizeXs') as string }
+      : { padding: '4px 12px', lineHeight: '22px', fontSize: token('fontSizeSm') as string }
 
-  const colorConfig = COLOR_MAP[color]
+  const colorConfig = COLOR_MAP[finalColor]
   const colorMain = colorConfig.main.startsWith('--') ? `var(${colorConfig.main})` : colorConfig.main
-  const colorText = colorConfig.text ?? colorMain
+  const colorText = useMemo(() => {
+    switch (finalColor) {
+      case 'primary':
+      case 'danger':
+      case 'warning':
+        return 'var(--fe-text-on-primary)'
+      default:
+        return colorMain
+    }
+  }, [colorMain, finalColor])
 
   const base: React.CSSProperties = {
     display: 'flex',
@@ -68,7 +86,7 @@ export const WidgetButton: React.FC<{
   } else {
     // default
     base.color = colorMain
-    base.borderColor = color === 'default' ? token('borderPrimary') as string : colorMain
+    base.borderColor = finalColor === 'default' ? (token('borderPrimary') as string) : colorMain
   }
 
   // style 最后合并，允许覆盖

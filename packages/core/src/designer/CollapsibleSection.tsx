@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useStyle } from '../styles'
+import { Space } from '../widgets/Space'
+import { Divider } from '../widgets/Divider'
 
 interface CollapsibleSectionProps {
   title: string
@@ -23,31 +25,30 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
       <div
         onClick={() => !forceExpand && setCollapsed(!collapsed)}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           padding: `${token('spacingXs')} 0`,
           cursor: forceExpand ? 'default' : 'pointer',
-          borderBottom: '1px solid var(--fe-border-light)',
           fontSize: token('fontSizeSm'),
           fontWeight: 500,
           color: token('textSecondary') as string,
         }}
       >
-        <span>{title}</span>
-        {!forceExpand && (
-          <span
-            style={{
-              fontSize: token('widgetInputFontSizeXxs'),
-              color: token('textTertiary') as string,
-              transition: 'transform 0.2s',
-              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-            }}
-          >
-            ▲
-          </span>
-        )}
+        <Space justify="space-between">
+          <span>{title}</span>
+          {!forceExpand && (
+            <span
+              style={{
+                fontSize: token('widgetInputFontSizeXxs'),
+                color: token('textTertiary') as string,
+                transition: 'transform 0.2s',
+                transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
+            >
+              ▲
+            </span>
+          )}
+        </Space>
       </div>
+      <Divider direction="bottom" padding={false} />
       {isExpanded && (
         <div style={{ paddingTop: token('spacingSm'), fontSize: token('fontSizeSm') }}>
           {children}

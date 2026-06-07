@@ -11,6 +11,8 @@ import type { DesignerAction } from '../../types/designer'
 import type { PropertySlots } from '../../types/property-slot'
 import type { FieldDataSource, FormFieldSchema } from '../../types/schema'
 import { WidgetButton } from '../../widgets/Button'
+import { Divider } from '../../widgets/Divider'
+import { Space } from '../../widgets/Space'
 import { CollapsibleSection } from '../CollapsibleSection'
 import { RulesEditor } from '../RulesEditor'
 import { useDebouncedInput } from '../useDebouncedInput'
@@ -139,13 +141,13 @@ export function DefaultPropertyContent({
   return (
     <>
       <FieldItem label="字段名">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingXs'), flex: 1 }}>
+        <Space direction="vertical" gap="xs" style={{ flex: 1 }}>
           <w.Input value={nameValue} onChange={handleNameChange} />
           {nameError && <ErrorMessage>{nameError}</ErrorMessage>}
-        </div>
+        </Space>
       </FieldItem>
       <FieldItem label="标签">
-        <div style={{ display: 'flex', gap: token('spacingXs'), alignItems: 'center', flex: 1 }}>
+        <Space gap="xs" style={{ flex: 1 }}>
           <w.Input value={labelValue} onChange={handleLabelChange} placeholder="字段标签" style={{ flex: 1 }} />
           <WidgetButton
             type="text"
@@ -158,7 +160,7 @@ export function DefaultPropertyContent({
           >
             {field.labelHidden ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
           </WidgetButton>
-        </div>
+        </Space>
       </FieldItem>
       {isForm && (
         <FieldItem label="默认值">
@@ -186,13 +188,8 @@ export function DefaultPropertyContent({
       )}
 
       {(ComponentPropsRender || customConfig?.propertyConfig?.length) && (
-        <div
-          style={{
-            borderTop: '1px solid var(--fe-border-light)',
-            paddingTop: token('spacingSm'),
-            marginTop: token('spacingSm'),
-          }}
-        >
+        <>
+          <Divider style={{ marginTop: token('spacingSm') }} />
           {ComponentPropsRender ? (
             <ComponentPropsRender
               widgets={w}
@@ -213,7 +210,7 @@ export function DefaultPropertyContent({
               slots={slots}
             />
           ) : null}
-        </div>
+        </>
       )}
 
       <CollapsibleSection title="高级属性" defaultCollapsed={true} forceExpand={hasAdvanced}>

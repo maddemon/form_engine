@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from 'react'
 import { getEventDeclarations } from '../components'
+import { ErrorMessage, TooltipIcon } from '../designer/UIPrimitives'
 import { resolveEvents, type EventContext } from '../events'
 import { useStyle } from '../styles'
 import type { ComponentRenderFn, FieldComponentProps, FormEngineAdapter, FormItemProps } from '../types/adapter'
-import { isFormComponent } from '../types/component-category'
 import type { $Self, ResolvedEventHandler } from '../types/events'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
-import { TooltipIcon, ErrorMessage } from '../designer/UIPrimitives'
+import { Text } from '../widgets/Text'
 import { AdapterContext } from './AdapterContext'
 import { FieldSchemaContext } from './FieldSchemaContext'
 import { useInsideContainer } from './InsideContainerContext'
@@ -44,7 +44,16 @@ export interface FieldRendererProps {
  * 两者互不干扰，有错误时显示错误，无错误时显示 help
  */
 const DefaultFormItem: React.FC<FormItemProps> = React.memo(function DefaultFormItem({
-  label, labelHidden, required, validateStatus, errors, help, tooltip, formConfig, scene, children,
+  label,
+  labelHidden,
+  required,
+  validateStatus,
+  errors,
+  help,
+  tooltip,
+  formConfig,
+  scene,
+  children,
 }) {
   const { token } = useStyle()
   const insideContainer = useInsideContainer()
@@ -73,19 +82,26 @@ const DefaultFormItem: React.FC<FormItemProps> = React.memo(function DefaultForm
     [required, token, isHorizontal],
   )
 
-  const labelNode = !label || labelHidden ? null : (
-    <label className="fe-field-label" style={labelStyle}>
-      {required && <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>}
-      {labelText}
-      {tooltip && <TooltipIcon tooltip={tooltip} />}
-    </label>
-  )
+  const labelNode =
+    !label || labelHidden ? null : (
+      <label className="fe-field-label" style={labelStyle}>
+        {required && (
+          <span style={{ color: token('error') as string, marginRight: 'var(--fe-spacing-xs, 4px)' }}>*</span>
+        )}
+        {labelText}
+        {tooltip && <TooltipIcon tooltip={tooltip} />}
+      </label>
+    )
 
   const content = (
     <>
       {children}
       {errorMsg && <ErrorMessage margin="top">{errorMsg}</ErrorMessage>}
-      {help && !errorMsg && <div style={{ color: token('textTertiary') as string, fontSize: token('fontSizeXs') as string, marginTop: token('spacingXs') }}>{help}</div>}
+      {help && !errorMsg && (
+        <Text type="tertiary" style={{ marginTop: token('spacingXs') }}>
+          {help}
+        </Text>
+      )}
     </>
   )
 
@@ -126,7 +142,18 @@ export { DefaultFormItem }
  * 事件合并优先级（后写覆盖前写）：
  * 内置 props < componentProps < 事件处理器（events 解析结果）
  */
-export const FieldRenderer = React.memo(function FieldRenderer({ field, value, onChange, options, disabled, adapter, components = {}, eventContext, errors, formConfig }: FieldRendererProps) {
+export const FieldRenderer = React.memo(function FieldRenderer({
+  field,
+  value,
+  onChange,
+  options,
+  disabled,
+  adapter,
+  components = {},
+  eventContext,
+  errors,
+  formConfig,
+}: FieldRendererProps) {
   // 表达式计算（disabled / required）
   const { exprDisabled, exprRequired } = useFieldExpression(field, value)
 
@@ -137,17 +164,14 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
   const isRequired = field.rules?.some((r) => r.required) || exprRequired
 
   // 通用 props
-  const resolvedOptions = useMemo<OptionItem[]>(
-    () => {
-      if (field.mock?.options?.length) return field.mock.options
-      if (options.length) return options
-      if (field.dataSource?.type === 'static') return field.dataSource.static.options
-      const cpOptions = field.componentProps?.options as OptionItem[] | undefined
-      if (cpOptions?.length) return cpOptions
-      return []
-    },
-    [field.mock?.options, options, field.dataSource, field.componentProps?.options],
-  )
+  const resolvedOptions = useMemo<OptionItem[]>(() => {
+    if (field.mock?.options?.length) return field.mock.options
+    if (options.length) return options
+    if (field.dataSource?.type === 'static') return field.dataSource.static.options
+    const cpOptions = field.componentProps?.options as OptionItem[] | undefined
+    if (cpOptions?.length) return cpOptions
+    return []
+  }, [field.mock?.options, options, field.dataSource, field.componentProps?.options])
 
   // 解析事件处理器（memo 避免每次渲染重建 handler 闭包）
   const $self: $Self = useMemo(
@@ -165,7 +189,16 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
   )
 
   const eventHandlers: Record<string, ResolvedEventHandler> = useMemo(
-    () => (eventContext ? resolveEvents(field.events, $self, eventContext.$form, eventContext.callbacks, getEventDeclarations(field.type)) : {}),
+    () =>
+      eventContext
+        ? resolveEvents(
+            field.events,
+            $self,
+            eventContext.$form,
+            eventContext.callbacks,
+            getEventDeclarations(field.type),
+          )
+        : {},
     [eventContext, field.events, field.type, $self],
   )
 
@@ -226,18 +259,33 @@ export const FieldRenderer = React.memo(function FieldRenderer({ field, value, o
       labelHidden: field.labelHidden,
       rules: field.rules,
       required: isRequired,
-      validateStatus: errorMsg ? 'error' as const : undefined,
+      validateStatus: errorMsg ? ('error' as const) : undefined,
       errors,
       help: field.help,
       tooltip: field.tooltip,
       formConfig,
       scene: adapter.scene,
     }),
-    [field.name, field.label, field.labelHidden, field.rules, field.help, field.tooltip, isRequired, errorMsg, errors, formConfig, adapter.scene],
+    [
+      field.name,
+      field.label,
+      field.labelHidden,
+      field.rules,
+      field.help,
+      field.tooltip,
+      isRequired,
+      errorMsg,
+      errors,
+      formConfig,
+      adapter.scene,
+    ],
   )
 
   return (
-    <div className="fe-field" style={!renderFn ? { padding: 'var(--fe-spacing-sm, 8px) 0', color: 'var(--fe-text-tertiary)' } : undefined}>
+    <div
+      className="fe-field"
+      style={!renderFn ? { padding: 'var(--fe-spacing-sm, 8px) 0', color: 'var(--fe-text-tertiary)' } : undefined}
+    >
       <FormItemTag {...formItemProps}>
         <FieldSchemaContext.Provider value={field}>
           <AdapterContext.Provider value={adapter}>

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useStyle } from '../styles'
 import { TooltipIcon } from '../designer/UIPrimitives'
+import { Space } from '../widgets/Space'
 
 interface FieldItemProps {
   label: string
@@ -37,11 +38,10 @@ export const FieldItem: React.FC<FieldItemProps> = ({ label, children, variant =
   }
 
   return (
-    <label
+    <Space
+      gap="sm"
+      align="center"
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: token('spacingSm'),
         marginBottom: token('spacingSm'),
         fontSize: token('fontSizeSm'),
         color: token('textSecondary') as string,
@@ -50,6 +50,6 @@ export const FieldItem: React.FC<FieldItemProps> = ({ label, children, variant =
     >
       <span style={{ whiteSpace: 'nowrap', flexShrink: 0, minWidth: 80 }}>{labelNode}</span>
       <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
-    </label>
+    </Space>
   )
 }

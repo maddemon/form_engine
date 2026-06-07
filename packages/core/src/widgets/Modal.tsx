@@ -16,7 +16,17 @@ export interface WidgetModalProps {
 
 const WIDTH_MAP = { sm: 'modalWidthSm', md: 'modalWidthMd' } as const
 
-export const WidgetModal: React.FC<WidgetModalProps> = ({ open, title, width = 'md', onCancel, onConfirm, confirmText = '确定', cancelText = '取消', children, footer }) => {
+export const WidgetModal: React.FC<WidgetModalProps> = ({
+  open,
+  title,
+  width = 'md',
+  onCancel,
+  onConfirm,
+  confirmText = '确定',
+  cancelText = '取消',
+  children,
+  footer,
+}) => {
   const { token } = useStyle()
 
   if (!open) return null
@@ -44,7 +54,9 @@ export const WidgetModal: React.FC<WidgetModalProps> = ({ open, title, width = '
   }
 
   const defaultFooter = onConfirm ? (
-    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: token('spacingSm'), marginTop: token('spacingMd') }}>
+    <div
+      style={{ display: 'flex', justifyContent: 'flex-end', gap: token('spacingSm'), marginTop: token('spacingMd') }}
+    >
       <WidgetButton type="default" onClick={onCancel}>
         {cancelText}
       </WidgetButton>

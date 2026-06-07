@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useStyle } from '../styles'
+import { Space } from '../widgets/Space'
 import { WidgetButton } from '../widgets/Button'
 
 export interface TreeItem {
@@ -23,9 +24,6 @@ const TreeNode: React.FC<{ item: TreeItem; selectedId: string | null; onSelect: 
       <div
         onClick={() => onSelect(item.id)}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: token('spacingXs'),
           padding: '2px 4px',
           cursor: 'pointer',
           fontSize: token('fontSizeSm'),
@@ -35,8 +33,10 @@ const TreeNode: React.FC<{ item: TreeItem; selectedId: string | null; onSelect: 
           marginLeft: depth * parseInt(token('spacingMd') as string),
         }}
       >
-        {item.children.length ? '📁' : '📄'} {item.label}
-        <span style={{ color: 'var(--fe-text-muted)', fontSize: token('widgetInputFontSizeXxs') }}>({item.type})</span>
+        <Space gap="xs" align="center">
+          {item.children.length ? '📁' : '📄'} {item.label}
+          <span style={{ color: 'var(--fe-text-muted)', fontSize: token('widgetInputFontSizeXxs') }}>({item.type})</span>
+        </Space>
       </div>
       {item.children.map(child => (
         <TreeNode key={child.id} item={child} selectedId={selectedId} onSelect={onSelect} depth={depth + 1} />
@@ -78,10 +78,10 @@ export const ComponentTree: React.FC<ComponentTreeProps> = ({ items, selectedId,
         zIndex: 100,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: token('spacingSm') }}>
+      <Space justify="space-between" gap={0} style={{ marginBottom: token('spacingSm') }}>
         <strong style={{ fontSize: token('fontSizeSm') }}>组件树</strong>
         <WidgetButton type="text" size="sm" onClick={onClose} label="关闭" style={{ padding: '0 2px', lineHeight: 1 }}>✕</WidgetButton>
-      </div>
+      </Space>
       {items.map(item => (
         <TreeNode key={item.id} item={item} selectedId={selectedId} onSelect={onSelect} depth={0} />
       ))}

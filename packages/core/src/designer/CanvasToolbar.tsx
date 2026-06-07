@@ -3,6 +3,8 @@ import { Monitor, Smartphone } from '../components/icons'
 import { useStyle } from '../styles'
 import type { DeviceScene } from '../types/adapter'
 import { WidgetButton, WidgetButtonGroup } from '../widgets'
+import { Space } from '../widgets/Space'
+import { Divider } from '../widgets/Divider'
 
 const SCENE_TOGGLES = [
   { key: 'desktop' as const, icon: Monitor, title: '桌面' },
@@ -24,50 +26,41 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = React.memo(({ scene, 
   const { token } = useStyle()
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: `${token('spacingXs')} ${token('spacingMd')}`,
-        background: 'var(--fe-bg-primary)',
-        borderBottom: '1px solid var(--fe-border-light)',
-        flexShrink: 0,
-        fontSize: token('fontSizeSm'),
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: token('spacingXs') }}>
-        <WidgetButton label="组件树" onClick={onTreeClick} size="sm">
-          ☰
-        </WidgetButton>
-        <WidgetButton label="撤销" onClick={onUndo} disabled={!canUndo} size="sm">
-          ↩
-        </WidgetButton>
-        <WidgetButton label="重做" onClick={onRedo} disabled={!canRedo} size="sm">
-          ↪
-        </WidgetButton>
-      </div>
+    <div style={{ background: 'var(--fe-bg-primary)', flexShrink: 0 }}>
+      <Space
+        justify="space-between"
+        style={{
+          padding: `${token('spacingXs')} ${token('spacingMd')}`,
+          fontSize: token('fontSizeSm'),
+        }}
+      >
+        <Space gap="xs">
+          <WidgetButton label="组件树" onClick={onTreeClick} size="sm">
+            ☰
+          </WidgetButton>
+          <WidgetButton label="撤销" onClick={onUndo} disabled={!canUndo} size="sm">
+            ↩
+          </WidgetButton>
+          <WidgetButton label="重做" onClick={onRedo} disabled={!canRedo} size="sm">
+            ↪
+          </WidgetButton>
+        </Space>
 
-      <WidgetButtonGroup
-        options={SCENE_TOGGLES.map((item) => ({
-          label: (
-            <div
-              style={{
-                margin: token('spacingXs'),
-                display: 'flex',
-                alignItems: 'center',
-                gap: token('spacingXs'),
-              }}
-            >
-              <item.icon />
-            </div>
-          ),
-          value: item.key,
-          active: scene === item.key,
-        }))}
-        value={scene}
-        onChange={(value) => onSceneChange?.(value as DeviceScene)}
-      />
+        <WidgetButtonGroup
+          options={SCENE_TOGGLES.map((item) => ({
+            label: (
+              <Space gap="xs" style={{ margin: token('spacingXs') }}>
+                <item.icon />
+              </Space>
+            ),
+            value: item.key,
+            active: scene === item.key,
+          }))}
+          value={scene}
+          onChange={(value) => onSceneChange?.(value as DeviceScene)}
+        />
+      </Space>
+      <Divider direction="bottom" padding={false} />
     </div>
   )
 })

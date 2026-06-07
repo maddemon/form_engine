@@ -3,10 +3,13 @@ import { useStyle } from '../styles'
 import type { FieldDataSource, OptionItem } from '../types/schema'
 import { WidgetButton } from './Button'
 import { WidgetButtonGroup } from './ButtonGroup'
+import { Divider } from './Divider'
 import { WidgetInput } from './Input'
 import { WidgetModal } from './Modal'
 import { WidgetOptionsEditor } from './OptionsEditor'
+import { Space } from './Space'
 import { TagLabel } from './TagLabel'
+import { Text } from './Text'
 import { WidgetTreeDataEditor } from './TreeDataEditor'
 
 function parseUrlDeps(url: string): string[] {
@@ -61,17 +64,11 @@ function RemoteConfigModal({
 
   return (
     <WidgetModal open={open} title="远程数据源" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingSm') }}>
+      <Space direction="vertical" gap="sm" align="stretch" style={{ width: '100%' }}>
         <div>
-          <div
-            style={{
-              fontSize: token('fontSizeXs'),
-              color: 'var(--fe-text-secondary)',
-              marginBottom: token('spacingXs'),
-            }}
-          >
+          <Text type="secondary" style={{ marginBottom: token('spacingXs') }}>
             接口地址（GET）
-          </div>
+          </Text>
           <WidgetInput
             value={url}
             onChange={(v) => {
@@ -81,50 +78,39 @@ function RemoteConfigModal({
             placeholder="/api/options?parentId={parentField}"
             style={{ padding: '3px 6px' }}
           />
-          <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginTop: '2px' }}>
+          <Text type="tertiary" style={{ marginTop: '2px' }}>
             用 <code>{`{fieldName}`}</code> 引用其他字段的值作为参数
-          </div>
+          </Text>
         </div>
 
         {touched && url && deps.length > 0 && (
           <div>
-            <div
-              style={{
-                fontSize: token('fontSizeXs'),
-                color: 'var(--fe-text-secondary)',
-                marginBottom: token('spacingXs'),
-              }}
-            >
+            <Text type="secondary" style={{ marginBottom: token('spacingXs') }}>
               依赖字段
-            </div>
-            <div style={{ display: 'flex', gap: token('spacingXs'), flexWrap: 'wrap' }}>
+            </Text>
+            <Space gap="xs" wrap align="start" style={{ width: '100%' }}>
               {deps.map((dep) => (
                 <TagLabel key={dep} variant="secondary">
                   {dep}
                 </TagLabel>
               ))}
-            </div>
-            <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginTop: '2px' }}>
+            </Space>
+            <Text type="tertiary" style={{ marginTop: '2px' }}>
               依赖字段的值变化时自动重新请求
-            </div>
+            </Text>
           </div>
         )}
 
-        <div style={{ borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm') }}>
-          <div
-            style={{
-              fontSize: token('fontSizeXs'),
-              color: 'var(--fe-text-secondary)',
-              marginBottom: token('spacingSm'),
-            }}
-          >
+        <Divider />
+        <div>
+          <Text type="secondary" style={{ marginBottom: token('spacingSm') }}>
             响应映射
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingSm') }}>
+          </Text>
+          <Space direction="vertical" gap="sm" align="stretch" style={{ width: '100%' }}>
             <div>
-              <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>
+              <Text type="tertiary" style={{ marginBottom: '2px' }}>
                 列表路径
-              </div>
+              </Text>
               <WidgetInput
                 value={resultPath}
                 onChange={(v) => setResultPath(v as string)}
@@ -132,11 +118,11 @@ function RemoteConfigModal({
                 style={{ padding: '3px 6px' }}
               />
             </div>
-            <div style={{ display: 'flex', gap: token('spacingSm') }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>
+            <Space gap="sm" align="stretch" style={{ width: '100%' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <Text type="tertiary" style={{ marginBottom: '2px' }}>
                   标签字段
-                </div>
+                </Text>
                 <WidgetInput
                   value={labelField}
                   onChange={(v) => setLabelField(v as string)}
@@ -144,10 +130,10 @@ function RemoteConfigModal({
                   style={{ padding: '3px 6px' }}
                 />
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <Text type="tertiary" style={{ marginBottom: '2px' }}>
                   值字段
-                </div>
+                </Text>
                 <WidgetInput
                   value={valueField}
                   onChange={(v) => setValueField(v as string)}
@@ -155,10 +141,10 @@ function RemoteConfigModal({
                   style={{ padding: '3px 6px' }}
                 />
               </div>
-            </div>
-          </div>
+            </Space>
+          </Space>
         </div>
-      </div>
+      </Space>
     </WidgetModal>
   )
 }
@@ -277,21 +263,14 @@ function WidgetDataSourceEditorInner({
 
       {dsType === 'remote' && (
         <div>
-          <div
-            style={{
-              fontSize: token('fontSizeXs'),
-              color: 'var(--fe-text-secondary)',
-              marginBottom: token('spacingXs'),
-              lineHeight: 1.5,
-            }}
-          >
+          <Text type="secondary" style={{ marginBottom: token('spacingXs'), lineHeight: 1.5 }}>
             <div>接口：{currentRemoteConfig.url || '未配置'}</div>
             {currentRemoteConfig.url && (
-              <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginTop: '2px' }}>
+              <Text type="tertiary" style={{ marginTop: '2px' }}>
                 依赖：{parseUrlDeps(currentRemoteConfig.url).join('、') || '无'}
-              </div>
+              </Text>
             )}
-          </div>
+          </Text>
           <WidgetButton
             type="dashed"
             size="sm"
