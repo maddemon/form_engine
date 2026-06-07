@@ -1,4 +1,5 @@
-import { ColorPicker as AntdColorPicker, Input as AntdInput, Space } from 'antd'
+import { BgColorsOutlined } from '@ant-design/icons'
+import { ColorPicker as AntdColorPicker, Input as AntdInput, Button, Space } from 'antd'
 import React from 'react'
 
 export const ColorPicker: React.FC<{
@@ -9,34 +10,36 @@ export const ColorPicker: React.FC<{
   allowClear?: boolean
   style?: React.CSSProperties
 }> = ({ value, onChange, placeholder, disabled, allowClear, style }) => {
-  const [localValue, setLocalValue] = React.useState(value ?? '')
+  const [draft, setDraft] = React.useState<string | null>(null)
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  React.useEffect(() => {
-    setLocalValue(value ?? '')
-  }, [value])
+  const displayValue = draft ?? value ?? ''
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value
-    setLocalValue(v)
+    setDraft(v)
     if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => onChange?.(v), 300)
+    timerRef.current = setTimeout(() => {
+      setDraft(null)
+      onChange?.(v)
+    }, 300)
   }
 
   const handleColorPickerChange = (_: unknown, hex: string) => {
-    setLocalValue(hex)
+    setDraft(null)
     if (timerRef.current) clearTimeout(timerRef.current)
     onChange?.(hex)
   }
 
   React.useEffect(() => {
-    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
   }, [])
 
   return (
     <Space.Compact style={{ width: '100%', ...style }}>
       <AntdInput
-        value={localValue}
+        value={displayValue}
         onChange={handleInputChange}
         placeholder={placeholder}
         disabled={disabled}
@@ -45,21 +48,22 @@ export const ColorPicker: React.FC<{
         style={{ flex: 1, minWidth: 60, fontFamily: 'monospace' }}
       />
       <AntdColorPicker
-        value={localValue || undefined}
+        value={displayValue || undefined}
         onChange={handleColorPickerChange}
         disabled={disabled}
         size="small"
       >
-        <div
-          style={{
-            width: 22,
-            height: 22,
-            borderRadius: 4,
-            border: '1px solid #d9d9d9',
-            background: localValue || '#fff',
-            cursor: disabled ? 'not-allowed' : 'pointer',
+        <Button
+          type="primary"
+          size="small"
+          style={displayValue ? { backgroundColor: displayValue, borderColor: displayValue } : undefined}
+          onClick={() => {
+            setDraft(null)
+            onChange?.('')
           }}
-        />
+        >
+          <BgColorsOutlined />
+        </Button>
       </AntdColorPicker>
     </Space.Compact>
   )

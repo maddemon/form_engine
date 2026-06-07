@@ -210,8 +210,6 @@ function WidgetTreeDataEditorInner({
           style={{
             flex: 1,
             textAlign: 'center',
-            color: 'var(--fe-text-secondary)',
-            borderColor: 'var(--fe-border-primary)',
           }}
         >
           批量编辑

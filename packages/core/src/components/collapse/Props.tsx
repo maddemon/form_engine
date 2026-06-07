@@ -62,6 +62,8 @@ export default function CollapsePropsRender({ widgets: w, values, onChange }: Pr
           }}
           minItems={1}
           addLabel="添加面板"
+          layout="table"
+          widgets={{ Input: w.Input, NumberInput: w.NumberInput, Switch: w.Switch }}
         />
       </FieldItem>
     </>

@@ -163,9 +163,39 @@ export const EyeOffIcon = createIcon(
   '0 0 24 24'
 )
 
+// 创建填充风格图标组件的工厂函数（fill 而非 stroke）
+function createFilledIcon(path: React.ReactNode, viewBox: string = '0 0 24 24') {
+  return ({ size = 16, color = 'currentColor' }: IconProps = {}) => (
+    <svg
+      width={size}
+      height={size}
+      viewBox={viewBox}
+      fill={color}
+    >
+      {path}
+    </svg>
+  )
+}
+
 // 新增图标：子表单
 export const SubFormIcon = createIcon(
   <><path d="M3 3h18v18H3z" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="3" y1="15" x2="21" y2="15" /><line x1="9" y1="3" x2="9" y2="21" /><line x1="15" y1="3" x2="15" y2="21" /></>,
+  '0 0 24 24'
+)
+
+// 新增图标：设计器操作
+export const Copy = createIcon(
+  <><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></>,
+  '0 0 24 24'
+)
+
+export const Trash = createIcon(
+  <><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></>,
+  '0 0 24 24'
+)
+
+export const Grip = createFilledIcon(
+  <><circle cx="12" cy="4" r="2" /><circle cx="12" cy="20" r="2" /><circle cx="4" cy="12" r="2" /><circle cx="20" cy="12" r="2" /></>,
   '0 0 24 24'
 )
 
@@ -196,6 +226,9 @@ export const iconMap: Record<string, React.FC<IconProps>> = {
   FolderOpen,
   Image: ImageIcon,
   Bold,
+  Copy,
+  Trash,
+  Grip,
 }
 
 export default iconMap

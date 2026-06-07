@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
 import type { FieldDataSource, OptionItem } from '../types/schema'
-import { BASE_STYLE } from './shared'
-import { TagLabel } from './TagLabel'
 import { WidgetButton } from './Button'
 import { WidgetButtonGroup } from './ButtonGroup'
+import { WidgetInput } from './Input'
 import { WidgetModal } from './Modal'
 import { WidgetOptionsEditor } from './OptionsEditor'
-import { WidgetTextArea } from './TextArea'
+import { TagLabel } from './TagLabel'
 import { WidgetTreeDataEditor } from './TreeDataEditor'
 
 function parseUrlDeps(url: string): string[] {
@@ -56,8 +55,6 @@ function RemoteConfigModal({
     prevOpenRef.current = open
   }, [open, config])
 
-  const baseInputStyle: React.CSSProperties = { ...BASE_STYLE, padding: '3px 6px' }
-
   const handleConfirm = () => {
     onConfirm({ url, resultPath, labelField, valueField })
   }
@@ -66,13 +63,23 @@ function RemoteConfigModal({
     <WidgetModal open={open} title="远程数据源" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingSm') }}>
         <div>
-          <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-secondary)', marginBottom: token('spacingXs') }}>接口地址（GET）</div>
-          <input
-            type="text"
+          <div
+            style={{
+              fontSize: token('fontSizeXs'),
+              color: 'var(--fe-text-secondary)',
+              marginBottom: token('spacingXs'),
+            }}
+          >
+            接口地址（GET）
+          </div>
+          <WidgetInput
             value={url}
-            onChange={(e) => { setUrl(e.target.value); setTouched(true) }}
+            onChange={(v) => {
+              setUrl(v as string)
+              setTouched(true)
+            }}
             placeholder="/api/options?parentId={parentField}"
-            style={baseInputStyle}
+            style={{ padding: '3px 6px' }}
           />
           <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginTop: '2px' }}>
             用 <code>{`{fieldName}`}</code> 引用其他字段的值作为参数
@@ -81,10 +88,20 @@ function RemoteConfigModal({
 
         {touched && url && deps.length > 0 && (
           <div>
-            <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-secondary)', marginBottom: token('spacingXs') }}>依赖字段</div>
+            <div
+              style={{
+                fontSize: token('fontSizeXs'),
+                color: 'var(--fe-text-secondary)',
+                marginBottom: token('spacingXs'),
+              }}
+            >
+              依赖字段
+            </div>
             <div style={{ display: 'flex', gap: token('spacingXs'), flexWrap: 'wrap' }}>
               {deps.map((dep) => (
-                <TagLabel key={dep} variant="secondary">{dep}</TagLabel>
+                <TagLabel key={dep} variant="secondary">
+                  {dep}
+                </TagLabel>
               ))}
             </div>
             <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginTop: '2px' }}>
@@ -94,20 +111,49 @@ function RemoteConfigModal({
         )}
 
         <div style={{ borderTop: '1px solid var(--fe-border-light)', paddingTop: token('spacingSm') }}>
-          <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-secondary)', marginBottom: token('spacingSm') }}>响应映射</div>
+          <div
+            style={{
+              fontSize: token('fontSizeXs'),
+              color: 'var(--fe-text-secondary)',
+              marginBottom: token('spacingSm'),
+            }}
+          >
+            响应映射
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: token('spacingSm') }}>
             <div>
-              <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>列表路径</div>
-              <input type="text" value={resultPath} onChange={(e) => setResultPath(e.target.value)} placeholder="data.list 或留空取根" style={baseInputStyle} />
+              <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>
+                列表路径
+              </div>
+              <WidgetInput
+                value={resultPath}
+                onChange={(v) => setResultPath(v as string)}
+                placeholder="data.list 或留空取根"
+                style={{ padding: '3px 6px' }}
+              />
             </div>
             <div style={{ display: 'flex', gap: token('spacingSm') }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>标签字段</div>
-                <input type="text" value={labelField} onChange={(e) => setLabelField(e.target.value)} placeholder="name" style={baseInputStyle} />
+                <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>
+                  标签字段
+                </div>
+                <WidgetInput
+                  value={labelField}
+                  onChange={(v) => setLabelField(v as string)}
+                  placeholder="name"
+                  style={{ padding: '3px 6px' }}
+                />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>值字段</div>
-                <input type="text" value={valueField} onChange={(e) => setValueField(e.target.value)} placeholder="id" style={baseInputStyle} />
+                <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: '2px' }}>
+                  值字段
+                </div>
+                <WidgetInput
+                  value={valueField}
+                  onChange={(v) => setValueField(v as string)}
+                  placeholder="id"
+                  style={{ padding: '3px 6px' }}
+                />
               </div>
             </div>
           </div>
@@ -218,21 +264,16 @@ function WidgetDataSourceEditorInner({
         />
       </div>
 
-      {dsType === 'static' && (
-        optionsType === 'tree' ? (
-          <WidgetTreeDataEditor
-            value={staticOptions}
-            onChange={handleStaticChange}
-            disabled={disabled}
-          />
+      {dsType === 'static' &&
+        (optionsType === 'tree' ? (
+          <WidgetTreeDataEditor value={staticOptions} onChange={handleStaticChange} disabled={disabled} />
         ) : (
           <WidgetOptionsEditor
             value={staticOptions as { label: string; value: string }[]}
             onChange={handleStaticChange as (v: { label: string; value: string }[]) => void}
             disabled={disabled}
           />
-        )
-      )}
+        ))}
 
       {dsType === 'remote' && (
         <div>
@@ -258,8 +299,6 @@ function WidgetDataSourceEditorInner({
             disabled={disabled}
             style={{
               textAlign: 'center',
-              color: 'var(--fe-text-secondary)',
-              borderColor: 'var(--fe-border-primary)',
             }}
           >
             配置远程接口

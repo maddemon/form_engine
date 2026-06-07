@@ -167,6 +167,9 @@ export {
 // 图标映射（供 adapter 解析图标字符串）
 export { iconMap } from './components'
 
+// 图标组件（供设计器 & adapter 直接使用）
+export { Copy, Trash, Grip, Monitor, Smartphone } from './components/icons'
+
 // ============================
 // 自定义组件注册 API
 // ============================

@@ -1,5 +1,5 @@
-import { FormSchema } from '@form-engine/core'
-import { Anchor, Layout, Typography } from 'antd'
+import type { FormSchema } from '@form-engine/core'
+import { Anchor, Layout, theme, Typography } from 'antd'
 import React, { useRef } from 'react'
 
 interface Props {
@@ -23,6 +23,7 @@ const sections = [
 const DocPage: React.FC<Props> = () => {
   const contentRef = useRef<HTMLDivElement>(null)
   const { Sider, Content } = Layout
+  const { token } = theme.useToken()
 
   const CodeBlock: React.FC<{ code: string }> = ({ code }) => (
     <pre style={{ background: 'var(--fe-bg-tertiary)', padding: 16, borderRadius: 6, fontSize: 13, lineHeight: 1.6, overflow: 'auto', margin: '12px 0' }}>
@@ -32,7 +33,7 @@ const DocPage: React.FC<Props> = () => {
 
   return (
     <Layout style={{ height: '100%', overflow: 'hidden' }}>
-      <Sider width={200} style={{ padding: '20px 0', overflow: 'auto' }}>
+      <Sider width={200} style={{ padding: '20px 0', overflow: 'auto', background: token.colorBgContainer }}>
         <Typography.Text type="secondary" style={{ fontSize: 12, padding: '0 24px', display: 'block', marginBottom: 8 }}>
           目录
         </Typography.Text>

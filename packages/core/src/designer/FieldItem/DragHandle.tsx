@@ -1,4 +1,5 @@
 import React from 'react'
+import { Grip } from '../../components/icons'
 
 interface DragHandleProps {
   dragActivatorRef?: (node: HTMLElement | null) => void
@@ -35,12 +36,7 @@ export const DragHandle: React.FC<DragHandleProps> = ({ dragActivatorRef, dragLi
       }}
       title="拖拽排序"
     >
-      <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor">
-        <circle cx="12" cy="4" r="2" />
-        <circle cx="12" cy="20" r="2" />
-        <circle cx="4" cy="12" r="2" />
-        <circle cx="20" cy="12" r="2" />
-      </svg>
+      <Grip size={12} />
     </span>
   </div>
 )

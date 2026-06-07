@@ -36,6 +36,8 @@ export default function GridPropsRender({ widgets: w, values, onChange }: PropsR
           }}
           minItems={1}
           addLabel="添加列"
+          layout="table"
+          widgets={{ Input: w.Input, NumberInput: w.NumberInput, Switch: w.Switch }}
         />
       </FieldItem>
     </>

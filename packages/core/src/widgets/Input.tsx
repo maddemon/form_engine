@@ -6,8 +6,9 @@ export const WidgetInput: React.FC<{
   onChange?: (v: string | number) => void
   placeholder?: string
   disabled?: boolean
+  variant?: 'outlined' | 'borderless' | 'filled' | 'underlined'
   style?: React.CSSProperties
-}> = ({ value, onChange, placeholder, disabled, style }) => {
+}> = ({ value, onChange, placeholder, disabled, variant, style }) => {
   const [focused, setFocused] = React.useState(false)
   return (
     <input
@@ -18,7 +19,7 @@ export const WidgetInput: React.FC<{
       disabled={disabled}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
-      style={getInputControlStyle({ focused, disabled, style })}
+      style={getInputControlStyle({ focused, disabled, variant, style })}
     />
   )
 }

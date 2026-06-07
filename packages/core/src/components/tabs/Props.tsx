@@ -7,17 +7,20 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
   const tabs = (values.tabs as TabPaneConfig[]) ?? []
   const defaultActiveKey = values.defaultActiveKey as string | undefined
 
-  const handleTabsChange = useCallback((newTabs: TabPaneConfig[]) => {
-    // defaultActiveKey 同步
-    if (defaultActiveKey && !newTabs.some(t => t.key === defaultActiveKey)) {
-      // defaultActiveKey 指向的 key 已被删除，清空
-      onChange('tabs', newTabs)
-      onChange('defaultActiveKey', undefined)
-    } else {
-      // 未设置或仍匹配，不动
-      onChange('tabs', newTabs)
-    }
-  }, [defaultActiveKey, onChange])
+  const handleTabsChange = useCallback(
+    (newTabs: TabPaneConfig[]) => {
+      // defaultActiveKey 同步
+      if (defaultActiveKey && !newTabs.some((t) => t.key === defaultActiveKey)) {
+        // defaultActiveKey 指向的 key 已被删除，清空
+        onChange('tabs', newTabs)
+        onChange('defaultActiveKey', undefined)
+      } else {
+        // 未设置或仍匹配，不动
+        onChange('tabs', newTabs)
+      }
+    },
+    [defaultActiveKey, onChange],
+  )
 
   return (
     <>
@@ -67,14 +70,21 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
             { key: 'key', label: 'Key', kind: 'text', placeholder: '唯一标识', unique: true },
             { key: 'disabled', label: '禁用', kind: 'switch', flex: 0 },
           ]}
-          newItem={() => ({ id: genId('tab'), key: `tab_${(tabs?.length || 0) + 1}`, title: `标签页${(tabs?.length || 0) + 1}`, disabled: false })}
+          newItem={() => ({
+            id: genId('tab'),
+            key: `tab_${(tabs?.length || 0) + 1}`,
+            title: `标签页${(tabs?.length || 0) + 1}`,
+            disabled: false,
+          })}
           validateUnique={(items) => {
-            const keys = items.map(x => x.key).filter(Boolean)
+            const keys = items.map((x) => x.key).filter(Boolean)
             const dup = keys.find((k, i) => keys.indexOf(k) !== i)
             return dup ? `标签页 key "${dup}" 重复，请保证唯一` : null
           }}
           minItems={1}
           addLabel="添加标签页"
+          layout="table"
+          widgets={{ Input: w.Input, NumberInput: w.NumberInput, Switch: w.Switch }}
         />
       </FieldItem>
     </>

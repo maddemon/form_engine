@@ -107,7 +107,9 @@
 
   --fe-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --fe-font-family-code: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-  --fe-font-family-cn: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --fe-font-family-cn:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    sans-serif;
 
   --fe-font-size-xs: 12px;
   --fe-font-size-sm: 13px;
@@ -148,9 +150,13 @@
      ============================ */
 
   --fe-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
-  --fe-shadow-md: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02), 0 3px 12px 0 rgba(0, 0, 0, 0.05);
-  --fe-shadow-lg: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
-  --fe-shadow-xl: 0 6px 16px -8px rgba(0, 0, 0, 0.16), 0 9px 28px 0 rgba(0, 0, 0, 0.12), 0 12px 48px 16px rgba(0, 0, 0, 0.09);
+  --fe-shadow-md:
+    0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02),
+    0 3px 12px 0 rgba(0, 0, 0, 0.05);
+  --fe-shadow-lg:
+    0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  --fe-shadow-xl:
+    0 6px 16px -8px rgba(0, 0, 0, 0.16), 0 9px 28px 0 rgba(0, 0, 0, 0.12), 0 12px 48px 16px rgba(0, 0, 0, 0.09);
 
   /* ============================
      Animation - 动画系统
@@ -163,7 +169,9 @@
 
   --fe-transition-fn: cubic-bezier(0.4, 0, 0.2, 1);
   --fe-transition-all: all var(--fe-transition-normal) var(--fe-transition-fn);
-  --fe-transition-colors: background-color var(--fe-transition-normal), border-color var(--fe-transition-normal), color var(--fe-transition-normal);
+  --fe-transition-colors:
+    background-color var(--fe-transition-normal), border-color var(--fe-transition-normal),
+    color var(--fe-transition-normal);
 
   /* ============================
      Z-Index - 层级系统
@@ -296,6 +304,8 @@
   --fe-item-list-drag-handle-height-lg: 28px;
   --fe-item-list-remove-button-size: 18px;
   --fe-item-list-remove-button-padding: 0;
+  --fe-item-list-table-cell-padding: 0;
+  --fe-item-list-table-cell-padding-x: 4px;
 
   /* Modal */
   --fe-modal-width-sm: 400px;
@@ -308,6 +318,8 @@
 
 /* Dark Mode - 暗黑模式 */
 [data-fe-theme='dark'] {
+  color-scheme: dark;
+
   --fe-primary: #1668dc;
   --fe-primary-hover: #3b82f6;
   --fe-primary-active: #0958d9;

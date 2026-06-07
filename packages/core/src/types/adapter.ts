@@ -10,8 +10,8 @@
  */
 
 import * as React from 'react'
-import type { FieldDataSource, FormConfig, FormFieldSchema, FormRule, OptionItem, ValidateResult } from './schema'
 import type { BridgeProviderProps } from '../styles/themeBridge'
+import type { FieldDataSource, FormConfig, FormFieldSchema, FormRule, OptionItem, ValidateResult } from './schema'
 
 // ============================
 // 字段渲染相关类型
@@ -230,6 +230,10 @@ export interface DesignerWidgets {
     placeholder?: string
     disabled?: boolean
     style?: React.CSSProperties
+    /** 形态变体，antd v5.13+ 支持 `outlined`/`borderless`/`filled`/`underlined` */
+    variant?: 'outlined' | 'borderless' | 'filled' | 'underlined'
+    /** 尺寸，antd 默认 `middle`，PropertyPanel 紧凑模式用 `small` */
+    size?: 'small' | 'middle' | 'large'
   }>
   /** 多行文本 */
   TextArea: React.ComponentType<{
@@ -262,6 +266,8 @@ export interface DesignerWidgets {
     onChange?: (v: boolean) => void
     disabled?: boolean
     style?: React.CSSProperties
+    /** 尺寸，antd 默认 `default`，PropertyPanel 紧凑模式用 `small` */
+    size?: 'small' | 'default'
   }>
   /** 数字输入框 */
   NumberInput: React.ComponentType<{
@@ -271,12 +277,17 @@ export interface DesignerWidgets {
     max?: number
     disabled?: boolean
     style?: React.CSSProperties
+    /** 形态变体，antd v5.13+ 支持 `outlined`/`borderless`/`filled`/`underlined` */
+    variant?: 'outlined' | 'borderless' | 'filled' | 'underlined'
+    /** 尺寸，antd 默认 `middle`，PropertyPanel 紧凑模式用 `small` */
+    size?: 'small' | 'middle' | 'large'
   }>
   /** 按钮 */
   Button: React.ComponentType<{
     children?: React.ReactNode
     onClick?: () => void
-    type?: 'default' | 'primary' | 'danger' | 'dashed'
+    type?: 'primary' | 'default' | 'dashed' | 'text' | 'link'
+    color?: 'default' | 'primary' | 'danger' | 'warning'
     disabled?: boolean
     style?: React.CSSProperties
   }>

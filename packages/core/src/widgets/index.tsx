@@ -1,4 +1,4 @@
-export { WidgetButton } from './Button'
+export { WidgetButton, type WidgetButtonType, type WidgetButtonColor } from './Button'
 export { WidgetButtonGroup } from './ButtonGroup'
 export { WidgetCheckbox } from './Checkbox'
 export { WidgetColorPicker } from './ColorPicker'

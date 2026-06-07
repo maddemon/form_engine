@@ -6,12 +6,12 @@
 import { Switch as AntdSwitch } from 'antd'
 import React from 'react'
 
-export const Switch: React.FC<any> = ({ checked, onChange, disabled, style }) => (
+export const Switch: React.FC<any> = ({ checked, onChange, disabled, size = 'small', style }) => (
   <AntdSwitch
     checked={!!checked}
     onChange={v => onChange?.(v)}
     disabled={disabled}
-    size="small"
+    size={size}
     style={style}
   />
 )

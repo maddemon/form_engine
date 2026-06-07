@@ -7,9 +7,11 @@ export const WidgetNumberInput: React.FC<{
   min?: number
   max?: number
   step?: number
+  placeholder?: string
   disabled?: boolean
+  variant?: 'outlined' | 'borderless' | 'filled' | 'underlined'
   style?: React.CSSProperties
-}> = ({ value, onChange, min, max, step = 1, disabled, style }) => {
+}> = ({ value, onChange, min, max, step = 1, placeholder, disabled, variant, style }) => {
   const [focused, setFocused] = React.useState(false)
   return (
     <input
@@ -19,10 +21,11 @@ export const WidgetNumberInput: React.FC<{
       min={min}
       max={max}
       step={step}
+      placeholder={placeholder}
       disabled={disabled}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
-      style={getInputControlStyle({ focused, disabled, style })}
+      style={getInputControlStyle({ focused, disabled, variant, style })}
     />
   )
 }

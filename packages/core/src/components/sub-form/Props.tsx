@@ -34,6 +34,8 @@ export default function SubFormPropsRender({ widgets: w, values, onChange }: Pro
           newItem={() => ({ id: genId('col'), label: `列${(columns?.length || 0) + 1}`, width: 120 })}
           minItems={1}
           addLabel="添加列"
+          layout="table"
+          widgets={{ Input: w.Input, NumberInput: w.NumberInput, Switch: w.Switch }}
         />
       </FieldItem>
     </>

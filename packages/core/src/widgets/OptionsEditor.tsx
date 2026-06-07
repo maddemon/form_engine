@@ -3,9 +3,10 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
 import { WidgetButton } from './Button'
+import { WidgetInput } from './Input'
 import { WidgetModal } from './Modal'
 import { WidgetTextArea } from './TextArea'
-import { arrayMove, SortableRow, DragHandleIcon, InlineDeleteButton, getInputBaseStyle, getLabelStyle, getSortableRowContentStyle } from './sortableListShared'
+import { arrayMove, SortableRow, DragHandleIcon, InlineDeleteButton, getLabelStyle, getSortableRowContentStyle } from './sortableListShared'
 
 const SORTABLE_PREFIX = '__opteditor_'
 
@@ -159,7 +160,6 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
 
   const sortableIds = useMemo(() => options.map((o) => `${SORTABLE_PREFIX}${o._id}`), [options])
 
-  const inputBaseStyle = getInputBaseStyle(token, disabled)
   const labelStyle = getLabelStyle(token)
 
   return (
@@ -171,11 +171,11 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
               <div style={getSortableRowContentStyle(token, { flex: 1 })}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={labelStyle}>标签</div>
-                  <input type="text" value={opt.label} placeholder="标签" onChange={(e) => update(idx, { label: e.target.value })} disabled={disabled} style={inputBaseStyle} />
+                  <WidgetInput value={opt.label} placeholder="标签" onChange={(v) => update(idx, { label: v as string })} disabled={disabled} variant="borderless" />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={labelStyle}>值</div>
-                  <input type="text" value={opt.value} placeholder="值" onChange={(e) => update(idx, { value: e.target.value })} disabled={disabled} style={inputBaseStyle} />
+                  <WidgetInput value={opt.value} placeholder="值" onChange={(v) => update(idx, { value: v as string })} disabled={disabled} variant="borderless" />
                 </div>
                 <InlineDeleteButton
                   disabled={disabled}
@@ -191,10 +191,11 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
       <div style={{ display: 'flex', gap: token('spacingXs') }}>
         <WidgetButton
           type="dashed"
+          color="primary"
           size="sm"
           onClick={add}
           disabled={disabled}
-          style={{ flex: 1, textAlign: 'center' as const, color: 'var(--fe-primary)', borderColor: 'var(--fe-primary)' }}
+          style={{ flex: 1, textAlign: 'center' as const }}
         >
           + 添加选项
         </WidgetButton>
@@ -203,7 +204,7 @@ function WidgetOptionsEditorInner({ value, onChange, disabled, style }: { value?
           size="sm"
           onClick={() => setBatchOpen(true)}
           disabled={disabled}
-          style={{ flex: 1, textAlign: 'center' as const, color: 'var(--fe-text-secondary)', borderColor: 'var(--fe-border-primary)' }}
+          style={{ flex: 1, textAlign: 'center' as const }}
         >
           批量编辑
         </WidgetButton>

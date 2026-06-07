@@ -1,10 +1,10 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useStyle } from '../styles'
-import { BASE_STYLE, FOCUS_STYLE } from './shared'
-import { WidgetModal } from './Modal'
-import { WidgetTextArea } from './TextArea'
+import { WidgetButton } from './Button'
 import { InputOverlayButton } from './InputOverlayButton'
-import { TagLabel } from './TagLabel'
+import { WidgetModal } from './Modal'
+import { BASE_STYLE, FOCUS_STYLE } from './shared'
+import { WidgetTextArea } from './TextArea'
 
 /** 表达式编辑弹窗 */
 function ExpressionModal({
@@ -38,7 +38,7 @@ function ExpressionModal({
     if (!textarea) return
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
-    setText(prev => {
+    setText((prev) => {
       const before = prev.slice(0, start)
       const after = prev.slice(end)
       const newText = before + name + after
@@ -52,36 +52,25 @@ function ExpressionModal({
   }
 
   return (
-    <WidgetModal
-      open={open}
-      title="编辑表达式"
-      width="md"
-      onCancel={onCancel}
-      onConfirm={() => onConfirm(text)}
-    >
-      <WidgetTextArea
-        ref={textareaRef}
-        value={text}
-        onChange={setText}
-        rows={8}
-        style={{ fontFamily: 'monospace' }}
-      />
+    <WidgetModal open={open} title="编辑表达式" width="md" onCancel={onCancel} onConfirm={() => onConfirm(text)}>
+      <WidgetTextArea ref={textareaRef} value={text} onChange={setText} rows={8} style={{ fontFamily: 'monospace' }} />
 
       {fieldNames.length > 0 && (
         <div style={{ marginTop: token('spacingSm') }}>
-          <div style={{ fontSize: token('fontSizeXs'), color: 'var(--fe-text-tertiary)', marginBottom: token('spacingXs') }}>
+          <div
+            style={{
+              fontSize: token('fontSizeXs'),
+              color: 'var(--fe-text-tertiary)',
+              marginBottom: token('spacingXs'),
+            }}
+          >
             可用字段（点击插入）
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingXs'), maxHeight: 120, overflow: 'auto' }}>
-            {fieldNames.map(name => (
-              <button
-                key={name}
-                type="button"
-                onClick={() => insertFieldName(name)}
-                style={{ cursor: 'pointer', lineHeight: '18px', border: 'none', background: 'transparent' }}
-              >
-                <TagLabel fontFamily="monospace">{name}</TagLabel>
-              </button>
+            {fieldNames.map((name) => (
+              <WidgetButton key={name} size="sm" onClick={() => insertFieldName(name)}>
+                {name}
+              </WidgetButton>
             ))}
           </div>
         </div>
@@ -126,7 +115,7 @@ export const WidgetExpressionInput: React.FC<{
           ref={inputRef}
           type="text"
           defaultValue={value ?? ''}
-          onChange={e => onChangeRef.current?.(e.target.value)}
+          onChange={(e) => onChangeRef.current?.(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
           onFocus={() => setFocused(true)}
@@ -144,7 +133,10 @@ export const WidgetExpressionInput: React.FC<{
           onClick={() => setModalOpen(true)}
           disabled={disabled}
           title="编辑表达式"
-          style={{ color: focused ? 'var(--fe-primary)' : 'var(--fe-text-tertiary)', fontSize: token('fontSizeSm') as string }}
+          style={{
+            color: focused ? 'var(--fe-primary)' : 'var(--fe-text-tertiary)',
+            fontSize: token('fontSizeSm') as string,
+          }}
         >
           ƒ
         </InputOverlayButton>

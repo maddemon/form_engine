@@ -74,6 +74,7 @@ export const StaticExpressionToggle: React.FC<StaticExpressionToggleProps> = ({
         )}
         <WidgetButton
           type="text"
+          color="primary"
           size="sm"
           onClick={() => {
             if (mode === 'static') {
@@ -85,7 +86,7 @@ export const StaticExpressionToggle: React.FC<StaticExpressionToggleProps> = ({
             }
           }}
           label={mode === 'static' ? '切换为表达式' : '切换为静态'}
-          style={{ color: 'var(--fe-primary)', fontSize: token('fontSizeXs') as string, flexShrink: 0, whiteSpace: 'nowrap' }}
+          style={{ fontSize: token('fontSizeXs') as string, flexShrink: 0, whiteSpace: 'nowrap' }}
         >
           {mode === 'static' ? 'ƒ' : '≡'}
         </WidgetButton>

@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import React from 'react'
 import { useStyle } from '../styles'
+import { WidgetButton } from './Button'
 
 /** 数组元素移动工具 */
 export function arrayMove<T>(arr: T[], from: number, to: number): T[] {
@@ -44,34 +45,18 @@ export const InlineDeleteButton: React.FC<{
   onClick: (e: React.MouseEvent) => void
   title?: string
 }> = ({ disabled, onClick, title = '删除' }) => {
-  const { token } = useStyle()
   return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      title={title}
-      style={{
-        flexShrink: 0,
-        width: token('itemListRemoveButtonSize'),
-        height: token('itemListRemoveButtonSize'),
-        padding: token('itemListRemoveButtonPadding'),
-        border: 'none',
-        background: 'transparent',
-        color: 'var(--fe-text-tertiary)',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        fontSize: token('fontSizeXs'),
-        lineHeight: 1,
-        opacity: disabled ? 0.3 : 0.6,
-      }}
-    >
+    <WidgetButton style={{ flexShrink: 0 }} size="sm" type="text" disabled={disabled} onClick={onClick} label={title}>
       ✕
-    </button>
+    </WidgetButton>
   )
 }
 
 /** 列表行内输入框基础样式 */
-export function getInputBaseStyle(token: ReturnType<typeof useStyle>['token'], disabled?: boolean): React.CSSProperties {
+export function getInputBaseStyle(
+  token: ReturnType<typeof useStyle>['token'],
+  disabled?: boolean,
+): React.CSSProperties {
   return {
     width: '100%',
     padding: '1px 0',
@@ -94,7 +79,10 @@ export function getLabelStyle(token: ReturnType<typeof useStyle>['token']): Reac
 }
 
 /** 可排序列表行内容容器样式 */
-export function getSortableRowContentStyle(token: ReturnType<typeof useStyle>['token'], extra?: React.CSSProperties): React.CSSProperties {
+export function getSortableRowContentStyle(
+  token: ReturnType<typeof useStyle>['token'],
+  extra?: React.CSSProperties,
+): React.CSSProperties {
   return {
     display: 'flex',
     alignItems: 'center',
