@@ -11,7 +11,9 @@ export function useDesignerSync(
   const lastSyncedSchemaRef = useRef(schema)
   const lastNotifiedSchemaRef = useRef(stateSchema)
   const onSchemaChangeRef = useRef(onSchemaChange)
-  onSchemaChangeRef.current = onSchemaChange
+  useEffect(() => {
+    onSchemaChangeRef.current = onSchemaChange
+  }, [onSchemaChange])
 
   useEffect(() => {
     // ── 方向一：外部 schema prop 变化 → 同步到内部 state ──

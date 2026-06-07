@@ -20,11 +20,15 @@ export interface UseFormValuesResult {
 export function useFormValues({ initialValues, onChange }: UseFormValuesOptions): UseFormValuesResult {
   const [formValues, setFormValues] = useState<Record<string, unknown>>(initialValues)
   const formValuesRef = useRef(formValues)
-  formValuesRef.current = formValues
+  useEffect(() => {
+    formValuesRef.current = formValues
+  }, [formValues])
 
   const onChangeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const onChangeRef = useRef(onChange)
-  onChangeRef.current = onChange
+  useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
 
   const debouncedOnChange = useCallback(() => {
     if (onChangeTimerRef.current) clearTimeout(onChangeTimerRef.current)
@@ -45,11 +49,12 @@ export function useFormValues({ initialValues, onChange }: UseFormValuesOptions)
   }, [debouncedOnChange])
 
   const setFieldsValue = useCallback((patch: Record<string, unknown>) => {
+    let next: Record<string, unknown>
     setFormValues((prev) => {
-      const next = { ...prev, ...patch }
-      onChangeRef.current?.(next)
+      next = { ...prev, ...patch }
       return next
     })
+    onChangeRef.current?.(next!)
   }, [])
 
   const getFieldValue = useCallback((name: string): unknown => formValues[name], [formValues])

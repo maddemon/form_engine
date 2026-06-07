@@ -1,6 +1,6 @@
 import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
 import { WidgetButton } from './Button'
 import { WidgetInput } from './Input'
@@ -118,7 +118,9 @@ function WidgetOptionsEditorInner({
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
   const internalRef = useRef(internal)
-  internalRef.current = internal
+  useEffect(() => {
+    internalRef.current = internal
+  }, [internal])
 
   const update = useCallback(
     (idx: number, patch: Partial<{ label: string; value: string }>) => {

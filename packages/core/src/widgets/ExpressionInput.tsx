@@ -89,7 +89,9 @@ export const WidgetExpressionInput: React.FC<{
   const [modalOpen, setModalOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const onChangeRef = useRef(onChange)
-  onChangeRef.current = onChange
+  useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
 
   // 非受控输入：父组件 external value 变化时同步到 input
   // focused 时不覆盖，避免打断用户输入

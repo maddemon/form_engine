@@ -1,5 +1,5 @@
 import { DndContext, DragOverlay } from '@dnd-kit/core'
-import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { getComponentIcon } from '../components'
 import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
 import type { DeviceScene, FormEngineAdapter } from '../types/adapter'
@@ -15,19 +15,7 @@ import { buildFieldIndex, designerReducerWithHistory, findInTree, type FieldInde
 import { useDesignerSync } from './useDesignerSync'
 
 function useFieldIndex(fields: FormFieldSchema[]): FieldIndex {
-  const prevFieldsRef = useRef<FormFieldSchema[]>(fields)
-  const indexRef = useRef<FieldIndex>(buildFieldIndex(fields))
-
-  if (prevFieldsRef.current !== fields) {
-    const prev = prevFieldsRef.current
-    const changed = fields.length !== prev.length || fields.some((f, i) => f !== prev[i])
-    if (changed) {
-      indexRef.current = buildFieldIndex(fields)
-    }
-    prevFieldsRef.current = fields
-  }
-
-  return indexRef.current
+  return useMemo(() => buildFieldIndex(fields), [fields])
 }
 
 export const Designer: React.FC<DesignerProps> = ({

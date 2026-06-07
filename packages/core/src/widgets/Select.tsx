@@ -15,7 +15,9 @@ export const WidgetSelect: React.FC<{
   const [focused, setFocused] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement>(null)
   const onChangeRef = React.useRef(onChange)
-  onChangeRef.current = onChange
+  React.useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
 
   const { token } = useStyle()
 
