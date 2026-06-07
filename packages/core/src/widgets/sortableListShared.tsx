@@ -22,8 +22,8 @@ export const DragHandleIcon: React.FC<{ disabled?: boolean; sortable?: boolean }
       style={{
         justifyContent: 'center',
         flexShrink: 0,
-        width: token('itemListDragHandleWidthLg'),
-        height: token('itemListDragHandleHeightLg'),
+        width: 'var(--fe-item-list-drag-handle-width-lg)',
+        height: 'var(--fe-item-list-drag-handle-height-lg)',
         cursor: disabled || !sortable ? 'default' : 'grab',
         color: 'var(--fe-text-secondary)',
         fontSize: token('fontSizeMd'),

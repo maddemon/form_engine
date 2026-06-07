@@ -17,6 +17,7 @@ export const InputOverlayButton: React.FC<{
 }> = ({ onClick, onMouseDown, disabled, title, children, style }) => {
   const [hovered, setHovered] = useState(false)
   const { token } = useStyle()
+  const iconPx = `calc(${token('fontSizeIcon')} * 1.333)`
 
   return (
     <div
@@ -38,8 +39,8 @@ export const InputOverlayButton: React.FC<{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: token('inputActionSize') as string,
-          height: token('inputActionSize') as string,
+          width: iconPx,
+          height: iconPx,
           lineHeight: 1,
           cursor: disabled ? 'not-allowed' : 'pointer',
           opacity: disabled ? 0.5 : 1,

@@ -34,7 +34,7 @@ import type { PropsRenderProps } from './types'
 export { genId } from '../utils/id'
 export { ItemListEditor } from './ItemListEditor'
 export type { ItemListEditorProps, ItemListField } from './ItemListEditor'
-export { FieldItem } from './shared'
+export { FieldItem, DataSourceEditorField } from './shared'
 export type { PropsRenderProps } from './types'
 
 export const PropsRenderMap: Record<string, ComponentType<PropsRenderProps>> = {

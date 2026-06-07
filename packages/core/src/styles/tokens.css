@@ -119,6 +119,7 @@
   --fe-font-size-xl: 20px;
   --fe-font-size-2xl: 24px;
   --fe-font-size-3xl: 32px;
+  --fe-font-size-icon: 12px;
 
   --fe-font-weight-regular: 400;
   --fe-font-weight-medium: 500;
@@ -284,32 +285,17 @@
   --fe-widget-field-handle-font-size: 12px;
   --fe-widget-canvas-dnd-shadow: 0 2px 8px rgba(22, 119, 255, 0.3);
 
-  /* Widget Switch - Widget 物理尺寸 */
-  --fe-widget-switch-track-width: 36px;
-  --fe-widget-switch-track-height: 20px;
-  --fe-widget-switch-track-radius: 10px;
-  --fe-widget-switch-thumb-size: 16px;
-  --fe-widget-switch-thumb-offset: 2px;
-  --fe-widget-switch-thumb-active-offset: 18px;
-  --fe-widget-switch-shadow: 0 1px 2px var(--fe-bg-mask);
+  /* Widget Switch */
+  --fe-switch-track-height: 20px;
+  --fe-switch-track-width: calc(var(--fe-switch-track-height) * 1.8);
+  --fe-switch-track-radius: calc(var(--fe-switch-track-height) / 2);
+  --fe-switch-thumb-size: 16px;
 
-  /* Widget 输入框内操作按钮 */
-  --fe-input-action-size: 16px;
-
-  /* Widget 微调 - 物理特殊值 */
-  --fe-widget-checkbox-margin: 0;
-  --fe-widget-input-font-size-xs: 11px;
-  --fe-widget-input-font-size-xxs: 10px;
-
-  /* ItemListEditor 物理尺寸 */
-  --fe-item-list-drag-handle-width: 16px;
-  --fe-item-list-drag-handle-height: 24px;
-  --fe-item-list-drag-handle-width-lg: 20px;
-  --fe-item-list-drag-handle-height-lg: 28px;
-  --fe-item-list-remove-button-size: 18px;
-  --fe-item-list-remove-button-padding: 0;
+  /* ItemListEditor 物理尺寸（CSS-only，不暴露到 ThemeTokens 接口） */
   --fe-item-list-table-cell-padding: 0;
   --fe-item-list-table-cell-padding-x: 4px;
+  --fe-item-list-drag-handle-width-lg: 20px;
+  --fe-item-list-drag-handle-height-lg: 28px;
 
   /* Modal */
   --fe-modal-width-sm: 400px;

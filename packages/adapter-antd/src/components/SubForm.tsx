@@ -4,7 +4,7 @@
  * 使用 Ant Design 的 Table 组件
  */
 
-import type { FormFieldSchema, SubFormColumnConfig, OptionItem } from '@form-engine/core'
+import type { FormFieldSchema, OptionItem, SubFormColumnConfig } from '@form-engine/core'
 import { useAdapter } from '@form-engine/core'
 import { Table as AntTable } from 'antd'
 import React from 'react'
@@ -47,7 +47,7 @@ export const SubForm: React.FC<{
     const { options: _ignored, ...restComponentProps } = childSchema.componentProps ?? {}
     return React.createElement(renderFn, {
       value: row[child.name as string],
-      onChange: (newValue: unknown) => {
+      onChange: (newValue) => {
         const newRows = [...value]
         newRows[rowIndex] = { ...row, [child.name as string]: newValue }
         onChange?.(newRows)

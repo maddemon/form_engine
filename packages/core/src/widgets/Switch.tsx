@@ -9,14 +9,16 @@ export const WidgetSwitch: React.FC<{
 }> = ({ checked, onChange, disabled, style }) => {
   const { token } = useStyle()
   const trackColor = checked ? token('primary') as string : token('borderPrimary') as string
+  const trackH = token('switchTrackHeight') as string
+  const thumbSize = token('switchThumbSize') as string
   return (
     <div
       onClick={() => !disabled && onChange?.(!checked)}
       style={{
         display: 'inline-block',
-        width: token('widgetSwitchTrackWidth'),
-        height: token('widgetSwitchTrackHeight'),
-        borderRadius: token('widgetSwitchTrackRadius'),
+        width: `calc(${trackH} * 1.8)`,
+        height: trackH,
+        borderRadius: `calc(${trackH} / 2)`,
         background: trackColor,
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
@@ -28,14 +30,14 @@ export const WidgetSwitch: React.FC<{
       <div
         style={{
           position: 'absolute',
-          top: token('widgetSwitchThumbOffset'),
-          left: checked ? token('widgetSwitchThumbActiveOffset') : token('widgetSwitchThumbOffset'),
-          width: token('widgetSwitchThumbSize'),
-          height: token('widgetSwitchThumbSize'),
+          top: thumbSize ? `calc((${trackH} - ${thumbSize}) / 2)` : 0,
+          left: checked ? `calc(${trackH} * 1.8 - ${thumbSize} - (${trackH} - ${thumbSize}) / 2)` : `calc((${trackH} - ${thumbSize}) / 2)`,
+          width: thumbSize,
+          height: thumbSize,
           borderRadius: '50%',
           background: token('bgPrimary') as string,
           transition: 'left 0.2s',
-          boxShadow: token('widgetSwitchShadow') as string,
+          boxShadow: token('shadowSm') as string,
         }}
       />
     </div>

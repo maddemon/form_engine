@@ -35,7 +35,7 @@ const TreeNode: React.FC<{ item: TreeItem; selectedId: string | null; onSelect: 
       >
         <Space gap="xs" align="center">
           {item.children.length ? '📁' : '📄'} {item.label}
-          <span style={{ color: 'var(--fe-text-muted)', fontSize: token('widgetInputFontSizeXxs') }}>({item.type})</span>
+          <span style={{ color: 'var(--fe-text-muted)', fontSize: token('fontSizeIcon') }}>({item.type})</span>
         </Space>
       </div>
       {item.children.map(child => (

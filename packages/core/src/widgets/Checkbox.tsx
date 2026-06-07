@@ -1,3 +1,5 @@
+/* check-tokens-disable */
+
 import React from 'react'
 import { useStyle } from '../styles'
 
@@ -15,7 +17,8 @@ export const WidgetCheckbox: React.FC<{
         checked={!!checked}
         onChange={e => onChange?.(e.target.checked)}
         disabled={disabled}
-        style={{ margin: token('widgetCheckboxMargin') as unknown as number, cursor: disabled ? 'not-allowed' : 'pointer' }}
+        // eslint-disable-next-line form-engine/ban-hardcoded-style
+        style={{ margin: 0, cursor: disabled ? 'not-allowed' : 'pointer' }}
       />
       <span>{checked ? '是' : '否'}</span>
     </label>

@@ -2,6 +2,10 @@ import React from 'react'
 import { useStyle } from '../styles'
 import { TooltipIcon } from '../designer/UIPrimitives'
 import { Space } from '../widgets/Space'
+import { resolveSlot } from '../registry/propertySlotRegistry'
+import type { PropertySlots } from '../types/property-slot'
+import type { DesignerWidgets } from '../types/adapter'
+import type { FieldDataSource } from '../types/schema'
 
 interface FieldItemProps {
   label: string
@@ -52,4 +56,30 @@ export const FieldItem: React.FC<FieldItemProps> = ({ label, children, variant =
       <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
     </Space>
   )
+}
+
+interface DataSourceEditorFieldProps {
+  dataSource?: FieldDataSource
+  onChange?: (ds: FieldDataSource) => void
+  optionsType: 'flat' | 'tree'
+  slots?: PropertySlots
+  widgets: DesignerWidgets
+}
+
+export const DataSourceEditorField: React.FC<DataSourceEditorFieldProps> = ({
+  dataSource,
+  onChange,
+  optionsType,
+  slots,
+  widgets,
+}) => {
+  const Slot = React.useMemo(
+    () => resolveSlot('dataSourceEditor', slots, widgets),
+    [slots, widgets],
+  )
+  return React.createElement(Slot, {
+    value: dataSource,
+    onChange: (v: unknown) => onChange?.(v as FieldDataSource),
+    context: { optionsType },
+  })
 }

@@ -1,5 +1,10 @@
+/* check-tokens-disable */
+
 import React from 'react'
 import { useStyle } from '../styles'
+
+// eslint-disable-next-line form-engine/ban-hardcoded-style
+const NO_GAP: React.CSSProperties = { display: 'flex', gap: 0 }
 
 export const WidgetButtonGroup: React.FC<{
   value?: string
@@ -11,7 +16,7 @@ export const WidgetButtonGroup: React.FC<{
   const { token } = useStyle()
 
   return (
-    <div style={{ display: 'flex', gap: token('widgetCheckboxMargin') as unknown as number, ...style }}>
+    <div style={{ ...NO_GAP, ...style }}>
       {options.map((opt, idx) => {
         const isFirst = idx === 0
         const isLast = idx === options.length - 1

@@ -81,6 +81,7 @@ export interface ThemeTokens {
   fontSizeXl: string
   fontSize2xl: string
   fontSize3xl: string
+  fontSizeIcon: string
 
   fontWeightRegular: number
   fontWeightMedium: number
@@ -138,34 +139,20 @@ export interface ThemeTokens {
   widgetCanvasDndShadow: string
 
   // Widget Switch
-  widgetSwitchTrackWidth: string
-  widgetSwitchTrackHeight: string
-  widgetSwitchTrackRadius: string
-  widgetSwitchThumbSize: string
-  widgetSwitchThumbOffset: string
-  widgetSwitchThumbActiveOffset: string
-  widgetSwitchShadow: string
-
-  // Widget 输入框内操作按钮（清除、表达式等）
-  inputActionSize: string
-
-  // Widget 微调
-  widgetCheckboxMargin: string
-  widgetInputFontSizeXs: string
-  widgetInputFontSizeXxs: string
-
-  // ItemListEditor 物理尺寸
-  itemListDragHandleWidth: string
-  itemListDragHandleHeight: string
-  itemListDragHandleWidthLg: string
-  itemListDragHandleHeightLg: string
-  itemListRemoveButtonSize: string
-  itemListRemoveButtonPadding: string
+  switchTrackHeight: string
+  switchThumbSize: string
 
   // Modal 物理尺寸
   modalWidthSm: string
   modalWidthMd: string
 }
+
+// ============================
+// 尺寸种子常量（唯一真实源）
+// ============================
+const FONT_SIZE_ICON = 12
+const SWITCH_TRACK_H = 20
+const SWITCH_THUMB = 16
 
 export const defaultTheme: ThemeTokens = {
   // Primary
@@ -243,6 +230,7 @@ export const defaultTheme: ThemeTokens = {
   fontSizeXl: '20px',
   fontSize2xl: '24px',
   fontSize3xl: '32px',
+  fontSizeIcon: `${FONT_SIZE_ICON}px`,
 
   fontWeightRegular: 400,
   fontWeightMedium: 500,
@@ -300,28 +288,8 @@ export const defaultTheme: ThemeTokens = {
   widgetCanvasDndShadow: '0 2px 8px rgba(22, 119, 255, 0.3)',
 
   // Widget Switch
-  widgetSwitchTrackWidth: '36px',
-  widgetSwitchTrackHeight: '20px',
-  widgetSwitchTrackRadius: '10px',
-  widgetSwitchThumbSize: '16px',
-  widgetSwitchThumbOffset: '2px',
-  widgetSwitchThumbActiveOffset: '18px',
-  widgetSwitchShadow: '0 1px 2px var(--fe-bg-mask)',
-
-  inputActionSize: '16px',
-
-  // Widget 微调
-  widgetCheckboxMargin: '0',
-  widgetInputFontSizeXs: '11px',
-  widgetInputFontSizeXxs: '10px',
-
-  // ItemListEditor 物理尺寸
-  itemListDragHandleWidth: '16px',
-  itemListDragHandleHeight: '24px',
-  itemListDragHandleWidthLg: '20px',
-  itemListDragHandleHeightLg: '28px',
-  itemListRemoveButtonSize: '18px',
-  itemListRemoveButtonPadding: '0',
+  switchTrackHeight: `${SWITCH_TRACK_H}px`,
+  switchThumbSize: `${SWITCH_THUMB}px`,
 
   // Modal 物理尺寸
   modalWidthSm: '400px',

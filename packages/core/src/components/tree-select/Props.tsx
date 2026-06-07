@@ -1,16 +1,16 @@
-import { FieldItem } from '../../propRenders/shared'
+import { FieldItem, DataSourceEditorField } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
-import { resolveSlot } from '../../registry/propertySlotRegistry'
 
 export default function TreeSelectPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange, slots }: PropsRenderProps) {
-  const DataSourceEditorSlot = resolveSlot('dataSourceEditor', slots, w)
   return (
     <>
       <FieldItem label="选项数据" variant="group">
-        <DataSourceEditorSlot
-          value={dataSource}
-          onChange={(v) => onDataSourceChange?.(v as import('../../types/schema').FieldDataSource)}
-          context={{ optionsType: 'tree' }}
+        <DataSourceEditorField
+          dataSource={dataSource}
+          onChange={onDataSourceChange}
+          optionsType="tree"
+          slots={slots}
+          widgets={w}
         />
       </FieldItem>
       <FieldItem label="占位文本">

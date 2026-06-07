@@ -37,7 +37,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           {!forceExpand && (
             <span
               style={{
-                fontSize: token('widgetInputFontSizeXxs'),
+                fontSize: token('fontSizeIcon'),
                 color: token('textTertiary') as string,
                 transition: 'transform 0.2s',
                 transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
