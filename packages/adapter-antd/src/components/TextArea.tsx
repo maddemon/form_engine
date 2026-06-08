@@ -1,5 +1,6 @@
 import React from 'react'
 import { Input as AntdInput } from 'antd'
+import { useLocale } from '@form-engine/core/locale'
 import type { TextAreaProps } from '@form-engine/core'
 
 const { TextArea: AntdTextArea } = AntdInput
@@ -11,7 +12,7 @@ const { TextArea: AntdTextArea } = AntdInput
 export const TextArea: React.FC<TextAreaProps> = ({
   value,
   onChange,
-  placeholder,
+  placeholder: placeholderProp,
   disabled,
   readOnly,
   rows = 4,
@@ -22,6 +23,8 @@ export const TextArea: React.FC<TextAreaProps> = ({
   className,
   id,
 }) => {
+  const { locale } = useLocale()
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.input ?? 'Please enter'
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if ((e.nativeEvent as InputEvent)?.isComposing) return
     onChange?.(e.target.value)

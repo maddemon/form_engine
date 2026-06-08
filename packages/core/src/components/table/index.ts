@@ -23,7 +23,7 @@ export interface TableProps extends BaseComponentProps {
 }
 
 export const meta: ComponentRegistration = {
-  label: '表格',
+  label: 'component.table.label',
   category: 'display',
   icon: 'Table',
   defaultProps: {

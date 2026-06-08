@@ -26,10 +26,10 @@ export interface TextAreaProps extends Omit<InputProps, 'prefix' | 'suffix'> {
 }
 
 export const inputEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '输入框内容变化时触发' },
-  { name: 'onBlur', label: '失焦', description: '输入框失去焦点时触发' },
-  { name: 'onFocus', label: '聚焦', description: '输入框获得焦点时触发' },
-  { name: 'onPressEnter', label: '回车', description: '按下回车键时触发' },
+  { name: 'onChange', label: 'component.input.events.onChange.label', description: 'component.input.events.onChange.description' },
+  { name: 'onBlur', label: 'component.input.events.onBlur.label', description: 'component.input.events.onBlur.description' },
+  { name: 'onFocus', label: 'component.input.events.onFocus.label', description: 'component.input.events.onFocus.description' },
+  { name: 'onPressEnter', label: 'component.input.events.onPressEnter.label', description: 'component.input.events.onPressEnter.description' },
 ]
 
 export const textAreaEventDeclarations: EventDeclaration[] = inputEventDeclarations
@@ -37,17 +37,17 @@ export const textAreaEventDeclarations: EventDeclaration[] = inputEventDeclarati
 export { default as Props } from './Props'
 
 export const inputMeta: ComponentRegistration = {
-  label: '输入框',
+  label: 'component.input.label',
   category: 'form',
   icon: 'Edit',
-  defaultProps: { componentProps: { placeholder: '请输入', allowClear: true } },
+  defaultProps: { componentProps: { allowClear: true } },
   eventDeclarations: inputEventDeclarations,
 }
 
 export const textAreaMeta: ComponentRegistration = {
-  label: '多行文本',
+  label: 'component.textarea.label',
   category: 'form',
   icon: 'AlignLeft',
-  defaultProps: { componentProps: { placeholder: '请输入', rows: 3, showCount: false } },
+  defaultProps: { componentProps: { rows: 3, showCount: false } },
   eventDeclarations: textAreaEventDeclarations,
 }

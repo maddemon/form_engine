@@ -1,5 +1,6 @@
 import { DatePicker, Space } from 'antd-mobile'
 import { CalendarOutline, CloseCircleFill } from 'antd-mobile-icons'
+import { useLocale } from '@form-engine/core/locale'
 import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 /** 根据 format 字符串自动判断是否包含时间部分 */
@@ -13,9 +14,10 @@ function formatDate(d: Date): string {
 
 export const DateRangeField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, disabled, fieldSchema } = props
+  const { locale } = useLocale()
   const format = fieldSchema.componentProps?.format as string || 'YYYY-MM-DD'
   const showTime = !!fieldSchema.componentProps?.showTime || isTimeFormat(format)
-  const placeholder = fieldSchema.placeholder || '请选择日期范围'
+  const placeholder = fieldSchema.placeholder ?? locale.adapter.common.placeholder.date ?? 'Select date'
   const allowClear = fieldSchema.componentProps?.allowClear
   const vals = (value as [string, string] | null) || [null, null]
   const hasValue = !!vals[0] || !!vals[1]
@@ -31,8 +33,8 @@ export const DateRangeField: FieldRendererFn = (props: FieldComponentProps) => {
     >
       <Space gap={4} align="center">
         <DatePicker
-          confirmText="确定"
-          cancelText="取消"
+          confirmText={locale.adapter.mobile.confirm}
+          cancelText={locale.adapter.mobile.cancel}
           precision={showTime ? 'minute' : 'day'}
           value={vals[0] ? new Date(vals[0]) : undefined}
           onConfirm={(d: any) => {
@@ -45,14 +47,14 @@ export const DateRangeField: FieldRendererFn = (props: FieldComponentProps) => {
               onClick={disabled ? undefined : actions.open}
               style={{ cursor: disabled ? 'default' : 'pointer' }}
             >
-              {v ? formatDate(v as Date) : '开始'}
+              {v ? formatDate(v as Date) : locale.adapter.mobile.dateRangeStart}
             </span>
           )}
         </DatePicker>
         <span>~</span>
         <DatePicker
-          confirmText="确定"
-          cancelText="取消"
+          confirmText={locale.adapter.mobile.confirm}
+          cancelText={locale.adapter.mobile.cancel}
           precision={showTime ? 'minute' : 'day'}
           value={vals[1] ? new Date(vals[1]) : undefined}
           onConfirm={(d: any) => {
@@ -65,7 +67,7 @@ export const DateRangeField: FieldRendererFn = (props: FieldComponentProps) => {
               onClick={disabled ? undefined : actions.open}
               style={{ cursor: disabled ? 'default' : 'pointer' }}
             >
-              {v ? formatDate(v as Date) : '结束'}
+              {v ? formatDate(v as Date) : locale.adapter.mobile.dateRangeEnd}
             </span>
           )}
         </DatePicker>

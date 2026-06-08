@@ -12,7 +12,7 @@ export interface SegmentProps extends BaseComponentProps {
 }
 
 export const segmentEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '选中变化', description: '选中项变化时触发，参数为新值' },
+  { name: 'onChange', label: 'component.segment.events.onChange.label', description: 'component.segment.events.onChange.description' },
 ]
 
 export { default as Props } from './Props'
@@ -24,7 +24,7 @@ const DEFAULT_OPTIONS = [
 ]
 
 export const meta: ComponentRegistration = {
-  label: '分段控制',
+  label: 'component.segment.label',
   category: 'display',
   icon: 'SegmentIcon',
   defaultProps: {

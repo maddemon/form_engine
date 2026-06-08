@@ -11,8 +11,8 @@ export interface TransferProps extends BaseFormComponentProps<string[] | undefin
 }
 
 export const transferEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '选中项变化时触发' },
-  { name: 'onSearch', label: '搜索', description: '搜索文本变化时触发' },
+  { name: 'onChange', label: 'component.transfer.events.onChange.label', description: 'component.transfer.events.onChange.description' },
+  { name: 'onSearch', label: 'component.transfer.events.onSearch.label', description: 'component.transfer.events.onSearch.description' },
 ]
 
 const DEFAULT_OPTIONS = [
@@ -24,7 +24,7 @@ const DEFAULT_OPTIONS = [
 ]
 
 export const meta: ComponentRegistration = {
-  label: '穿梭框',
+  label: 'component.transfer.label',
   category: 'form',
   icon: 'ArrowLeftRight',
   defaultProps: { dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS } } },

@@ -1,5 +1,6 @@
 import { DatePicker, Space } from 'antd-mobile'
 import { CalendarOutline, CloseCircleFill } from 'antd-mobile-icons'
+import { useLocale } from '@form-engine/core/locale'
 import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 /** 根据 format 字符串自动判断是否包含时间部分 */
@@ -25,17 +26,18 @@ function formatDisplayDate(d: Date, showTime: boolean): string {
 
 export const DateField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, disabled, fieldSchema } = props
+  const { locale } = useLocale()
   const format = fieldSchema.componentProps?.format as string || 'YYYY-MM-DD'
   const explicitShowTime = !!fieldSchema.componentProps?.showTime
   const showTime = explicitShowTime || isTimeFormat(format)
-  const placeholder = fieldSchema.placeholder || '请选择日期'
+  const placeholder = fieldSchema.placeholder ?? locale.adapter.common.placeholder.date ?? 'Select date'
   const allowClear = fieldSchema.componentProps?.allowClear
   const hasValue = !!value
 
   return (
     <DatePicker
-      confirmText="确定"
-      cancelText="取消"
+      confirmText={locale.adapter.mobile.confirm}
+      cancelText={locale.adapter.mobile.cancel}
       precision={showTime ? 'minute' : 'day'}
       value={value ? new Date(value as string) : undefined}
       onConfirm={(d: any) => {

@@ -1,9 +1,11 @@
+import { useLocale } from '../../locale'
 import { FieldItem, PropsRenderProps, DataSourceEditorField } from '../../propRenders'
 
 export default function CheckboxPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange, slots }: PropsRenderProps) {
+  const { locale } = useLocale()
   return (
     <>
-      <FieldItem label="选项数据" variant="group">
+      <FieldItem label={locale.component.checkbox.dataSource} variant="group">
         <DataSourceEditorField
           dataSource={dataSource}
           onChange={onDataSourceChange}
@@ -12,16 +14,16 @@ export default function CheckboxPropsRender({ widgets: w, values, onChange, data
           widgets={w}
         />
       </FieldItem>
-      <FieldItem label="半选状态">
+      <FieldItem label={locale.component.checkbox.indeterminate}>
         <w.Switch checked={!!values.indeterminate} onChange={(v) => onChange('indeterminate', v)} />
       </FieldItem>
-      <FieldItem label="排列方向">
+      <FieldItem label={locale.component.checkbox.direction}>
         <w.ButtonGroup
           value={(values.direction as string) ?? 'horizontal'}
           onChange={(v) => onChange('direction', v)}
           options={[
-            { label: '横向', value: 'horizontal' },
-            { label: '竖向', value: 'vertical' },
+            { label: locale.component.checkbox.horizontal, value: 'horizontal' },
+            { label: locale.component.checkbox.vertical, value: 'vertical' },
           ]}
         />
       </FieldItem>

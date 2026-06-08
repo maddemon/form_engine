@@ -10,7 +10,7 @@ export interface RadioProps extends BaseFormComponentProps<string | number | und
 }
 
 export const radioEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '选中项变化时触发' },
+  { name: 'onChange', label: 'component.radio.events.onChange.label', description: 'component.radio.events.onChange.description' },
 ]
 
 export { default as Props } from './Props'
@@ -22,7 +22,7 @@ const DEFAULT_OPTIONS = [
 ]
 
 export const meta: ComponentRegistration = {
-  label: '单选框',
+  label: 'component.radio.label',
   category: 'form',
   icon: 'CircleDot',
   defaultProps: { dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS } } },

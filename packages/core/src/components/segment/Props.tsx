@@ -1,9 +1,11 @@
+import { useLocale } from '../../locale'
 import { FieldItem, PropsRenderProps, DataSourceEditorField } from '../../propRenders'
 
 export default function SegmentPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange, slots }: PropsRenderProps) {
+  const { locale } = useLocale()
   return (
     <>
-      <FieldItem label="选项数据" variant="group">
+      <FieldItem label={locale.component.segment.dataSource} variant="group">
         <DataSourceEditorField
           dataSource={dataSource}
           onChange={onDataSourceChange}
@@ -12,28 +14,28 @@ export default function SegmentPropsRender({ widgets: w, values, onChange, dataS
           widgets={w}
         />
       </FieldItem>
-      <FieldItem label="默认值">
+      <FieldItem label={locale.component.segment.defaultValue}>
         <w.Input
           value={(values.defaultValue as string) ?? ''}
           onChange={(v) => onChange('defaultValue', v)}
-          placeholder="选项的 value 值"
+          placeholder={locale.component.segment.placeholder}
         />
       </FieldItem>
-      <FieldItem label="尺寸">
+      <FieldItem label={locale.component.segment.size}>
         <w.ButtonGroup
           value={(values.size as string) ?? 'middle'}
           onChange={(v) => onChange('size', v)}
           options={[
-            { label: '大', value: 'large' },
-            { label: '中', value: 'middle' },
-            { label: '小', value: 'small' },
+            { label: locale.component.segment.large, value: 'large' },
+            { label: locale.component.segment.medium, value: 'middle' },
+            { label: locale.component.segment.small, value: 'small' },
           ]}
         />
       </FieldItem>
-      <FieldItem label="块级">
+      <FieldItem label={locale.component.segment.block}>
         <w.Switch checked={!!values.block} onChange={(v) => onChange('block', v)} />
       </FieldItem>
-      <FieldItem label="禁用">
+      <FieldItem label={locale.component.segment.disabled}>
         <w.Switch checked={!!values.disabled} onChange={(v) => onChange('disabled', v)} />
       </FieldItem>
     </>

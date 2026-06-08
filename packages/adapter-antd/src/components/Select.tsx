@@ -1,5 +1,6 @@
 import type { SelectProps } from '@form-engine/core'
 import { Select as AntdSelect } from 'antd'
+import { useLocale } from '@form-engine/core/locale'
 import React from 'react'
 
 /**
@@ -10,7 +11,7 @@ export const Select: React.FC<SelectProps> = ({
   value,
   onChange,
   options = [],
-  placeholder,
+  placeholder: placeholderProp,
   disabled,
   mode,
   showSearch,
@@ -19,13 +20,16 @@ export const Select: React.FC<SelectProps> = ({
   maxTagCount,
   placement,
   onSearch,
-  notFoundContent,
+  notFoundContent: notFoundContentProp,
   defaultValue,
   style,
   className,
   id,
   ...rest
 }) => {
+  const { locale } = useLocale()
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.select ?? 'Please select'
+  const notFoundContent = notFoundContentProp ?? locale.widget.select.noOptions
   const handleChange = (val?: string | string[] | null) => {
     onChange?.(val)
   }

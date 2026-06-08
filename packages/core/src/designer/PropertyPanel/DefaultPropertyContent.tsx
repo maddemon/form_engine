@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { EyeIcon, EyeOffIcon } from '../../components/icons'
+import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders'
 import CustomPropsRender from '../../propRenders/CustomPropsRender'
 import type { PropsRenderProps } from '../../propRenders/types'
@@ -61,6 +62,8 @@ export function DefaultPropertyContent({
   allFields,
 }: DefaultContentProps) {
   const { token } = useStyle()
+  const { locale } = useLocale()
+  const lp = locale.designer.propertyPanel
   const hasAdvanced = hasAdvancedConfig(field)
   const { nameDirty, setNameDirty, nameError, existingNames } = useFieldNameValidation(allFields, field.id, field.name)
 
@@ -140,22 +143,22 @@ export function DefaultPropertyContent({
 
   return (
     <>
-      <FieldItem label="字段名">
+      <FieldItem label={lp.fieldName}>
         <Space direction="vertical" gap="xs" style={{ flex: 1 }}>
           <w.Input value={nameValue} onChange={handleNameChange} />
           {nameError && <ErrorMessage>{nameError}</ErrorMessage>}
         </Space>
       </FieldItem>
-      <FieldItem label="标签">
+      <FieldItem label={lp.fieldLabel}>
         <Space gap="xs" style={{ flex: 1 }}>
-          <w.Input value={labelValue} onChange={handleLabelChange} placeholder="字段标签" style={{ flex: 1 }} />
+          <w.Input value={labelValue} onChange={handleLabelChange} placeholder={lp.fieldLabelPlaceholder} style={{ flex: 1 }} />
           <WidgetButton
             type="text"
             size="sm"
             onClick={() =>
               dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { labelHidden: !field.labelHidden } })
             }
-            label={field.labelHidden ? '显示标签' : '隐藏标签'}
+            label={field.labelHidden ? lp.showLabel : lp.hideLabel}
             style={{ color: field.labelHidden ? 'var(--fe-text-tertiary)' : 'var(--fe-primary)', flexShrink: 0, padding: '0 2px' }}
           >
             {field.labelHidden ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
@@ -163,13 +166,13 @@ export function DefaultPropertyContent({
         </Space>
       </FieldItem>
       {isForm && (
-        <FieldItem label="默认值">
+        <FieldItem label={lp.defaultValue}>
           <ExpressionEditorSlot
             value={defaultValueValue}
             onChange={handleDefaultValueChangeTyped}
             field={field}
             fieldNames={allFields.map((f) => f.name).filter(Boolean)}
-            placeholder="静态值或动态表达式"
+            placeholder={lp.defaultValuePlaceholder}
           />
         </FieldItem>
       )}
@@ -183,7 +186,7 @@ export function DefaultPropertyContent({
             marginBottom: token('spacingSm'),
           }}
         >
-          容器组件支持拖入子组件
+          {lp.containerHint}
         </div>
       )}
 
@@ -213,17 +216,17 @@ export function DefaultPropertyContent({
         </>
       )}
 
-      <CollapsibleSection title="高级属性" defaultCollapsed={true} forceExpand={hasAdvanced}>
+      <CollapsibleSection title={lp.advancedProps} defaultCollapsed={true} forceExpand={hasAdvanced}>
         {isForm && (
           <>
-            <FieldItem label="列宽">
+            <FieldItem label={lp.colSpan}>
               <w.NumberInput value={colSpanValue} onChange={handleColSpanChange} min={1} max={24} />
             </FieldItem>
             <RulesEditor field={field} widgets={w} dispatch={dispatch} slots={slots} />
             <StaticExpressionToggle
               field={field}
               propKey="disabled"
-              label="禁用"
+              label={lp.disabled}
               w={w}
               dispatch={dispatch}
               ExpressionEditorSlot={ExpressionEditorSlot}
@@ -232,7 +235,7 @@ export function DefaultPropertyContent({
             <StaticExpressionToggle
               field={field}
               propKey="readOnly"
-              label="只读"
+              label={lp.readOnly}
               w={w}
               dispatch={dispatch}
               ExpressionEditorSlot={ExpressionEditorSlot}
@@ -244,12 +247,12 @@ export function DefaultPropertyContent({
         <StaticExpressionToggle
           field={field}
           propKey="hidden"
-          label="是否隐藏"
+          label={lp.hidden}
           w={w}
           dispatch={dispatch}
           ExpressionEditorSlot={ExpressionEditorSlot}
           fieldNames={allFields.map((f) => f.name).filter(Boolean)}
-          placeholder="如：form.type !== 'admin'"
+          placeholder={lp.hiddenPlaceholder}
         />
       </CollapsibleSection>
 

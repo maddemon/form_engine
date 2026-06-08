@@ -4,13 +4,13 @@ import type { PaletteGroup } from '../types/designer'
 import type { FieldType } from '../types/schema'
 
 const GROUP_MEMBERS: Record<string, FieldType[]> = {
-  文本输入: ['input', 'textarea', 'password'],
-  数值: ['input-number', 'slider', 'rate'],
-  选择: ['select', 'cascader', 'tree-select', 'radio', 'checkbox', 'switch', 'segment'],
-  日期时间: ['date', 'datetime', 'date-range', 'time'],
-  布局: ['grid', 'flex', 'collapse', 'tabs', 'sub-form', 'card'],
-  展示: ['text', 'title', 'image', 'divider', 'alert'],
-  其他: ['button', 'upload'],
+  'designer.paletteGroups.textInput': ['input', 'textarea', 'password'],
+  'designer.paletteGroups.number': ['input-number', 'slider', 'rate'],
+  'designer.paletteGroups.select': ['select', 'cascader', 'tree-select', 'radio', 'checkbox', 'switch', 'segment'],
+  'designer.paletteGroups.dateTime': ['date', 'datetime', 'date-range', 'time'],
+  'designer.paletteGroups.layout': ['grid', 'flex', 'collapse', 'tabs', 'sub-form', 'card'],
+  'designer.paletteGroups.display': ['text', 'title', 'image', 'divider', 'alert'],
+  'designer.paletteGroups.other': ['button', 'upload'],
 }
 
 function buildGroup(groupName: string, types: FieldType[]): PaletteGroup {

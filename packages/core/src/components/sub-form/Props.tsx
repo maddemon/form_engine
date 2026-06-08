@@ -1,10 +1,12 @@
 import { useCallback } from 'react'
+import { useLocale } from '../../locale'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
 import { SortableTableEditor, WidgetButton } from '../../widgets'
 import type { SubFormColumnConfig } from '.'
 
 export default function SubFormPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+  const { locale } = useLocale()
   const columns = (values.columns as SubFormColumnConfig[]) ?? []
   const rowMode = (values.rowMode as string) ?? 'dynamic'
 
@@ -14,18 +16,18 @@ export default function SubFormPropsRender({ widgets: w, values, onChange }: Pro
 
   return (
     <>
-      <FieldItem label="行模式">
+      <FieldItem label={locale.component.subForm.rowMode}>
         <w.ButtonGroup
           value={rowMode}
           onChange={(v) => onChange('rowMode', v)}
           options={[
-            { label: '动态', value: 'dynamic' },
-            { label: '固定', value: 'fixed' },
+            { label: locale.component.subForm.dynamic, value: 'dynamic' },
+            { label: locale.component.subForm.fixed, value: 'fixed' },
           ]}
         />
       </FieldItem>
       {rowMode === 'fixed' && (
-        <FieldItem label="固定行数">
+        <FieldItem label={locale.component.subForm.fixedRows}>
           <w.NumberInput
             value={(values.fixedRowCount as number) ?? 3}
             onChange={(v) => onChange('fixedRowCount', v)}
@@ -34,21 +36,21 @@ export default function SubFormPropsRender({ widgets: w, values, onChange }: Pro
           />
         </FieldItem>
       )}
-      <FieldItem label="列管理" variant="group">
+      <FieldItem label={locale.component.subForm.columnMgmt} variant="group">
         <SortableTableEditor<SubFormColumnConfig>
           value={columns}
           onChange={(v) => onChange('columns', v)}
           columns={[
             {
               key: 'label',
-              label: '列标题',
+              label: locale.component.subForm.columnTitle,
               render: ({ value, onChange: onValChange, disabled: d }) => (
                 <w.Input value={String(value ?? '')} disabled={d} variant="filled" onChange={(v) => onValChange(v)} />
               ),
             },
             {
               key: 'width',
-              label: '宽度(px)',
+              label: locale.component.subForm.columnWidth,
               render: ({ value, onChange: onValChange, disabled: d }) => (
                 <w.NumberInput
                   value={value as number | undefined}
@@ -70,7 +72,7 @@ export default function SubFormPropsRender({ widgets: w, values, onChange }: Pro
           onClick={handleAddColumn}
           style={{ width: '100%', marginTop: 4 }}
         >
-          + 添加列
+          + {locale.component.subForm.addColumn}
         </WidgetButton>
       </FieldItem>
     </>

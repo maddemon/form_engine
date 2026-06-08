@@ -13,8 +13,8 @@ export interface TreeSelectProps extends BaseFormComponentProps<string | string[
 }
 
 export const treeSelectEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '选中节点变化时触发' },
-  { name: 'onSearch', label: '搜索', description: '搜索文本变化时触发' },
+  { name: 'onChange', label: 'component.treeSelect.events.onChange.label', description: 'component.treeSelect.events.onChange.description' },
+  { name: 'onSearch', label: 'component.treeSelect.events.onSearch.label', description: 'component.treeSelect.events.onSearch.description' },
 ]
 
 export { default as Props } from './Props'
@@ -32,11 +32,11 @@ const DEFAULT_OPTIONS = [
 ]
 
 export const meta: ComponentRegistration = {
-  label: '树选择',
+  label: 'component.treeSelect.label',
   category: 'form',
   icon: 'GitFork',
   defaultProps: {
-    componentProps: { placeholder: '请选择', allowClear: true },
+    componentProps: { allowClear: true },
     dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS } },
   },
   eventDeclarations: treeSelectEventDeclarations,

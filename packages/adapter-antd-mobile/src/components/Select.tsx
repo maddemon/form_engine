@@ -1,14 +1,16 @@
 import { Picker, Space } from 'antd-mobile'
 import { DownOutline, CloseCircleFill } from 'antd-mobile-icons'
+import { useLocale } from '@form-engine/core/locale'
 import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 import { toPickerColumns } from '../utils'
 
 export const SelectField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, disabled, fieldSchema, options } = props
+  const { locale } = useLocale()
   const opts = (options || []) as OptionItem[]
   const columns = toPickerColumns(opts)
   const isMulti = fieldSchema.componentProps?.mode === 'multiple'
-  const placeholder = fieldSchema.placeholder || '请选择'
+  const placeholder = fieldSchema.placeholder ?? locale.adapter.common.placeholder.select ?? 'Please select'
   const allowClear = fieldSchema.componentProps?.allowClear
 
   const valArr = isMulti

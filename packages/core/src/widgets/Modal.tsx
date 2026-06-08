@@ -1,5 +1,6 @@
 import React from 'react'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import { WidgetButton } from './Button'
 
 export interface WidgetModalProps {
@@ -22,12 +23,15 @@ export const WidgetModal: React.FC<WidgetModalProps> = ({
   width = 'md',
   onCancel,
   onConfirm,
-  confirmText = '确定',
-  cancelText = '取消',
+  confirmText,
+  cancelText,
   children,
   footer,
 }) => {
   const { token } = useStyle()
+  const { locale } = useLocale()
+  const resolvedConfirm = confirmText ?? locale.widget.modal.confirm
+  const resolvedCancel = cancelText ?? locale.widget.modal.cancel
 
   if (!open) return null
 
@@ -58,10 +62,10 @@ export const WidgetModal: React.FC<WidgetModalProps> = ({
       style={{ display: 'flex', justifyContent: 'flex-end', gap: token('spacingSm'), marginTop: token('spacingMd') }}
     >
       <WidgetButton type="default" onClick={onCancel}>
-        {cancelText}
+        {resolvedCancel}
       </WidgetButton>
       <WidgetButton type="primary" onClick={onConfirm}>
-        {confirmText}
+        {resolvedConfirm}
       </WidgetButton>
     </div>
   ) : undefined

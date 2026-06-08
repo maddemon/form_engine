@@ -1,6 +1,7 @@
 import React from 'react'
 import { Upload as AntUpload, Button } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
+import { useLocale } from '@form-engine/core/locale'
 import type { UploadProps, UploadFile } from '@form-engine/core'
 import type { UploadChangeParam } from 'antd/es/upload'
 
@@ -21,6 +22,7 @@ export const Upload: React.FC<UploadProps> = ({
   children,
   ...rest
 }) => {
+  const { locale } = useLocale()
   const handleChange = (info: UploadChangeParam) => {
     const fileList: UploadFile[] = info.fileList.map(
       (file) =>
@@ -74,7 +76,7 @@ export const Upload: React.FC<UploadProps> = ({
           +
         </div>
       ) : (
-        <Button disabled={disabled} icon={<UploadOutlined />}>上传文件</Button>
+        <Button disabled={disabled} icon={<UploadOutlined />}>{locale.adapter.antd.upload.button}</Button>
       ))}
     </AntUpload>
   )

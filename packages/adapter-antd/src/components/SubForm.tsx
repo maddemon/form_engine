@@ -6,6 +6,7 @@
 
 import type { FormFieldSchema, OptionItem, SubFormColumnConfig } from '@form-engine/core'
 import { useAdapter } from '@form-engine/core'
+import { useLocale } from '@form-engine/core/locale'
 import { Table as AntTable } from 'antd'
 import React from 'react'
 
@@ -18,6 +19,7 @@ export const SubForm: React.FC<{
 }> = ({ value = [], onChange, fieldSchema, disabled, ...rest }) => {
   const field = fieldSchema
   const adapter = useAdapter()
+  const { locale } = useLocale()
   const children = field.children ?? []
   const columns = ((field.componentProps?.columns as SubFormColumnConfig[]) || []).filter(Boolean)
 
@@ -92,13 +94,13 @@ export const SubForm: React.FC<{
       }
     }),
     {
-      title: '操作',
+      title: locale.adapter.antd.subForm.operation,
       key: '__op__',
       width: 60,
       fixed: 'right' as const,
       render: (_: unknown, _row: Record<string, unknown>, rowIndex: number) => (
         <a style={{ color: 'var(--fe-error)' }} onClick={() => handleRemoveRow(rowIndex)}>
-          删除
+          {locale.adapter.antd.subForm.delete}
         </a>
       ),
     },
@@ -116,7 +118,7 @@ export const SubForm: React.FC<{
       />
       <div style={{ marginTop: 8, textAlign: 'right' }}>
         <a onClick={handleAddRow} style={{ color: 'var(--fe-primary)' }}>
-          + 添加行
+          {locale.adapter.antd.subForm.addRow}
         </a>
       </div>
     </div>

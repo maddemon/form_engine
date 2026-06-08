@@ -1,13 +1,15 @@
 import React from 'react'
 import { Grip } from '../../components/icons'
+import { useLocale } from '../../locale'
 
 interface DragHandleProps {
   dragActivatorRef?: (node: HTMLElement | null) => void
   dragListeners?: Record<string, Function>
 }
 
-/** 拖拽手柄：选中时显示在左上角 */
-export const DragHandle: React.FC<DragHandleProps> = ({ dragActivatorRef, dragListeners }) => (
+export const DragHandle: React.FC<DragHandleProps> = ({ dragActivatorRef, dragListeners }) => {
+  const { locale } = useLocale()
+  return (
   <div
     style={{
       position: 'absolute',
@@ -34,9 +36,10 @@ export const DragHandle: React.FC<DragHandleProps> = ({ dragActivatorRef, dragLi
         userSelect: 'none',
         whiteSpace: 'nowrap',
       }}
-      title="拖拽排序"
+      title={locale.designer.fieldActions.dragSort}
     >
       <Grip size={12} />
     </span>
   </div>
-)
+  )
+}

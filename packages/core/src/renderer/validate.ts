@@ -11,7 +11,8 @@
  * - 异步校验
  */
 
-import type { FormFieldSchema, FormSchema, FormRule, ValidateResult } from '../types/schema'
+import type { FormFieldSchema, FormRule, ValidateResult } from '../types/schema'
+import type { LocalePack } from '../locale/types'
 
 // 重新导出 ValidateResult 以保持向后兼容
 export type { ValidateResult } from '../types/schema'
@@ -20,77 +21,76 @@ export type { ValidateResult } from '../types/schema'
  * 执行单条规则
  * 返回错误消息，null 表示通过
  */
-function checkRule(value: unknown, rule: FormRule): string | null {
+function checkRule(value: unknown, rule: FormRule, validation?: LocalePack['validation']): string | null {
   if (rule.required) {
     if (value === undefined || value === null || value === '') {
-      return rule.message || '必填'
+      return rule.message || (validation?.required ?? 'Required')
     }
   }
   if (value === undefined || value === null || value === '') {
-    // 非 required 字段值为空时，跳过其他校验
     return null
   }
   if (rule.type === 'string' && typeof value !== 'string') {
-    return rule.message || '类型错误：期望 string'
+    return rule.message || (validation?.typeError?.string ?? 'Type error: expected string')
   }
   if (rule.type === 'number') {
     const n = Number(value)
-    if (Number.isNaN(n)) return rule.message || '类型错误：期望 number'
+    if (Number.isNaN(n)) return rule.message || (validation?.typeError?.number ?? 'Type error: expected number')
   }
   if (rule.type === 'email' && typeof value === 'string') {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      return rule.message || '邮箱格式错误'
+      return rule.message || (validation?.email ?? 'Invalid email format')
     }
   }
   if (rule.type === 'url' && typeof value === 'string') {
     try {
       new URL(value)
     } catch {
-      return rule.message || 'URL 格式错误'
+      return rule.message || (validation?.url ?? 'Invalid URL format')
     }
   }
   if (rule.type === 'phone' && typeof value === 'string') {
     if (!/^1[3-9]\d{9}$/.test(value)) {
-      return rule.message || '手机号格式错误'
+      return rule.message || (validation?.phone ?? 'Invalid phone number')
     }
   }
   if (rule.type === 'boolean' && typeof value !== 'boolean') {
-    return rule.message || '类型错误：期望 boolean'
+    return rule.message || (validation?.typeError?.boolean ?? 'Type error: expected boolean')
   }
   if (typeof rule.min === 'number') {
     if (typeof value === 'number' && value < rule.min) {
-      return rule.message || `不能小于 ${rule.min}`
+      return rule.message || 'Invalid value'
     }
     if (typeof value === 'string' && value.length < rule.min) {
-      return rule.message || `长度不能小于 ${rule.min}`
+      return rule.message || 'Invalid value'
     }
     if (Array.isArray(value) && value.length < rule.min) {
-      return rule.message || `数量不能小于 ${rule.min}`
+      return rule.message || 'Invalid value'
     }
   }
   if (typeof rule.max === 'number') {
     if (typeof value === 'number' && value > rule.max) {
-      return rule.message || `不能大于 ${rule.max}`
+      return rule.message || 'Invalid value'
     }
     if (typeof value === 'string' && value.length > rule.max) {
-      return rule.message || `长度不能大于 ${rule.max}`
+      return rule.message || 'Invalid value'
     }
     if (Array.isArray(value) && value.length > rule.max) {
-      return rule.message || `数量不能大于 ${rule.max}`
+      return rule.message || 'Invalid value'
     }
   }
   if (typeof rule.len === 'number') {
     if (typeof value === 'string' && value.length !== rule.len) {
-      return rule.message || `长度必须为 ${rule.len}`
+      return rule.message || 'Invalid value'
     }
     if (Array.isArray(value) && value.length !== rule.len) {
-      return rule.message || `数量必须为 ${rule.len}`
+      return rule.message || 'Invalid value'
     }
   }
   if (rule.pattern && typeof value === 'string') {
     try {
       if (!new RegExp(rule.pattern).test(value)) {
-        return rule.message || '格式不匹配'
+        return rule.message || (validation?.pattern ?? 'Format mismatch')
       }
     } catch {
       // 非法正则：跳过
@@ -121,6 +121,7 @@ export function validateForm(
   fields: FormFieldSchema[],
   formValues: Record<string, unknown>,
   name?: string,
+  validation?: LocalePack['validation'],
 ): ValidateResult {
   const errors: Record<string, string[]> = {}
   const allFields = collectFields(fields)
@@ -133,7 +134,7 @@ export function validateForm(
     const value = formValues[field.name]
     const fieldErrors: string[] = []
     for (const rule of field.rules) {
-      const msg = checkRule(value, rule)
+      const msg = checkRule(value, rule, validation)
       if (msg) fieldErrors.push(msg)
     }
     if (fieldErrors.length > 0) {

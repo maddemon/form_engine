@@ -1,5 +1,6 @@
 import type { FormFieldSchema, OptionItem } from '@form-engine/core'
 import { Trash, useAdapter, type FieldComponentProps, type FieldRendererFn } from '@form-engine/core'
+import { useLocale } from '@form-engine/core/locale'
 import { Button, Card } from 'antd-mobile'
 import React from 'react'
 
@@ -13,6 +14,7 @@ interface SubFormColumnConfig {
 export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
   const { value, onChange, fieldSchema, disabled } = props
   const adapter = useAdapter()
+  const { locale } = useLocale()
   const rows: Record<string, unknown>[] = (value ?? []) as Record<string, unknown>[]
   const children: FormFieldSchema[] = fieldSchema.children ?? []
   const columns: SubFormColumnConfig[] = (fieldSchema.componentProps?.columns as SubFormColumnConfig[]) ?? []
@@ -86,7 +88,7 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
                 padding: 0,
                 zIndex: 1,
               }}
-              title="删除"
+              title={locale.adapter.mobile.subForm.delete}
             >
               <Trash size={12} strokeWidth={2.5} />
             </button>
@@ -126,7 +128,7 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
       ))}
       {rowMode === 'dynamic' && !disabled && (
         <Button block size="small" color="primary" fill="outline" onClick={handleAddRow} style={{ marginTop: 8 }}>
-          + 添加行
+          {locale.adapter.mobile.subForm.addRow}
         </Button>
       )}
     </>

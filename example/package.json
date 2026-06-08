@@ -9,13 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@form-engine/core": "workspace:*",
     "@form-engine/adapter-antd": "workspace:*",
     "@form-engine/adapter-antd-mobile": "workspace:*",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "@form-engine/core": "workspace:*",
     "antd": "^6.4.3",
-    "antd-mobile": "^5.42.3"
+    "antd-mobile": "^5.42.3",
+    "highlight.js": "^11.11.1",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

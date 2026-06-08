@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import { Space } from '../widgets/Space'
 import { WidgetButton } from '../widgets/Button'
 
@@ -47,6 +48,7 @@ const TreeNode: React.FC<{ item: TreeItem; selectedId: string | null; onSelect: 
 
 export const ComponentTree: React.FC<ComponentTreeProps> = ({ items, selectedId, onSelect, onClose }) => {
   const { token } = useStyle()
+  const { locale } = useLocale()
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -79,8 +81,8 @@ export const ComponentTree: React.FC<ComponentTreeProps> = ({ items, selectedId,
       }}
     >
       <Space justify="space-between" gap={0} style={{ marginBottom: token('spacingSm') }}>
-        <strong style={{ fontSize: token('fontSizeSm') }}>组件树</strong>
-        <WidgetButton type="text" size="sm" onClick={onClose} label="关闭" style={{ padding: '0 2px', lineHeight: 1 }}>✕</WidgetButton>
+        <strong style={{ fontSize: token('fontSizeSm') }}>{locale.designer.canvasToolbar.componentTree}</strong>
+        <WidgetButton type="text" size="sm" onClick={onClose} label={locale.designer.canvasToolbar.close} style={{ padding: '0 2px', lineHeight: 1 }}>✕</WidgetButton>
       </Space>
       {items.map(item => (
         <TreeNode key={item.id} item={item} selectedId={selectedId} onSelect={onSelect} depth={0} />

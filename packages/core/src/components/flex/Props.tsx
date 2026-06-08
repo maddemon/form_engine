@@ -1,3 +1,4 @@
+import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
@@ -23,9 +24,10 @@ const ALIGN_OPTIONS = [
 ]
 
 export default function FlexPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+  const { locale } = useLocale()
   return (
     <>
-      <FieldItem label="方向">
+      <FieldItem label={locale.component.flex.direction}>
         <w.Select
           value={(values.direction as string) ?? 'row'}
           onChange={(v) => onChange('direction', v)}
@@ -37,22 +39,22 @@ export default function FlexPropsRender({ widgets: w, values, onChange }: PropsR
           ]}
         />
       </FieldItem>
-      <FieldItem label="主轴对齐">
+      <FieldItem label={locale.component.flex.justify}>
         <w.Select value={(values.justify as string) ?? 'flex-start'} onChange={(v) => onChange('justify', v)} options={JUSTIFY_OPTIONS} />
       </FieldItem>
-      <FieldItem label="交叉轴对齐">
+      <FieldItem label={locale.component.flex.align}>
         <w.Select value={(values.align as string) ?? 'stretch'} onChange={(v) => onChange('align', v)} options={ALIGN_OPTIONS} />
       </FieldItem>
-      <FieldItem label="间距">
+      <FieldItem label={locale.component.flex.gap}>
         <w.NumberInput value={(values.gap as number) ?? 0} onChange={(v) => onChange('gap', v)} min={0} max={100} />
       </FieldItem>
-      <FieldItem label="换行">
+      <FieldItem label={locale.component.flex.wrap}>
         <w.Select value={(values.wrap as string) ?? 'nowrap'} onChange={(v) => onChange('wrap', v)} options={WRAP_OPTIONS} />
       </FieldItem>
-      <FieldItem label="内边距(px)">
+      <FieldItem label={locale.component.flex.padding}>
         <w.NumberInput value={(values.padding as number) ?? 0} onChange={(v) => onChange('padding', v)} min={0} max={200} />
       </FieldItem>
-      <FieldItem label="外边距(px)">
+      <FieldItem label={locale.component.flex.margin}>
         <w.NumberInput value={(values.margin as number) ?? 0} onChange={(v) => onChange('margin', v)} min={0} max={200} />
       </FieldItem>
     </>

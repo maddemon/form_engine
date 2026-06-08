@@ -45,6 +45,11 @@
         "import": "./dist/styles/index.mjs",
         "require": "./dist/styles/index.js",
         "types": "./dist/styles/index.d.ts"
+      },
+      "./locale": {
+        "import": "./dist/locale/index.mjs",
+        "require": "./dist/locale/index.js",
+        "types": "./dist/locale/index.d.ts"
       }
     }
   },
@@ -80,6 +85,10 @@
     "./styles": {
       "import": "./src/styles/index.ts",
       "types": "./src/styles/index.ts"
+    },
+    "./locale": {
+      "import": "./src/locale/index.ts",
+      "types": "./src/locale/index.ts"
     }
   },
   "dependencies": {

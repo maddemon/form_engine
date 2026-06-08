@@ -1,32 +1,45 @@
 import { antdAdapter } from '@form-engine/adapter-antd'
 import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
-import type { FormRenderHandle, FormSchema } from '@form-engine/core'
+import type { FormRenderHandle, FormSchema, SupportedLocale } from '@form-engine/core'
 import { FormRender, Monitor, Smartphone, type DeviceScene } from '@form-engine/core'
 import { Button, Card, Empty, Flex, Segmented } from 'antd'
 import React, { useCallback, useRef, useState } from 'react'
+import { useAppContext } from '../context/AppContext'
 
 interface Props {
   schema: FormSchema
-  themeMode?: import('@form-engine/core').ThemeMode
 }
 
-const sceneOptions = [
-  { label: '桌面端', value: 'desktop' as const, icon: <Monitor size={16} /> },
-  { label: '移动端', value: 'mobile' as const, icon: <Smartphone size={16} /> },
-]
+const localeSceneLabels: Record<SupportedLocale, { desktop: string; mobile: string }> = {
+  'zh-CN': { desktop: '桌面端', mobile: '移动端' },
+  'en-US': { desktop: 'Desktop', mobile: 'Mobile' },
+}
 
-const RenderPage: React.FC<Props> = ({ schema, themeMode }) => {
+const RenderPage: React.FC<Props> = ({ schema }) => {
+  const { themeMode, locale } = useAppContext()
   const [scene, setScene] = useState<DeviceScene>('desktop')
   const formRef = useRef<FormRenderHandle>(null)
+  const labels = localeSceneLabels[locale]
 
-  const handleSubmit = useCallback((values: Record<string, unknown>) => {
-    console.log('提交:', values)
-    alert('提交成功！\n' + JSON.stringify(values, null, 2))
-  }, [])
+  const sceneOptions = [
+    { label: labels.desktop, value: 'desktop' as const, icon: <Monitor size={16} /> },
+    { label: labels.mobile, value: 'mobile' as const, icon: <Smartphone size={16} /> },
+  ]
+
+  const handleSubmit = useCallback(
+    (values: Record<string, unknown>) => {
+      console.log('提交:', values)
+      alert((locale === 'zh-CN' ? '提交成功！\n' : 'Submit successful!\n') + JSON.stringify(values, null, 2))
+    },
+    [locale],
+  )
 
   const handleChange = useCallback((values: Record<string, unknown>) => {
     console.log('变化:', values)
   }, [])
+
+  const emptyText =
+    locale === 'zh-CN' ? '暂无字段，请先到「设计器」页面添加字段' : 'No fields. Add fields in the Designer page first.'
 
   return (
     <Flex vertical gap={0} style={{ height: '100%' }}>
@@ -51,7 +64,7 @@ const RenderPage: React.FC<Props> = ({ schema, themeMode }) => {
         </div>
         <PreviewFrame scene={scene}>
           {schema.fields.length === 0 ? (
-            <Empty description="暂无字段，请先到「设计器」页面添加字段" />
+            <Empty description={emptyText} />
           ) : (
             <>
               <FormRender
@@ -63,12 +76,13 @@ const RenderPage: React.FC<Props> = ({ schema, themeMode }) => {
                 mobileAdapter={antdMobileAdapter}
                 scene={scene}
                 themeMode={themeMode}
+                locale={locale}
               />
               <Flex gap={8} style={{ marginTop: 24 }}>
                 <Button type="primary" onClick={() => formRef.current?.submit()}>
-                  提交
+                  {locale === 'zh-CN' ? '提交' : 'Submit'}
                 </Button>
-                <Button onClick={() => formRef.current?.reset()}>重置</Button>
+                <Button onClick={() => formRef.current?.reset()}>{locale === 'zh-CN' ? '重置' : 'Reset'}</Button>
               </Flex>
             </>
           )}

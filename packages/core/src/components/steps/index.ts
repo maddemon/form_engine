@@ -21,7 +21,7 @@ export interface StepsProps extends BaseComponentProps {
 }
 
 export const meta: ComponentRegistration = {
-  label: '步骤条',
+  label: 'component.steps.label',
   category: 'display',
   icon: 'ListOrdered',
   defaultProps: {

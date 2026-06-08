@@ -17,7 +17,7 @@ export interface SubFormProps extends BaseLayoutComponentProps {
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '子表单',
+  label: 'component.subForm.label',
   category: ['form', 'container'] as ComponentCategory[],
   icon: 'FolderInput',
   defaultProps: {},

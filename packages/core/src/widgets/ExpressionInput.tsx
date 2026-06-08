@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import { WidgetButton } from './Button'
 import { InputOverlayButton } from './InputOverlayButton'
 import { WidgetModal } from './Modal'
@@ -23,6 +24,7 @@ function ExpressionModal({
   onCancel: () => void
 }) {
   const { token } = useStyle()
+  const { locale } = useLocale()
   const [text, setText] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const prevOpenRef = useRef(false)
@@ -54,13 +56,13 @@ function ExpressionModal({
   }
 
   return (
-    <WidgetModal open={open} title="编辑表达式" width="md" onCancel={onCancel} onConfirm={() => onConfirm(text)}>
+    <WidgetModal open={open} title={locale.widget.expressionInput.title} width="md" onCancel={onCancel} onConfirm={() => onConfirm(text)}>
       <WidgetTextArea ref={textareaRef} value={text} onChange={setText} rows={8} style={{ fontFamily: 'monospace' }} />
 
       {fieldNames.length > 0 && (
         <div style={{ marginTop: token('spacingSm') }}>
           <Text type="tertiary" style={{ marginBottom: token('spacingXs') }}>
-            可用字段（点击插入）
+            {locale.widget.expressionInput.availableFields}
           </Text>
           <Space wrap gap="xs" style={{ maxHeight: 120, overflow: 'auto' }}>
             {fieldNames.map((name) => (
@@ -85,6 +87,7 @@ export const WidgetExpressionInput: React.FC<{
   style?: React.CSSProperties
 }> = React.memo(({ value, onChange, placeholder, disabled, fieldNames = [], style }) => {
   const { token } = useStyle()
+  const { locale } = useLocale()
   const [focused, setFocused] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -130,7 +133,7 @@ export const WidgetExpressionInput: React.FC<{
         <InputOverlayButton
           onClick={() => setModalOpen(true)}
           disabled={disabled}
-          title="编辑表达式"
+          title={locale.widget.expressionInput.editButton}
           style={{
             color: focused ? 'var(--fe-primary)' : 'var(--fe-text-tertiary)',
             fontSize: token('fontSizeSm') as string,

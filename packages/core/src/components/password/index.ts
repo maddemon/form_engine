@@ -4,7 +4,7 @@ import { inputEventDeclarations } from '../input'
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '密码',
+  label: 'component.password.label',
   category: 'form',
   icon: 'Lock',
   defaultProps: { componentProps: { allowClear: true } },

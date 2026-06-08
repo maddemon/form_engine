@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
+import { useLocale, type LocalePack } from '../locale'
 import type { FieldDataSource, OptionItem } from '../types/schema'
 import { WidgetButton } from './Button'
 import { WidgetButtonGroup } from './ButtonGroup'
@@ -55,6 +56,7 @@ function BatchEditModal({
   onConfirm: (v: OptionItem[]) => void
   onCancel: () => void
 }) {
+  const { locale } = useLocale()
   const [text, setText] = useState('')
   const prevOpenRef = useRef(false)
 
@@ -70,9 +72,9 @@ function BatchEditModal({
   }
 
   return (
-    <WidgetModal open={open} title="批量编辑" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
+    <WidgetModal open={open} title={locale.widget.dataSourceEditor.batchEdit} width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
       <Text type="tertiary" style={{ marginBottom: '8px' }}>
-        每行一个选项，标签和值之间用空格隔开（多个空格算一个）：
+        {locale.widget.dataSourceEditor.batchInstructions}
         <div style={{ marginTop: '4px', lineHeight: 1.6 }}>
           选项1 1<br />
           选项2 2
@@ -99,6 +101,7 @@ function RemoteConfigModal({
   onCancel: () => void
 }) {
   const { token } = useStyle()
+  const { locale } = useLocale()
   const [url, setUrl] = useState('')
   const [resultPath, setResultPath] = useState('')
   const [labelField, setLabelField] = useState('name')
@@ -124,11 +127,11 @@ function RemoteConfigModal({
   }
 
   return (
-    <WidgetModal open={open} title="远程数据源" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
+    <WidgetModal open={open} title={locale.widget.dataSourceEditor.remoteDataSource} width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
       <Space direction="vertical" gap="sm" align="stretch" style={{ width: '100%' }}>
         <div>
           <Text type="secondary" style={{ marginBottom: token('spacingXs') }}>
-            接口地址（GET）
+            {locale.widget.dataSourceEditor.apiUrl}
           </Text>
           <WidgetInput
             value={url}
@@ -136,18 +139,18 @@ function RemoteConfigModal({
               setUrl(v as string)
               setTouched(true)
             }}
-            placeholder="/api/options?parentId={parentField}"
+            placeholder={locale.widget.dataSourceEditor.apiUrlPlaceholder}
             style={{ padding: '3px 6px' }}
           />
           <Text type="tertiary" style={{ marginTop: '2px' }}>
-            用 <code>{`{fieldName}`}</code> 引用其他字段的值作为参数
+            {locale.widget.dataSourceEditor.paramHelp.split('{fieldName}')[0]}<code>{`{fieldName}`}</code>{locale.widget.dataSourceEditor.paramHelp.split('{fieldName}')[1]}
           </Text>
         </div>
 
         {touched && url && deps.length > 0 && (
           <div>
             <Text type="secondary" style={{ marginBottom: token('spacingXs') }}>
-              依赖字段
+              {locale.widget.dataSourceEditor.dependentField}
             </Text>
             <Space gap="xs" wrap align="start" style={{ width: '100%' }}>
               {deps.map((dep) => (
@@ -157,7 +160,7 @@ function RemoteConfigModal({
               ))}
             </Space>
             <Text type="tertiary" style={{ marginTop: '2px' }}>
-              依赖字段的值变化时自动重新请求
+              {locale.widget.dataSourceEditor.reloadHelp}
             </Text>
           </div>
         )}
@@ -165,40 +168,40 @@ function RemoteConfigModal({
         <Divider />
         <div>
           <Text type="secondary" style={{ marginBottom: token('spacingSm') }}>
-            响应映射
+            {locale.widget.dataSourceEditor.responseMapping}
           </Text>
           <Space direction="vertical" gap="sm" align="stretch" style={{ width: '100%' }}>
             <div>
               <Text type="tertiary" style={{ marginBottom: '2px' }}>
-                列表路径
+                {locale.widget.dataSourceEditor.listPath}
               </Text>
               <WidgetInput
                 value={resultPath}
                 onChange={(v) => setResultPath(v as string)}
-                placeholder="data.list 或留空取根"
+                placeholder={locale.widget.dataSourceEditor.listPathPlaceholder}
                 style={{ padding: '3px 6px' }}
               />
             </div>
             <Space gap="sm" align="stretch" style={{ width: '100%' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <Text type="tertiary" style={{ marginBottom: '2px' }}>
-                  标签字段
+                  {locale.widget.dataSourceEditor.labelField}
                 </Text>
                 <WidgetInput
                   value={labelField}
                   onChange={(v) => setLabelField(v as string)}
-                  placeholder="name"
+                  placeholder={locale.widget.dataSourceEditor.labelFieldPlaceholder}
                   style={{ padding: '3px 6px' }}
                 />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <Text type="tertiary" style={{ marginBottom: '2px' }}>
-                  值字段
+                  {locale.widget.dataSourceEditor.valueField}
                 </Text>
                 <WidgetInput
                   value={valueField}
                   onChange={(v) => setValueField(v as string)}
-                  placeholder="id"
+                  placeholder={locale.widget.dataSourceEditor.valueFieldPlaceholder}
                   style={{ padding: '3px 6px' }}
                 />
               </div>
@@ -214,10 +217,15 @@ function RemoteConfigModal({
 // DataSourceEditor 主组件
 // ============================
 
-const SOURCE_TYPE_OPTIONS = [
-  { label: '静态数据', value: 'static' },
-  { label: '远程数据', value: 'remote' },
-]
+function useSourceTypeOptions(locale: LocalePack) {
+  return React.useMemo(
+    () => [
+      { label: locale.widget.dataSourceEditor.staticData, value: 'static' },
+      { label: locale.widget.dataSourceEditor.remoteData, value: 'remote' },
+    ],
+    [locale],
+  )
+}
 
 function WidgetDataSourceEditorInner({
   value,
@@ -233,6 +241,8 @@ function WidgetDataSourceEditorInner({
   optionsType?: 'flat' | 'tree'
 }) {
   const { token } = useStyle()
+  const { locale } = useLocale()
+  const SOURCE_TYPE_OPTIONS = useSourceTypeOptions(locale)
   const [dsType, setDsType] = useState<'static' | 'remote'>(value?.type || 'static')
   const [remoteModalOpen, setRemoteModalOpen] = useState(false)
   const [batchOpen, setBatchOpen] = useState(false)
@@ -353,7 +363,7 @@ function WidgetDataSourceEditorInner({
               columns={[
                 {
                   key: 'label' as keyof TableOptionItem,
-                  label: '标签',
+                  label: locale.widget.dataSourceEditor.labelCol,
                   render: ({ value, onChange: onValChange, disabled: d }) => (
                     <WidgetInput
                       value={String(value ?? '')}
@@ -365,7 +375,7 @@ function WidgetDataSourceEditorInner({
                 },
                 {
                   key: 'value' as keyof TableOptionItem,
-                  label: '值',
+                  label: locale.widget.dataSourceEditor.valueCol,
                   render: ({ value, onChange: onValChange, disabled: d }) => (
                     <WidgetInput
                       value={String(value ?? '')}
@@ -387,7 +397,7 @@ function WidgetDataSourceEditorInner({
                 disabled={disabled}
                 style={{ flex: 1, textAlign: 'center' }}
               >
-                + 添加选项
+                {locale.widget.dataSourceEditor.addOption}
               </WidgetButton>
               <WidgetButton
                 type="dashed"
@@ -397,7 +407,7 @@ function WidgetDataSourceEditorInner({
                 disabled={disabled}
                 style={{ flex: 1, textAlign: 'center' }}
               >
-                批量编辑
+                {locale.widget.dataSourceEditor.batchEditBtn}
               </WidgetButton>
             </Space>
             <BatchEditModal
@@ -412,10 +422,10 @@ function WidgetDataSourceEditorInner({
       {dsType === 'remote' && (
         <div>
           <Text type="secondary" style={{ marginBottom: token('spacingXs'), lineHeight: 1.5 }}>
-            <div>接口：{currentRemoteConfig.url || '未配置'}</div>
+            <div>{locale.widget.dataSourceEditor.apiUrl.split('（')[0]}：{currentRemoteConfig.url || locale.widget.dataSourceEditor.none}</div>
             {currentRemoteConfig.url && (
               <Text type="tertiary" style={{ marginTop: '2px' }}>
-                依赖：{parseUrlDeps(currentRemoteConfig.url).join('、') || '无'}
+                {locale.widget.dataSourceEditor.dependentField}：{parseUrlDeps(currentRemoteConfig.url).join('、') || locale.widget.dataSourceEditor.none}
               </Text>
             )}
           </Text>
@@ -428,7 +438,7 @@ function WidgetDataSourceEditorInner({
               textAlign: 'center',
             }}
           >
-            配置远程接口
+            {locale.widget.dataSourceEditor.configRemote}
           </WidgetButton>
         </div>
       )}

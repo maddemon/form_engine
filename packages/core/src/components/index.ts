@@ -195,8 +195,11 @@ export function getEventDeclarations(type: string): EventDeclaration[] {
 // ============================
 
 /** 获取组件显示名称 */
-export function getComponentLabel(type: string): string {
-  return (componentRegistry as Record<string, ComponentRegistration>)[type]?.label ?? type
+export function getComponentLabel(type: string, t?: (key: string) => string | undefined): string | undefined {
+  const reg = (componentRegistry as Record<string, ComponentRegistration>)[type]
+  if (!reg) return type
+  if (type === 'custom' || type.startsWith('custom:')) return reg.label
+  return t ? t(reg.label) : reg.label
 }
 
 /** 获取组件分类（支持 custom / custom:xxx） */

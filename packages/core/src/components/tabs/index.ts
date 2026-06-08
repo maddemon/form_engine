@@ -30,7 +30,7 @@ const DEFAULT_TABS = [
 ]
 
 export const meta: ComponentRegistration = {
-  label: '标签页',
+  label: 'component.tabs.label',
   category: 'container',
   icon: 'TabIcon',
   defaultProps: { componentProps: { tabs: DEFAULT_TABS, type: 'line', tabPosition: 'top' } },

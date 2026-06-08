@@ -12,7 +12,7 @@ export interface CardProps extends BaseLayoutComponentProps {
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '卡片',
+  label: 'component.card.label',
   category: 'container',
   icon: 'CardIcon',
   defaultProps: {

@@ -3,6 +3,9 @@ import { type FormFieldSchema, type FormSchema, type OptionItem } from '../types
 import type { EventCallbacks } from '../types/events'
 import type { EventContext } from '../events'
 import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
+import type { LocalePack } from '../locale/types'
+import type { SupportedLocale } from '../locale/LocaleProvider'
+import { LocaleProvider } from '../locale/LocaleProvider'
 import type { PartialThemeTokens } from '../styles/types'
 import type { ThemeMode, SizeMode } from '../styles/StyleProvider'
 import type { ComponentRenderFn, FormEngineAdapter, FormWrapperProps } from '../types/adapter'
@@ -60,6 +63,8 @@ export interface FormRenderProps {
    * - success=false 表示校验失败
    */
   afterSubmit?: (values: Record<string, unknown>, success: boolean) => void
+  /** 语言包（i18n） */
+  locale?: SupportedLocale | Partial<LocalePack>
 }
 
 /**
@@ -69,29 +74,31 @@ export interface FormRenderProps {
  */
 export const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {}, themeMode, sizeMode, theme, beforeSubmit, afterSubmit }, ref) => {
+export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {}, themeMode, sizeMode, theme, beforeSubmit, afterSubmit, locale }, ref) => {
   const hasStyleProvider = useHasStyleProvider()
   const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
   const bridgeProvider = resolvedAdapter?.bridgeProvider
 
   // 内层内容
   const inner = (
-    <FormRenderInner
-      ref={ref}
-      schema={schema}
-      onSubmit={onSubmit}
-      onChange={onChange}
-      dataSourceResolver={dataSourceResolver}
-      components={components}
-      desktopAdapter={desktopAdapter}
-      mobileAdapter={mobileAdapter}
-      scene={scene}
-      initialValues={initialValues}
-      loading={loading}
-      callbacks={callbacks}
-      beforeSubmit={beforeSubmit}
-      afterSubmit={afterSubmit}
-    />
+    <LocaleProvider locale={locale}>
+      <FormRenderInner
+        ref={ref}
+        schema={schema}
+        onSubmit={onSubmit}
+        onChange={onChange}
+        dataSourceResolver={dataSourceResolver}
+        components={components}
+        desktopAdapter={desktopAdapter}
+        mobileAdapter={mobileAdapter}
+        scene={scene}
+        initialValues={initialValues}
+        loading={loading}
+        callbacks={callbacks}
+        beforeSubmit={beforeSubmit}
+        afterSubmit={afterSubmit}
+      />
+    </LocaleProvider>
   )
 
   // 包裹 BridgeProvider（adapter 提供）

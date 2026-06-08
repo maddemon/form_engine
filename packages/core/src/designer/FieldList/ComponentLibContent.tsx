@@ -1,4 +1,5 @@
 import React from 'react'
+import { useLocale } from '../../locale'
 import { useStyle } from '../../styles'
 import type { PaletteGroup } from '../../types/designer'
 import { PaletteItemCard } from './PaletteItemCard'
@@ -9,6 +10,7 @@ interface ComponentLibContentProps {
 
 export const ComponentLibContent: React.FC<ComponentLibContentProps> = ({ groups }) => {
   const { token } = useStyle()
+  const { t } = useLocale()
   return (
     <>
       {groups.map((group) => (
@@ -23,7 +25,7 @@ export const ComponentLibContent: React.FC<ComponentLibContentProps> = ({ groups
               letterSpacing: 0.5,
             }}
           >
-            {group.groupName}
+            {t(group.groupName) ?? group.groupName}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--fe-spacing-xs)' }}>
             {group.items.map((item) => (

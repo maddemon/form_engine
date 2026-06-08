@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { getComponentCategory, getComponentLabel } from '../components'
+import { useLocale } from '../locale'
 import { PropsRenderMap } from '../propRenders'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { useStyle } from '../styles'
@@ -63,6 +64,7 @@ function PropertyPanelInner({
   propertySlots?: PropertySlots
   allFields: FormFieldSchema[]
 }) {
+  const { t } = useLocale()
   const ComponentPropsRender = PropsRenderMap[field.type]
   const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
   const category = getComponentCategory(field.type)
@@ -93,7 +95,7 @@ function PropertyPanelInner({
       {activeTab === PROPERTIES_DEFAULT_TAB_KEY ? (
         <>
           <SectionTitle>
-            {getComponentLabel(field.type)}
+            {getComponentLabel(field.type, t)}
             <span style={{ marginLeft: token('spacingXs'), color: token('textTertiary') as string, fontWeight: 400 }}>
               ({field.type})
             </span>
@@ -137,10 +139,11 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 }) => {
   const w = useWidgets(designerWidgets)
   const { token } = useStyle()
+  const { locale } = useLocale()
   const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
   const hasTabs = propertyPanelTabs && propertyPanelTabs.length > 0
   const [activeTab, setActiveTab] = useState(PROPERTIES_DEFAULT_TAB_KEY)
-  const allTabs = hasTabs ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: '属性' }, ...(propertyPanelTabs || [])] : []
+  const allTabs = hasTabs ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: locale.designer.propertyPanel.title }, ...(propertyPanelTabs || [])] : []
 
   /**
    * 无字段时扩展 Tab 的 onUpdate / onUpdateProp 退化为 no-op

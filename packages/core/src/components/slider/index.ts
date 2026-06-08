@@ -11,14 +11,14 @@ export interface SliderProps extends BaseFormComponentProps<number | undefined> 
 }
 
 export const sliderEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '滑块值变化时触发' },
-  { name: 'onAfterChange', label: '拖拽结束', description: '与 onmouseup 触发时机一致，把当前值作为参数传入' },
+  { name: 'onChange', label: 'component.slider.events.onChange.label', description: 'component.slider.events.onChange.description' },
+  { name: 'onAfterChange', label: 'component.slider.events.onAfterChange.label', description: 'component.slider.events.onAfterChange.description' },
 ]
 
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '滑块',
+  label: 'component.slider.label',
   category: 'form',
   icon: 'Sliders',
   defaultProps: { componentProps: { min: 0, max: 100, step: 1 } },

@@ -1,13 +1,15 @@
+import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function TitlePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+  const { locale } = useLocale()
   return (
     <>
-      <FieldItem label="标题内容">
-        <w.Input value={(values.content as string) ?? ''} onChange={(v) => onChange('content', v)} placeholder="输入标题" />
+      <FieldItem label={locale.component.title.content}>
+        <w.Input value={(values.content as string) ?? ''} onChange={(v) => onChange('content', v)} placeholder={locale.component.title.contentPlaceholder} />
       </FieldItem>
-      <FieldItem label="级别">
+      <FieldItem label={locale.component.title.level}>
         <w.ButtonGroup
           value={String((values.level as number) ?? 1)}
           onChange={(v) => onChange('level', Number(v))}
@@ -20,40 +22,40 @@ export default function TitlePropsRender({ widgets: w, values, onChange }: Props
           ]}
         />
       </FieldItem>
-      <FieldItem label="类型">
+      <FieldItem label={locale.component.title.type}>
         <w.Select
           value={(values.type as string) ?? ''}
           onChange={(v) => onChange('type', v || undefined)}
           options={[
-            { label: '默认', value: '' },
-            { label: '次要', value: 'secondary' },
-            { label: '成功', value: 'success' },
-            { label: '警告', value: 'warning' },
-            { label: '危险', value: 'danger' },
+            { label: locale.component.title.default, value: '' },
+            { label: locale.component.title.secondary, value: 'secondary' },
+            { label: locale.component.title.success, value: 'success' },
+            { label: locale.component.title.warning, value: 'warning' },
+            { label: locale.component.title.danger, value: 'danger' },
           ]}
         />
       </FieldItem>
-      <FieldItem label="对齐方式">
+      <FieldItem label={locale.component.title.align}>
         <w.ButtonGroup
           value={(values.textAlign as string) ?? 'left'}
           onChange={(v) => onChange('textAlign', v)}
           options={[
-            { label: '左', value: 'left' },
-            { label: '中', value: 'center' },
-            { label: '右', value: 'right' },
+            { label: locale.component.title.left, value: 'left' },
+            { label: locale.component.title.center, value: 'center' },
+            { label: locale.component.title.right, value: 'right' },
           ]}
         />
       </FieldItem>
-      <FieldItem label="加粗">
+      <FieldItem label={locale.component.title.bold}>
         <w.Switch checked={!!values.strong} onChange={(v) => onChange('strong', v)} />
       </FieldItem>
-      <FieldItem label="斜体">
+      <FieldItem label={locale.component.title.italic}>
         <w.Switch checked={!!values.italic} onChange={(v) => onChange('italic', v)} />
       </FieldItem>
-      <FieldItem label="下划线">
+      <FieldItem label={locale.component.title.underline}>
         <w.Switch checked={!!values.underline} onChange={(v) => onChange('underline', v)} />
       </FieldItem>
-      <FieldItem label="标记">
+      <FieldItem label={locale.component.title.mark}>
         <w.Switch checked={!!values.mark} onChange={(v) => onChange('mark', v)} />
       </FieldItem>
     </>

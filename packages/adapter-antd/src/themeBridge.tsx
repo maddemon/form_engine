@@ -46,10 +46,12 @@ function buildMapped(antd: ReturnType<typeof antdTheme.useToken>['token']): Reco
   const primary = String(t.colorPrimary ?? '#1677ff')
   const colorText = String(t.colorText ?? 'rgba(0,0,0,0.88)')
   const colorBgContainer = String(t.colorBgContainer ?? '#ffffff')
+  console.log('colorBgContainer', colorBgContainer)
   const colorBgLayout = String(t.colorBgLayout ?? '#f5f5f5')
   const colorBgElevated = String(t.colorBgElevated ?? '#ffffff')
   const colorBorder = String(t.colorBorder ?? '#d9d9d9')
   const colorBorderSecondary = String(t.colorBorderSecondary ?? '#e8e8e8')
+  console.log('colorBorderSecondary', colorBorderSecondary)
   const colorTextSecondary = String(t.colorTextSecondary ?? 'rgba(0,0,0,0.65)')
   const colorTextTertiary = String(t.colorTextTertiary ?? 'rgba(0,0,0,0.45)')
   const colorTextQuaternary = String(t.colorTextQuaternary ?? 'rgba(0,0,0,0.25)')
@@ -121,7 +123,27 @@ function buildMapped(antd: ReturnType<typeof antdTheme.useToken>['token']): Reco
 function transformValue(feKey: string, _src: string, rawValue: string): string {
   if (!rawValue) return rawValue
 
-  const pxKeys = new Set(['borderRadiusXs', 'borderRadiusSm', 'borderRadiusMd', 'borderRadiusLg', 'borderRadiusXl', 'spacingXs', 'spacingSm', 'spacingMd', 'spacingLg', 'spacingXl', 'spacing2xl', 'spacing3xl', 'fontSizeXs', 'fontSizeSm', 'fontSizeMd', 'fontSizeLg', 'fontSizeXl', 'fontSize2xl', 'fontSize3xl'])
+  const pxKeys = new Set([
+    'borderRadiusXs',
+    'borderRadiusSm',
+    'borderRadiusMd',
+    'borderRadiusLg',
+    'borderRadiusXl',
+    'spacingXs',
+    'spacingSm',
+    'spacingMd',
+    'spacingLg',
+    'spacingXl',
+    'spacing2xl',
+    'spacing3xl',
+    'fontSizeXs',
+    'fontSizeSm',
+    'fontSizeMd',
+    'fontSizeLg',
+    'fontSizeXl',
+    'fontSize2xl',
+    'fontSize3xl',
+  ])
 
   if (pxKeys.has(feKey) && !isNaN(Number(rawValue)) && !rawValue.includes('px')) {
     return `${rawValue}px`

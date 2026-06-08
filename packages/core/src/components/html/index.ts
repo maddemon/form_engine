@@ -5,7 +5,7 @@ export interface HtmlProps extends BaseComponentProps {
 }
 
 export const meta: ComponentRegistration = {
-  label: 'HTML',
+  label: 'component.html.label',
   category: 'display',
   icon: 'Code',
   defaultProps: { componentProps: { content: '<p>HTML 内容</p>' } },

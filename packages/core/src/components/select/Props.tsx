@@ -1,15 +1,16 @@
+import { useLocale } from '../../locale'
 import { FieldItem, PropsRenderProps, DataSourceEditorField } from '../../propRenders'
 
-const MODE_OPTIONS = [
-  { label: '默认', value: '' },
-  { label: '多选', value: 'multiple' },
-  { label: '标签', value: 'tags' },
-]
-
 export default function SelectPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange, slots }: PropsRenderProps) {
+  const { locale } = useLocale()
+  const MODE_OPTIONS = [
+    { label: locale.component.select.modeDefault, value: '' },
+    { label: locale.component.select.modeMultiple, value: 'multiple' },
+    { label: locale.component.select.modeTags, value: 'tags' },
+  ]
   return (
     <>
-      <FieldItem label="选项数据" variant="group">
+      <FieldItem label={locale.component.select.dataSource} variant="group">
         <DataSourceEditorField
           dataSource={dataSource}
           onChange={onDataSourceChange}
@@ -18,19 +19,19 @@ export default function SelectPropsRender({ widgets: w, values, onChange, dataSo
           widgets={w}
         />
       </FieldItem>
-      <FieldItem label="允许清除">
+      <FieldItem label={locale.component.select.allowClear}>
         <w.Switch checked={!!values.allowClear} onChange={(v) => onChange('allowClear', v)} />
       </FieldItem>
-      <FieldItem label="模式">
+      <FieldItem label={locale.component.select.mode}>
         <w.ButtonGroup options={MODE_OPTIONS} value={(values.mode as string) ?? ''} onChange={(v) => onChange('mode', v)} />
       </FieldItem>
       {['multiple', 'tags'].includes(values.mode as string) && (
-        <FieldItem label="最多标签数">
+        <FieldItem label={locale.component.select.maxTagCount}>
           <w.NumberInput value={(values.maxTagCount as number) ?? undefined} onChange={(v) => onChange('maxTagCount', v)} min={1} />
         </FieldItem>
       )}
-      <FieldItem label="无匹配时文本">
-        <w.Input value={(values.notFoundContent as string) ?? ''} onChange={(v) => onChange('notFoundContent', v)} placeholder="无匹配时的提示文字" />
+      <FieldItem label={locale.component.select.notFoundContent}>
+        <w.Input value={(values.notFoundContent as string) ?? ''} onChange={(v) => onChange('notFoundContent', v)} placeholder={locale.component.select.notFoundContentPlaceholder} />
       </FieldItem>
     </>
   )

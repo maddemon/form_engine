@@ -9,7 +9,7 @@ export interface TagProps extends BaseComponentProps {
 }
 
 export const meta: ComponentRegistration = {
-  label: '标签',
+  label: 'component.tag.label',
   category: 'display',
   icon: 'Tag',
   defaultProps: { componentProps: { children: '标签内容', type: 'primary' } },

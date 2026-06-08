@@ -22,7 +22,7 @@ export interface TextProps extends BaseComponentProps {
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '文本',
+  label: 'component.text.label',
   category: 'display',
   icon: 'LetterA',
   defaultProps: { componentProps: { children: '文本内容' } },

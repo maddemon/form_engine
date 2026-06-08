@@ -1,12 +1,14 @@
 import React from 'react'
 import { Copy, Trash } from '../../components/icons'
+import { useLocale } from '../../locale'
 import { useStyle } from '../../styles'
 import { WidgetButton } from '../../widgets/Button'
 import type { FieldActionsProps } from './types'
 
-/** 操作按钮：复制 / 删除，hover 或选中时显示在右上角 */
 export const FieldActions: React.FC<FieldActionsProps> = ({ fieldId, onCopy, onRemove }) => {
   const { token } = useStyle()
+  const { locale } = useLocale()
+  const fa = locale.designer.fieldActions
 
   return (
     <div
@@ -29,7 +31,7 @@ export const FieldActions: React.FC<FieldActionsProps> = ({ fieldId, onCopy, onR
         color="primary"
         size="sm"
         onClick={(e: React.MouseEvent) => { e.stopPropagation(); onCopy() }}
-        label="复制"
+        label={fa.copy}
         style={{ fontSize: token('widgetFieldHandleFontSize') as string, padding: '2px var(--fe-spacing-xs)', userSelect: 'none' }}
       >
         <Copy size={12} strokeWidth={2.5} />
@@ -39,7 +41,7 @@ export const FieldActions: React.FC<FieldActionsProps> = ({ fieldId, onCopy, onR
         color="danger"
         size="sm"
         onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRemove() }}
-        label="删除"
+        label={fa.delete}
         style={{ fontSize: token('widgetFieldHandleFontSize') as string, padding: '2px var(--fe-spacing-xs)', userSelect: 'none' }}
       >
         <Trash size={12} strokeWidth={2.5} />

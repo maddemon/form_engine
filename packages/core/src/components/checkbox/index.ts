@@ -9,7 +9,7 @@ export interface CheckboxProps extends BaseFormComponentProps<string[] | undefin
 }
 
 export const checkboxEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '勾选项变化时触发' },
+  { name: 'onChange', label: 'component.checkbox.events.onChange.label', description: 'component.checkbox.events.onChange.description' },
 ]
 
 export { default as Props } from './Props'
@@ -21,7 +21,7 @@ const DEFAULT_OPTIONS = [
 ]
 
 export const meta: ComponentRegistration = {
-  label: '多选框',
+  label: 'component.checkbox.label',
   category: 'form',
   icon: 'CheckSquare',
   defaultProps: { dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS } } },

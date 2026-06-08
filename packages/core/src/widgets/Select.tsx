@@ -1,5 +1,6 @@
 import React from 'react'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import { InputOverlayButton } from './InputOverlayButton'
 import { BASE_STYLE, FOCUS_STYLE } from './shared'
 
@@ -20,6 +21,7 @@ export const WidgetSelect: React.FC<{
   }, [onChange])
 
   const { token } = useStyle()
+  const { locale } = useLocale()
 
   const hasValue = value !== undefined && value !== ''
 
@@ -95,7 +97,7 @@ export const WidgetSelect: React.FC<{
             color: selectedOption ? 'var(--fe-text-primary)' : 'var(--fe-text-placeholder)',
           }}
         >
-          {selectedOption ? selectedOption.label : '请选择'}
+          {selectedOption ? selectedOption.label : locale.widget.select.placeholder}
         </span>
 
         {/* 箭头图标：有值可清除时隐藏，由清除按钮占据同一位置 */}
@@ -131,7 +133,7 @@ export const WidgetSelect: React.FC<{
 
         {/* 清除按钮：绝对定位，占据箭头同一位置 */}
         {allowClear && hasValue && !disabled && (
-          <InputOverlayButton onClick={handleClear} onMouseDown={(e) => e.stopPropagation()} title="清除">
+          <InputOverlayButton onClick={handleClear} onMouseDown={(e) => e.stopPropagation()} title={locale.widget.select.clear}>
             ✕
           </InputOverlayButton>
         )}
@@ -160,7 +162,7 @@ export const WidgetSelect: React.FC<{
             <div
               style={{ padding: '4px 8px', color: 'var(--fe-text-tertiary)', fontSize: token('fontSizeSm') as string }}
             >
-              无选项
+              {locale.widget.select.noOptions}
             </div>
           ) : (
             options.map((opt) => {

@@ -143,6 +143,8 @@ export interface DesignerProps {
   theme?: import('../styles/types').PartialThemeTokens
   /** 属性编辑器 Slot（运行时注入，优先级最高） */
   propertySlots?: PropertySlots
+  /** 语言包（i18n） */
+  locale?: import('../locale').SupportedLocale | Partial<import('../locale').LocalePack>
 }
 
 /**

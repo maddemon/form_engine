@@ -1,8 +1,9 @@
-import type { FormSchema, ThemeMode } from '@form-engine/core'
+import type { FormSchema, SupportedLocale, ThemeMode } from '@form-engine/core'
 import { registerSimpleCustomComponent } from '@form-engine/core'
 import { theme as antdTheme, Button, Card, ConfigProvider, Input, Layout, Space, Typography } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
 import '../custom-component-demo'
+import { AppProvider } from './context/AppContext'
 
 // ==== 注册 antd 风格的自定义组件 ====
 const CustomCard: React.FC<any> = (props) => {
@@ -28,6 +29,8 @@ registerSimpleCustomComponent('custom:custom-card' as any, CustomCard, {
 })
 
 // ==== 页面组件 ====
+import schemaEn from './_EN_demo'
+import schemaZh from './_ZH_demo'
 import DesignerPage from './pages/DesignerPage'
 import DocPage from './pages/DocPage'
 import RenderPage from './pages/RenderPage'
@@ -36,16 +39,18 @@ import RenderPage from './pages/RenderPage'
 
 type PageKey = 'designer' | 'render' | 'doc'
 
-const navItems: { key: PageKey; label: string }[] = [
-  { key: 'designer', label: '🎨 设计器' },
-  { key: 'render', label: '📋 渲染' },
-  { key: 'doc', label: '📖 文档' },
-]
-
-const themeOptions: { key: ThemeMode; label: string; title: string }[] = [
-  { key: 'system', label: '系统', title: '跟随系统' },
-  { key: 'light', label: '亮色', title: '亮色模式' },
-  { key: 'dark', label: '暗色', title: '暗色模式' },
+const themeOptions: {
+  key: ThemeMode
+  label: Record<SupportedLocale, string>
+  title: Record<SupportedLocale, string>
+}[] = [
+  {
+    key: 'system',
+    label: { 'zh-CN': '系统', 'en-US': 'System' },
+    title: { 'zh-CN': '跟随系统', 'en-US': 'Follow system' },
+  },
+  { key: 'light', label: { 'zh-CN': '亮色', 'en-US': 'Light' }, title: { 'zh-CN': '亮色模式', 'en-US': 'Light mode' } },
+  { key: 'dark', label: { 'zh-CN': '暗色', 'en-US': 'Dark' }, title: { 'zh-CN': '暗色模式', 'en-US': 'Dark mode' } },
 ]
 
 const GithubIcon = () => (
@@ -68,228 +73,22 @@ function useResolvedDark(themeMode: ThemeMode): boolean {
 const App: React.FC = () => {
   const [pageKey, setPageKey] = useState<PageKey>('designer')
   const [themeMode, setThemeMode] = useState<ThemeMode>('system')
-  const [schema, setSchema] = useState<FormSchema>({
-    version: '0.1',
-    name: '表单引擎演示',
-    description: '用于演示和测试各种数据源类型的示例表单',
-    fields: [
-      // ── 展示型：欢迎区域 ──
-      {
-        id: 'field-welcome-title',
-        name: 'welcomeTitle',
-        type: 'title',
-        label: '',
-        componentProps: { children: '欢迎使用 Form Engine', level: 3, textAlign: 'center' },
-        children: [],
-      },
-      {
-        id: 'field-welcome-text',
-        name: 'welcomeText',
-        type: 'text',
-        label: '',
-        componentProps: {
-          children: '这是一份示例表单，用于测试不同数据源类型的控件。您可以在设计器中自由编辑，或切换到「渲染」页面预览效果。',
-          type: 'secondary',
-        },
-        children: [],
-      },
-      {
-        id: 'field-divider-1',
-        name: 'divider1',
-        type: 'divider',
-        label: '',
-        componentProps: {},
-        children: [],
-      },
-
-      // ── 表单控件：基础信息 ──
-      {
-        id: 'field-name',
-        name: 'name',
-        type: 'input',
-        label: '姓名',
-        placeholder: '请输入您的姓名',
-        rules: [{ required: true, message: '请输入姓名' }],
-        componentProps: { allowClear: true },
-        children: [],
-      },
-      {
-        id: 'field-gender',
-        name: 'gender',
-        type: 'select',
-        label: '性别',
-        placeholder: '请选择性别',
-        dataSource: {
-          type: 'static',
-          static: {
-            options: [
-              { label: '男', value: 'male' },
-              { label: '女', value: 'female' },
-            ],
-          },
-        },
-        help: '数据源：静态（Static）',
-        componentProps: { allowClear: true },
-        children: [],
-      },
-      {
-        id: 'field-age',
-        name: 'age',
-        type: 'input-number',
-        label: '年龄',
-        placeholder: '请输入年龄',
-        rules: [{ required: true, message: '请输入年龄' }],
-        componentProps: { min: 1, max: 150 },
-        children: [],
-      },
-
-      // ── 分隔 + 数据源演示区 ──
-      {
-        id: 'field-divider-2',
-        name: 'divider2',
-        type: 'divider',
-        label: '',
-        componentProps: {},
-        children: [],
-      },
-      {
-        id: 'field-ds-title',
-        name: 'dsTitle',
-        type: 'text',
-        label: '',
-        componentProps: { children: '▼ 数据源测试区：下面演示了静态数据源和远程数据源', strong: true },
-        children: [],
-      },
-
-      // ── 远程数据源：城市选择 ──
-      {
-        id: 'field-city',
-        name: 'city',
-        type: 'select',
-        label: '所在城市',
-        placeholder: '请选择城市（远程数据）',
-        dataSource: {
-          type: 'remote',
-          remote: {
-            config: {
-              url: '/data.json',
-              method: 'GET',
-              labelField: 'label',
-              valueField: 'value',
-              resultPath: 'cities',
-            },
-          },
-        },
-        help: '数据源：远程接口（GET /data.json → resultPath: "cities"）',
-        componentProps: { allowClear: true, showSearch: true },
-        children: [],
-      },
-      {
-        id: 'field-department',
-        name: 'department',
-        type: 'cascader',
-        label: '所属部门',
-        placeholder: '请选择部门（远程数据）',
-        dataSource: {
-          type: 'remote',
-          remote: {
-            config: {
-              url: '/data.json',
-              method: 'GET',
-              labelField: 'label',
-              valueField: 'value',
-              resultPath: 'departments',
-            },
-          },
-        },
-        help: '数据源：远程接口（级联数据，带 children 嵌套）',
-        componentProps: { allowClear: true },
-        children: [],
-      },
-
-      // ── 远程数据源：多选技能 ──
-      {
-        id: 'field-skills',
-        name: 'skills',
-        type: 'multi-select',
-        label: '擅长技能',
-        placeholder: '请选择技能（远程数据，可多选）',
-        dataSource: {
-          type: 'remote',
-          remote: {
-            config: {
-              url: '/data.json',
-              method: 'GET',
-              labelField: 'label',
-              valueField: 'value',
-              resultPath: 'skills',
-            },
-          },
-        },
-        help: '数据源：远程接口（多选模式）',
-        componentProps: { mode: 'multiple', allowClear: true },
-        children: [],
-      },
-
-      // ── 静态数据源：颜色偏好 ──
-      {
-        id: 'field-color',
-        name: 'color',
-        type: 'radio',
-        label: '颜色偏好',
-        dataSource: {
-          type: 'static',
-          static: {
-            options: [
-              { label: '红色', value: 'red' },
-              { label: '蓝色', value: 'blue' },
-              { label: '绿色', value: 'green' },
-              { label: '黄色', value: 'yellow' },
-            ],
-          },
-        },
-        help: '数据源：静态（Radio 组件）',
-        componentProps: { direction: 'horizontal' },
-        children: [],
-      },
-      {
-        id: 'field-birthday',
-        name: 'birthday',
-        type: 'date',
-        label: '出生日期',
-        placeholder: '请选择出生日期',
-        componentProps: { allowClear: true },
-        children: [],
-      },
-
-      // ── 提示信息 ──
-      {
-        id: 'field-hint',
-        name: 'hint',
-        type: 'text',
-        label: '',
-        componentProps: { children: '💡 提示：带 * 标记的为必填项，远程数据源需要启动开发服务器才能正常加载。', type: 'secondary' },
-        children: [],
-      },
-    ],
-    form: {
-      size: 'middle' as const,
-      colon: false,
-      desktop: {
-        layout: 'horizontal' as const,
-        labelAlign: 'right' as const,
-        labelCol: { span: 5 },
-        wrapperCol: { span: 15 },
-      },
-      mobile: {
-        layout: 'vertical' as const,
-      },
-    },
-  })
+  const [locale, setLocale] = useState<SupportedLocale>('zh-CN')
+  const [schema, setSchema] = useState<FormSchema>(schemaZh)
 
   const isDark = useResolvedDark(themeMode)
   const themeAlgorithm = isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm
   const { Header, Content } = Layout
+
+  const navLabels: Record<SupportedLocale, Record<PageKey, string>> = {
+    'zh-CN': { designer: '🎨 设计器', render: '📋 渲染', doc: '📖 文档' },
+    'en-US': { designer: '🎨 Designer', render: '📋 Render', doc: '📖 Docs' },
+  }
+
+  // 切换 locale 时同步切换 schema 数据
+  useEffect(() => {
+    setSchema(locale === 'zh-CN' ? schemaZh : schemaEn)
+  }, [locale])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-prefers-color-scheme', isDark ? 'dark' : 'light')
@@ -303,19 +102,27 @@ const App: React.FC = () => {
             <Typography.Title level={5} style={{ margin: 0 }}>
               Form Engine
             </Typography.Title>
-            {navItems.map((item) => (
+            {(['designer', 'render', 'doc'] as PageKey[]).map((key) => (
               <Button
-                key={item.key}
-                type={pageKey === item.key ? 'primary' : 'text'}
+                key={key}
+                type={pageKey === key ? 'primary' : 'text'}
                 size="small"
-                onClick={() => setPageKey(item.key)}
+                onClick={() => setPageKey(key)}
               >
-                {item.label}
+                {navLabels[locale][key]}
               </Button>
             ))}
           </Space>
 
           <Space>
+            <Button
+              size="small"
+              type={locale === 'en-US' ? 'primary' : 'default'}
+              onClick={() => setLocale(locale === 'zh-CN' ? 'en-US' : 'zh-CN')}
+              style={{ minWidth: 48 }}
+            >
+              {locale === 'zh-CN' ? 'EN' : '中'}
+            </Button>
             <a href="https://github.com/maddemon/form_engine" target="_blank" rel="noopener noreferrer" title="GitHub">
               <GithubIcon />
             </a>
@@ -326,19 +133,21 @@ const App: React.FC = () => {
                   key={opt.key}
                   type={themeMode === opt.key ? 'primary' : 'default'}
                   onClick={() => setThemeMode(opt.key)}
-                  title={opt.title}
+                  title={opt.title[locale]}
                 >
-                  {opt.label}
+                  {opt.label[locale]}
                 </Button>
               ))}
             </Space.Compact>
           </Space>
         </Header>
 
-        <Content style={{ overflow: 'hidden' }}>
-          {pageKey === 'designer' && <DesignerPage schema={schema} onSchemaChange={setSchema} themeMode={themeMode} />}
-          {pageKey === 'render' && <RenderPage schema={schema} themeMode={themeMode} />}
-          {pageKey === 'doc' && <DocPage schema={schema} />}
+        <Content style={{ overflow: 'hidden' }} key={locale}>
+          <AppProvider value={{ locale, themeMode, isDark }}>
+            {pageKey === 'designer' && <DesignerPage schema={schema} onSchemaChange={setSchema} />}
+            {pageKey === 'render' && <RenderPage schema={schema} />}
+            {pageKey === 'doc' && <DocPage />}
+          </AppProvider>
         </Content>
       </Layout>
     </ConfigProvider>

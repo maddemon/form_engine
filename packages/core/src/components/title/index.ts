@@ -18,7 +18,7 @@ export interface TitleProps extends BaseComponentProps {
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '标题',
+  label: 'component.title.label',
   category: 'display',
   icon: 'Heading',
   defaultProps: { componentProps: { children: '标题', level: 1 } },

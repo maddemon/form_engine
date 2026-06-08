@@ -12,7 +12,7 @@ export interface DividerProps extends BaseComponentProps {
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '分割线',
+  label: 'component.divider.label',
   category: 'display',
   icon: 'Minus',
   defaultProps: {},

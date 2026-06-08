@@ -22,20 +22,26 @@ export interface DateRangeProps extends Omit<BaseFormComponentProps<string[] | u
 }
 
 export const datePickerEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '选中日期变化时触发' },
-  { name: 'onCalendarChange', label: '日历面板变化', description: '日历面板月份/年份变化时触发' },
-  { name: 'onOpenChange', label: '打开状态', description: '弹出/收起面板时触发' },
-  { name: 'onPanelChange', label: '面板变化', description: '面板类型（date/month/year）变化时触发' },
-  { name: 'onOk', label: '确认', description: '点击确认按钮时触发' },
+  { name: 'onChange', label: 'component.datePicker.events.onChange.label', description: 'component.datePicker.events.onChange.description' },
+  { name: 'onCalendarChange', label: 'component.datePicker.events.onCalendarChange.label', description: 'component.datePicker.events.onCalendarChange.description' },
+  { name: 'onOpenChange', label: 'component.datePicker.events.onOpenChange.label', description: 'component.datePicker.events.onOpenChange.description' },
+  { name: 'onPanelChange', label: 'component.datePicker.events.onPanelChange.label', description: 'component.datePicker.events.onPanelChange.description' },
+  { name: 'onOk', label: 'component.datePicker.events.onOk.label', description: 'component.datePicker.events.onOk.description' },
 ]
 
-export const dateRangeEventDeclarations: EventDeclaration[] = datePickerEventDeclarations
+export const dateRangeEventDeclarations: EventDeclaration[] = [
+  { name: 'onChange', label: 'component.dateRange.events.onChange.label', description: 'component.dateRange.events.onChange.description' },
+  { name: 'onCalendarChange', label: 'component.dateRange.events.onCalendarChange.label', description: 'component.dateRange.events.onCalendarChange.description' },
+  { name: 'onOpenChange', label: 'component.dateRange.events.onOpenChange.label', description: 'component.dateRange.events.onOpenChange.description' },
+  { name: 'onPanelChange', label: 'component.dateRange.events.onPanelChange.label', description: 'component.dateRange.events.onPanelChange.description' },
+  { name: 'onOk', label: 'component.dateRange.events.onOk.label', description: 'component.dateRange.events.onOk.description' },
+]
 
 export { default as DateRangePropsRender } from './DateRangePropsRender'
 export { default as Props } from './Props'
 
 export const dateMeta: ComponentRegistration = {
-  label: '日期',
+  label: 'component.datePicker.label',
   category: 'form',
   icon: 'Calendar',
   defaultProps: { componentProps: { format: 'YYYY-MM-DD', allowClear: true } },
@@ -43,7 +49,7 @@ export const dateMeta: ComponentRegistration = {
 }
 
 export const dateRangeMeta: ComponentRegistration = {
-  label: '日期范围',
+  label: 'component.dateRange.label',
   category: 'form',
   icon: 'DateRangeIcon',
   defaultProps: { componentProps: { format: 'YYYY-MM-DD', allowClear: true } },

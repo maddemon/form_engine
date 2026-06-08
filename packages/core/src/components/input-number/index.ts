@@ -17,17 +17,17 @@ export interface InputNumberProps extends BaseFormComponentProps<number | undefi
 }
 
 export const inputNumberEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '输入框内容变化时触发' },
-  { name: 'onBlur', label: '失焦', description: '输入框失去焦点时触发' },
-  { name: 'onPressEnter', label: '回车', description: '按下回车键时触发' },
+  { name: 'onChange', label: 'component.inputNumber.events.onChange.label', description: 'component.inputNumber.events.onChange.description' },
+  { name: 'onBlur', label: 'component.inputNumber.events.onBlur.label', description: 'component.inputNumber.events.onBlur.description' },
+  { name: 'onPressEnter', label: 'component.inputNumber.events.onPressEnter.label', description: 'component.inputNumber.events.onPressEnter.description' },
 ]
 
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '数字输入',
+  label: 'component.inputNumber.label',
   category: 'form',
   icon: 'NumberOutlined',
-  defaultProps: { componentProps: { placeholder: '请输入数字', allowClear: true } },
+  defaultProps: { componentProps: { allowClear: true } },
   eventDeclarations: inputNumberEventDeclarations,
 }

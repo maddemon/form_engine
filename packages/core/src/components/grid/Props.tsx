@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import { useLocale } from '../../locale'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
 import { SortableTableEditor, WidgetButton } from '../../widgets'
@@ -23,6 +24,7 @@ function normalizeSpans(items: ColSpanItem[]): ColSpanItem[] {
 }
 
 export default function GridPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+  const { locale } = useLocale()
   const colSpans = (values.colSpans as ColSpanItem[]) ?? []
 
   const handleColSpansChange = useCallback((v: ColSpanItem[]) => onChange('colSpans', normalizeSpans(v)), [onChange])
@@ -33,20 +35,20 @@ export default function GridPropsRender({ widgets: w, values, onChange }: PropsR
 
   return (
     <>
-      <FieldItem label="布局模式">
+      <FieldItem label={locale.component.grid.layoutMode}>
         <w.Select
           value={(values.variant as string) ?? 'grid'}
           onChange={(v) => onChange('variant', v)}
           options={[
-            { label: '栅格', value: 'grid' },
-            { label: '弹性', value: 'flex' },
+            { label: locale.component.grid.grid, value: 'grid' },
+            { label: locale.component.grid.flex, value: 'flex' },
           ]}
         />
       </FieldItem>
-      <FieldItem label="间距">
+      <FieldItem label={locale.component.grid.gap}>
         <w.NumberInput value={(values.gap as number) ?? 8} onChange={(v) => onChange('gap', v)} min={0} max={100} />
       </FieldItem>
-      <FieldItem label="内边距(px)">
+      <FieldItem label={locale.component.grid.padding}>
         <w.NumberInput
           value={(values.padding as number) ?? 0}
           onChange={(v) => onChange('padding', v)}
@@ -54,7 +56,7 @@ export default function GridPropsRender({ widgets: w, values, onChange }: PropsR
           max={200}
         />
       </FieldItem>
-      <FieldItem label="外边距(px)">
+      <FieldItem label={locale.component.grid.margin}>
         <w.NumberInput
           value={(values.margin as number) ?? 0}
           onChange={(v) => onChange('margin', v)}
@@ -62,14 +64,14 @@ export default function GridPropsRender({ widgets: w, values, onChange }: PropsR
           max={200}
         />
       </FieldItem>
-      <FieldItem label="列管理" variant="group">
+      <FieldItem label={locale.component.grid.columnMgmt} variant="group">
         <SortableTableEditor<ColSpanItem>
           value={colSpans}
           onChange={handleColSpansChange}
           columns={[
             {
               key: 'span',
-              label: '宽度',
+              label: locale.component.grid.columnWidth,
               render: ({ value, onChange: onValChange, disabled: d }) => (
                 <w.NumberInput
                   value={value as number | undefined}
@@ -91,7 +93,7 @@ export default function GridPropsRender({ widgets: w, values, onChange }: PropsR
           onClick={handleAddCol}
           style={{ width: '100%', marginTop: 4 }}
         >
-          + 添加列
+          + {locale.component.grid.addColumn}
         </WidgetButton>
       </FieldItem>
     </>

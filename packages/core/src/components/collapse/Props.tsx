@@ -1,10 +1,12 @@
 import { useCallback } from 'react'
+import { useLocale } from '../../locale'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
 import { SortableTableEditor, WidgetButton } from '../../widgets'
 import type { CollapsePanelConfig } from '.'
 
 export default function CollapsePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
+  const { locale } = useLocale()
   const panels = (values.panels as CollapsePanelConfig[]) ?? []
   const defaultActiveKey = values.defaultActiveKey as string | string[] | undefined
 
@@ -47,41 +49,41 @@ export default function CollapsePropsRender({ widgets: w, values, onChange }: Pr
 
   return (
     <>
-      <FieldItem label="手风琴模式">
+      <FieldItem label={locale.component.collapse.accordion}>
         <w.Switch checked={!!values.accordion} onChange={(v) => onChange('accordion', v)} />
       </FieldItem>
-      <FieldItem label="简洁模式">
+      <FieldItem label={locale.component.collapse.ghost}>
         <w.Switch checked={!!values.ghost} onChange={(v) => onChange('ghost', v)} />
       </FieldItem>
-      <FieldItem label="默认展开">
+      <FieldItem label={locale.component.collapse.defaultActive}>
         <w.Input
           value={(values.defaultActiveKey as string) ?? ''}
           onChange={(v) => onChange('defaultActiveKey', v)}
-          placeholder="面板 key，多个用逗号"
+          placeholder={locale.component.collapse.defaultActivePlaceholder}
         />
       </FieldItem>
-      <FieldItem label="面板管理" variant="group">
+      <FieldItem label={locale.component.collapse.panelMgmt} variant="group">
         <SortableTableEditor<CollapsePanelConfig>
           value={panels}
           onChange={handlePanelsChange}
           columns={[
             {
               key: 'header',
-              label: '标题',
+              label: locale.component.collapse.header,
               render: ({ value, onChange: onValChange, disabled: d }) => (
                 <w.Input value={String(value ?? '')} disabled={d} variant="filled" onChange={(v) => onValChange(v)} />
               ),
             },
             {
               key: 'key',
-              label: 'Key',
+              label: locale.component.collapse.key,
               render: ({ value, onChange: onValChange, disabled: d }) => (
                 <w.Input value={String(value ?? '')} disabled={d} variant="filled" onChange={(v) => onValChange(v)} />
               ),
             },
             {
               key: 'disabled',
-              label: '禁用',
+              label: locale.component.collapse.disabled,
               width: 40,
               render: ({ value, onChange: onValChange, disabled: d }) => (
                 <w.Switch checked={!!value} disabled={d} onChange={(v) => onValChange(v)} />
@@ -97,7 +99,7 @@ export default function CollapsePropsRender({ widgets: w, values, onChange }: Pr
           onClick={handleAddPanel}
           style={{ width: '100%', marginTop: 4 }}
         >
-          + 添加面板
+          + {locale.component.collapse.addPanel}
         </WidgetButton>
       </FieldItem>
     </>

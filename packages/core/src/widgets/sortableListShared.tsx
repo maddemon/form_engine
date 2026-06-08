@@ -2,6 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import React from 'react'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import { WidgetButton } from './Button'
 import { Space } from './Space'
 
@@ -44,9 +45,11 @@ export const InlineDeleteButton: React.FC<{
   disabled?: boolean
   onClick: (e: React.MouseEvent) => void
   title?: string
-}> = ({ disabled, onClick, title = '删除' }) => {
+}> = ({ disabled, onClick, title }) => {
+  const { locale } = useLocale()
+  const resolvedTitle = title ?? locale.widget.sortableList.delete
   return (
-    <WidgetButton style={{ flexShrink: 0 }} size="sm" type="text" disabled={disabled} onClick={onClick} label={title}>
+    <WidgetButton style={{ flexShrink: 0 }} size="sm" type="text" disabled={disabled} onClick={onClick} label={resolvedTitle}>
       ✕
     </WidgetButton>
   )

@@ -5,14 +5,15 @@
 
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
+import 'dayjs/locale/en'
 import React from 'react'
 import { DatePicker as AntDatePicker, TimePicker as AntTimePicker } from 'antd'
 import zhCN from 'antd/es/date-picker/locale/zh_CN'
+import enUS from 'antd/es/date-picker/locale/en_US'
+import { useLocale } from '@form-engine/core/locale'
 import type { DatePickerProps, DateRangeProps } from '@form-engine/core'
 
 const { RangePicker } = AntDatePicker
-
-dayjs.locale('zh-cn')
 
 /** 根据 format 字符串自动判断是否包含时间部分 */
 function isTimeFormat(fmt: string): boolean {
@@ -39,13 +40,22 @@ function toDayjsRange(value: [string, string] | undefined): [dayjs.Dayjs | null,
 /**
  * DatePicker 组件
  */
+function useAntdLocale() {
+  const { locale } = useLocale()
+  const isChinese = locale.adapter.common.placeholder.input === '请填写'
+  React.useEffect(() => {
+    dayjs.locale(isChinese ? 'zh-cn' : 'en')
+  }, [isChinese])
+  return isChinese ? zhCN : enUS
+}
+
 export const DatePicker: React.FC<DatePickerProps> = ({
   value,
   onChange,
   format = 'YYYY-MM-DD',
   showTime: explicitShowTime,
   picker = 'date',
-  placeholder,
+  placeholder: placeholderProp,
   allowClear,
   disabled,
   disabledDate,
@@ -54,6 +64,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   id,
   ...rest
 }) => {
+  const { locale } = useLocale()
+  const antdLocale = useAntdLocale()
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.date ?? 'Select date'
   const showTime = explicitShowTime ?? isTimeFormat(format)
   const handleChange = (_date: dayjs.Dayjs | null, dateString: string | null) => {
     onChange?.(dateString || undefined)
@@ -65,7 +78,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   return (
     <AntDatePicker
-      locale={zhCN}
+      locale={antdLocale}
       value={toDayjs(value)}
       onChange={handleChange}
       format={format}
@@ -91,7 +104,7 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
   format = 'YYYY-MM-DD',
   showTime: explicitShowTime,
   picker = 'date',
-  placeholder,
+  placeholder: placeholderProp,
   allowClear,
   disabled,
   disabledDate,
@@ -100,6 +113,9 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
   id,
   ...rest
 }) => {
+  const { locale } = useLocale()
+  const antdLocale = useAntdLocale()
+  const placeholder = placeholderProp ?? (locale.adapter.common.placeholder.date ?? 'Select date') as unknown as [string, string]
   const showTime = explicitShowTime ?? isTimeFormat(format)
   const handleChange = (_dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null, dateStrings: [string, string]) => {
     const cb = onChange as ((value: string[] | undefined) => void) | undefined
@@ -112,13 +128,13 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
 
   return (
     <RangePicker
-      locale={zhCN}
+      locale={antdLocale}
       value={toDayjsRange(value as [string, string] | undefined)}
       onChange={handleChange}
       format={format}
       showTime={showTime}
       picker={picker}
-      placeholder={placeholder as [string, string]}
+      placeholder={placeholder}
       allowClear={allowClear}
       disabled={disabled as boolean | undefined}
       disabledDate={resolvedDisabledDate}
@@ -136,7 +152,7 @@ export const TimePicker: React.FC<DatePickerProps> = ({
   value,
   onChange,
   format = 'HH:mm',
-  placeholder,
+  placeholder: placeholderProp,
   allowClear,
   disabled,
   style,
@@ -144,6 +160,8 @@ export const TimePicker: React.FC<DatePickerProps> = ({
   id,
   ...rest
 }) => {
+  const { locale } = useLocale()
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.time ?? 'Select time'
   const handleChange = (_time: dayjs.Dayjs | null, timeString: string | null) => {
     onChange?.(timeString || undefined)
   }

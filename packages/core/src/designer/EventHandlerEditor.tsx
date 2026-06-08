@@ -10,6 +10,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { listActionNames } from '../events'
+import { useLocale } from '../locale'
 import { resolveSlot } from '../registry/propertySlotRegistry'
 import { FieldItem } from '../propRenders/shared'
 import { useStyle } from '../styles/useStyle'
@@ -45,7 +46,16 @@ const HANDLER_TYPE_OPTIONS: { label: string; value: EventHandlerType | '' }[] = 
 
 export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, onChange, eventName, widgets: w, slots }) => {
   const { token } = useStyle()
+  const { locale } = useLocale()
+  const eh = locale.designer.eventHandler
   const [type, setType] = useState<EventHandlerType | ''>(value?.type ?? '')
+
+  const handlerTypeOptions = [
+    { label: eh.notConfigured, value: '' },
+    { label: eh.expression, value: 'expression' },
+    { label: eh.action, value: 'action' },
+    { label: eh.callback, value: 'callback' },
+  ]
 
   // 外部 value 变化时同步本地 type 状态
   useEffect(() => {
@@ -80,38 +90,38 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
   return (
     <div style={containerStyle}>
       <FieldItem label={eventName}>
-        <w.Select value={type} onChange={(v) => handleTypeChange(v as EventHandlerType | '')} options={HANDLER_TYPE_OPTIONS.map((opt) => ({ label: opt.label, value: opt.value }))} />
+        <w.Select value={type} onChange={(v) => handleTypeChange(v as EventHandlerType | '')} options={handlerTypeOptions.map((opt) => ({ label: opt.label, value: opt.value }))} />
       </FieldItem>
 
       {type === 'expression' && value?.type === 'expression' && (
-        <FieldItem label="表达式" variant="group">
+        <FieldItem label={eh.expressionLabel} variant="group">
           <ExpressionEditorSlot
             value={value.expression || ''}
             onChange={(v) => onChange({ ...value, expression: v as string })}
-            placeholder={`如：$form.setFieldValue('other', $event)`}
+            placeholder={eh.expressionPlaceholder}
           />
-          <Text type="tertiary" style={{ marginTop: 2 }}>可用变量：$self（当前字段）、$form（表单 API）、$event（事件对象）</Text>
+          <Text type="tertiary" style={{ marginTop: 2 }}>{eh.expressionHelp}</Text>
         </FieldItem>
       )}
 
       {type === 'action' && value?.type === 'action' && (
         <>
-          <FieldItem label="动作" variant="group">
+          <FieldItem label={eh.actionLabel} variant="group">
             <w.Select value={value.action || ''} onChange={(v) => onChange({ ...value, action: v })} options={listActionNames().map((name) => ({ label: name, value: name }))} />
           </FieldItem>
-          <FieldItem label="参数（JSON）">
+          <FieldItem label={eh.actionParams}>
             <JsonEditorSlot
               value={value.params}
               onChange={(v) => onChange({ ...value, params: v as Record<string, unknown> | undefined })}
-              placeholder='如：{ "name": "other", "value": "x" }'
+              placeholder={eh.actionParamsPlaceholder}
             />
           </FieldItem>
         </>
       )}
 
       {type === 'callback' && value?.type === 'callback' && (
-        <FieldItem variant="group" label="回调名（FormRenderProps.callbacks 中的 key）">
-          <w.Input value={value.callback || ''} onChange={(v) => onChange({ ...value, callback: String(v) })} placeholder="如：onCustomClick" />
+        <FieldItem variant="group" label={eh.callbackNameLabel}>
+          <w.Input value={value.callback || ''} onChange={(v) => onChange({ ...value, callback: String(v) })} placeholder={eh.callbackNamePlaceholder} />
         </FieldItem>
       )}
     </div>

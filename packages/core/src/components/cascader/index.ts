@@ -10,8 +10,8 @@ export interface CascaderProps extends BaseFormComponentProps<string[]> {
 }
 
 export const cascaderEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '选中项变化时触发' },
-  { name: 'onPopupVisibleChange', label: '面板显隐', description: '弹出/收起面板时触发' },
+  { name: 'onChange', label: 'component.cascader.events.onChange.label', description: 'component.cascader.events.onChange.description' },
+  { name: 'onPopupVisibleChange', label: 'component.cascader.events.onPopupVisibleChange.label', description: 'component.cascader.events.onPopupVisibleChange.description' },
 ]
 
 export { default as Props } from './Props'
@@ -34,7 +34,7 @@ const DEFAULT_OPTIONS = [
 ]
 
 export const meta: ComponentRegistration = {
-  label: '级联选择',
+  label: 'component.cascader.label',
   category: 'form',
   icon: 'GitBranch',
   defaultProps: {

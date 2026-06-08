@@ -12,13 +12,13 @@ export interface RateProps extends BaseFormComponentProps<number | undefined> {
 }
 
 export const rateEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '评分值变化时触发' },
+  { name: 'onChange', label: 'component.rate.events.onChange.label', description: 'component.rate.events.onChange.description' },
 ]
 
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '评分',
+  label: 'component.rate.label',
   category: 'form',
   icon: 'Star',
   defaultProps: { componentProps: { count: 5, allowHalf: false, allowClear: true } },

@@ -13,7 +13,7 @@ export interface FormProps extends BaseLayoutComponentProps {
 }
 
 export const meta: ComponentRegistration = {
-  label: '表单',
+  label: 'component.form.label',
   category: 'container',
   icon: 'FormOutlined',
   defaultProps: { componentProps: { layout: 'vertical', labelAlign: 'right' } },

@@ -12,13 +12,13 @@ export interface ButtonProps extends BaseComponentProps {
 }
 
 export const buttonEventDeclarations: EventDeclaration[] = [
-  { name: 'onClick', label: '点击', description: '点击按钮时触发' },
+  { name: 'onClick', label: 'component.button.events.onClick.label', description: 'component.button.events.onClick.description' },
 ]
 
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '按钮',
+  label: 'component.button.label',
   category: 'button',
   icon: 'Square',
   defaultProps: { componentProps: { children: '按钮' } },

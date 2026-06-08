@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities'
 import React, { useCallback, useMemo } from 'react'
 import { ErrorMessage } from '../designer/UIPrimitives'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import { arrayMove, DragHandleIcon, InlineDeleteButton } from './sortableListShared'
 
 export interface Column<T> {
@@ -70,6 +71,7 @@ function SortableTableEditorInner<T extends { id: string }>({
   disabled = false,
 }: SortableTableEditorProps<T>) {
   const { token } = useStyle()
+  const { locale } = useLocale()
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
@@ -181,7 +183,7 @@ function SortableTableEditorInner<T extends { id: string }>({
                             e.stopPropagation()
                             handleRemove(index)
                           }}
-                          title="删除"
+                          title={locale.widget.sortableTableEditor.delete}
                         />
                       </td>
                     </>

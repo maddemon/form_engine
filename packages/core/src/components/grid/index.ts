@@ -9,7 +9,7 @@ export interface GridProps extends BaseLayoutComponentProps {
 export { default as Props } from './Props';
 
 export const meta: ComponentRegistration = {
-  label: '栅格布局',
+  label: 'component.grid.label',
   category: 'container',
   icon: 'Columns',
   defaultProps: {

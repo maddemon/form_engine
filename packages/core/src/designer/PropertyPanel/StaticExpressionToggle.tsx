@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useStyle } from '../../styles'
+import { useLocale } from '../../locale'
 import type { DesignerWidgets } from '../../types/adapter'
 import type { DesignerAction } from '../../types/designer'
 import type { FormFieldSchema } from '../../types/schema'
@@ -37,6 +38,8 @@ export const StaticExpressionToggle: React.FC<StaticExpressionToggleProps> = ({
   fieldNames,
 }) => {
   const { token } = useStyle()
+  const { locale } = useLocale()
+  const se = locale.designer.staticExpressionToggle
   const currentValue = field[propKey]
 
   const [mode, setMode] = useState<'static' | 'expression'>(
@@ -85,10 +88,10 @@ export const StaticExpressionToggle: React.FC<StaticExpressionToggleProps> = ({
               dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { [propKey]: false } })
             }
           }}
-          label={mode === 'static' ? '切换为表达式' : '切换为静态'}
+          label={mode === 'static' ? se.switchToExpression : se.switchToStatic}
           style={{ fontSize: token('fontSizeXs') as string, flexShrink: 0, whiteSpace: 'nowrap' }}
         >
-          {mode === 'static' ? 'ƒ' : '≡'}
+          {mode === 'static' ? se.funcIcon : se.staticIcon}
         </WidgetButton>
       </div>
     </FieldItem>

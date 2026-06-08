@@ -23,14 +23,14 @@ export interface UploadProps extends BaseFormComponentProps<UploadFile[] | undef
 }
 
 export const uploadEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '文件变化', description: '上传文件状态变化时触发' },
-  { name: 'onRemove', label: '移除文件', description: '移除文件时触发' },
+  { name: 'onChange', label: 'component.upload.events.onChange.label', description: 'component.upload.events.onChange.description' },
+  { name: 'onRemove', label: 'component.upload.events.onRemove.label', description: 'component.upload.events.onRemove.description' },
 ]
 
 export { default as Props } from './UploadPropsRender'
 
 export const meta: ComponentRegistration = {
-  label: '上传',
+  label: 'component.upload.label',
   category: 'form',
   icon: 'Upload',
   defaultProps: { componentProps: { multiple: false, listType: 'text' } },

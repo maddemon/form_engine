@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { getComponentIcon } from '../../components'
+import { useLocale } from '../../locale'
 import { useStyle } from '../../styles'
 import type { SidePanelTabContentProps } from '../../types/designer'
 import { resolvePanelWidth } from '../../utils'
@@ -22,13 +23,14 @@ export const FieldList: React.FC<FieldListProps> = ({
 }) => {
   const finalGroups = groups || getFullPaletteGroups(excludeTypes)
   const { token } = useStyle()
+  const { locale } = useLocale()
   const resolvedWidth = resolvePanelWidth(width, token('panelFieldListWidth') as string, MIN_PALETTE_WIDTH)
   const hasTabs = sidePanelTabs && sidePanelTabs.length > 0
   const [activeTab, setActiveTab] = useState(COMPONENT_LIB_TAB_KEY)
 
   const allTabs = hasTabs
     ? [
-        { key: COMPONENT_LIB_TAB_KEY, title: '组件库', icon: getComponentIcon('input') || <DefaultIcon /> },
+        { key: COMPONENT_LIB_TAB_KEY, title: locale.designer.fieldList.title, icon: getComponentIcon('input') || <DefaultIcon /> },
         ...sidePanelTabs,
       ]
     : []

@@ -15,11 +15,11 @@ export interface SelectProps extends BaseFormComponentProps<string | number | un
 }
 
 export const selectEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '值变化', description: '选中项变化时触发' },
-  { name: 'onSearch', label: '搜索', description: '搜索文本变化时触发' },
-  { name: 'onFocus', label: '聚焦', description: '选择器获得焦点时触发' },
-  { name: 'onBlur', label: '失焦', description: '选择器失去焦点时触发' },
-  { name: 'onDropdownVisibleChange', label: '下拉显隐', description: '下拉/收起展开面板时触发' },
+  { name: 'onChange', label: 'component.select.events.onChange.label', description: 'component.select.events.onChange.description' },
+  { name: 'onSearch', label: 'component.select.events.onSearch.label', description: 'component.select.events.onSearch.description' },
+  { name: 'onFocus', label: 'component.select.events.onFocus.label', description: 'component.select.events.onFocus.description' },
+  { name: 'onBlur', label: 'component.select.events.onBlur.label', description: 'component.select.events.onBlur.description' },
+  { name: 'onDropdownVisibleChange', label: 'component.select.events.onDropdownVisibleChange.label', description: 'component.select.events.onDropdownVisibleChange.description' },
 ]
 
 export { default as Props } from './Props'
@@ -31,11 +31,11 @@ const DEFAULT_OPTIONS = [
 ]
 
 export const meta: ComponentRegistration = {
-  label: '下拉选择',
+  label: 'component.select.label',
   category: 'form',
   icon: 'ChevronDown',
   defaultProps: {
-    componentProps: { placeholder: '请选择', allowClear: true },
+    componentProps: { allowClear: true },
     dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS } },
   },
   eventDeclarations: selectEventDeclarations,

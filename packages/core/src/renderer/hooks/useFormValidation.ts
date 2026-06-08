@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import type { FormFieldSchema, OptionItem } from '../../types/schema'
+import { useLocale } from '../../locale'
 import { validateForm } from '../validate'
 import type { ValidateResult } from '../validate'
 
@@ -17,27 +18,29 @@ export interface UseFormValidationResult {
 export function useFormValidation(): UseFormValidationResult {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const [fieldOptions, setFieldOptions] = useState<Record<string, OptionItem[]>>({})
+  const { locale } = useLocale()
+  const validation = locale.validation
 
   const validateRaw = useCallback(
     async (fields: FormFieldSchema[], formValues: Record<string, unknown>, name?: string): Promise<ValidateResult> => {
-      const result = validateForm(fields, formValues, name)
+      const result = validateForm(fields, formValues, name, validation)
       if (!result.valid) {
         console.warn('[form-engine] 校验失败:', result.errors)
       }
       return result
     },
-    [],
+    [validation],
   )
 
   const validate = useCallback(
     async (fields: FormFieldSchema[], formValues: Record<string, unknown>, name?: string): Promise<boolean> => {
-      const result = validateForm(fields, formValues, name)
+      const result = validateForm(fields, formValues, name, validation)
       if (!result.valid) {
         console.warn('[form-engine] 校验失败:', result.errors)
       }
       return result.valid
     },
-    [],
+    [validation],
   )
 
   const clearFieldError = useCallback((name: string) => {

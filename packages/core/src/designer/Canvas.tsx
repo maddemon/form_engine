@@ -2,6 +2,7 @@ import { useDroppable, type UniqueIdentifier } from '@dnd-kit/core'
 import React, { useMemo, useState } from 'react'
 import type { DeviceScene } from '../types/adapter'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import type { FormFieldSchema } from '../types/schema'
 import { CanvasToolbar } from './CanvasToolbar'
 import { ComponentTree, type TreeItem } from './ComponentTree'
@@ -54,6 +55,7 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
   const dispatch = useDesignerDispatch()
   const { selectedFieldId, onSelectField } = useDesignerSelection()
   const { scene, formConfig, adapter } = useDesignerConfig()
+  const { t } = useLocale()
 
   const FormWrapper = adapter?.FormWrapper
   const [showTree, setShowTree] = useState(false)
@@ -111,7 +113,7 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
           }}
         >
           {fields.length === 0 && !activeId && (
-            <EmptyContainerPlaceholder containerId={CANVAS_ROOT_ID} variant="dashed" text="从左侧拖拽控件到此处" />
+            <EmptyContainerPlaceholder containerId={CANVAS_ROOT_ID} variant="dashed" text={t('designer.canvasEmptyHint') ?? 'Drag components here'} />
           )}
 
           <CanvasRootHead />

@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import { useLocale } from '../locale'
 import { FieldItem } from '../propRenders/shared'
 import { resolveSlot } from '../registry/propertySlotRegistry'
 import { useStyle } from '../styles'
@@ -8,6 +9,18 @@ import type { PropertySlots } from '../types/property-slot'
 import type { FormFieldSchema, FormRule } from '../types/schema'
 import { SectionTitle } from './UIPrimitives'
 import { useDebouncedInput } from './useDebouncedInput'
+
+export function useCommonPatterns() {
+  const { locale } = useLocale()
+  const r = locale.designer.rules
+  return [
+    { label: r.custom, value: '' },
+    { label: r.phone, value: '^1[3-9]\\d{9}$' },
+    { label: r.idCard, value: '^[1-9]\\d{5}(19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx]$' },
+    { label: r.email, value: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$' },
+    { label: r.url, value: '^https?://[\\w.-]+(:\\d+)?(/[\\w./-]*)?$' },
+  ]
+}
 
 export const COMMON_PATTERNS: { label: string; value: string }[] = [
   { label: '自定义', value: '' },
@@ -26,6 +39,9 @@ interface RulesEditorProps {
 
 export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorProps) {
   const { token } = useStyle()
+  const { locale } = useLocale()
+  const r = locale.designer.rules
+  const commonPatterns = useCommonPatterns()
   const CodeEditorSlot = resolveSlot('codeEditor', slots, w)
   const rule: FormRule = field.rules?.[0] ?? {}
 
@@ -62,26 +78,26 @@ export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorP
 
   return (
     <>
-      <SectionTitle variant="primary">校验规则</SectionTitle>
-      <FieldItem label="必填">
+      <SectionTitle variant="primary">{r.title}</SectionTitle>
+      <FieldItem label={r.required}>
         <w.Switch checked={!!rule.required} onChange={(v: boolean) => updateRule({ required: v || undefined })} />
       </FieldItem>
-      <FieldItem label="错误提示">
-        <w.Input value={messageValue} onChange={handleMessageChange} placeholder="此字段为必填" />
+      <FieldItem label={r.errorMessage}>
+        <w.Input value={messageValue} onChange={handleMessageChange} placeholder={r.errorMessagePlaceholder} />
       </FieldItem>
-      <FieldItem label="正则验证">
+      <FieldItem label={r.regex}>
         <CodeEditorSlot
           value={patternValue}
           onChange={handlePatternChangeTyped}
           field={field}
-          placeholder="输入正则表达式"
+          placeholder={r.regexPlaceholder}
         />
       </FieldItem>
-      <FieldItem label="常用正则预设">
+      <FieldItem label={r.regexPresets}>
         <w.Select
-          value={COMMON_PATTERNS.some((p) => p.value === rule.pattern) ? rule.pattern || '' : ''}
+          value={commonPatterns.some((p) => p.value === rule.pattern) ? rule.pattern || '' : ''}
           onChange={(v) => handlePatternSelect(v as string)}
-          options={COMMON_PATTERNS}
+          options={commonPatterns}
         />
       </FieldItem>
     </>

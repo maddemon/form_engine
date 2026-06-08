@@ -1,5 +1,6 @@
 import React from 'react'
 import { getEventDeclarations } from '../../components'
+import { useLocale } from '../../locale'
 import { customComponentRegistry } from '../../registry/customComponentRegistry'
 import type { DesignerWidgets } from '../../types/adapter'
 import type { DesignerAction } from '../../types/designer'
@@ -25,12 +26,13 @@ interface EventEditorProps {
 }
 
 export function EventEditor({ field, w, dispatch, slots }: EventEditorProps) {
+  const { locale } = useLocale()
   const eventDeclarations = getFieldEventDeclarations(field)
   if (eventDeclarations.length === 0) return null
 
   return (
     <CollapsibleSection
-      title={`事件（${eventDeclarations.length}）`}
+      title={`${locale.designer.propertyPanel.events}（${eventDeclarations.length}）`}
       defaultCollapsed={!field.events || Object.keys(field.events).length === 0}
       forceExpand={!!field.events && Object.keys(field.events).length > 0}
     >

@@ -12,13 +12,13 @@ export interface AlertProps extends BaseComponentProps {
 }
 
 export const alertEventDeclarations: EventDeclaration[] = [
-  { name: 'onClose', label: '关闭', description: '点击关闭按钮时触发' },
+  { name: 'onClose', label: 'component.alert.events.onClose.label', description: 'component.alert.events.onClose.description' },
 ]
 
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '警告提示',
+  label: 'component.alert.label',
   category: 'display',
   icon: 'AlertIcon',
   defaultProps: {

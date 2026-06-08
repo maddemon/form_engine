@@ -14,13 +14,13 @@ export interface ImageProps extends BaseComponentProps {
 }
 
 export const imageEventDeclarations: EventDeclaration[] = [
-  { name: 'onError', label: '加载失败', description: '图片加载失败时触发' },
+  { name: 'onError', label: 'component.image.events.onError.label', description: 'component.image.events.onError.description' },
 ]
 
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '图片',
+  label: 'component.image.label',
   category: 'display',
   icon: 'Image',
   defaultProps: {

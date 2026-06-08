@@ -1,5 +1,6 @@
 import { InputProps } from '@form-engine/core'
 import { Input as AntdInput } from 'antd'
+import { useLocale } from '@form-engine/core/locale'
 import React from 'react'
 
 /**
@@ -9,7 +10,7 @@ import React from 'react'
 export const Input: React.FC<InputProps> = ({
   value,
   onChange,
-  placeholder,
+  placeholder: placeholderProp,
   disabled,
   readOnly,
   type = 'text',
@@ -25,6 +26,8 @@ export const Input: React.FC<InputProps> = ({
   className,
   id,
 }) => {
+  const { locale } = useLocale()
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.input ?? 'Please enter'
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if ((e.nativeEvent as InputEvent)?.isComposing) return
     onChange?.(e.target.value)

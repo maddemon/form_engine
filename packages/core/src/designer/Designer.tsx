@@ -2,6 +2,7 @@ import { DndContext, DragOverlay } from '@dnd-kit/core'
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { getComponentIcon } from '../components'
 import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
+import { LocaleProvider } from '../locale/LocaleProvider'
 import type { DeviceScene, FormEngineAdapter } from '../types/adapter'
 import type { DesignerProps } from '../types/designer'
 import type { FormFieldSchema, FormSchema } from '../types/schema'
@@ -34,25 +35,28 @@ export const Designer: React.FC<DesignerProps> = ({
   themeMode,
   sizeMode,
   theme,
+  locale,
 }) => {
   const hasStyleProvider = useHasStyleProvider()
 
   // 内层内容（BridgeProvider 在 DesignerInner 内部根据 scene 动态选择）
   const inner = (
-    <DesignerInner
-      schema={value}
-      onSchemaChange={onChange}
-      onSceneChange={onSceneChange}
-      groups={groups}
-      excludeTypes={excludeTypes}
-      readOnly={readOnly}
-      desktopAdapter={desktopAdapter}
-      mobileAdapter={mobileAdapter}
-      panelWidths={panelWidths}
-      sidePanelTabs={sidePanelTabs}
-      propertyPanelTabs={propertyPanelTabs}
-      propertySlots={propertySlots}
-    />
+    <LocaleProvider locale={locale}>
+      <DesignerInner
+        schema={value}
+        onSchemaChange={onChange}
+        onSceneChange={onSceneChange}
+        groups={groups}
+        excludeTypes={excludeTypes}
+        readOnly={readOnly}
+        desktopAdapter={desktopAdapter}
+        mobileAdapter={mobileAdapter}
+        panelWidths={panelWidths}
+        sidePanelTabs={sidePanelTabs}
+        propertyPanelTabs={propertyPanelTabs}
+        propertySlots={propertySlots}
+      />
+    </LocaleProvider>
   )
 
   // 包裹 StyleProvider（如果外层没有）

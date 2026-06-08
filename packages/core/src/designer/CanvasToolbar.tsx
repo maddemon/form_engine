@@ -1,15 +1,11 @@
 import React from 'react'
 import { Monitor, Smartphone } from '../components/icons'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import type { DeviceScene } from '../types/adapter'
 import { WidgetButton, WidgetButtonGroup } from '../widgets'
 import { Space } from '../widgets/Space'
 import { Divider } from '../widgets/Divider'
-
-const SCENE_TOGGLES = [
-  { key: 'desktop' as const, icon: Monitor, title: '桌面' },
-  { key: 'mobile' as const, icon: Smartphone, title: '手机' },
-]
 
 interface CanvasToolbarProps {
   scene: DeviceScene
@@ -24,6 +20,13 @@ interface CanvasToolbarProps {
 
 export const CanvasToolbar: React.FC<CanvasToolbarProps> = React.memo(({ scene, onSceneChange, canUndo, canRedo, onUndo, onRedo, onTreeClick, showTree }) => {
   const { token } = useStyle()
+  const { locale } = useLocale()
+  const t = locale.designer.canvasToolbar
+
+  const SCENE_TOGGLES = [
+    { key: 'desktop' as const, icon: Monitor, title: t.desktop },
+    { key: 'mobile' as const, icon: Smartphone, title: t.mobile },
+  ]
 
   return (
     <div style={{ background: 'var(--fe-bg-primary)', flexShrink: 0 }}>
@@ -35,13 +38,13 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = React.memo(({ scene, 
         }}
       >
         <Space gap="xs">
-          <WidgetButton label="组件树" onClick={onTreeClick} size="sm">
+          <WidgetButton label={t.componentTree} onClick={onTreeClick} size="sm">
             ☰
           </WidgetButton>
-          <WidgetButton label="撤销" onClick={onUndo} disabled={!canUndo} size="sm">
+          <WidgetButton label={t.undo} onClick={onUndo} disabled={!canUndo} size="sm">
             ↩
           </WidgetButton>
-          <WidgetButton label="重做" onClick={onRedo} disabled={!canRedo} size="sm">
+          <WidgetButton label={t.redo} onClick={onRedo} disabled={!canRedo} size="sm">
             ↪
           </WidgetButton>
         </Space>

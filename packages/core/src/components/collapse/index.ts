@@ -19,7 +19,7 @@ export interface CollapseProps extends BaseLayoutComponentProps {
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '折叠面板',
+  label: 'component.collapse.label',
   category: 'container',
   icon: 'CollapseIcon',
   defaultProps: {

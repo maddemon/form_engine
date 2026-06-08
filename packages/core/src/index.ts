@@ -216,6 +216,14 @@ export {
 } from './renderer'
 
 // ============================
+// 多国语言
+// ============================
+
+export { LocaleProvider, useLocale } from './locale'
+export type { LocalePack } from './locale'
+export type { SupportedLocale } from './locale/LocaleProvider'
+
+// ============================
 // 工具函数
 // ============================
 

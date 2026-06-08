@@ -1,5 +1,6 @@
 import React from 'react'
 import { TreeSelect as AntdTreeSelect } from 'antd'
+import { useLocale } from '@form-engine/core/locale'
 import type { TreeSelectProps } from '@form-engine/core'
 
 /**
@@ -9,7 +10,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = ({
   value,
   onChange,
   options = [],
-  placeholder,
+  placeholder: placeholderProp,
   allowClear,
   multiple = false,
   treeCheckable = false,
@@ -19,6 +20,8 @@ export const TreeSelect: React.FC<TreeSelectProps> = ({
   id,
   ...rest
 }) => {
+  const { locale } = useLocale()
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.select ?? 'Please select'
   const handleChange = (val: string | string[]) => {
     onChange?.(val)
   }

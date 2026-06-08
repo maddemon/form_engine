@@ -9,13 +9,13 @@ export interface SwitchProps extends BaseFormComponentProps<boolean | undefined>
 }
 
 export const switchEventDeclarations: EventDeclaration[] = [
-  { name: 'onChange', label: '切换', description: '开关状态变化时触发' },
+  { name: 'onChange', label: 'component.switch.events.onChange.label', description: 'component.switch.events.onChange.description' },
 ]
 
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '开关',
+  label: 'component.switch.label',
   category: 'form',
   icon: 'ToggleLeft',
   defaultProps: { componentProps: {} },

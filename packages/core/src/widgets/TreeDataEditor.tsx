@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useStyle } from '../styles'
+import { useLocale } from '../locale'
 import type { OptionItem } from '../types/schema'
 import { WidgetButton } from './Button'
 import { WidgetModal } from './Modal'
@@ -113,6 +114,7 @@ function BatchEditModal({
   onCancel: () => void
 }) {
   const { token } = useStyle()
+  const { locale } = useLocale()
   const [text, setText] = useState('')
   const prevOpenRef = useRef(false)
 
@@ -128,9 +130,9 @@ function BatchEditModal({
   }
 
   return (
-    <WidgetModal open={open} title="编辑树形数据" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
+    <WidgetModal open={open} title={locale.widget.treeDataEditor.title} width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
       <Text type="tertiary" style={{ marginBottom: token('spacingSm') }}>
-        每行一个叶子路径，层级用 <code style={{ background: 'var(--fe-bg-tertiary)', padding: '0 2px' }}>&gt;</code> 分隔：
+        {locale.widget.treeDataEditor.instructions.split('>')[0]}<code style={{ background: 'var(--fe-bg-tertiary)', padding: '0 2px' }}>&gt;</code>{locale.widget.treeDataEditor.instructions.split('>')[1]}
         <div style={{ marginTop: token('spacingXs'), lineHeight: 1.6 }}>
           广东 &gt; 广州 &gt; 天河区<br />
           广东 &gt; 广州 &gt; 越秀区<br />
@@ -154,6 +156,7 @@ function WidgetTreeDataEditorInner({
   style?: React.CSSProperties
 }) {
   const { token } = useStyle()
+  const { locale } = useLocale()
   const [batchOpen, setBatchOpen] = useState(false)
   const options = value ?? []
   const totalNodes = countTreeNodes(options)
@@ -180,7 +183,7 @@ function WidgetTreeDataEditorInner({
         </Text>
       ) : (
         <Text type="tertiary" style={{ marginBottom: token('spacingXs') }}>
-          暂无数据
+          {locale.widget.treeDataEditor.empty}
         </Text>
       )}
 
@@ -196,7 +199,7 @@ function WidgetTreeDataEditorInner({
             textAlign: 'center',
           }}
         >
-          批量编辑
+          {locale.widget.treeDataEditor.batchEdit}
         </WidgetButton>
       </Space>
 

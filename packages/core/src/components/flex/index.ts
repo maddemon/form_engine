@@ -12,7 +12,7 @@ export interface FlexProps extends BaseLayoutComponentProps {
 export { default as Props } from './Props'
 
 export const meta: ComponentRegistration = {
-  label: '弹性布局',
+  label: 'component.flex.label',
   category: 'container',
   icon: 'FlexIcon',
   defaultProps: { componentProps: { direction: 'row', gap: 16 } },

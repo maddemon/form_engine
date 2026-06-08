@@ -4,6 +4,7 @@ import type { EventContext } from '../../events'
 import type { EventCallbacks, $Form } from '../../types/events'
 import type { DataSourceResolver } from '../../types/render'
 import type { ValidateFn } from '../../types/adapter'
+import { useLocale } from '../../locale'
 import { validateForm } from '../validate'
 import { useFormValues } from './useFormValues'
 import { useFormValidation } from './useFormValidation'
@@ -65,6 +66,8 @@ export function useFormRender({
   })
 
   const { visibleFields } = useVisibility(formSchema, formValues)
+  const { locale } = useLocale()
+  const validation = locale.validation
 
   const handleFieldChange = useCallback((name: string, value: unknown) => {
     setFormValues((prev) => ({ ...prev, [name]: value }))
@@ -80,13 +83,13 @@ export function useFormRender({
   const validate = useCallback(
     async (name?: string): Promise<boolean> => {
       const doValidate = adapterValidate ?? validateForm
-      const result = await Promise.resolve(doValidate(formSchema.fields, formValues, name))
+      const result = await Promise.resolve(doValidate(formSchema.fields, formValues, name, validation))
       if (!result.valid) {
         console.warn('[form-engine] 校验失败:', result.errors)
       }
       return result.valid
     },
-    [adapterValidate, formSchema.fields, formValues],
+    [adapterValidate, formSchema.fields, formValues, validation],
   )
 
   const handleSubmit = useCallback(() => {
@@ -103,7 +106,7 @@ export function useFormRender({
 
     // 2. 校验（adapter.validate 优先，内置兜底）
     const doValidate = adapterValidate ?? validateForm
-    Promise.resolve(doValidate(visibleFields, submitValues_))
+    Promise.resolve(doValidate(visibleFields, submitValues_, undefined, validation))
       .then((result) => {
         if (!result.valid) {
           setFieldErrors(result.errors)
@@ -118,7 +121,7 @@ export function useFormRender({
       .catch((err) => {
         console.error('[form-engine] 校验异常:', err)
       })
-  }, [visibleFields, formValuesRef, setFieldErrors, onSubmit, adapterValidate, beforeSubmit, afterSubmit])
+  }, [visibleFields, formValuesRef, setFieldErrors, onSubmit, adapterValidate, beforeSubmit, afterSubmit, validation])
 
   const $form: $Form = useMemo(() => ({
     get values() { return formValuesRef.current },
