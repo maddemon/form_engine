@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
-import { SortableTableEditor } from '../../widgets'
+import { SortableTableEditor, WidgetButton } from '../../widgets'
 
 interface ColSpanItem {
   id: string
@@ -26,6 +26,10 @@ export default function GridPropsRender({ widgets: w, values, onChange }: PropsR
   const colSpans = (values.colSpans as ColSpanItem[]) ?? []
 
   const handleColSpansChange = useCallback((v: ColSpanItem[]) => onChange('colSpans', normalizeSpans(v)), [onChange])
+
+  const handleAddCol = useCallback(() => {
+    onChange('colSpans', normalizeSpans([...colSpans, { id: genId('col'), span: 8 }]))
+  }, [colSpans, onChange])
 
   return (
     <>
@@ -78,10 +82,17 @@ export default function GridPropsRender({ widgets: w, values, onChange }: PropsR
               ),
             },
           ]}
-          newItem={() => ({ id: genId('col'), span: 8 })}
           minItems={1}
-          addLabel="添加列"
         />
+        <WidgetButton
+          type="dashed"
+          color="primary"
+          size="sm"
+          onClick={handleAddCol}
+          style={{ width: '100%', marginTop: 4 }}
+        >
+          + 添加列
+        </WidgetButton>
       </FieldItem>
     </>
   )

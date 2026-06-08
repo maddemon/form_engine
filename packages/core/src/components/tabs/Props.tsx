@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
-import { SortableTableEditor } from '../../widgets'
-import type { TabPaneConfig } from './types'
+import { SortableTableEditor, WidgetButton } from '../../widgets'
+import type { TabPaneConfig } from '.'
 
 export default function TabsPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   const tabs = (values.tabs as TabPaneConfig[]) ?? []
@@ -19,6 +19,13 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
     },
     [defaultActiveKey, onChange],
   )
+
+  const handleAddTab = useCallback(() => {
+    handleTabsChange([
+      ...tabs,
+      { id: genId('tab'), key: `tab_${tabs.length + 1}`, title: `标签页${tabs.length + 1}`, disabled: false },
+    ])
+  }, [tabs, handleTabsChange])
 
   return (
     <>
@@ -87,15 +94,17 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
               ),
             },
           ]}
-          newItem={() => ({
-            id: genId('tab'),
-            key: `tab_${(tabs?.length || 0) + 1}`,
-            title: `标签页${(tabs?.length || 0) + 1}`,
-            disabled: false,
-          })}
           minItems={1}
-          addLabel="添加标签页"
         />
+        <WidgetButton
+          type="dashed"
+          color="primary"
+          size="sm"
+          onClick={handleAddTab}
+          style={{ width: '100%', marginTop: 4 }}
+        >
+          + 添加标签页
+        </WidgetButton>
       </FieldItem>
     </>
   )

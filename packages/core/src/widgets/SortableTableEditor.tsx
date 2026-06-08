@@ -4,7 +4,6 @@ import { CSS } from '@dnd-kit/utilities'
 import React, { useCallback, useMemo } from 'react'
 import { ErrorMessage } from '../designer/UIPrimitives'
 import { useStyle } from '../styles'
-import { WidgetButton } from './Button'
 import { arrayMove, DragHandleIcon, InlineDeleteButton } from './sortableListShared'
 
 export interface Column<T> {
@@ -18,11 +17,8 @@ export interface SortableTableEditorProps<T extends { id: string }> {
   value: T[]
   onChange: (v: T[]) => void
   columns: Column<T>[]
-  newItem: () => T
   minItems?: number
-  maxItems?: number
   disabled?: boolean
-  addLabel?: string
 }
 
 const SORTABLE_PREFIX = '__steditor_'
@@ -70,11 +66,8 @@ function SortableTableEditorInner<T extends { id: string }>({
   value = [],
   onChange,
   columns,
-  newItem,
   minItems = 0,
-  maxItems = Infinity,
   disabled = false,
-  addLabel,
 }: SortableTableEditorProps<T>) {
   const { token } = useStyle()
 
@@ -97,11 +90,6 @@ function SortableTableEditorInner<T extends { id: string }>({
     [value, onChange, minItems],
   )
 
-  const handleAdd = useCallback(() => {
-    if (value.length >= maxItems) return
-    onChange([...value, newItem()])
-  }, [value, onChange, newItem, maxItems])
-
   const handleSortEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event
@@ -114,8 +102,6 @@ function SortableTableEditorInner<T extends { id: string }>({
     },
     [value, onChange],
   )
-
-  const addDisabled = disabled || value.length >= maxItems
 
   const minError = value.length < minItems ? `至少保留 ${minItems} 项` : null
 
@@ -206,20 +192,6 @@ function SortableTableEditorInner<T extends { id: string }>({
           </table>
 
           {minError && <ErrorMessage>{minError}</ErrorMessage>}
-
-          <WidgetButton
-            type="dashed"
-            color="primary"
-            size="sm"
-            onClick={handleAdd}
-            disabled={addDisabled}
-            style={{
-              width: '100%',
-              marginTop: token('spacingXs'),
-            }}
-          >
-            + {addLabel ?? '添加'}
-          </WidgetButton>
         </div>
       </SortableContext>
     </DndContext>

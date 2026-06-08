@@ -121,6 +121,9 @@ importers:
       antd-mobile:
         specifier: ^5.42.3
         version: 5.42.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      antd-mobile-icons:
+        specifier: ^0.3.0
+        version: 0.3.0
     devDependencies:
       '@types/react':
         specifier: ^19.2.14

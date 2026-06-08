@@ -22,24 +22,21 @@ export const Upload: React.FC<UploadProps> = ({
   ...rest
 }) => {
   const handleChange = (info: UploadChangeParam) => {
-    const fileList: UploadFile[] = info.fileList.map((file) => ({
-      uid: file.uid,
-      name: file.name,
-      status: file.status as UploadFile['status'],
-      response: file.response,
-      url: file.url,
-      thumbUrl: file.thumbUrl,
-      percent: file.percent,
-    }))
+    const fileList: UploadFile[] = info.fileList.map(
+      (file) =>
+        ({
+          uid: file.uid,
+          name: file.name,
+          status: file.status as UploadFile['status'],
+          url: file.url,
+        }) as UploadFile,
+    )
     const currentFile: UploadFile = {
       uid: info.file.uid,
       name: info.file.name,
       status: info.file.status as UploadFile['status'],
-      response: info.file.response,
       url: info.file.url,
-      thumbUrl: info.file.thumbUrl,
-      percent: info.file.percent,
-    }
+    } as UploadFile
     onChange?.({ file: currentFile, fileList })
   }
 
@@ -52,7 +49,7 @@ export const Upload: React.FC<UploadProps> = ({
       maxCount={maxCount}
       listType={isCard ? 'picture-card' : 'text'}
       multiple={multiple}
-      directory={directory}
+      directory={directory as boolean | undefined}
       showUploadList={isCard || showUploadList}
       disabled={disabled}
       style={style}

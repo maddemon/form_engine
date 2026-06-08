@@ -19,7 +19,12 @@
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit"
   },
-  "keywords": ["form", "engine", "antd-mobile", "adapter"],
+  "keywords": [
+    "form",
+    "engine",
+    "antd-mobile",
+    "adapter"
+  ],
   "author": "",
   "license": "MIT",
   "publishConfig": {
@@ -27,20 +32,21 @@
   },
   "dependencies": {
     "@form-engine/core": "workspace:*",
-    "antd-mobile": "^5.42.3"
+    "antd-mobile": "^5.42.3",
+    "antd-mobile-icons": "^0.3.0"
   },
   "peerDependencies": {
+    "antd-mobile": ">=5.0.0",
     "react": ">=19.0.0",
-    "react-dom": ">=19.0.0",
-    "antd-mobile": ">=5.0.0"
+    "react-dom": ">=19.0.0"
   },
   "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "typescript": "~6.0.2",
-    "tsup": "^8.0.0",
     "rimraf": "^5.0.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "tsup": "^8.0.0",
+    "typescript": "~6.0.2"
   }
 }

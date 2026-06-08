@@ -1,8 +1,8 @@
 /**
- * Form Engine - 组件注册中心（Single Source of Truth）
+ * Form Engine - 组件注册中心（聚合入口）
  *
- * 所有内置组件的元信息（label / category / icon / defaultProps / eventDeclarations）
- * 统一在此注册。新增组件只需在此文件添加一条记录。
+ * 从各组件目录的 index.ts 导入 meta 数据，组装成 componentRegistry。
+ * 各组件自管 label / category / icon / defaultProps / eventDeclarations。
  *
  * 消费方：
  * - FieldType 联合类型       → keyof typeof componentRegistry | 'custom' | `custom:${string}`
@@ -14,395 +14,164 @@
  */
 
 import React from 'react'
-import type { ComponentCategory } from '../types/component-category'
+import { ComponentCategory, ComponentRegistration } from '../types/component'
 import type { EventDeclaration } from '../types/events'
-import type { FormFieldSchema } from '../types/schema'
+import type { FieldType, FormFieldSchema } from '../types/schema'
+import { meta as alert } from './alert'
+import { meta as button } from './button'
+import { meta as card } from './card'
+import { meta as cascader } from './cascader'
+import { meta as checkbox } from './checkbox'
+import { meta as collapse } from './collapse'
+import { dateMeta, dateRangeMeta } from './date-picker'
+import { meta as dateTime } from './date-time'
+import { meta as divider } from './divider'
+import { meta as flex } from './flex'
+import { meta as grid } from './grid'
 import iconMap from './icons'
+import { meta as image } from './image'
+import { inputMeta } from './input'
+import { meta as inputNumber } from './input-number'
+import { meta as password } from './password'
+import { meta as radio } from './radio'
+import { meta as rate } from './rate'
+import { meta as segment } from './segment'
+import { meta as select } from './select'
+import { meta as slider } from './slider'
+import { meta as subForm } from './sub-form'
+import { meta as switch_ } from './switch'
+import { meta as tabs } from './tabs'
+import { meta as text } from './text'
+import { meta as textarea } from './textarea'
+import { meta as time } from './time-picker'
+import { meta as title_ } from './title'
+import { meta as treeSelect } from './tree-select'
+import { meta as upload } from './upload'
 
-// ============================
-// ComponentRegistration 接口
-// ============================
-
-export interface ComponentRegistration {
-  /** 显示名称 */
-  label: string
-  /** 组件分类（form / display / container / button），支持数组表示同时属于多个分类 */
-  category: ComponentCategory | ComponentCategory[]
-  /** 图标名称（纯字符串，通过 icons/iconMap 查找实际 SVG 组件） */
-  icon: string
-  /** 拖入画布时的默认 Schema（合并到 field） */
-  defaultProps?: Partial<FormFieldSchema>
-  /** 该组件支持的事件声明 */
-  eventDeclarations: EventDeclaration[]
+import type { AlertProps } from './alert/'
+import type { ButtonProps } from './button/'
+import type { CardProps } from './card/'
+import type { CascaderProps } from './cascader/'
+import type { CheckboxProps } from './checkbox/'
+import type { CollapsePanelConfig, CollapseProps } from './collapse/'
+import type { DatePickerProps, DateRangeProps } from './date-picker/'
+import type { DividerProps } from './divider/'
+import type { FlexProps } from './flex/'
+import type { GridProps } from './grid/'
+import type { ImageProps } from './image/'
+import type { InputNumberProps } from './input-number/'
+import type { InputProps } from './input/'
+import type { RadioProps } from './radio/'
+import type { RateProps } from './rate/'
+import type { SegmentProps } from './segment/'
+import type { SelectProps } from './select/'
+import type { SliderProps } from './slider/'
+import type { SubFormColumnConfig, SubFormProps } from './sub-form/'
+import type { SwitchProps } from './switch/'
+import type { TabPaneConfig, TabsProps } from './tabs/'
+import type { TextProps } from './text/'
+import type { TextAreaProps } from './textarea/'
+import type { TitleProps } from './title/'
+import type { TreeSelectProps } from './tree-select/'
+import type { UploadFile, UploadProps } from './upload/'
+export type {
+  AlertProps,
+  ButtonProps,
+  CardProps,
+  CascaderProps,
+  CheckboxProps,
+  CollapsePanelConfig,
+  CollapseProps,
+  DatePickerProps,
+  DateRangeProps,
+  DividerProps,
+  FlexProps,
+  GridProps,
+  ImageProps,
+  InputNumberProps,
+  InputProps,
+  RadioProps,
+  RateProps,
+  SegmentProps,
+  SelectProps,
+  SliderProps,
+  SubFormColumnConfig,
+  SubFormProps,
+  SwitchProps,
+  TabPaneConfig,
+  TabsProps,
+  TextAreaProps,
+  TextProps,
+  TitleProps,
+  TreeSelectProps,
+  UploadFile,
+  UploadProps
 }
-
-// ============================
-// 事件声明导入
-// ============================
-
-import { alertEventDeclarations } from './alert/types'
-import { buttonEventDeclarations } from './button/types'
-import { cascaderEventDeclarations } from './cascader/types'
-import { checkboxEventDeclarations } from './checkbox/types'
-import { datePickerEventDeclarations, dateRangeEventDeclarations } from './date-picker/types'
-import { inputNumberEventDeclarations } from './input-number/types'
-import { inputEventDeclarations } from './input/types'
-import { radioEventDeclarations } from './radio/types'
-import { rateEventDeclarations } from './rate/types'
-import { segmentEventDeclarations } from './segment/types'
-import { selectEventDeclarations } from './select/types'
-import { sliderEventDeclarations } from './slider/types'
-import { switchEventDeclarations } from './switch/types'
-import { textAreaEventDeclarations } from './textarea/types'
-import { treeSelectEventDeclarations } from './tree-select/types'
-import { uploadEventDeclarations } from './upload/types'
-
-// ============================
-// 类型导出（保持兼容）
-// ============================
-
-export type { AlertProps } from './alert/types'
-export type { ButtonProps } from './button/types'
-export type { CardProps } from './card/types'
-export type { CascaderProps } from './cascader/types'
-export type { CheckboxProps } from './checkbox/types'
-export type { DatePickerProps, DateRangeProps } from './date-picker/types'
-export type { DividerProps } from './divider/types'
-export type { FlexProps } from './flex/types'
-export type { GridProps } from './grid/types'
-export type { ImageProps } from './image/types'
-export type { InputNumberProps } from './input-number/types'
-export type { InputProps } from './input/types'
-export type { RadioProps } from './radio/types'
-export type { RateProps } from './rate/types'
-export type { SegmentProps } from './segment/types'
-export type { SelectProps } from './select/types'
-export type { SliderProps } from './slider/types'
-export type { SwitchProps } from './switch/types'
-export type { TextProps } from './text/types'
-export type { TextAreaProps } from './textarea/types'
-export type { TreeSelectProps } from './tree-select/types'
-export type { UploadFile, UploadProps } from './upload/types'
 
 // ============================
 // 事件声明 re-export（保持兼容）
 // ============================
 
-export {
-  alertEventDeclarations, buttonEventDeclarations,
-  cascaderEventDeclarations, checkboxEventDeclarations, datePickerEventDeclarations,
-  dateRangeEventDeclarations, inputEventDeclarations, inputNumberEventDeclarations, radioEventDeclarations, rateEventDeclarations, segmentEventDeclarations, selectEventDeclarations, sliderEventDeclarations, switchEventDeclarations, textAreaEventDeclarations, treeSelectEventDeclarations, uploadEventDeclarations
-}
+export { alertEventDeclarations } from './alert'
+export { buttonEventDeclarations } from './button'
+export { cascaderEventDeclarations } from './cascader'
+export { checkboxEventDeclarations } from './checkbox'
+export { datePickerEventDeclarations, dateRangeEventDeclarations } from './date-picker'
+export { inputEventDeclarations } from './input'
+export { inputNumberEventDeclarations } from './input-number'
+export { radioEventDeclarations } from './radio'
+export { rateEventDeclarations } from './rate'
+export { segmentEventDeclarations } from './segment'
+export { selectEventDeclarations } from './select'
+export { sliderEventDeclarations } from './slider'
+export { switchEventDeclarations } from './switch'
+export { textAreaEventDeclarations } from './textarea'
+export { treeSelectEventDeclarations } from './tree-select'
+export { uploadEventDeclarations } from './upload'
 
 // ============================
-// 默认选项（部分组件需要）
-// ============================
-
-const DEFAULT_OPTIONS_3 = [
-  { label: '选项一', value: 'option1' },
-  { label: '选项二', value: 'option2' },
-  { label: '选项三', value: 'option3' },
-]
-
-const DEFAULT_CASCADER_OPTIONS = [
-  {
-    label: '选项一',
-    value: 'option1',
-    children: [
-      { label: '子选项1-1', value: 'option1-1' },
-      { label: '子选项1-2', value: 'option1-2' },
-    ],
-  },
-  {
-    label: '选项二',
-    value: 'option2',
-    children: [{ label: '子选项2-1', value: 'option2-1' }],
-  },
-  { label: '选项三', value: 'option3' },
-]
-
-// ============================
-// 组件注册表（Single Source of Truth）
+// 组件注册表（数据源自各组件 index.ts）
 // ============================
 
 export const componentRegistry = {
   // ── 表单组件 ─────────────────────────────────────
-  input: {
-    label: '单行文本',
-    category: 'form',
-    icon: 'Type',
-    defaultProps: { componentProps: { allowClear: true } },
-    eventDeclarations: inputEventDeclarations,
-  },
-  textarea: {
-    label: '多行文本',
-    category: 'form',
-    icon: 'FileText',
-    eventDeclarations: textAreaEventDeclarations,
-  },
-  'input-number': {
-    label: '数字',
-    category: 'form',
-    icon: 'Hash',
-    eventDeclarations: inputNumberEventDeclarations,
-  },
-  password: {
-    label: '密码',
-    category: 'form',
-    icon: 'Lock',
-    defaultProps: { componentProps: { allowClear: true } },
-    eventDeclarations: inputEventDeclarations,
-  },
-  select: {
-    label: '下拉框',
-    category: 'form',
-    icon: 'ChevronDown',
-    defaultProps: { componentProps: { allowClear: true }, dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS_3 } } },
-    eventDeclarations: selectEventDeclarations,
-  },
-  'multi-select': {
-    label: '下拉框',
-    category: 'form',
-    icon: 'ChevronDown',
-    defaultProps: { componentProps: { allowClear: true }, dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS_3 } } },
-    eventDeclarations: selectEventDeclarations,
-  },
-  radio: {
-    label: '单选框',
-    category: 'form',
-    icon: 'Circle',
-    defaultProps: { dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS_3 } } },
-    eventDeclarations: radioEventDeclarations,
-  },
-  checkbox: {
-    label: '多选框',
-    category: 'form',
-    icon: 'CheckSquare',
-    defaultProps: { dataSource: { type: 'static', static: { options: DEFAULT_OPTIONS_3 } } },
-    eventDeclarations: checkboxEventDeclarations,
-  },
-  switch: {
-    label: '开关',
-    category: 'form',
-    icon: 'ToggleLeft',
-    defaultProps: { defaultValue: false },
-    eventDeclarations: switchEventDeclarations,
-  },
-  slider: {
-    label: '滑块',
-    category: 'form',
-    icon: 'Slash',
-    defaultProps: { componentProps: { min: 0, max: 100, step: 1 } },
-    eventDeclarations: sliderEventDeclarations,
-  },
-  rate: {
-    label: '评分',
-    category: 'form',
-    icon: 'Star',
-    defaultProps: { componentProps: { count: 5 } },
-    eventDeclarations: rateEventDeclarations,
-  },
-  date: {
-    label: '日期',
-    category: 'form',
-    icon: 'Calendar',
-    defaultProps: { componentProps: { format: 'YYYY-MM-DD', allowClear: true } },
-    eventDeclarations: datePickerEventDeclarations,
-  },
-  'date-range': {
-    label: '日期范围',
-    category: 'form',
-    icon: 'Calendar',
-    defaultProps: { componentProps: { format: 'YYYY-MM-DD', allowClear: true } },
-    eventDeclarations: dateRangeEventDeclarations,
-  },
-  datetime: {
-    label: '日期时间',
-    category: 'form',
-    icon: 'Calendar',
-    defaultProps: { componentProps: { format: 'YYYY-MM-DD HH:mm', showTime: true, allowClear: true } },
-    eventDeclarations: datePickerEventDeclarations,
-  },
-  time: {
-    label: '时间',
-    category: 'form',
-    icon: 'Clock',
-    defaultProps: { componentProps: { format: 'HH:mm', allowClear: true } },
-    eventDeclarations: datePickerEventDeclarations,
-  },
-  upload: {
-    label: '上传',
-    category: 'form',
-    icon: 'Upload',
-    eventDeclarations: uploadEventDeclarations,
-  },
-  cascader: {
-    label: '级联选择',
-    category: 'form',
-    icon: 'GitBranch',
-    defaultProps: { dataSource: { type: 'static', static: { options: DEFAULT_CASCADER_OPTIONS } } },
-    eventDeclarations: cascaderEventDeclarations,
-  },
-  'tree-select': {
-    label: '树选择',
-    category: 'form',
-    icon: 'FolderOpen',
-    defaultProps: { dataSource: { type: 'static', static: { options: DEFAULT_CASCADER_OPTIONS } } },
-    eventDeclarations: treeSelectEventDeclarations,
-  },
+  input: { ...inputMeta },
+  textarea: { ...textarea },
+  'input-number': { ...inputNumber },
+  password: { ...password },
+  select: { ...select },
+  'multi-select': { ...select },
+  radio: { ...radio },
+  checkbox: { ...checkbox },
+  switch: { ...switch_ },
+  slider: { ...slider },
+  rate: { ...rate },
+  date: { ...dateMeta },
+  'date-range': { ...dateRangeMeta },
+  datetime: { ...dateTime },
+  time: { ...time },
+  upload: { ...upload },
+  cascader: { ...cascader },
+  'tree-select': { ...treeSelect },
 
   // ── 容器组件 ─────────────────────────────────────
-  grid: {
-    label: '栅格布局',
-    category: 'container',
-    icon: 'Grid',
-    defaultProps: {
-      componentProps: {
-        colSpans: [
-          { id: 'col_1', span: 12 },
-          { id: 'col_2', span: 12 },
-        ],
-        gap: 16,
-      },
-    },
-    eventDeclarations: [],
-  },
-  flex: {
-    label: '弹性布局',
-    category: 'container',
-    icon: 'Layout',
-    defaultProps: { componentProps: { direction: 'row', gap: 16 } },
-    eventDeclarations: [],
-  },
-  collapse: {
-    label: '折叠面板',
-    category: 'container',
-    icon: 'FolderOpen',
-    defaultProps: {
-      componentProps: {
-        panels: [
-          { id: 'panel_1', key: 'panel_1', header: '面板一' },
-          { id: 'panel_2', key: 'panel_2', header: '面板二' },
-        ],
-        accordion: false,
-        ghost: false,
-      },
-    },
-    eventDeclarations: [],
-  },
-  tabs: {
-    label: '标签页',
-    category: 'container',
-    icon: 'Minus',
-    defaultProps: {
-      componentProps: {
-        tabs: [
-          { id: 'tab_1', key: 'tab_1', title: '标签页一' },
-          { id: 'tab_2', key: 'tab_2', title: '标签页二' },
-        ],
-      },
-    },
-    eventDeclarations: [],
-  },
-  'sub-form': {
-    label: '子表单',
-    category: ['form', 'container'],
-    icon: 'Table',
-    defaultProps: {
-      componentProps: {
-        columns: [
-          { id: 'col_1', label: '列1', width: 120 },
-          { id: 'col_2', label: '列2', width: 120 },
-        ],
-        rowMode: 'dynamic',
-      },
-    },
-    eventDeclarations: [],
-  },
-  card: {
-    label: '卡片',
-    category: 'container',
-    icon: 'Layout',
-    defaultProps: {
-      componentProps: {
-        title: '卡片标题',
-        bodyPadding: 16,
-        bodyGap: 8,
-        bordered: true,
-        size: 'default',
-      },
-    },
-    eventDeclarations: [],
-  },
+  grid: { ...grid },
+  flex: { ...flex },
+  collapse: { ...collapse },
+  tabs: { ...tabs },
+  'sub-form': { ...subForm },
+  card: { ...card },
 
   // ── 展示组件 ─────────────────────────────────────
-  text: {
-    label: '文本展示',
-    category: 'display',
-    icon: 'Type',
-    defaultProps: { componentProps: { content: '文本内容' } },
-    eventDeclarations: [],
-  },
-  title: {
-    label: '标题',
-    category: 'display',
-    icon: 'Type',
-    defaultProps: { componentProps: { level: 1, content: '标题内容' } },
-    eventDeclarations: [],
-  },
-  image: {
-    label: '图片展示',
-    category: 'display',
-    icon: 'Image',
-    defaultProps: { componentProps: { alt: '图片描述', src: '' } },
-    eventDeclarations: [],
-  },
-  divider: {
-    label: '分割线',
-    category: 'display',
-    icon: 'Minus',
-    eventDeclarations: [],
-  },
-  alert: {
-    label: '警告提示',
-    category: 'display',
-    icon: 'Circle',
-    defaultProps: {
-      componentProps: { type: 'info', content: '提示内容', showIcon: true, closable: false },
-    },
-    eventDeclarations: alertEventDeclarations,
-  },
-  segment: {
-    label: '分段控制器',
-    category: 'display',
-    icon: 'ToggleLeft',
-    defaultProps: {
-      dataSource: {
-        type: 'static',
-        static: {
-          options: [
-            { label: '选项1', value: 'option_1' },
-            { label: '选项2', value: 'option_2' },
-            { label: '选项3', value: 'option_3' },
-          ],
-        },
-      },
-      componentProps: {
-        size: 'middle',
-        block: false,
-      },
-    },
-    eventDeclarations: segmentEventDeclarations,
-  },
+  text: { ...text },
+  title: { ...title_ },
+  image: { ...image },
+  divider: { ...divider },
+  alert: { ...alert },
+  segment: { ...segment },
 
   // ── 按钮组件 ─────────────────────────────────────
-  button: {
-    label: '按钮',
-    category: 'button',
-    icon: 'Square',
-    defaultProps: { componentProps: { children: '按钮' } },
-    eventDeclarations: buttonEventDeclarations,
-  },
+  button: { ...button },
 } as const satisfies Record<string, ComponentRegistration>
 
 // ============================
@@ -412,7 +181,9 @@ export const componentRegistry = {
 /**
  * EVENT_DECLARATION_MAP（从 registry 派生）
  */
-const EVENT_DECLARATION_MAP: Record<string, EventDeclaration[]> = Object.fromEntries(Object.entries(componentRegistry).map(([type, reg]) => [type, reg.eventDeclarations]))
+const EVENT_DECLARATION_MAP: Record<string, EventDeclaration[]> = Object.fromEntries(
+  Object.entries(componentRegistry).map(([type, reg]) => [type, reg.eventDeclarations]),
+)
 
 /** 按 FieldType 查询该组件支持的事件声明 */
 export function getEventDeclarations(type: string): EventDeclaration[] {
@@ -443,6 +214,22 @@ function hasCategory(type: string, cat: ComponentCategory): boolean {
   return c === cat
 }
 
+export function isFormComponent(type: string): boolean {
+  return hasCategory(type, 'form')
+}
+
+export function isDisplayComponent(type: string): boolean {
+  return hasCategory(type, 'display')
+}
+
+export function isContainerComponent(type: string): boolean {
+  return hasCategory(type, 'container')
+}
+
+export function isButtonComponent(type: string): boolean {
+  return hasCategory(type, 'button')
+}
+
 /** 获取组件图标名称（字符串） */
 export function getComponentIconName(type: string): string | null {
   return (componentRegistry as Record<string, ComponentRegistration>)[type]?.icon ?? null
@@ -462,17 +249,17 @@ export function getComponentDefaultProps(type: string): Partial<FormFieldSchema>
 }
 
 /** 获取所有表单组件类型 */
-export function getFormFieldTypes(): string[] {
+export function getFormFieldTypes(): FieldType[] {
   return Object.entries(componentRegistry)
     .filter(([type]) => hasCategory(type, 'form'))
-    .map(([type]) => type)
+    .map(([type]) => type) as FieldType[]
 }
 
 /** 获取所有容器组件类型 */
-export function getContainerFieldTypes(): string[] {
+export function getContainerFieldTypes(): FieldType[] {
   return Object.entries(componentRegistry)
     .filter(([type]) => hasCategory(type, 'container'))
-    .map(([type]) => type)
+    .map(([type]) => type) as FieldType[]
 }
 
 /** 所有内置字段类型列表 */

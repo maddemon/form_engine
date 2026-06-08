@@ -20,6 +20,7 @@ export const Select: React.FC<SelectProps> = ({
   placement,
   onSearch,
   notFoundContent,
+  defaultValue,
   style,
   className,
   id,
@@ -31,29 +32,30 @@ export const Select: React.FC<SelectProps> = ({
 
   return (
     <AntdSelect
-      value={value}
+      value={value as string | string[] | null | undefined}
+      defaultValue={defaultValue as string | string[] | null | undefined}
       onChange={handleChange}
       placeholder={placeholder}
       disabled={disabled}
       mode={mode}
       showSearch={
         showSearch
-          ? {
+          ? ({
               optionFilterProp: 'label',
               filterOption,
               onSearch,
-            }
+            } as Record<string, unknown>)
           : false
       }
       allowClear={allowClear}
       maxTagCount={maxTagCount}
-      placement={placement}
+      placement={placement as 'bottomLeft' | 'bottomRight' | 'topLeft' | 'topRight' | undefined}
       notFoundContent={notFoundContent}
       style={{ width: '100%', ...style }}
       className={className}
       id={id}
       {...rest}
-      options={options}
+      options={options as unknown as Record<string, unknown>[]}
     />
   )
 }

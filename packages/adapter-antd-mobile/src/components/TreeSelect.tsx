@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
-import { Button, Cascader } from 'antd-mobile'
+import { Cascader, Space } from 'antd-mobile'
+import { DownOutline, CloseCircleFill } from 'antd-mobile-icons'
 import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 import { toCascaderOptions } from '../utils'
 
@@ -14,6 +15,7 @@ export const TreeSelectField: FieldRendererFn = (props: FieldComponentProps) => 
   const { value, onChange, disabled, fieldSchema, options } = props
   const cascaderOptions = useMemo(() => toCascaderOptions((options || []) as OptionItem[]), [options])
   const placeholder = fieldSchema.placeholder || '请选择'
+  const allowClear = fieldSchema.componentProps?.allowClear
 
   // 叶子节点值 → 路径数组
   const toPath = useCallback((opts: OptionItem[], target: string): string[] => {
@@ -45,6 +47,8 @@ export const TreeSelectField: FieldRendererFn = (props: FieldComponentProps) => 
     return toPath((options as OptionItem[]) || [], String(value))
   }, [value, options, toPath])
 
+  const hasValue = valArr.length > 0
+
   return (
     <Cascader
       options={cascaderOptions}
@@ -58,13 +62,31 @@ export const TreeSelectField: FieldRendererFn = (props: FieldComponentProps) => 
         const pathValues = (vals ?? []).map((v: any) => v?.value ?? v ?? '')
         const labels = toLabels((options as OptionItem[]) || [], pathValues)
         return (
-          <Button
-            onClick={actions.open}
-            disabled={disabled}
-            style={{ width: '100%', textAlign: 'left', color: labels.length ? undefined : '#999' }}
+          <Space
+            block
+            justify="between"
+            align="center"
+            onClick={disabled ? undefined : actions.open}
+            style={{
+              color: hasValue ? undefined : 'var(--adm-color-weak)',
+              cursor: disabled ? 'default' : 'pointer',
+            }}
           >
-            {labels.length > 0 ? labels.join(' / ') : placeholder}
-          </Button>
+            <span>
+              {labels.length > 0 ? labels.join(' / ') : placeholder}
+            </span>
+            {hasValue && allowClear ? (
+              <CloseCircleFill
+                style={{ fontSize: 16, flexShrink: 0 }}
+                onClick={e => {
+                  e.stopPropagation()
+                  onChange?.(undefined)
+                }}
+              />
+            ) : (
+              <DownOutline style={{ fontSize: 16, flexShrink: 0 }} />
+            )}
+          </Space>
         )
       }}
     </Cascader>

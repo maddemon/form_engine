@@ -6,7 +6,7 @@ import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } f
 import type { PartialThemeTokens } from '../styles/types'
 import type { ThemeMode, SizeMode } from '../styles/StyleProvider'
 import type { ComponentRenderFn, FormEngineAdapter, FormWrapperProps } from '../types/adapter'
-import { isContainerComponent } from '../types/component-category'
+import { isContainerComponent } from '../components'
 import type { DataSourceResolver } from '../types/render'
 import { pickAdapter } from '../utils'
 import { FieldRenderer } from './FieldRenderer'

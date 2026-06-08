@@ -17,6 +17,10 @@ import type { SliderProps as CoreSliderProps } from '@form-engine/core'
 export const Slider: React.FC<CoreSliderProps> = (props) => {
   const { range, value, onChange } = props
 
+  const tooltipProp = props.tooltip
+    ? { formatter: (v?: number) => props.tooltip!.formatter?.replace('{value}', String(v ?? '')) ?? '' }
+    : undefined
+
   if (range) {
     return (
       <AntSlider
@@ -28,10 +32,10 @@ export const Slider: React.FC<CoreSliderProps> = (props) => {
         max={props.max ?? 100}
         step={props.step ?? 1}
         marks={props.marks}
-        dots={props.dots}
-        included={props.included ?? true}
-        tooltip={props.tooltip}
-        vertical={props.vertical}
+        dots={props.dots as boolean | undefined}
+        included={(props.included as boolean | undefined) ?? true}
+        tooltip={tooltipProp}
+        vertical={props.vertical as boolean | undefined}
         disabled={props.disabled}
         style={props.style}
         className={props.className}
@@ -49,10 +53,10 @@ export const Slider: React.FC<CoreSliderProps> = (props) => {
       max={props.max ?? 100}
       step={props.step ?? 1}
       marks={props.marks}
-      dots={props.dots}
-      included={props.included ?? true}
-      tooltip={props.tooltip}
-      vertical={props.vertical}
+      dots={props.dots as boolean | undefined}
+      included={(props.included as boolean | undefined) ?? true}
+      tooltip={tooltipProp}
+      vertical={props.vertical as boolean | undefined}
       disabled={props.disabled}
       style={props.style}
       className={props.className}

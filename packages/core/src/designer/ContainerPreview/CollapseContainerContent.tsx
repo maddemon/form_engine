@@ -1,6 +1,6 @@
 import { useDroppable } from '@dnd-kit/core'
 import React, { useMemo } from 'react'
-import type { CollapsePanelConfig } from '../../components/collapse/types'
+import type { CollapsePanelConfig } from '../../components/collapse'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import { RegionDroppable } from './RegionDroppable'
 import { SelfRenderedContainer } from './SelfRenderedContainer'

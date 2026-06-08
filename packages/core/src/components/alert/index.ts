@@ -1,0 +1,28 @@
+import type { BaseComponentProps, ComponentRegistration } from '../../types/component'
+import type { EventDeclaration } from '../../types/events'
+
+/** Alert 警告提示 */
+export interface AlertProps extends BaseComponentProps {
+  type?: 'primary' | 'info' | 'success' | 'warning' | 'error'
+  title?: string
+  content: string
+  showIcon?: boolean
+  closable?: boolean
+  icon?: string
+}
+
+export const alertEventDeclarations: EventDeclaration[] = [
+  { name: 'onClose', label: '关闭', description: '点击关闭按钮时触发' },
+]
+
+export { default as Props } from './Props'
+
+export const meta: ComponentRegistration = {
+  label: '警告提示',
+  category: 'display',
+  icon: 'AlertIcon',
+  defaultProps: {
+    componentProps: { type: 'info', content: '提示内容', showIcon: true, closable: false },
+  },
+  eventDeclarations: alertEventDeclarations,
+}

@@ -3,9 +3,9 @@
  * 适配 Form Engine 的 InputNumberProps
  */
 
-import React from 'react'
-import { InputNumber as AntInputNumber } from 'antd'
 import type { InputNumberProps } from '@form-engine/core'
+import { InputNumber as AntInputNumber } from 'antd'
+import React from 'react'
 
 /**
  * InputNumber 组件
@@ -30,7 +30,7 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   const handleChange = (val: number | string | null) => {
     onChange?.(val as number | undefined)
   }
-  
+
   return (
     <AntInputNumber
       value={value}
@@ -41,7 +41,6 @@ export const InputNumber: React.FC<InputNumberProps> = ({
       precision={precision}
       decimalSeparator={decimalSeparator}
       formatter={formatter}
-      parser={parser}
       prefix={prefix}
       suffix={suffix}
       disabled={disabled}

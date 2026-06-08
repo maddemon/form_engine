@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
-import { SortableTableEditor } from '../../widgets'
-import type { CollapsePanelConfig } from './types'
+import { SortableTableEditor, WidgetButton } from '../../widgets'
+import type { CollapsePanelConfig } from '.'
 
 export default function CollapsePropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   const panels = (values.panels as CollapsePanelConfig[]) ?? []
@@ -37,6 +37,13 @@ export default function CollapsePropsRender({ widgets: w, values, onChange }: Pr
     },
     [defaultActiveKey, onChange, collectActiveKeys],
   )
+
+  const handleAddPanel = useCallback(() => {
+    handlePanelsChange([
+      ...panels,
+      { id: genId('panel'), key: `panel_${panels.length + 1}`, header: `面板${panels.length + 1}`, disabled: false },
+    ])
+  }, [panels, handlePanelsChange])
 
   return (
     <>
@@ -81,15 +88,17 @@ export default function CollapsePropsRender({ widgets: w, values, onChange }: Pr
               ),
             },
           ]}
-          newItem={() => ({
-            id: genId('panel'),
-            key: `panel_${(panels?.length || 0) + 1}`,
-            header: `面板${(panels?.length || 0) + 1}`,
-            disabled: false,
-          })}
           minItems={1}
-          addLabel="添加面板"
         />
+        <WidgetButton
+          type="dashed"
+          color="primary"
+          size="sm"
+          onClick={handleAddPanel}
+          style={{ width: '100%', marginTop: 4 }}
+        >
+          + 添加面板
+        </WidgetButton>
       </FieldItem>
     </>
   )

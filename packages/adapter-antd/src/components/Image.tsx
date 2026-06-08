@@ -4,9 +4,9 @@
  * 使用 Ant Design 的 Image 组件
  */
 
-import React from 'react'
-import { Image as AntImage } from 'antd'
 import type { ImageProps } from '@form-engine/core'
+import { Image as AntImage } from 'antd'
+import React from 'react'
 
 /**
  * Image 组件
@@ -18,7 +18,6 @@ export const Image: React.FC<ImageProps> = ({
   height,
   fallback,
   preview = true,
-  placeholder,
   style,
   className,
   id,
@@ -32,7 +31,6 @@ export const Image: React.FC<ImageProps> = ({
       height={height}
       fallback={fallback}
       preview={preview}
-      placeholder={placeholder}
       style={style}
       className={className}
       id={id}

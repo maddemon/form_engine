@@ -97,7 +97,6 @@ const DesignerPage: React.FC<Props> = ({ schema, onSchemaChange, themeMode }) =>
         desktopAdapter={antdAdapter}
         mobileAdapter={antdMobileAdapter}
         panelWidths={{ palette: 260, properties: 'min(320px, 26vw)' }}
-        excludeTypes={['date-range']}
         sidePanelTabs={sidePanelTabs}
         propertyPanelTabs={propertyPanelTabs}
         themeMode={themeMode}

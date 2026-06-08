@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useStyle } from '../styles'
 import type { FieldDataSource, OptionItem } from '../types/schema'
-import { genId } from '../utils/id'
 import { WidgetButton } from './Button'
 import { WidgetButtonGroup } from './ButtonGroup'
 import { Divider } from './Divider'
@@ -11,6 +10,7 @@ import { SortableTableEditor } from './SortableTableEditor'
 import { Space } from './Space'
 import { TagLabel } from './TagLabel'
 import { Text } from './Text'
+import { WidgetTextArea } from './TextArea'
 import { WidgetTreeDataEditor } from './TreeDataEditor'
 
 function parseUrlDeps(url: string): string[] {
@@ -21,6 +21,66 @@ function parseUrlDeps(url: string): string[] {
     if (!deps.includes(match[1])) deps.push(match[1])
   }
   return deps
+}
+
+function toFlatLines(options: OptionItem[]): string {
+  return options.map((o) => `${o.label} ${o.value}`).join('\n')
+}
+
+function fromFlatLines(text: string): OptionItem[] {
+  return text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      const parts = l.split(/\s+/)
+      const label = parts[0] || ''
+      const value = parts.length > 1 ? parts[1] : label
+      return { label, value }
+    })
+}
+
+// ============================
+// 批量编辑弹窗
+// ============================
+
+function BatchEditModal({
+  open,
+  options,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean
+  options: OptionItem[]
+  onConfirm: (v: OptionItem[]) => void
+  onCancel: () => void
+}) {
+  const [text, setText] = useState('')
+  const prevOpenRef = useRef(false)
+
+  React.useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      setText(options.length > 0 ? toFlatLines(options) : '')
+    }
+    prevOpenRef.current = open
+  }, [open, options])
+
+  const handleConfirm = () => {
+    onConfirm(fromFlatLines(text))
+  }
+
+  return (
+    <WidgetModal open={open} title="批量编辑" width="sm" onCancel={onCancel} onConfirm={handleConfirm}>
+      <Text type="tertiary" style={{ marginBottom: '8px' }}>
+        每行一个选项，标签和值之间用空格隔开（多个空格算一个）：
+        <div style={{ marginTop: '4px', lineHeight: 1.6 }}>
+          选项1 1<br />
+          选项2 2
+        </div>
+      </Text>
+      <WidgetTextArea value={text} onChange={setText} rows={12} />
+    </WidgetModal>
+  )
 }
 
 // ============================
@@ -175,6 +235,7 @@ function WidgetDataSourceEditorInner({
   const { token } = useStyle()
   const [dsType, setDsType] = useState<'static' | 'remote'>(value?.type || 'static')
   const [remoteModalOpen, setRemoteModalOpen] = useState(false)
+  const [batchOpen, setBatchOpen] = useState(false)
 
   const staticOptions = useMemo<OptionItem[]>(() => {
     if (value?.type === 'static') return value.static.options || []
@@ -202,6 +263,18 @@ function WidgetDataSourceEditorInner({
   const handleTableChange = useCallback(
     (items: TableOptionItem[]) => {
       handleStaticChange(items.map(({ id: _, ...opt }) => opt))
+    },
+    [handleStaticChange],
+  )
+
+  const handleAddOption = useCallback(() => {
+    handleStaticChange([...staticOptions, { label: '', value: '' }])
+  }, [handleStaticChange, staticOptions])
+
+  const handleBatchConfirm = useCallback(
+    (newOptions: OptionItem[]) => {
+      handleStaticChange(newOptions)
+      setBatchOpen(false)
     },
     [handleStaticChange],
   )
@@ -273,39 +346,67 @@ function WidgetDataSourceEditorInner({
         (optionsType === 'tree' ? (
           <WidgetTreeDataEditor value={staticOptions} onChange={handleStaticChange} disabled={disabled} />
         ) : (
-          <SortableTableEditor<TableOptionItem>
-            value={tableItems}
-            onChange={handleTableChange}
-            columns={[
-              {
-                key: 'label' as keyof TableOptionItem,
-                label: '标签',
-                render: ({ value, onChange: onValChange, disabled: d }) => (
-                  <WidgetInput
-                    value={String(value ?? '')}
-                    disabled={d}
-                    variant="filled"
-                    onChange={(v) => onValChange(v)}
-                  />
-                ),
-              },
-              {
-                key: 'value' as keyof TableOptionItem,
-                label: '值',
-                render: ({ value, onChange: onValChange, disabled: d }) => (
-                  <WidgetInput
-                    value={String(value ?? '')}
-                    disabled={d}
-                    variant="filled"
-                    onChange={(v) => onValChange(v)}
-                  />
-                ),
-              },
-            ]}
-            newItem={() => ({ id: genId('opt'), label: '', value: '' })}
-            addLabel="添加选项"
-            disabled={disabled}
-          />
+          <>
+            <SortableTableEditor<TableOptionItem>
+              value={tableItems}
+              onChange={handleTableChange}
+              columns={[
+                {
+                  key: 'label' as keyof TableOptionItem,
+                  label: '标签',
+                  render: ({ value, onChange: onValChange, disabled: d }) => (
+                    <WidgetInput
+                      value={String(value ?? '')}
+                      disabled={d}
+                      variant="filled"
+                      onChange={(v) => onValChange(v)}
+                    />
+                  ),
+                },
+                {
+                  key: 'value' as keyof TableOptionItem,
+                  label: '值',
+                  render: ({ value, onChange: onValChange, disabled: d }) => (
+                    <WidgetInput
+                      value={String(value ?? '')}
+                      disabled={d}
+                      variant="filled"
+                      onChange={(v) => onValChange(v)}
+                    />
+                  ),
+                },
+              ]}
+              disabled={disabled}
+            />
+            <Space gap="xs" style={{ marginTop: token('spacingXs') }}>
+              <WidgetButton
+                type="dashed"
+                size="sm"
+                color="primary"
+                onClick={handleAddOption}
+                disabled={disabled}
+                style={{ flex: 1, textAlign: 'center' }}
+              >
+                + 添加选项
+              </WidgetButton>
+              <WidgetButton
+                type="dashed"
+                size="sm"
+                color="primary"
+                onClick={() => setBatchOpen(true)}
+                disabled={disabled}
+                style={{ flex: 1, textAlign: 'center' }}
+              >
+                批量编辑
+              </WidgetButton>
+            </Space>
+            <BatchEditModal
+              open={batchOpen}
+              options={staticOptions}
+              onConfirm={handleBatchConfirm}
+              onCancel={() => setBatchOpen(false)}
+            />
+          </>
         ))}
 
       {dsType === 'remote' && (

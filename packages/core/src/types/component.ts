@@ -1,0 +1,98 @@
+/**
+ * 基础组件 Props 定义
+ * 集中定义所有组件的基类 Props
+ * 命名参考 antd、material-ui 等知名库
+ */
+
+import { EventDeclaration } from './events'
+import type { FormFieldSchema, FormRule, VisibleWhen } from './schema'
+
+// ============================
+// 基础 Props
+// ============================
+
+/** 所有组件的基类 Props */
+export interface BaseComponentProps {
+  // 标识
+  id?: string
+  className?: string
+  style?: React.CSSProperties
+
+  // 状态
+  disabled?: boolean
+  hidden?: boolean
+  readOnly?: boolean
+
+  /** 是否隐藏标签 */
+  labelHidden?: boolean
+
+  // 事件
+  onClick?: (event: React.MouseEvent) => void
+  onBlur?: () => void
+  onFocus?: () => void
+
+  // 扩展
+  [key: string]: unknown
+}
+
+/**
+ * 表单组件的基类 Props（泛型）
+ * @template TValue - 组件值的类型
+ */
+// 泛型默认值，下游 ComponentPropsMap 已为每种组件类型精确覆盖
+export interface BaseFormComponentProps<TValue = any> extends BaseComponentProps {
+  // 值相关
+  value?: TValue
+  defaultValue?: TValue
+  /**
+   * 值变化回调
+   * 注意：子接口应该重新定义这个类型，提供更精确的类型
+   */
+  /**
+   * onChange 在子接口（如 UploadProps）中被重定义为不同参数签名，无法用 unknown 统一
+   */
+  onChange?: (value: any) => void
+
+  // 表单相关
+  name?: string
+  required?: boolean
+  placeholder?: string
+
+  // 校验
+  rules?: FormRule[]
+
+  // 联动
+  visibleWhen?: VisibleWhen
+  disabledWhen?: VisibleWhen
+}
+
+/** 布局组件的基类 Props */
+export interface BaseLayoutComponentProps extends BaseComponentProps {
+  children?: React.ReactNode
+
+  // 布局相关
+  padding?: number | string
+  margin?: number | string
+  gap?: string | number | [number, number]
+}
+// ============================
+// ComponentCategory 类型
+// ============================
+
+export type ComponentCategory = 'form' | 'display' | 'container' | 'button'
+// ============================
+// ComponentRegistration 接口
+// ============================
+
+export interface ComponentRegistration {
+  /** 显示名称 */
+  label: string
+  /** 组件分类（form / display / container / button），支持数组表示同时属于多个分类 */
+  category: ComponentCategory | ComponentCategory[]
+  /** 图标名称（纯字符串，通过 icons/iconMap 查找实际 SVG 组件） */
+  icon: string
+  /** 拖入画布时的默认 Schema（合并到 field） */
+  defaultProps?: Partial<FormFieldSchema>
+  /** 该组件支持的事件声明 */
+  eventDeclarations: EventDeclaration[]
+}

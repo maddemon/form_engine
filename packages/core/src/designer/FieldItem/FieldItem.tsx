@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { isContainerComponent } from '../../types/component-category'
+import { isContainerComponent } from '../../components'
 import { useDesignerDispatch, useDesignerSelection } from '../DesignerContext'
 import { DragHandle } from './DragHandle'
 import { FieldActions } from './FieldActions'

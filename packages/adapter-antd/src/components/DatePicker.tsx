@@ -112,6 +112,7 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
 
   return (
     <RangePicker
+      locale={zhCN}
       value={toDayjsRange(value as [string, string] | undefined)}
       onChange={handleChange}
       format={format}

@@ -1,11 +1,16 @@
+import { useCallback } from 'react'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
-import { SortableTableEditor } from '../../widgets'
-import type { SubFormColumnConfig } from './types'
+import { SortableTableEditor, WidgetButton } from '../../widgets'
+import type { SubFormColumnConfig } from '.'
 
 export default function SubFormPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   const columns = (values.columns as SubFormColumnConfig[]) ?? []
   const rowMode = (values.rowMode as string) ?? 'dynamic'
+
+  const handleAddColumn = useCallback(() => {
+    onChange('columns', [...columns, { id: genId('col'), label: `列${(columns?.length || 0) + 1}`, width: 120 }])
+  }, [columns, onChange])
 
   return (
     <>
@@ -56,10 +61,17 @@ export default function SubFormPropsRender({ widgets: w, values, onChange }: Pro
               ),
             },
           ]}
-          newItem={() => ({ id: genId('col'), label: `列${(columns?.length || 0) + 1}`, width: 120 })}
           minItems={1}
-          addLabel="添加列"
         />
+        <WidgetButton
+          type="dashed"
+          color="primary"
+          size="sm"
+          onClick={handleAddColumn}
+          style={{ width: '100%', marginTop: 4 }}
+        >
+          + 添加列
+        </WidgetButton>
       </FieldItem>
     </>
   )

@@ -1,6 +1,6 @@
 import { useDroppable } from '@dnd-kit/core'
 import React, { useMemo } from 'react'
-import type { TabPaneConfig } from '../../components/tabs/types'
+import type { TabPaneConfig } from '../../components/tabs'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import { RegionDroppable } from './RegionDroppable'
 import { SelfRenderedContainer } from './SelfRenderedContainer'

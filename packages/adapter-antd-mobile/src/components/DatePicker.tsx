@@ -1,4 +1,5 @@
-import { DatePicker, Button } from 'antd-mobile'
+import { DatePicker, Space } from 'antd-mobile'
+import { CalendarOutline, CloseCircleFill } from 'antd-mobile-icons'
 import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 /** 根据 format 字符串自动判断是否包含时间部分 */
@@ -28,6 +29,8 @@ export const DateField: FieldRendererFn = (props: FieldComponentProps) => {
   const explicitShowTime = !!fieldSchema.componentProps?.showTime
   const showTime = explicitShowTime || isTimeFormat(format)
   const placeholder = fieldSchema.placeholder || '请选择日期'
+  const allowClear = fieldSchema.componentProps?.allowClear
+  const hasValue = !!value
 
   return (
     <DatePicker
@@ -41,13 +44,31 @@ export const DateField: FieldRendererFn = (props: FieldComponentProps) => {
       }}
     >
       {(v: any, actions: any) => (
-        <Button
-          onClick={actions.open}
-          disabled={disabled}
-          style={{ width: '100%', textAlign: 'left', color: v ? undefined : '#999' }}
+        <Space
+          block
+          justify="between"
+          align="center"
+          onClick={disabled ? undefined : actions.open}
+          style={{
+            color: hasValue ? undefined : 'var(--adm-color-weak)',
+            cursor: disabled ? 'default' : 'pointer',
+          }}
         >
-          {v ? formatDisplayDate(v as Date, showTime) : placeholder}
-        </Button>
+          <span>
+            {v ? formatDisplayDate(v as Date, showTime) : placeholder}
+          </span>
+          {hasValue && allowClear ? (
+            <CloseCircleFill
+              style={{ fontSize: 16, flexShrink: 0 }}
+              onClick={e => {
+                e.stopPropagation()
+                onChange?.(undefined)
+              }}
+            />
+          ) : (
+            <CalendarOutline style={{ fontSize: 16, flexShrink: 0 }} />
+          )}
+        </Space>
       )}
     </DatePicker>
   )

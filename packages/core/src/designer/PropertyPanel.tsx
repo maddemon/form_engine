@@ -1,18 +1,18 @@
 import React, { useCallback, useState } from 'react'
+import { getComponentCategory, getComponentLabel } from '../components'
 import { PropsRenderMap } from '../propRenders'
 import { customComponentRegistry } from '../registry/customComponentRegistry'
 import { useStyle } from '../styles'
 import type { DesignerWidgets } from '../types/adapter'
-import { getComponentCategory } from '../types/component-category'
 import type { DesignerAction, PropertyPanelTab } from '../types/designer'
 import type { PropertySlots } from '../types/property-slot'
 import type { FormConfig, FormFieldSchema } from '../types/schema'
 import { resolvePanelWidth } from '../utils'
 import { defaultDesignerWidgets } from '../widgets'
 import { FormConfigPanel } from './FormConfigPanel'
-import { SectionTitle, PANEL_BORDER } from './UIPrimitives'
 import { DefaultPropertyContent } from './PropertyPanel/DefaultPropertyContent'
 import { PropertyPanelTabs } from './PropertyPanel/PropertyPanelTabs'
+import { PANEL_BORDER, SectionTitle } from './UIPrimitives'
 
 /**
  * 属性面板最小宽度（防呆）：再小 FieldItem / 控件就显示不全
@@ -44,7 +44,25 @@ function useWidgets(designerWidgets?: DesignerWidgets) {
   return { ...defaultDesignerWidgets, ...designerWidgets } as DesignerWidgets
 }
 
-function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPanelTabs, propertySlots, allFields }: { field: FormFieldSchema; w: DesignerWidgets; token: ReturnType<typeof useStyle>['token']; activeTab: string; dispatch: React.Dispatch<DesignerAction>; propertyPanelTabs?: PropertyPanelTab[]; propertySlots?: PropertySlots; allFields: FormFieldSchema[] }) {
+function PropertyPanelInner({
+  field,
+  w,
+  token,
+  activeTab,
+  dispatch,
+  propertyPanelTabs,
+  propertySlots,
+  allFields,
+}: {
+  field: FormFieldSchema
+  w: DesignerWidgets
+  token: ReturnType<typeof useStyle>['token']
+  activeTab: string
+  dispatch: React.Dispatch<DesignerAction>
+  propertyPanelTabs?: PropertyPanelTab[]
+  propertySlots?: PropertySlots
+  allFields: FormFieldSchema[]
+}) {
   const ComponentPropsRender = PropsRenderMap[field.type]
   const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
   const category = getComponentCategory(field.type)
@@ -75,24 +93,48 @@ function PropertyPanelInner({ field, w, token, activeTab, dispatch, propertyPane
       {activeTab === PROPERTIES_DEFAULT_TAB_KEY ? (
         <>
           <SectionTitle>
-            {category === 'form' ? '表单组件' : category === 'display' ? '展示组件' : category === 'container' ? '容器组件' : '按钮组件'}
-            <span style={{ marginLeft: token('spacingXs'), color: token('textTertiary') as string, fontWeight: 400 }}>({field.type})</span>
+            {getComponentLabel(field.type)}
+            <span style={{ marginLeft: token('spacingXs'), color: token('textTertiary') as string, fontWeight: 400 }}>
+              ({field.type})
+            </span>
           </SectionTitle>
-          <DefaultPropertyContent field={field} w={w} dispatch={dispatch} isForm={isForm} isContainer={isContainer} isButton={isButton} ComponentPropsRender={ComponentPropsRender} customConfig={customConfig ?? null} slots={propertySlots} allFields={allFields} />
+          <DefaultPropertyContent
+            field={field}
+            w={w}
+            dispatch={dispatch}
+            isForm={isForm}
+            isContainer={isContainer}
+            isButton={isButton}
+            ComponentPropsRender={ComponentPropsRender}
+            customConfig={customConfig ?? null}
+            slots={propertySlots}
+            allFields={allFields}
+          />
         </>
       ) : (
         (() => {
           const tab = propertyPanelTabs?.find((t) => t.key === activeTab)
           if (!tab) return null
           const TabContent = tab.content
-          return <TabContent field={field} onUpdate={onUpdate} onUpdateProp={onUpdateProp} widgets={w} dispatch={dispatch} />
+          return (
+            <TabContent field={field} onUpdate={onUpdate} onUpdateProp={onUpdateProp} widgets={w} dispatch={dispatch} />
+          )
         })()
       )}
     </>
   )
 }
 
-export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig, dispatch, designerWidgets, width, propertyPanelTabs, propertySlots, allFields }) => {
+export const PropertyPanel: React.FC<PropertyPanelProps> = ({
+  field,
+  formConfig,
+  dispatch,
+  designerWidgets,
+  width,
+  propertyPanelTabs,
+  propertySlots,
+  allFields,
+}) => {
   const w = useWidgets(designerWidgets)
   const { token } = useStyle()
   const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
@@ -117,14 +159,31 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({ field, formConfig,
     const tab = propertyPanelTabs?.find((t) => t.key === activeTab)
     if (!tab) return null
     const TabContent = tab.content
-    return <TabContent field={null} onUpdate={noopUpdate} onUpdateProp={noopUpdateProp} widgets={w} dispatch={dispatch} />
+    return (
+      <TabContent field={null} onUpdate={noopUpdate} onUpdateProp={noopUpdateProp} widgets={w} dispatch={dispatch} />
+    )
   }
 
   return (
     <div style={{ width: resolvedWidth, ...PANEL_BORDER, overflow: 'auto', height: '100%' }}>
       {hasTabs && <PropertyPanelTabs allTabs={allTabs} activeTab={activeTab} setActiveTab={setActiveTab} />}
 
-      <div style={{ padding: token('spacingMd') }}>{field ? <PropertyPanelInner field={field} w={w} token={token} activeTab={activeTab} dispatch={dispatch} propertyPanelTabs={propertyPanelTabs} propertySlots={propertySlots} allFields={allFields || []} /> : renderNoFieldContent()}</div>
+      <div style={{ padding: token('spacingMd') }}>
+        {field ? (
+          <PropertyPanelInner
+            field={field}
+            w={w}
+            token={token}
+            activeTab={activeTab}
+            dispatch={dispatch}
+            propertyPanelTabs={propertyPanelTabs}
+            propertySlots={propertySlots}
+            allFields={allFields || []}
+          />
+        ) : (
+          renderNoFieldContent()
+        )}
+      </div>
     </div>
   )
 }

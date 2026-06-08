@@ -4,12 +4,12 @@
  * 使用 Ant Design 的 Segmented
  */
 
-import React from 'react'
-import { Segmented } from 'antd'
 import type { SegmentProps } from '@form-engine/core'
+import { Segmented } from 'antd'
+import React from 'react'
 
 /**
- * Segment 分段控制器组件
+ * Segment 分段控制组件
  * display 类型，不作为表单组件
  */
 export const Segment: React.FC<SegmentProps> = ({
@@ -26,7 +26,7 @@ export const Segment: React.FC<SegmentProps> = ({
   ...rest
 }) => {
   // 将 OptionItem[] 转换为 Segmented 支持的 options 格式
-  const segOptions = options.map(opt => ({
+  const segOptions = options.map((opt) => ({
     label: opt.label,
     value: opt.value,
     disabled: opt.disabled,
