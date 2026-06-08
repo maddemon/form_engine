@@ -29,7 +29,7 @@ export const AntdFormItem: React.FC<FormItemProps> = ({
     }
   })
 
-  const isFullWidth = scene !== 'desktop' || insideContainer
+  const isFullWidth = scene !== 'desktop' || insideContainer || !resolvedLabel
   const colProps = isFullWidth
     ? { labelCol: { span: 24 }, wrapperCol: { span: 24 } }
     : { labelCol: formConfig.desktop.labelCol, wrapperCol: formConfig.desktop.wrapperCol }

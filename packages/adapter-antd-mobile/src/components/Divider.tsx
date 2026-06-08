@@ -1,20 +1,24 @@
+import { Divider } from 'antd-mobile'
 import React from 'react'
 import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 
 export const DividerField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { style } = props
-  const type = props.type || 'horizontal'
-  const children = props.children
+  const { style, type = 'horizontal', textPlacement = 'center', color, thickness, children } =
+    props as FieldComponentProps & Record<string, unknown>
 
-  if (type === 'vertical') {
-    return <span style={{ borderLeft: '1px solid #ddd', margin: '0 8px', ...style }} />
+  const mergedStyle: React.CSSProperties = {
+    ...(color ? { borderColor: color } : {}),
+    ...(thickness ? { borderTopWidth: thickness as number } : {}),
+    ...(style as React.CSSProperties | undefined),
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#999', fontSize: 12, ...style }}>
-      <div style={{ flex: 1, borderTop: '1px solid #ddd' }} />
-      {children && <span>{children}</span>}
-      {children && <div style={{ flex: 1, borderTop: '1px solid #ddd' }} />}
-    </div>
+    <Divider
+      direction={type === 'vertical' ? 'vertical' : 'horizontal'}
+      contentPosition={textPlacement as 'left' | 'center' | 'right'}
+      style={mergedStyle}
+    >
+      {children as React.ReactNode}
+    </Divider>
   )
 }

@@ -1,0 +1,32 @@
+{
+  "cities": [
+    { "label": "北京", "value": "beijing" },
+    { "label": "上海", "value": "shanghai" },
+    { "label": "广州", "value": "guangzhou" },
+    { "label": "深圳", "value": "shenzhen" },
+    { "label": "杭州", "value": "hangzhou" },
+    { "label": "成都", "value": "chengdu" },
+    { "label": "武汉", "value": "wuhan" },
+    { "label": "西安", "value": "xian" }
+  ],
+  "skills": [
+    { "label": "JavaScript", "value": "js" },
+    { "label": "TypeScript", "value": "ts" },
+    { "label": "React", "value": "react" },
+    { "label": "Vue", "value": "vue" },
+    { "label": "Node.js", "value": "node" },
+    { "label": "Python", "value": "python" },
+    { "label": "Rust", "value": "rust" },
+    { "label": "Go", "value": "go" }
+  ],
+  "departments": [
+    { "label": "技术部", "value": "tech", "children": [
+      { "label": "前端组", "value": "frontend" },
+      { "label": "后端组", "value": "backend" },
+      { "label": "运维组", "value": "ops" }
+    ]},
+    { "label": "产品部", "value": "product" },
+    { "label": "设计部", "value": "design" },
+    { "label": "市场部", "value": "marketing" }
+  ]
+}
