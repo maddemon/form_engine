@@ -610,8 +610,8 @@ export interface LocalePack {
         onRemove: { label: string; description: string }
       }
     }
-    html: { label: string; content?: string; contentPlaceholder?: string }
-    jsx: { label: string; code?: string; codePlaceholder?: string; compile?: string; compiling?: string; compileSuccess?: string; compileError?: string }
+    html: { label: string; content: string; contentPlaceholder: string }
+    jsx: { label: string; code: string; codePlaceholder: string; compile: string; compiling: string; compileSuccess: string; compileError: string }
     steps: { label: string }
     tag: { label: string }
     table: { label: string }
