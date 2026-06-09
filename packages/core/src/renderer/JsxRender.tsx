@@ -36,12 +36,37 @@ function compileJsxComponent(
         args.push((props as Record<string, unknown>)[k])
       }
       args.push(props, value, onChange)
-      const result = fn(...args) as React.ComponentType<Record<string, unknown>> | React.ReactElement | null
+      let result: unknown
+      try {
+        // 兜底捕获：编译时烟雾测试只能发现顶层裸引用，函数体内部抛错
+        // （如组件首次 render 才触发的 ReferenceError）仍需此处拦截，
+        // 避免错误冒到 React 导致整棵树被卸载、页面崩溃。
+        result = fn(...args)
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e)
+        return (
+          <div
+            style={{
+              color: 'var(--fe-error)',
+              fontSize: 'var(--fe-font-size-sm)',
+              padding: '8px 12px',
+              background: 'var(--fe-bg-secondary)',
+              border: '1px solid var(--fe-border-secondary)',
+              borderRadius: 'var(--fe-border-radius-sm)',
+              fontFamily: "'Menlo','Consolas',monospace",
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
+            JSX 运行时错误: {msg}
+          </div>
+        )
+      }
       if (typeof result === 'function') {
-        return React.createElement(result, props)
+        return React.createElement(result as React.ComponentType<Record<string, unknown>>, props)
       }
       if (result == null || typeof result === 'string') return null
-      return result
+      return result as React.ReactElement
     }
     Component.displayName = 'JsxWrapper'
     return Component

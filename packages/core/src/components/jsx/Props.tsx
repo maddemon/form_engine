@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
@@ -22,6 +22,19 @@ export default function JsxPropsRender({ widgets: w, slots, values, onChange }: 
         // 末尾返回 Component 函数引用，由 JsxRender 用 React.createElement 渲染，
         // 这样 React 会把 Component 当作真正的 React 组件处理，useState 等 hook 注册到正确 fiber
         const compiled = `${result.code ?? ''}\nreturn typeof Component === 'function' ? Component : null;`
+
+        // 烟雾测试：Babel 仅做语法校验，顶层裸引用（如 `未定义变量`）会通过编译，
+        // 但在 `new Function` body 求值时抛 ReferenceError。先用最小依赖（仅 React）
+        // 试运行一次，捕获顶层运行时错误让模态框直接显示；函数体内部错误由
+        // JsxRender 的 try/catch 兜底（见 JsxRender.compileJsxComponent）。
+        try {
+          const smokeTest = new Function('React', compiled) as (r: typeof React) => unknown
+          smokeTest(React)
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e)
+          return { success: false, error: `JSX 运行时错误: ${msg}` }
+        }
+
         onChange('compiledCode', compiled)
         return { success: true }
       } catch (e) {

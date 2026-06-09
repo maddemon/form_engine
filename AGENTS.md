@@ -2,6 +2,10 @@
 
 本文件只保留**最关键的硬约束**与**仓库概览**。具体规则、Token 速查等见 [`.agents/rules/`](./.agents/rules/)。
 
+## 禁止通过 AI Sandbox 执行 `git stash`
+
+Trae IDE sandbox 中 `git stash` 会触发 sandbox bug 导致 `.git` 目录被删除。替代方案：使用 IDE 内置 Git 面板或在系统原生终端执行。
+
 ---
 
 ## CodeGraph（必须传 `projectPath`）
@@ -22,18 +26,18 @@ packages/
 example/             — 演示应用（`pnpm dev:example`）
 ```
 
-| 命令 | 用途 |
-|---|---|
-| `pnpm dev` | 构建所有包（watch 模式） |
-| `pnpm dev:example` | 启动演示应用 |
-| `pnpm build` | `check:tokens` → 构建 core + 两个 adapter |
-| `pnpm test` | `check:tokens` → 运行测试（仅 core 包有测试） |
-| `pnpm test -- --run` | 单次运行 vitest（core） |
-| `pnpm lint` | ESLint v9 flat config 全量检查 |
-| `pnpm lint:fix` | ESLint 自动修复 |
-| `pnpm check:tokens` | 扫描硬编码样式（接入 build/test） |
-| `pnpm --filter @form-engine/core test` | 仅跑 core 包测试 |
-| `pnpm --filter @form-engine/core type-check` | 仅 core 包类型检查 |
+| 命令                                         | 用途                                          |
+| -------------------------------------------- | --------------------------------------------- |
+| `pnpm dev`                                   | 构建所有包（watch 模式）                      |
+| `pnpm dev:example`                           | 启动演示应用                                  |
+| `pnpm build`                                 | `check:tokens` → 构建 core + 两个 adapter     |
+| `pnpm test`                                  | `check:tokens` → 运行测试（仅 core 包有测试） |
+| `pnpm test -- --run`                         | 单次运行 vitest（core）                       |
+| `pnpm lint`                                  | ESLint v9 flat config 全量检查                |
+| `pnpm lint:fix`                              | ESLint 自动修复                               |
+| `pnpm check:tokens`                          | 扫描硬编码样式（接入 build/test）             |
+| `pnpm --filter @form-engine/core test`       | 仅跑 core 包测试                              |
+| `pnpm --filter @form-engine/core type-check` | 仅 core 包类型检查                            |
 
 **命令顺序**：`pnpm lint` → `pnpm check:tokens` → `pnpm test`（`build` / `test` 已自动跑 `check:tokens`，无需显式执行）。
 
@@ -51,7 +55,7 @@ import { antdAdapter } from '@form-engine/adapter-antd'
 import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
 
 // 显式选 adapter
-<FormRender schema={schema} adapter={scene === 'mobile' ? antdMobileAdapter : antdAdapter} />
+;<FormRender schema={schema} adapter={scene === 'mobile' ? antdMobileAdapter : antdAdapter} />
 
 // 或运行时自适应
 const adapter = useAdaptiveAdapter(antdAdapter, antdMobileAdapter)
@@ -122,7 +126,3 @@ pnpm build 2>&1 | Tee-Object ./tmp/build-$(Get-Date -Format 'yyyyMMdd_HHmmss').t
 ```
 
 ---
-
-## 禁止通过 AI Sandbox 执行 `git stash`
-
-Trae IDE sandbox 中 `git stash` 会触发 sandbox bug 导致 `.git` 目录被删除。替代方案：使用 IDE 内置 Git 面板或在系统原生终端执行。
