@@ -16,7 +16,7 @@ export const PaletteItemCard: React.FC<PaletteItemCardProps> = React.memo(({ ite
       source: 'palette',
       fieldType: item.type,
       label: displayLabel,
-      defaultProps: item.defaultProps || {},
+      defaultProps: item.defaultProps ?? {},
       extraData: item.extraData || {},
     },
   })

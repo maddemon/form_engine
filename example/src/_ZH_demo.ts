@@ -99,7 +99,7 @@ const schemaZh: FormSchema = {
         type: 'remote',
         remote: {
           config: {
-            url: '/data.json',
+            url: 'data.json',
             method: 'GET',
             labelField: 'label',
             valueField: 'value',
@@ -107,7 +107,7 @@ const schemaZh: FormSchema = {
           },
         },
       },
-      help: '数据源：远程接口（GET /data.json → resultPath: "cities"）',
+      help: '数据源：远程接口（GET data.json → resultPath: "cities"）',
       componentProps: { allowClear: true, showSearch: true },
       children: [],
     },
@@ -121,7 +121,7 @@ const schemaZh: FormSchema = {
         type: 'remote',
         remote: {
           config: {
-            url: '/data.json',
+            url: 'data.json',
             method: 'GET',
             labelField: 'label',
             valueField: 'value',
@@ -143,7 +143,7 @@ const schemaZh: FormSchema = {
         type: 'remote',
         remote: {
           config: {
-            url: '/data.json',
+            url: 'data.json',
             method: 'GET',
             labelField: 'label',
             valueField: 'value',

@@ -1,23 +1,22 @@
 import React, { useCallback, useMemo } from 'react'
-import { type FormFieldSchema, type FormSchema, type OptionItem } from '../types/schema'
-import type { EventCallbacks } from '../types/events'
-import type { EventContext } from '../events'
-import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
-import type { LocalePack } from '../locale/types'
+import { isContainerComponent } from '../components'
 import type { SupportedLocale } from '../locale/LocaleProvider'
 import { LocaleProvider } from '../locale/LocaleProvider'
+import type { LocalePack } from '../locale/types'
+import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
+import type { SizeMode, ThemeMode } from '../styles/StyleProvider'
 import type { PartialThemeTokens } from '../styles/types'
-import type { ThemeMode, SizeMode } from '../styles/StyleProvider'
-import type { ComponentRenderFn, FormEngineAdapter, FormWrapperProps } from '../types/adapter'
-import { isContainerComponent } from '../components'
+import type { ComponentRenderFn, DeviceScene, FormEngineAdapter, FormWrapperProps } from '../types/adapter'
+import type { EventCallbacks } from '../types/events'
 import type { DataSourceResolver } from '../types/render'
+import { type FormFieldSchema, type FormSchema } from '../types/schema'
 import { pickAdapter } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
-import { useFormRender } from './hooks/useFormRender'
 import { FormConfigContext, useFormConfig } from './FormConfigContext'
-import { InsideContainerContext } from './InsideContainerContext'
 import { FormEngineContext, useFormEngine, type FormEngineContextValue } from './FormEngineContext'
 import { FormStateContext, useFormState, type FormStateContextValue } from './FormStateContext'
+import { useFormRender } from './hooks/useFormRender'
+import { InsideContainerContext } from './InsideContainerContext'
 
 export interface FormRenderHandle {
   submit(): void
@@ -36,7 +35,7 @@ export interface FormRenderProps {
   /** 移动端适配器 */
   mobileAdapter?: FormEngineAdapter
   /** 当前场景（默认 'desktop'） */
-  scene?: import('../types/adapter').DeviceScene
+  scene?: DeviceScene
   initialValues?: Record<string, unknown>
   loading?: boolean
   /**
@@ -74,55 +73,79 @@ export interface FormRenderProps {
  */
 export const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {}, themeMode, sizeMode, theme, beforeSubmit, afterSubmit, locale }, ref) => {
-  const hasStyleProvider = useHasStyleProvider()
-  const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
-  const bridgeProvider = resolvedAdapter?.bridgeProvider
+export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(
+  (
+    {
+      schema,
+      onSubmit,
+      onChange,
+      dataSourceResolver,
+      components = {},
+      desktopAdapter,
+      mobileAdapter,
+      scene = 'desktop',
+      initialValues = {},
+      loading = false,
+      callbacks = {},
+      themeMode,
+      sizeMode,
+      theme,
+      beforeSubmit,
+      afterSubmit,
+      locale,
+    },
+    ref,
+  ) => {
+    const hasStyleProvider = useHasStyleProvider()
+    const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
+    const bridgeProvider = resolvedAdapter?.bridgeProvider
 
-  // 内层内容
-  const inner = (
-    <LocaleProvider locale={locale}>
-      <FormRenderInner
-        ref={ref}
-        schema={schema}
-        onSubmit={onSubmit}
-        onChange={onChange}
-        dataSourceResolver={dataSourceResolver}
-        components={components}
-        desktopAdapter={desktopAdapter}
-        mobileAdapter={mobileAdapter}
-        scene={scene}
-        initialValues={initialValues}
-        loading={loading}
-        callbacks={callbacks}
-        beforeSubmit={beforeSubmit}
-        afterSubmit={afterSubmit}
-      />
-    </LocaleProvider>
-  )
+    // 内层内容
+    const inner = (
+      <LocaleProvider locale={locale}>
+        <FormRenderInner
+          ref={ref}
+          schema={schema}
+          onSubmit={onSubmit}
+          onChange={onChange}
+          dataSourceResolver={dataSourceResolver}
+          components={components}
+          desktopAdapter={desktopAdapter}
+          mobileAdapter={mobileAdapter}
+          scene={scene}
+          initialValues={initialValues}
+          loading={loading}
+          callbacks={callbacks}
+          beforeSubmit={beforeSubmit}
+          afterSubmit={afterSubmit}
+        />
+      </LocaleProvider>
+    )
 
-  // 包裹 BridgeProvider（adapter 提供）
-  const withBridge = bridgeProvider
-    ? React.createElement(bridgeProvider, null, inner)
-    : inner
+    // 包裹 BridgeProvider（adapter 提供）
+    const withBridge = bridgeProvider ? React.createElement(bridgeProvider, null, inner) : inner
 
-  // 包裹 StyleProvider（如果外层没有）
-  if (hasStyleProvider) {
-    return withBridge as React.ReactElement
-  }
+    // 包裹 StyleProvider（如果外层没有）
+    if (hasStyleProvider) {
+      return withBridge as React.ReactElement
+    }
 
-  return (
-    <StyleProvider themeMode={themeMode} sizeMode={sizeMode} theme={theme}>
-      {withBridge}
-    </StyleProvider>
-  ) as React.ReactElement
-})
+    return (
+      <StyleProvider themeMode={themeMode} sizeMode={sizeMode} theme={theme}>
+        {withBridge}
+      </StyleProvider>
+    ) as React.ReactElement
+  },
+)
 FormRender.displayName = 'FormRender'
 
 /** 内置默认 Form 容器 — 使用原生 <form> 元素 */
 const DefaultFormWrapper: React.FC<FormWrapperProps> = ({ onSubmit, children, className, style }) => (
   <form
-    onSubmit={(e) => { e.preventDefault(); onSubmit?.() }}
+    onSubmit={(e) => {
+      e.preventDefault()
+      onSubmit?.()
+    }}
     onKeyDown={(e) => {
       if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') {
         e.preventDefault()
@@ -136,59 +159,109 @@ const DefaultFormWrapper: React.FC<FormWrapperProps> = ({ onSubmit, children, cl
 )
 
 /** FormRender 内部实现，在 StyleProvider + BridgeProvider 内部渲染 */
-const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps, 'themeMode' | 'sizeMode' | 'theme'>>(({ schema, onSubmit, onChange, dataSourceResolver, components = {}, desktopAdapter, mobileAdapter, scene = 'desktop', initialValues = {}, loading = false, callbacks = {}, beforeSubmit, afterSubmit }, ref) => {
-  useEnsureDefaultTheme()
-  const { token } = useStyle()
+const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps, 'themeMode' | 'sizeMode' | 'theme'>>(
+  (
+    {
+      schema,
+      onSubmit,
+      onChange,
+      dataSourceResolver,
+      components = {},
+      desktopAdapter,
+      mobileAdapter,
+      scene = 'desktop',
+      initialValues = {},
+      loading = false,
+      callbacks = {},
+      beforeSubmit,
+      afterSubmit,
+    },
+    ref,
+  ) => {
+    useEnsureDefaultTheme()
+    const { token } = useStyle()
 
-  const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
-  const formConfig = schema.form
+    const resolvedAdapter = pickAdapter(desktopAdapter, mobileAdapter, scene) as FormEngineAdapter
+    const formConfig = schema.form
 
-  const {
-    formValues, formValuesRef, visibleFields,
-    fieldErrors, fieldOptions,
-    handleFieldChange, handleSubmit,
-    $form, eventContext, reset, validate,
-  } = useFormRender({ schema, initialValues, onSubmit, onChange, dataSourceResolver, callbacks, adapterValidate: resolvedAdapter?.validate, beforeSubmit, afterSubmit })
+    const {
+      formValues,
+      formValuesRef,
+      visibleFields,
+      fieldErrors,
+      fieldOptions,
+      handleFieldChange,
+      handleSubmit,
+      $form,
+      eventContext,
+      reset,
+      validate,
+    } = useFormRender({
+      schema,
+      initialValues,
+      onSubmit,
+      onChange,
+      dataSourceResolver,
+      callbacks,
+      adapterValidate: resolvedAdapter?.validate,
+      beforeSubmit,
+      afterSubmit,
+    })
 
-  React.useImperativeHandle(ref, () => ({ submit: handleSubmit, reset, validate }), [handleSubmit, reset, validate])
+    React.useImperativeHandle(ref, () => ({ submit: handleSubmit, reset, validate }), [handleSubmit, reset, validate])
 
-  const handleFormSubmit = () => {
-    handleSubmit()
-  }
+    const handleFormSubmit = () => {
+      handleSubmit()
+    }
 
-  const FormTag = resolvedAdapter?.FormWrapper ?? DefaultFormWrapper
+    const FormTag = resolvedAdapter?.FormWrapper ?? DefaultFormWrapper
 
-  const engineCtx = useMemo<FormEngineContextValue>(() => ({
-    adapter: resolvedAdapter,
-    components,
-    loading,
-  }), [resolvedAdapter, components, loading])
+    const engineCtx = useMemo<FormEngineContextValue>(
+      () => ({
+        adapter: resolvedAdapter,
+        components,
+        loading,
+      }),
+      [resolvedAdapter, components, loading],
+    )
 
-  const stateCtx = useMemo<FormStateContextValue>(() => ({
-    formValues,
-    fieldOptions,
-    fieldErrors,
-    eventContext,
-  }), [formValues, fieldOptions, fieldErrors, eventContext])
+    const stateCtx = useMemo<FormStateContextValue>(
+      () => ({
+        formValues,
+        fieldOptions,
+        fieldErrors,
+        eventContext,
+      }),
+      [formValues, fieldOptions, fieldErrors, eventContext],
+    )
 
-  return (
-    <FormConfigContext.Provider value={formConfig}>
-      <FormEngineContext.Provider value={engineCtx}>
-        <FormStateContext.Provider value={stateCtx}>
-          <FormTag formConfig={formConfig} scene={resolvedAdapter?.scene ?? 'desktop'} onSubmit={handleFormSubmit} className="fe-form">
-            <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
-              {visibleFields.map((field) => (
-                <div key={field.id} style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}>
-                  <NestedFieldRenderer field={field} onFieldChange={handleFieldChange} />
-                </div>
-              ))}
-            </div>
-          </FormTag>
-        </FormStateContext.Provider>
-      </FormEngineContext.Provider>
-    </FormConfigContext.Provider>
-  )
-})
+    return (
+      <FormConfigContext.Provider value={formConfig}>
+        <FormEngineContext.Provider value={engineCtx}>
+          <FormStateContext.Provider value={stateCtx}>
+            <FormTag
+              formConfig={formConfig}
+              scene={resolvedAdapter?.scene ?? 'desktop'}
+              onSubmit={handleFormSubmit}
+              className="fe-form"
+            >
+              <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
+                {visibleFields.map((field) => (
+                  <div
+                    key={field.id}
+                    style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}
+                  >
+                    <NestedFieldRenderer field={field} onFieldChange={handleFieldChange} />
+                  </div>
+                ))}
+              </div>
+            </FormTag>
+          </FormStateContext.Provider>
+        </FormEngineContext.Provider>
+      </FormConfigContext.Provider>
+    )
+  },
+)
 FormRenderInner.displayName = 'FormRenderInner'
 
 // ── NestedFieldRenderer（递归字段渲染器，含 React.memo）─────────────
@@ -217,6 +290,19 @@ const NestedFieldRenderer: React.FC<NestedFieldRendererProps> = React.memo(({ fi
     return { ...field, componentProps: { ...field.componentProps, children: childNodes } }
   }, [field, isContainer, onFieldChange])
 
-  return <FieldRenderer field={enhancedField} value={formValues[field.name]} onChange={handleChange} options={fieldOptions[field.name] || []} disabled={loading || field.disabled === true} adapter={adapter} components={components} eventContext={eventContext} errors={fieldErrors[field.name]} formConfig={formConfig} />
+  return (
+    <FieldRenderer
+      field={enhancedField}
+      value={formValues[field.name]}
+      onChange={handleChange}
+      options={fieldOptions[field.name] || []}
+      disabled={loading || field.disabled === true}
+      adapter={adapter}
+      components={components}
+      eventContext={eventContext}
+      errors={fieldErrors[field.name]}
+      formConfig={formConfig}
+    />
+  )
 })
 NestedFieldRenderer.displayName = 'NestedFieldRenderer'

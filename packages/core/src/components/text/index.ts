@@ -25,6 +25,8 @@ export const meta: ComponentRegistration = {
   label: 'component.text.label',
   category: 'display',
   icon: 'LetterA',
-  defaultProps: { componentProps: { children: '文本内容' } },
+  defaultProps: (locale) => ({
+    componentProps: { content: locale?.component.text.defaultContent ?? 'Text content' },
+  }),
   eventDeclarations: [],
 }

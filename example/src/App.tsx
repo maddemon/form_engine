@@ -2,7 +2,6 @@ import type { FormSchema, SupportedLocale, ThemeMode } from '@form-engine/core'
 import { registerSimpleCustomComponent } from '@form-engine/core'
 import { theme as antdTheme, Button, Card, ConfigProvider, Input, Layout, Space, Typography } from 'antd'
 import React, { useEffect, useMemo, useState } from 'react'
-import '../custom-component-demo'
 import { AppProvider } from './context/AppContext'
 
 // ==== 注册 antd 风格的自定义组件 ====

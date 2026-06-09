@@ -1,14 +1,14 @@
-import type { PaletteGroup, PaletteItem } from '../../types/designer'
-import type { FieldType, FormFieldSchema } from '../../types'
+import type { FormFieldSchema } from '../../types'
+import type { DesignerAction, PaletteGroup, PaletteItem, SidePanelTab } from '../../types/designer'
 
 export interface FieldListProps {
   groups?: PaletteGroup[]
   excludeTypes?: string[]
   width?: number | string
-  sidePanelTabs?: import('../../types/designer').SidePanelTab[]
+  sidePanelTabs?: SidePanelTab[]
   fields?: FormFieldSchema[]
   selectedFieldId?: string | null
-  dispatch?: React.Dispatch<import('../../types/designer').DesignerAction>
+  dispatch?: React.Dispatch<DesignerAction>
 }
 
 export interface PaletteItemCardProps {

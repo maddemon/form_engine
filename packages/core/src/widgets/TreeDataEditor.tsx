@@ -78,7 +78,7 @@ function countTreeNodes(options: OptionItem[]): number {
   return count
 }
 
-function getDepthSummary(options: OptionItem[]): string {
+function getDepthSummary(options: OptionItem[]): number {
   let maxDepth = 0
   const walk = (nodes: OptionItem[], depth: number) => {
     for (const node of nodes) {
@@ -91,7 +91,7 @@ function getDepthSummary(options: OptionItem[]): string {
     }
   }
   walk(options, 0)
-  return maxDepth > 0 ? `${maxDepth} 层` : ''
+  return maxDepth
 }
 
 function getTopLevelSummary(options: OptionItem[]): string {
@@ -160,7 +160,7 @@ function WidgetTreeDataEditorInner({
   const [batchOpen, setBatchOpen] = useState(false)
   const options = value ?? []
   const totalNodes = countTreeNodes(options)
-  const depthInfo = getDepthSummary(options)
+  const depth = getDepthSummary(options)
   const summary = getTopLevelSummary(options)
 
   const handleBatchConfirm = useCallback(
@@ -177,8 +177,8 @@ function WidgetTreeDataEditorInner({
         <Text type="secondary" style={{ marginBottom: token('spacingXs'), lineHeight: 1.5 }}>
           <div>{summary}</div>
           <Text type="tertiary">
-            共 {totalNodes} 个节点
-            {depthInfo ? ` / ${depthInfo}` : ''}
+            {locale.widget.treeDataEditor.nodeCount.replace('{n}', String(totalNodes))}
+            {depth > 0 ? ` / ${locale.widget.treeDataEditor.layers.replace('{n}', String(depth))}` : ''}
           </Text>
         </Text>
       ) : (

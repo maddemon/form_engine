@@ -105,7 +105,7 @@ function SortableTableEditorInner<T extends { id: string }>({
     [value, onChange],
   )
 
-  const minError = value.length < minItems ? `至少保留 ${minItems} 项` : null
+  const minError = value.length < minItems ? locale.widget.sortableTableEditor.minItems.replace('{n}', String(minItems)) : null
 
   const sortableIds = useMemo(() => value.map((item) => `${SORTABLE_PREFIX}${item.id}`), [value])
 

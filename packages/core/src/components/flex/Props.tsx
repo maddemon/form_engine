@@ -2,29 +2,30 @@ import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 
-const WRAP_OPTIONS = [
-  { label: '不换行', value: 'nowrap' },
-  { label: '换行', value: 'wrap' },
-  { label: '反向换行', value: 'wrap-reverse' },
-]
-const JUSTIFY_OPTIONS = [
-  { label: '起始', value: 'flex-start' },
-  { label: '居中', value: 'center' },
-  { label: '末端', value: 'flex-end' },
-  { label: '均匀分布', value: 'space-between' },
-  { label: '环绕', value: 'space-around' },
-  { label: '等距', value: 'space-evenly' },
-]
-const ALIGN_OPTIONS = [
-  { label: '拉伸', value: 'stretch' },
-  { label: '起始', value: 'flex-start' },
-  { label: '居中', value: 'center' },
-  { label: '末端', value: 'flex-end' },
-  { label: '基线', value: 'baseline' },
-]
-
 export default function FlexPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   const { locale } = useLocale()
+
+  const WRAP_OPTIONS = [
+    { label: locale.component.flex.wrapNoWrap, value: 'nowrap' },
+    { label: locale.component.flex.wrapWrap, value: 'wrap' },
+    { label: locale.component.flex.wrapReverse, value: 'wrap-reverse' },
+  ]
+  const JUSTIFY_OPTIONS = [
+    { label: locale.component.flex.justifyFlexStart, value: 'flex-start' },
+    { label: locale.component.flex.justifyCenter, value: 'center' },
+    { label: locale.component.flex.justifyFlexEnd, value: 'flex-end' },
+    { label: locale.component.flex.justifySpaceBetween, value: 'space-between' },
+    { label: locale.component.flex.justifySpaceAround, value: 'space-around' },
+    { label: locale.component.flex.justifySpaceEvenly, value: 'space-evenly' },
+  ]
+  const ALIGN_OPTIONS = [
+    { label: locale.component.flex.alignStretch, value: 'stretch' },
+    { label: locale.component.flex.alignFlexStart, value: 'flex-start' },
+    { label: locale.component.flex.alignCenter, value: 'center' },
+    { label: locale.component.flex.alignFlexEnd, value: 'flex-end' },
+    { label: locale.component.flex.alignBaseline, value: 'baseline' },
+  ]
+
   return (
     <>
       <FieldItem label={locale.component.flex.direction}>
@@ -32,10 +33,10 @@ export default function FlexPropsRender({ widgets: w, values, onChange }: PropsR
           value={(values.direction as string) ?? 'row'}
           onChange={(v) => onChange('direction', v)}
           options={[
-            { label: '水平', value: 'row' },
-            { label: '水平反序', value: 'row-reverse' },
-            { label: '垂直', value: 'column' },
-            { label: '垂直反序', value: 'column-reverse' },
+            { label: locale.component.flex.directionRow, value: 'row' },
+            { label: locale.component.flex.directionRowReverse, value: 'row-reverse' },
+            { label: locale.component.flex.directionColumn, value: 'column' },
+            { label: locale.component.flex.directionColumnReverse, value: 'column-reverse' },
           ]}
         />
       </FieldItem>

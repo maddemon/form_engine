@@ -1,3 +1,4 @@
+import type { LocalePack } from '../locale'
 import type { PaletteItem } from './designer'
 import type { FieldType } from './schema'
 
@@ -5,7 +6,7 @@ export type PaletteDragData = {
   source: 'palette'
   fieldType: string
   label: string
-  defaultProps: Record<string, unknown>
+  defaultProps: Record<string, unknown> | ((locale: LocalePack) => Record<string, unknown>)
   extraData?: Record<string, unknown>
 }
 

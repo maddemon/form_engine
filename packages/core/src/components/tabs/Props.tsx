@@ -25,9 +25,9 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
   const handleAddTab = useCallback(() => {
     handleTabsChange([
       ...tabs,
-      { id: genId('tab'), key: `tab_${tabs.length + 1}`, title: `标签页${tabs.length + 1}`, disabled: false },
+      { id: genId('tab'), key: `tab_${tabs.length + 1}`, title: locale.component.tabs.defaultTabTitle.replace('{n}', String(tabs.length + 1)), disabled: false },
     ])
-  }, [tabs, handleTabsChange])
+  }, [tabs, handleTabsChange, locale])
 
   return (
     <>

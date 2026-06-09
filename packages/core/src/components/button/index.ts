@@ -21,6 +21,6 @@ export const meta: ComponentRegistration = {
   label: 'component.button.label',
   category: 'button',
   icon: 'Square',
-  defaultProps: { componentProps: { children: '按钮' } },
+  defaultProps: (locale) => ({ componentProps: { children: locale?.component.button.defaultContent ?? 'Button' } }),
   eventDeclarations: buttonEventDeclarations,
 }

@@ -248,7 +248,9 @@ export function getComponentIcon(type: string): React.ReactNode | null {
 
 /** 获取组件默认 Schema */
 export function getComponentDefaultProps(type: string): Partial<FormFieldSchema> {
-  return (componentRegistry as Record<string, ComponentRegistration>)[type]?.defaultProps ?? {}
+  const props = (componentRegistry as Record<string, ComponentRegistration>)[type]?.defaultProps
+  if (typeof props === 'function') return props()
+  return props ?? {}
 }
 
 /** 获取所有表单组件类型 */

@@ -4,6 +4,7 @@
  * 命名参考 antd、material-ui 等知名库
  */
 
+import type { LocalePack } from '../locale'
 import { EventDeclaration } from './events'
 import type { FormFieldSchema, FormRule, VisibleWhen } from './schema'
 
@@ -91,8 +92,8 @@ export interface ComponentRegistration {
   category: ComponentCategory | ComponentCategory[]
   /** 图标名称（纯字符串，通过 icons/iconMap 查找实际 SVG 组件） */
   icon: string
-  /** 拖入画布时的默认 Schema（合并到 field） */
-  defaultProps?: Partial<FormFieldSchema>
+  /** 拖入画布时的默认 Schema。可以是对象或函数（函数接收 locale 并在拖入时执行一次） */
+  defaultProps?: Partial<FormFieldSchema> | ((locale?: LocalePack) => Partial<FormFieldSchema>)
   /** 该组件支持的事件声明 */
   eventDeclarations: EventDeclaration[]
 }

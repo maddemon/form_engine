@@ -1,12 +1,13 @@
 import { useDroppable } from '@dnd-kit/core'
 import React from 'react'
+import { useLocale } from '../../locale'
 import { useStyle } from '../../styles'
 import { useEmptyContainerStyle } from '../useDroppableStyle'
 
 interface EmptyPlaceholderProps {
   containerId: string
   style?: React.CSSProperties
-  /** 占位文案，默认"拖入组件" */
+  /** 占位文案 */
   text?: string
   /** 变体：simple 为纯文本占位，dashed 为带虚线边框的画布级占位 */
   variant?: 'simple' | 'dashed'
@@ -14,10 +15,12 @@ interface EmptyPlaceholderProps {
   skipDroppable?: boolean
 }
 
-export const EmptyContainerPlaceholder: React.FC<EmptyPlaceholderProps> = React.memo(({ containerId, style, text = '拖入组件', variant = 'simple', skipDroppable = false }) => {
-  const { setNodeRef, isOver } = skipDroppable
-    ? { setNodeRef: undefined, isOver: false }
-    : useDroppable({ id: `${containerId}__container`, data: { parentId: containerId } })
+export const EmptyContainerPlaceholder: React.FC<EmptyPlaceholderProps> = React.memo(({ containerId, style, text, variant = 'simple', skipDroppable = false }) => {
+  const { locale } = useLocale()
+  const placeholderText = text ?? locale.designer.emptyContainerPlaceholder
+  const { setNodeRef: droppableRef, isOver: droppableOver } = useDroppable({ id: `${containerId}__container`, data: { parentId: containerId } })
+  const setNodeRef = skipDroppable ? undefined : droppableRef
+  const isOver = skipDroppable ? false : droppableOver
   const emptyStyle = useEmptyContainerStyle(isOver)
   const { token } = useStyle()
 
@@ -32,14 +35,14 @@ export const EmptyContainerPlaceholder: React.FC<EmptyPlaceholderProps> = React.
         borderRadius: 'var(--fe-border-radius-sm)',
         ...style,
       }}>
-        {text}
+        {placeholderText}
       </div>
     )
   }
 
   return (
     <div ref={setNodeRef} style={{ ...emptyStyle, ...style }}>
-      {text}
+      {placeholderText}
     </div>
   )
 })

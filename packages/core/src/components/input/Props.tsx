@@ -12,7 +12,7 @@ export default function InputPropsRender({ widgets: w, values, onChange }: Props
         <w.NumberInput value={(values.maxLength as number) ?? 0} onChange={(v) => onChange('maxLength', v)} min={0} />
       </FieldItem>
       <FieldItem label={locale.component.input.prefix}>
-        <w.Input value={(values.prefix as string) ?? ''} onChange={(v) => onChange('prefix', v)} placeholder="如：https://" />
+        <w.Input value={(values.prefix as string) ?? ''} onChange={(v) => onChange('prefix', v)} placeholder={locale.component.input.prefixPlaceholder} />
       </FieldItem>
       <FieldItem label={locale.component.input.suffix}>
         <w.Input value={(values.suffix as string) ?? ''} onChange={(v) => onChange('suffix', v)} />
@@ -24,7 +24,7 @@ export default function InputPropsRender({ widgets: w, values, onChange }: Props
         <w.Input value={(values.addonAfter as string) ?? ''} onChange={(v) => onChange('addonAfter', v)} />
       </FieldItem>
       <FieldItem label={locale.component.input.autoComplete}>
-        <w.Input value={(values.autoComplete as string) ?? ''} onChange={(v) => onChange('autoComplete', v)} placeholder="如：off" />
+        <w.Input value={(values.autoComplete as string) ?? ''} onChange={(v) => onChange('autoComplete', v)} placeholder={locale.component.input.autoCompletePlaceholder} />
       </FieldItem>
       <FieldItem label={locale.component.input.type}>
         <w.ButtonGroup

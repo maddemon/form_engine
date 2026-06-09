@@ -98,7 +98,7 @@ const schemaEn: FormSchema = {
         type: 'remote',
         remote: {
           config: {
-            url: '/data.json',
+            url: 'data.json',
             method: 'GET',
             labelField: 'label',
             valueField: 'value',
@@ -106,7 +106,7 @@ const schemaEn: FormSchema = {
           },
         },
       },
-      help: 'Data Source: Remote (GET /data.json → resultPath: "cities")',
+      help: 'Data Source: Remote (GET data.json → resultPath: "cities")',
       componentProps: { allowClear: true, showSearch: true },
       children: [],
     },
@@ -120,7 +120,7 @@ const schemaEn: FormSchema = {
         type: 'remote',
         remote: {
           config: {
-            url: '/data.json',
+            url: 'data.json',
             method: 'GET',
             labelField: 'label',
             valueField: 'value',
@@ -142,7 +142,7 @@ const schemaEn: FormSchema = {
         type: 'remote',
         remote: {
           config: {
-            url: '/data.json',
+            url: 'data.json',
             method: 'GET',
             labelField: 'label',
             valueField: 'value',

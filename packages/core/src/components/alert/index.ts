@@ -21,8 +21,13 @@ export const meta: ComponentRegistration = {
   label: 'component.alert.label',
   category: 'display',
   icon: 'AlertIcon',
-  defaultProps: {
-    componentProps: { type: 'info', content: '提示内容', showIcon: true, closable: false },
-  },
+  defaultProps: (locale) => ({
+    componentProps: {
+      type: 'info',
+      content: locale?.component.alert.contentPlaceholder ?? 'Alert content',
+      showIcon: true,
+      closable: false,
+    },
+  }),
   eventDeclarations: alertEventDeclarations,
 }

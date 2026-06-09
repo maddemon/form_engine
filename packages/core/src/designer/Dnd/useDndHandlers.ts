@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from 'react'
 import { isPaletteDrag, toPaletteItem, type DesignerDragData } from '../../types/designer-drag'
 import type { FormFieldSchema } from '../../types/schema'
 import type { DesignerAction } from '../../types/designer'
+import { useLocale } from '../../locale'
 import { CANVAS_ROOT_HEAD_ID, CANVAS_ROOT_ID } from '../Canvas'
 import { createFieldFromPalette } from '../FieldList'
 import type { FieldIndex } from '../reducer'
@@ -20,6 +21,8 @@ export function useDndHandlers(
   fieldIndex: FieldIndex,
   dispatch: React.Dispatch<DesignerAction>,
 ) {
+  const { locale } = useLocale()
+
   const [dndState, setDndState] = useState<DndState>({
     activeDragId: null,
     activeDragLabel: '',
@@ -154,7 +157,7 @@ export function useDndHandlers(
         if (!isValidCanvasTarget) return
 
         const target = resolveDropTarget(String(over.id), fields, fieldIndex)
-        const newField = createFieldFromPalette(toPaletteItem(activeData))
+        const newField = createFieldFromPalette(toPaletteItem(activeData), locale)
         dispatch({ type: 'ADD_FIELD', field: newField, index: target.index, parentId: target.parentId, regionKey: target.regionKey })
         return
       }
@@ -247,7 +250,7 @@ export function useDndHandlers(
         })
       }
     },
-    [fields, fieldIndex, dispatch],
+    [fields, fieldIndex, dispatch, locale],
   )
 
   const handleDragCancel = useCallback(() => {

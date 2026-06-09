@@ -9,6 +9,7 @@ export interface LocalePack {
       redo: string
     }
     canvasEmptyHint: string
+    emptyContainerPlaceholder: string
     fieldList: {
       title: string
     }
@@ -29,6 +30,9 @@ export interface LocalePack {
       hidden: string
       hiddenPlaceholder: string
       events: string
+      expressionPlaceholder: string
+      jsonPlaceholder: string
+      codePlaceholder: string
     }
     eventHandler: {
       notConfigured: string
@@ -119,6 +123,8 @@ export interface LocalePack {
       autoComplete: string
       type: string
       placeholder: string
+      prefixPlaceholder: string
+      autoCompletePlaceholder: string
       text: string
       email: string
       phone: string
@@ -180,6 +186,7 @@ export interface LocalePack {
       maxTagCount: string
       notFoundContent: string
       notFoundContentPlaceholder: string
+      defaultOptionTemplate: string
       events: {
         onChange: { label: string; description: string }
         onSearch: { label: string; description: string }
@@ -200,6 +207,7 @@ export interface LocalePack {
       solid: string
       horizontal: string
       vertical: string
+      defaultOptionTemplate: string
       events: {
         onChange: { label: string; description: string }
       }
@@ -211,6 +219,7 @@ export interface LocalePack {
       direction: string
       horizontal: string
       vertical: string
+      defaultOptionTemplate: string
       events: {
         onChange: { label: string; description: string }
       }
@@ -225,6 +234,8 @@ export interface LocalePack {
       expandTrigger: string
       click: string
       hover: string
+      defaultOptionTemplate: string
+      defaultSubOptionTemplate: string
       events: {
         onChange: { label: string; description: string }
         onPopupVisibleChange: { label: string; description: string }
@@ -239,6 +250,8 @@ export interface LocalePack {
       searchable: string
       multiple: string
       treeCheckable: string
+      defaultOptionTemplate: string
+      defaultSubOptionTemplate: string
       events: {
         onChange: { label: string; description: string }
         onSearch: { label: string; description: string }
@@ -255,6 +268,7 @@ export interface LocalePack {
       large: string
       medium: string
       small: string
+      defaultOptionTemplate: string
       events: {
         onChange: { label: string; description: string }
       }
@@ -331,6 +345,17 @@ export interface LocalePack {
     }
     dateRange: {
       label: string
+      defaultValue: string
+      format: string
+      picker: string
+      showTime: string
+      startPlaceholder: string
+      endPlaceholder: string
+      allowClear: string
+      date: string
+      week: string
+      month: string
+      year: string
       events: {
         onChange: { label: string; description: string }
         onCalendarChange: { label: string; description: string }
@@ -384,6 +409,7 @@ export interface LocalePack {
       textType: string
       iconPlaceholder: string
       textPlaceholder: string
+      defaultContent: string
       events: {
         onClick: { label: string; description: string }
       }
@@ -392,6 +418,7 @@ export interface LocalePack {
       label: string
       content: string
       contentPlaceholder: string
+      defaultContent: string
       level: string
       type: string
       align: string
@@ -412,6 +439,7 @@ export interface LocalePack {
       label: string
       content: string
       contentPlaceholder: string
+      defaultContent: string
       type: string
       fontSize: string
       fontSizePlaceholder: string
@@ -493,6 +521,24 @@ export interface LocalePack {
       wrap: string
       padding: string
       margin: string
+      wrapNoWrap: string
+      wrapWrap: string
+      wrapReverse: string
+      justifyFlexStart: string
+      justifyCenter: string
+      justifyFlexEnd: string
+      justifySpaceBetween: string
+      justifySpaceAround: string
+      justifySpaceEvenly: string
+      alignStretch: string
+      alignFlexStart: string
+      alignCenter: string
+      alignFlexEnd: string
+      alignBaseline: string
+      directionRow: string
+      directionRowReverse: string
+      directionColumn: string
+      directionColumnReverse: string
     }
     collapse: {
       label: string
@@ -505,6 +551,7 @@ export interface LocalePack {
       key: string
       disabled: string
       addPanel: string
+      defaultPanelHeader: string
       events: {
         onChange: { label: string; description: string }
       }
@@ -530,6 +577,7 @@ export interface LocalePack {
       key: string
       disabled: string
       addTab: string
+      defaultTabTitle: string
       events: {
         onChange: { label: string; description: string }
       }
@@ -544,6 +592,7 @@ export interface LocalePack {
       columnTitle: string
       columnWidth: string
       addColumn: string
+      defaultColumnLabel: string
     }
     upload: {
       label: string
@@ -568,6 +617,7 @@ export interface LocalePack {
     form: { label: string }
     transfer: {
       label: string
+      defaultOptionTemplate: string
       events: {
         onChange: { label: string; description: string }
         onSearch: { label: string; description: string }
@@ -635,9 +685,12 @@ export interface LocalePack {
       instructions: string
       batchEdit: string
       empty: string
+      nodeCount: string
+      layers: string
     }
     sortableTableEditor: {
       delete: string
+      minItems: string
     }
     sortableList: {
       delete: string

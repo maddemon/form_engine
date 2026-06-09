@@ -11,6 +11,7 @@ export const zhCN: LocalePack = {
       redo: '重做',
     },
     canvasEmptyHint: '从左侧拖拽控件到此处',
+    emptyContainerPlaceholder: '拖入组件',
     fieldList: {
       title: '组件库',
     },
@@ -31,6 +32,9 @@ export const zhCN: LocalePack = {
       hidden: '是否隐藏',
       hiddenPlaceholder: '如：form.type !== \'admin\'',
       events: '事件',
+      expressionPlaceholder: '输入表达式',
+      jsonPlaceholder: '输入 JSON',
+      codePlaceholder: '输入代码',
     },
     eventHandler: {
       notConfigured: '未配置',
@@ -121,6 +125,8 @@ export const zhCN: LocalePack = {
       autoComplete: '自动完成',
       type: '类型',
       placeholder: '请输入',
+      prefixPlaceholder: '如：https://',
+      autoCompletePlaceholder: '如：off',
       text: '文本',
       email: '邮箱',
       phone: '手机号',
@@ -182,6 +188,7 @@ export const zhCN: LocalePack = {
       maxTagCount: '最多标签数',
       notFoundContent: '无匹配时文本',
       notFoundContentPlaceholder: '无匹配时的提示文字',
+      defaultOptionTemplate: '选项{n}',
       events: {
         onChange: { label: '值变化', description: '选中项变化时触发' },
         onSearch: { label: '搜索', description: '搜索文本变化时触发' },
@@ -202,6 +209,7 @@ export const zhCN: LocalePack = {
       solid: '实心',
       horizontal: '水平',
       vertical: '垂直',
+      defaultOptionTemplate: '选项{n}',
       events: {
         onChange: { label: '值变化', description: '选中项变化时触发' },
       },
@@ -213,6 +221,7 @@ export const zhCN: LocalePack = {
       direction: '排列方向',
       horizontal: '水平',
       vertical: '垂直',
+      defaultOptionTemplate: '选项{n}',
       events: {
         onChange: { label: '值变化', description: '选中项变化时触发' },
       },
@@ -227,6 +236,8 @@ export const zhCN: LocalePack = {
       expandTrigger: '展开触发',
       click: '点击',
       hover: '悬浮',
+      defaultOptionTemplate: '选项{n}',
+      defaultSubOptionTemplate: '子选项{p}-{c}',
       events: {
         onChange: { label: '值变化', description: '选中项变化时触发' },
         onPopupVisibleChange: { label: '面板显隐', description: '弹出/收起面板时触发' },
@@ -241,6 +252,8 @@ export const zhCN: LocalePack = {
       searchable: '可搜索',
       multiple: '多选',
       treeCheckable: '树勾选',
+      defaultOptionTemplate: '节点{n}',
+      defaultSubOptionTemplate: '子节点{p}-{c}',
       events: {
         onChange: { label: '值变化', description: '选中节点变化时触发' },
         onSearch: { label: '搜索', description: '搜索文本变化时触发' },
@@ -257,6 +270,7 @@ export const zhCN: LocalePack = {
       large: '大',
       medium: '中',
       small: '小',
+      defaultOptionTemplate: '选项{n}',
       events: {
         onChange: { label: '值变化', description: '选中项变化时触发' },
       },
@@ -333,6 +347,17 @@ export const zhCN: LocalePack = {
     },
     dateRange: {
       label: '日期范围',
+      defaultValue: '默认值',
+      format: '格式',
+      picker: '选择器类型',
+      showTime: '显示时间',
+      startPlaceholder: '开始占位文本',
+      endPlaceholder: '结束占位文本',
+      allowClear: '允许清除',
+      date: '日',
+      week: '周',
+      month: '月',
+      year: '年',
       events: {
         onChange: { label: '值变化', description: '选中日期变化时触发' },
         onCalendarChange: { label: '日历面板变化', description: '日历面板月份/年份变化时触发' },
@@ -386,6 +411,7 @@ export const zhCN: LocalePack = {
       textType: '文本',
       iconPlaceholder: '如: SearchOutlined',
       textPlaceholder: '按钮文字',
+      defaultContent: '按钮',
       events: {
         onClick: { label: '点击', description: '按钮被点击时触发' },
       },
@@ -394,6 +420,7 @@ export const zhCN: LocalePack = {
       label: '标题',
       content: '标题内容',
       contentPlaceholder: '输入标题',
+      defaultContent: '标题',
       level: '级别',
       type: '类型',
       align: '对齐方式',
@@ -414,6 +441,7 @@ export const zhCN: LocalePack = {
       label: '文本',
       content: '文本内容',
       contentPlaceholder: '输入文本内容',
+      defaultContent: '文本内容',
       type: '类型',
       fontSize: '字号',
       fontSizePlaceholder: '如: 16',
@@ -495,6 +523,24 @@ export const zhCN: LocalePack = {
       wrap: '换行',
       padding: '内边距(px)',
       margin: '外边距(px)',
+      wrapNoWrap: '不换行',
+      wrapWrap: '换行',
+      wrapReverse: '反向换行',
+      justifyFlexStart: '起始',
+      justifyCenter: '居中',
+      justifyFlexEnd: '末端',
+      justifySpaceBetween: '均匀分布',
+      justifySpaceAround: '环绕',
+      justifySpaceEvenly: '等距',
+      alignStretch: '拉伸',
+      alignFlexStart: '起始',
+      alignCenter: '居中',
+      alignFlexEnd: '末端',
+      alignBaseline: '基线',
+      directionRow: '水平',
+      directionRowReverse: '水平反序',
+      directionColumn: '垂直',
+      directionColumnReverse: '垂直反序',
     },
     collapse: {
       label: '折叠面板',
@@ -507,6 +553,7 @@ export const zhCN: LocalePack = {
       key: '标识',
       disabled: '禁用',
       addPanel: '添加面板',
+      defaultPanelHeader: '面板{n}',
       events: {
         onChange: { label: '展开变化', description: '展开面板变化时触发' },
       },
@@ -532,6 +579,7 @@ export const zhCN: LocalePack = {
       key: '标识',
       disabled: '禁用',
       addTab: '添加标签页',
+      defaultTabTitle: '标签页{n}',
       events: {
         onChange: { label: '标签切换', description: '切换标签页时触发' },
       },
@@ -546,6 +594,7 @@ export const zhCN: LocalePack = {
       columnTitle: '列标题',
       columnWidth: '列宽',
       addColumn: '添加列',
+      defaultColumnLabel: '列{n}',
     },
     upload: {
       label: '上传',
@@ -570,6 +619,7 @@ export const zhCN: LocalePack = {
     form: { label: '表单' },
     transfer: {
       label: '穿梭框',
+      defaultOptionTemplate: '选项{n}',
       events: {
         onChange: { label: '值变化', description: '选中项变化时触发' },
         onSearch: { label: '搜索', description: '搜索文本变化时触发' },
@@ -637,9 +687,12 @@ export const zhCN: LocalePack = {
       instructions: '每行一个叶子路径，层级用 > 分隔：',
       batchEdit: '批量编辑',
       empty: '暂无数据',
+      nodeCount: '共 {n} 个节点',
+      layers: '{n} 层',
     },
     sortableTableEditor: {
       delete: '删除',
+      minItems: '至少保留 {n} 项',
     },
     sortableList: {
       delete: '删除',

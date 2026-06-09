@@ -11,6 +11,7 @@ export const enUS: LocalePack = {
       redo: 'Redo',
     },
     canvasEmptyHint: 'Drag components from the left panel',
+    emptyContainerPlaceholder: 'Drop components here',
     fieldList: {
       title: 'Components',
     },
@@ -31,6 +32,9 @@ export const enUS: LocalePack = {
       hidden: 'Hidden',
       hiddenPlaceholder: "e.g.: form.type !== 'admin'",
       events: 'Events',
+      expressionPlaceholder: 'Enter expression',
+      jsonPlaceholder: 'Enter JSON',
+      codePlaceholder: 'Enter code',
     },
     eventHandler: {
       notConfigured: 'Not configured',
@@ -121,6 +125,8 @@ export const enUS: LocalePack = {
       autoComplete: 'Auto Complete',
       type: 'Type',
       placeholder: 'Please enter',
+      prefixPlaceholder: 'e.g.: https://',
+      autoCompletePlaceholder: 'e.g.: off',
       text: 'Text',
       email: 'Email',
       phone: 'Phone',
@@ -182,6 +188,7 @@ export const enUS: LocalePack = {
       maxTagCount: 'Max Tag Count',
       notFoundContent: 'Not Found Text',
       notFoundContentPlaceholder: 'Text when no match found',
+      defaultOptionTemplate: 'Option {n}',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selection changes' },
         onSearch: { label: 'Search', description: 'Triggered when search text changes' },
@@ -202,6 +209,7 @@ export const enUS: LocalePack = {
       solid: 'Solid',
       horizontal: 'Horizontal',
       vertical: 'Vertical',
+      defaultOptionTemplate: 'Option {n}',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selection changes' },
       },
@@ -213,6 +221,7 @@ export const enUS: LocalePack = {
       direction: 'Direction',
       horizontal: 'Horizontal',
       vertical: 'Vertical',
+      defaultOptionTemplate: 'Option {n}',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selection changes' },
       },
@@ -227,6 +236,8 @@ export const enUS: LocalePack = {
       expandTrigger: 'Expand Trigger',
       click: 'Click',
       hover: 'Hover',
+      defaultOptionTemplate: 'Option {n}',
+      defaultSubOptionTemplate: 'Sub-option {p}-{c}',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selection changes' },
         onPopupVisibleChange: { label: 'Panel Toggle', description: 'Triggered when panel opens/closes' },
@@ -241,6 +252,8 @@ export const enUS: LocalePack = {
       searchable: 'Searchable',
       multiple: 'Multiple',
       treeCheckable: 'Tree Check',
+      defaultOptionTemplate: 'Node {n}',
+      defaultSubOptionTemplate: 'Child {p}-{c}',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selected node changes' },
         onSearch: { label: 'Search', description: 'Triggered when search text changes' },
@@ -257,6 +270,7 @@ export const enUS: LocalePack = {
       large: 'Large',
       medium: 'Medium',
       small: 'Small',
+      defaultOptionTemplate: 'Option {n}',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selection changes' },
       },
@@ -333,6 +347,17 @@ export const enUS: LocalePack = {
     },
     dateRange: {
       label: 'Date Range',
+      defaultValue: 'Default Value',
+      format: 'Format',
+      picker: 'Picker Type',
+      showTime: 'Show Time',
+      startPlaceholder: 'Start Placeholder',
+      endPlaceholder: 'End Placeholder',
+      allowClear: 'Allow Clear',
+      date: 'Date',
+      week: 'Week',
+      month: 'Month',
+      year: 'Year',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selected date changes' },
         onCalendarChange: { label: 'Calendar Panel Change', description: 'Triggered when calendar panel month/year changes' },
@@ -386,6 +411,7 @@ export const enUS: LocalePack = {
       textType: 'Text',
       iconPlaceholder: 'e.g.: SearchOutlined',
       textPlaceholder: 'Button text',
+      defaultContent: 'Button',
       events: {
         onClick: { label: 'Click', description: 'Triggered when button is clicked' },
       },
@@ -394,6 +420,7 @@ export const enUS: LocalePack = {
       label: 'Title',
       content: 'Content',
       contentPlaceholder: 'Enter title',
+      defaultContent: 'Title',
       level: 'Level',
       type: 'Type',
       align: 'Align',
@@ -414,6 +441,7 @@ export const enUS: LocalePack = {
       label: 'Text',
       content: 'Content',
       contentPlaceholder: 'Enter text content',
+      defaultContent: 'Text content',
       type: 'Type',
       fontSize: 'Font Size',
       fontSizePlaceholder: 'e.g.: 16',
@@ -495,6 +523,24 @@ export const enUS: LocalePack = {
       wrap: 'Wrap',
       padding: 'Padding (px)',
       margin: 'Margin (px)',
+      wrapNoWrap: 'No Wrap',
+      wrapWrap: 'Wrap',
+      wrapReverse: 'Wrap Reverse',
+      justifyFlexStart: 'Flex Start',
+      justifyCenter: 'Center',
+      justifyFlexEnd: 'Flex End',
+      justifySpaceBetween: 'Space Between',
+      justifySpaceAround: 'Space Around',
+      justifySpaceEvenly: 'Space Evenly',
+      alignStretch: 'Stretch',
+      alignFlexStart: 'Flex Start',
+      alignCenter: 'Center',
+      alignFlexEnd: 'Flex End',
+      alignBaseline: 'Baseline',
+      directionRow: 'Horizontal',
+      directionRowReverse: 'Horizontal Reverse',
+      directionColumn: 'Vertical',
+      directionColumnReverse: 'Vertical Reverse',
     },
     collapse: {
       label: 'Collapse',
@@ -507,6 +553,7 @@ export const enUS: LocalePack = {
       key: 'Key',
       disabled: 'Disabled',
       addPanel: 'Add Panel',
+      defaultPanelHeader: 'Panel {n}',
       events: {
         onChange: { label: 'Change', description: 'Triggered when active panel changes' },
       },
@@ -532,6 +579,7 @@ export const enUS: LocalePack = {
       key: 'Key',
       disabled: 'Disabled',
       addTab: 'Add Tab',
+      defaultTabTitle: 'Tab {n}',
       events: {
         onChange: { label: 'Tab Change', description: 'Triggered when tab switches' },
       },
@@ -546,6 +594,7 @@ export const enUS: LocalePack = {
       columnTitle: 'Column Title',
       columnWidth: 'Column Width',
       addColumn: 'Add Column',
+      defaultColumnLabel: 'Column {n}',
     },
     upload: {
       label: 'Upload',
@@ -570,6 +619,7 @@ export const enUS: LocalePack = {
     form: { label: 'Form' },
     transfer: {
       label: 'Transfer',
+      defaultOptionTemplate: 'Option {n}',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selection changes' },
         onSearch: { label: 'Search', description: 'Triggered when search text changes' },
@@ -637,9 +687,12 @@ export const enUS: LocalePack = {
       instructions: 'One leaf path per line, levels separated by >:',
       batchEdit: 'Batch Edit',
       empty: 'No data',
+      nodeCount: '{n} nodes total',
+      layers: '{n} layers',
     },
     sortableTableEditor: {
       delete: 'Delete',
+      minItems: 'At least {n} item(s)',
     },
     sortableList: {
       delete: 'Delete',

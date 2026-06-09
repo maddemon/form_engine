@@ -1,11 +1,11 @@
 import React from 'react'
-import { useStyle } from '../styles'
+import { ThemeTokens, useStyle } from '../styles'
 
 // ─── Space ────────────────────────────────────────────────
 
 export type SpaceSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | number
 
-const GAP_TOKEN_MAP: Record<string, keyof import('../styles/defaultTheme').ThemeTokens> = {
+const GAP_TOKEN_MAP: Record<string, keyof ThemeTokens> = {
   xxs: 'spacingXxs',
   xs: 'spacingXs',
   sm: 'spacingSm',

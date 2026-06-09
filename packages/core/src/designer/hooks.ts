@@ -2,6 +2,7 @@ import { useCallback, useMemo, useReducer, useState } from 'react'
 import type { DeviceScene } from '../types/adapter'
 import type { DesignerAction, PaletteItem } from '../types/designer'
 import { type FormConfig, type FormFieldSchema, type FormSchema } from '../types/schema'
+import { useLocale } from '../locale'
 import { createFieldFromPalette } from './FieldList'
 import type { DesignerState } from './reducer'
 import { designerReducer, findInTree } from './reducer'
@@ -11,6 +12,7 @@ import { designerReducer, findInTree } from './reducer'
 // ===========================
 
 export function useFormDesigner(form: FormSchema) {
+  const { locale } = useLocale()
   const [state, dispatch] = useReducer(designerReducer, {
     schema: form,
     selectedFieldId: null,
@@ -36,11 +38,11 @@ export function useFormDesigner(form: FormSchema) {
   // 从控件库添加字段
   const addFieldFromPalette = useCallback(
     (item: PaletteItem, index?: number) => {
-      const field = createFieldFromPalette(item)
+      const field = createFieldFromPalette(item, locale)
       addField(field, index)
       return field
     },
-    [addField],
+    [addField, locale],
   )
 
   return {

@@ -1,7 +1,9 @@
-import type { FormFieldSchema, FormSchema, FormConfig } from './schema'
-import type { FormEngineAdapter, DesignerWidgets } from './adapter'
-import type { PropertySlots } from './property-slot'
 import type React from 'react'
+import type { LocalePack, SupportedLocale } from '../locale'
+import { PartialThemeTokens, SizeMode, ThemeMode } from '../styles'
+import type { DesignerWidgets, DeviceScene, FormEngineAdapter } from './adapter'
+import type { PropertySlots } from './property-slot'
+import type { FormConfig, FormFieldSchema, FormSchema } from './schema'
 
 /**
  * 设计器内部状态：被选中字段的 id
@@ -12,13 +14,13 @@ export type SelectedFieldId = string | null
  * 设计器拖拽事件类型
  */
 export interface DragStartEvent {
-  fieldType: string       // 从控件库拖出时：字段类型
-  source: 'palette'      // 来源：控件库
+  fieldType: string // 从控件库拖出时：字段类型
+  source: 'palette' // 来源：控件库
   field?: FormFieldSchema // 从画布拖出时：已有字段
 }
 
 export interface DragEndEvent {
-  targetIndex: number     // 放置目标位置
+  targetIndex: number // 放置目标位置
 }
 
 /**
@@ -27,8 +29,8 @@ export interface DragEndEvent {
 export interface PaletteItem {
   type: FormFieldSchema['type']
   label: string
-  icon?: string           // lucide icon name 或 emoji
-  defaultProps?: Partial<FormFieldSchema>
+  icon?: string
+  defaultProps?: Partial<FormFieldSchema> | ((locale: LocalePack) => Partial<FormFieldSchema>)
   /** 拖入画布时合并到 field.componentProps 的额外数据 */
   extraData?: Record<string, unknown>
 }
@@ -134,17 +136,17 @@ export interface DesignerProps {
    */
   panelWidths?: PanelWidths
   /** 可选：场景变化回调 */
-  onSceneChange?: (scene: import('../types/adapter').DeviceScene) => void
+  onSceneChange?: (scene: DeviceScene) => void
   /** 主题模式，透传给 StyleProvider */
-  themeMode?: import('../styles/StyleProvider').ThemeMode
+  themeMode?: ThemeMode
   /** 尺寸模式，透传给 StyleProvider */
-  sizeMode?: import('../styles/StyleProvider').SizeMode
+  sizeMode?: SizeMode
   /** 主题覆盖，透传给 StyleProvider */
-  theme?: import('../styles/types').PartialThemeTokens
+  theme?: PartialThemeTokens
   /** 属性编辑器 Slot（运行时注入，优先级最高） */
   propertySlots?: PropertySlots
   /** 语言包（i18n） */
-  locale?: import('../locale').SupportedLocale | Partial<import('../locale').LocalePack>
+  locale?: SupportedLocale | Partial<LocalePack>
 }
 
 /**
@@ -152,9 +154,25 @@ export interface DesignerProps {
  */
 export type DesignerAction =
   | { type: 'SELECT_FIELD'; fieldId: string | null }
-  | { type: 'ADD_FIELD'; field: FormFieldSchema; index: number; parentId?: string; columnIndex?: number; regionKey?: string }
+  | {
+      type: 'ADD_FIELD'
+      field: FormFieldSchema
+      index: number
+      parentId?: string
+      columnIndex?: number
+      regionKey?: string
+    }
   | { type: 'REMOVE_FIELD'; fieldId: string }
-  | { type: 'MOVE_FIELD'; fromIndex: number; toIndex: number; parentId?: string; fromParentId?: string; toParentId?: string; columnIndex?: number; regionKey?: string }
+  | {
+      type: 'MOVE_FIELD'
+      fromIndex: number
+      toIndex: number
+      parentId?: string
+      fromParentId?: string
+      toParentId?: string
+      columnIndex?: number
+      regionKey?: string
+    }
   | { type: 'UPDATE_FIELD'; fieldId: string; patch: Partial<FormFieldSchema> }
   | { type: 'UPDATE_FORM_CONFIG'; patch: Partial<FormConfig> }
   | { type: 'COPY_FIELD'; fieldId: string }

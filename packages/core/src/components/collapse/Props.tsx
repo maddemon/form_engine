@@ -43,9 +43,9 @@ export default function CollapsePropsRender({ widgets: w, values, onChange }: Pr
   const handleAddPanel = useCallback(() => {
     handlePanelsChange([
       ...panels,
-      { id: genId('panel'), key: `panel_${panels.length + 1}`, header: `面板${panels.length + 1}`, disabled: false },
+      { id: genId('panel'), key: `panel_${panels.length + 1}`, header: locale.component.collapse.defaultPanelHeader.replace('{n}', String(panels.length + 1)), disabled: false },
     ])
-  }, [panels, handlePanelsChange])
+  }, [panels, handlePanelsChange, locale])
 
   return (
     <>

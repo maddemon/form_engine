@@ -24,6 +24,34 @@ export function flattenLocale(obj: object, prefix = ''): Record<string, string> 
   return result
 }
 
+export function getDefaultOptions(template: string, count: number, valuePrefix = 'option'): Array<{ label: string; value: string }> {
+  return Array.from({ length: count }, (_, i) => ({
+    label: template.replace('{n}', String(i + 1)),
+    value: `${valuePrefix}${i + 1}`,
+  }))
+}
+
+export function getDefaultTreeOptions(
+  parentTemplate: string,
+  childTemplate: string,
+  structure: { children?: number }[],
+  valuePrefix = 'option',
+): Array<{ label: string; value: string; children?: Array<{ label: string; value: string }> }> {
+  return structure.map((item, i) => {
+    const node: { label: string; value: string; children?: Array<{ label: string; value: string }> } = {
+      label: parentTemplate.replace('{n}', String(i + 1)),
+      value: `${valuePrefix}${i + 1}`,
+    }
+    if (item.children) {
+      node.children = Array.from({ length: item.children }, (_, ci) => ({
+        label: childTemplate.replace('{p}', String(i + 1)).replace('{c}', String(ci + 1)),
+        value: `${valuePrefix}${i + 1}-${ci + 1}`,
+      }))
+    }
+    return node
+  })
+}
+
 export function validateLocale(
   reference: Record<string, string>,
   target: Record<string, string>,

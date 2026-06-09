@@ -6,6 +6,8 @@
  */
 
 import React from 'react'
+import { useLocale } from '../locale'
+import { FieldDataSource } from '../types'
 import type { DesignerWidgets } from '../types/adapter'
 import type { PropertySlotProps, PropertySlots, SlotName } from '../types/property-slot'
 
@@ -71,7 +73,7 @@ function adaptDataSourceEditor(w: DesignerWidgets): React.ComponentType<Property
   const DataSourceEditor = w.DataSourceEditor
   const Adapted: React.FC<PropertySlotProps> = ({ value, onChange, context }) => (
     <DataSourceEditor
-      value={value as import('../types/schema').FieldDataSource | undefined}
+      value={value as FieldDataSource | undefined}
       onChange={(v) => onChange(v)}
       optionsType={(context?.optionsType as 'flat' | 'tree') ?? 'flat'}
     />
@@ -116,41 +118,50 @@ const FALLBACK_TEXTAREA_STYLE: React.CSSProperties = {
   resize: 'vertical',
 }
 
-const FallbackExpressionEditor: React.FC<PropertySlotProps> = ({ value, onChange }) => (
-  <textarea
-    value={typeof value === 'string' ? value : ''}
-    onChange={(e) => onChange(e.target.value)}
-    placeholder="输入表达式"
-    rows={2}
-    style={FALLBACK_TEXTAREA_STYLE}
-  />
-)
+const FallbackExpressionEditor: React.FC<PropertySlotProps> = ({ value, onChange }) => {
+  const { locale } = useLocale()
+  return (
+    <textarea
+      value={typeof value === 'string' ? value : ''}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={locale.designer.propertyPanel.expressionPlaceholder}
+      rows={2}
+      style={FALLBACK_TEXTAREA_STYLE}
+    />
+  )
+}
 
-const FallbackJsonEditor: React.FC<PropertySlotProps> = ({ value, onChange }) => (
-  <textarea
-    value={typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
-    onChange={(e) => {
-      try {
-        onChange(JSON.parse(e.target.value))
-      } catch {
-        onChange(e.target.value)
-      }
-    }}
-    placeholder="输入 JSON"
-    rows={4}
-    style={FALLBACK_TEXTAREA_STYLE}
-  />
-)
+const FallbackJsonEditor: React.FC<PropertySlotProps> = ({ value, onChange }) => {
+  const { locale } = useLocale()
+  return (
+    <textarea
+      value={typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
+      onChange={(e) => {
+        try {
+          onChange(JSON.parse(e.target.value))
+        } catch {
+          onChange(e.target.value)
+        }
+      }}
+      placeholder={locale.designer.propertyPanel.jsonPlaceholder}
+      rows={4}
+      style={FALLBACK_TEXTAREA_STYLE}
+    />
+  )
+}
 
-const FallbackCodeEditor: React.FC<PropertySlotProps> = ({ value, onChange }) => (
-  <textarea
-    value={typeof value === 'string' ? value : ''}
-    onChange={(e) => onChange(e.target.value)}
-    placeholder="输入代码"
-    rows={2}
-    style={FALLBACK_TEXTAREA_STYLE}
-  />
-)
+const FallbackCodeEditor: React.FC<PropertySlotProps> = ({ value, onChange }) => {
+  const { locale } = useLocale()
+  return (
+    <textarea
+      value={typeof value === 'string' ? value : ''}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={locale.designer.propertyPanel.codePlaceholder}
+      rows={2}
+      style={FALLBACK_TEXTAREA_STYLE}
+    />
+  )
+}
 
 const FallbackDataSourceEditor: React.FC<PropertySlotProps> = ({ value, onChange }) => (
   <textarea
@@ -193,9 +204,6 @@ export function resolveSlot(
   widgets?: DesignerWidgets,
 ): React.ComponentType<PropertySlotProps> {
   return (
-    slots?.[name] ??
-    propertySlotRegistry.get(name) ??
-    getWidgetFallback(name, widgets) ??
-    defaultSlotFallbacks[name]
+    slots?.[name] ?? propertySlotRegistry.get(name) ?? getWidgetFallback(name, widgets) ?? defaultSlotFallbacks[name]
   )
 }

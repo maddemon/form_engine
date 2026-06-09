@@ -15,14 +15,14 @@ export const meta: ComponentRegistration = {
   label: 'component.card.label',
   category: 'container',
   icon: 'CardIcon',
-  defaultProps: {
+  defaultProps: (locale) => ({
     componentProps: {
-      title: '卡片标题',
+      title: locale?.component.card.titlePlaceholder ?? 'Card title',
       bodyPadding: 16,
       bodyGap: 8,
       bordered: true,
       size: 'default',
     },
-  },
+  }),
   eventDeclarations: [],
 }
