@@ -72,6 +72,7 @@ export type {
   DividerProps,
   FlexProps,
   GridProps,
+  HtmlProps,
   ImageProps,
   InputNumberProps,
   InputProps,

@@ -612,7 +612,8 @@ export const zhCN: LocalePack = {
         onRemove: { label: '移除文件', description: '移除文件时触发' },
       },
     },
-    html: { label: 'HTML' },
+    html: { label: 'HTML', content: 'HTML 内容', contentPlaceholder: '输入 HTML 代码...' },
+    jsx: { label: 'JSX', code: 'JSX 源码', codePlaceholder: '输入 JSX 代码...', compile: '编译', compiling: '编译中...', compileSuccess: '编译成功', compileError: '编译失败' },
     steps: { label: '步骤条' },
     tag: { label: '标签' },
     table: { label: '表格' },
@@ -699,6 +700,16 @@ export const zhCN: LocalePack = {
     },
     colorPicker: {
       clear: '清除',
+    },
+    codeEditor: {
+      title: '代码编辑器',
+      lines: '行',
+      fullscreen: '全屏',
+      exitFullscreen: '退出',
+      compile: '编译',
+      compiling: '编译中...',
+      compileSuccess: '编译成功',
+      compileError: '编译失败',
     },
   },
 

@@ -9,7 +9,7 @@ const GROUP_MEMBERS: Record<string, FieldType[]> = {
   'designer.paletteGroups.select': ['select', 'cascader', 'tree-select', 'radio', 'checkbox', 'switch', 'segment'],
   'designer.paletteGroups.dateTime': ['date', 'datetime', 'date-range', 'time'],
   'designer.paletteGroups.layout': ['grid', 'flex', 'collapse', 'tabs', 'sub-form', 'card'],
-  'designer.paletteGroups.display': ['text', 'title', 'image', 'divider', 'alert'],
+  'designer.paletteGroups.display': ['text', 'title', 'image', 'divider', 'html', 'jsx', 'alert'],
   'designer.paletteGroups.other': ['button', 'upload'],
 }
 

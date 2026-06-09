@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import { getEventDeclarations } from '../components'
 import { ErrorMessage, TooltipIcon } from '../designer/UIPrimitives'
 import { resolveEvents, type EventContext } from '../events'
@@ -11,6 +11,8 @@ import { AdapterContext } from './AdapterContext'
 import { FieldSchemaContext } from './FieldSchemaContext'
 import { useInsideContainer } from './InsideContainerContext'
 import { useFieldExpression } from './hooks/useFieldExpression'
+import { JsxRender } from './JsxRender'
+import { FormEngineContext } from './FormEngineContext'
 
 export interface FieldRendererProps {
   field: FormFieldSchema
@@ -29,6 +31,8 @@ export interface FieldRendererProps {
   errors?: string[]
   /** 已解析的表单全局配置（labelCol/wrapperCol 保证存在） */
   formConfig: FormConfig
+  /** JSX 组件作用域（不传时从 FormEngineContext 读取） */
+  jsxScope?: Record<string, unknown>
 }
 
 // ============================
@@ -153,7 +157,10 @@ export const FieldRenderer = React.memo(function FieldRenderer({
   eventContext,
   errors,
   formConfig,
+  jsxScope: jsxScopeProp,
 }: FieldRendererProps) {
+  const engineCtx = useContext(FormEngineContext)
+  const jsxScope = jsxScopeProp ?? engineCtx?.jsxScope ?? {}
   // 表达式计算（disabled / required）
   const { exprDisabled, exprRequired } = useFieldExpression(field, value)
 
@@ -280,6 +287,23 @@ export const FieldRenderer = React.memo(function FieldRenderer({
       adapter.scene,
     ],
   )
+
+  if (field.type === 'jsx') {
+    const compiledCode = (field.componentProps?.compiledCode as string) || ''
+    return (
+      <div className="fe-field">
+        <FormItemTag {...formItemProps}>
+          <JsxRender
+            compiledCode={compiledCode}
+            scope={jsxScope}
+            componentProps={field.componentProps ?? {}}
+            value={value}
+            onChange={handleChange}
+          />
+        </FormItemTag>
+      </div>
+    )
+  }
 
   return (
     <div

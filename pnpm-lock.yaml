@@ -152,6 +152,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@babel/standalone':
+        specifier: ^7.26.0
+        version: 7.29.7
       '@dnd-kit/core':
         specifier: ^6.3.1
         version: 6.3.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -333,6 +336,10 @@ packages:
 
   '@babel/runtime@7.29.7':
     resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/standalone@7.29.7':
+    resolution: {integrity: sha512-oFh9XoGL20UuHIeIuBQHOvF7r2dOCRnZW0r4SageGb9SWnt6HhbuPLREykNaEnP7/SRpMUwr50SSMJLrmeHvnQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.29.7':
@@ -3263,6 +3270,8 @@ snapshots:
       '@babel/helper-plugin-utils': 7.29.7
 
   '@babel/runtime@7.29.7': {}
+
+  '@babel/standalone@7.29.7': {}
 
   '@babel/template@7.29.7':
     dependencies:

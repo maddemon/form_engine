@@ -1,11 +1,12 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { FieldRenderer, DefaultFormItem } from '../renderer/FieldRenderer'
 import { isContainerComponent, isFormComponent } from '../components'
 import type { FormEngineAdapter } from '../types/adapter'
 import type { FormItemProps } from '../types/adapter'
 import type { FormConfig, FormFieldSchema } from '../types/schema'
+import { mergeJsxScope } from '../renderer'
 import { ContainerPreview } from './ContainerPreview'
 import { FieldItem } from './FieldItem'
 import { useDesignerConfig, useDesignerSelection } from './DesignerContext'
@@ -25,11 +26,16 @@ interface NestedFieldProps {
 
 export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, parentContainerId, childIndex, selectedFieldId: selectedFieldIdProp, formConfig: formConfigProp, adapter: adapterProp }) => {
   const { selectedFieldId: selectedFieldIdCtx } = useDesignerSelection()
-  const { formConfig: formConfigCtx, adapter: adapterCtx } = useDesignerConfig()
+  const { formConfig: formConfigCtx, adapter: adapterCtx, desktopAdapter: desktopAdapterCtx } = useDesignerConfig()
 
   const selectedFieldId = selectedFieldIdProp ?? selectedFieldIdCtx
   const formConfig = formConfigProp ?? formConfigCtx
   const adapter = adapterProp ?? adapterCtx
+
+  const designerJsxScope = useMemo(
+    () => mergeJsxScope(desktopAdapterCtx, adapter, adapter.scene),
+    [desktopAdapterCtx, adapter],
+  )
 
   const isContainer = isContainerComponent(field.type)
 
@@ -45,7 +51,7 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
   const content = isContainer ? (
     <ContainerPreview field={field} />
   ) : (
-    <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} />
+    <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} jsxScope={designerJsxScope} />
   )
 
   const needsLabel = isContainer && !SELF_RENDERED.has(field.type)

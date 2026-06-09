@@ -14,7 +14,35 @@
 
 import type { DesignerWidgets, FieldComponentProps, FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
 
-// 静态导入所有组件
+// JSX Scope 组件
+import {
+  Alert as AntAlert,
+  Avatar as AntAvatar,
+  Badge as AntBadge,
+  Button as AntButton,
+  Card as AntCard,
+  Col as AntCol,
+  Descriptions as AntDescriptions,
+  Divider as AntDivider,
+  Empty as AntEmpty,
+  List as AntList,
+  Popover as AntPopover,
+  Progress as AntProgress,
+  QRCode as AntQRCode,
+  Result as AntResult,
+  Row as AntRow,
+  Skeleton as AntSkeleton,
+  Space as AntSpace,
+  Spin as AntSpin,
+  Steps as AntSteps,
+  Table as AntTable,
+  Tag as AntTag,
+  Tooltip as AntTooltip,
+  Typography,
+} from 'antd'
+const { Text: AntText, Title: AntTitle, Paragraph: AntParagraph } = Typography
+
+// 静态导入所有字段组件
 import { Alert } from './components/Alert'
 import { Button } from './components/Button'
 import { Card } from './components/Card'
@@ -27,6 +55,7 @@ import { Flex } from './components/Flex'
 import { AntdFormItem } from './components/FormItem'
 import { AntdFormWrapper } from './components/FormWrapper'
 import { Grid } from './components/Grid'
+import { Html } from './components/Html'
 import { Image } from './components/Image'
 import { Input, Password } from './components/Input'
 import { InputNumber } from './components/InputNumber'
@@ -35,8 +64,8 @@ import { Rate } from './components/Rate'
 import { Segment } from './components/Segment'
 import { Select } from './components/Select'
 import { Slider } from './components/Slider'
-import { Switch as SwitchField } from './components/Switch'
 import { SubForm } from './components/SubForm'
+import { Switch as SwitchField } from './components/Switch'
 import { Tabs } from './components/Tabs'
 import { Text } from './components/Text'
 import { TextArea } from './components/TextArea'
@@ -57,6 +86,7 @@ export { DatePicker, DateRangePicker, TimePicker } from './components/DatePicker
 export { Divider } from './components/Divider'
 export { Flex } from './components/Flex'
 export { Grid } from './components/Grid'
+export { Html } from './components/Html'
 export { Image } from './components/Image'
 export { Input, Password } from './components/Input'
 export { InputNumber } from './components/InputNumber'
@@ -65,8 +95,8 @@ export { Rate } from './components/Rate'
 export { Segment } from './components/Segment'
 export { Select } from './components/Select'
 export { Slider } from './components/Slider'
-export { Switch } from './components/Switch'
 export { SubForm } from './components/SubForm'
+export { Switch } from './components/Switch'
 export { TabPane, Tabs } from './components/Tabs'
 export { Text } from './components/Text'
 export { TextArea } from './components/TextArea'
@@ -145,6 +175,7 @@ export const antdAdapter: FormEngineAdapter = {
     divider: Divider,
     title: Title,
     alert: Alert,
+    html: Html,
     segment: Segment,
     button: Button,
   } as unknown as Record<string, FieldRendererFn>,
@@ -154,6 +185,33 @@ export const antdAdapter: FormEngineAdapter = {
   bridgeProvider: AntdBridgeProvider,
   FormWrapper: AntdFormWrapper,
   FormItem: AntdFormItem,
+  jsxScope: {
+    AntCard,
+    AntTag,
+    AntTable,
+    AntBadge,
+    AntAlert,
+    AntProgress,
+    AntAvatar,
+    AntList,
+    AntEmpty,
+    AntSpin,
+    AntTooltip,
+    AntPopover,
+    AntQRCode,
+    AntSkeleton,
+    AntResult,
+    AntSteps,
+    AntDescriptions,
+    AntSpace,
+    AntRow,
+    AntCol,
+    AntDivider,
+    AntText,
+    AntTitle,
+    AntParagraph,
+    AntButton,
+  },
 }
 
 export default antdAdapter

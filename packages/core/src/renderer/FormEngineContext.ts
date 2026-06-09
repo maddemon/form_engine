@@ -11,6 +11,7 @@ export interface FormEngineContextValue {
   adapter: FormEngineAdapter
   components: Record<string, ComponentRenderFn>
   loading: boolean
+  jsxScope: Record<string, unknown>
 }
 
 export const FormEngineContext = createContext<FormEngineContextValue | null>(null)

@@ -7,6 +7,7 @@ export { InsideContainerContext, useInsideContainer } from './InsideContainerCon
 export { FormEngineContext, useFormEngine, type FormEngineContextValue } from './FormEngineContext'
 export { FormStateContext, useFormState, type FormStateContextValue } from './FormStateContext'
 export { useAdaptiveAdapter, detectScene } from './useAdaptiveAdapter'
+export { mergeJsxScope } from './jsxScope'
 export { useFormRender } from './hooks/useFormRender'
 export { useVisibility } from './hooks/useVisibility'
 export { useFormValues } from './hooks/useFormValues'

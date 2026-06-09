@@ -14,6 +14,7 @@ import { pickAdapter } from '../utils'
 import { FieldRenderer } from './FieldRenderer'
 import { FormConfigContext, useFormConfig } from './FormConfigContext'
 import { FormEngineContext, useFormEngine, type FormEngineContextValue } from './FormEngineContext'
+import { mergeJsxScope } from './jsxScope'
 import { FormStateContext, useFormState, type FormStateContextValue } from './FormStateContext'
 import { useFormRender } from './hooks/useFormRender'
 import { InsideContainerContext } from './InsideContainerContext'
@@ -27,6 +28,8 @@ export interface FormRenderHandle {
 export interface FormRenderProps {
   schema: FormSchema
   onSubmit?: (values: Record<string, unknown>) => void
+  /** JSX 组件额外作用域（用户注入的非 adapter 组件） */
+  jsxScope?: Record<string, React.ComponentType<any>>
   onChange?: (values: Record<string, unknown>) => void
   dataSourceResolver?: DataSourceResolver
   components?: Record<string, ComponentRenderFn>
@@ -93,6 +96,7 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(
       beforeSubmit,
       afterSubmit,
       locale,
+      jsxScope: userJsxScope,
     },
     ref,
   ) => {
@@ -118,6 +122,7 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(
           callbacks={callbacks}
           beforeSubmit={beforeSubmit}
           afterSubmit={afterSubmit}
+          jsxScope={userJsxScope}
         />
       </LocaleProvider>
     )
@@ -175,6 +180,7 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
       callbacks = {},
       beforeSubmit,
       afterSubmit,
+      jsxScope: userJsxScope,
     },
     ref,
   ) => {
@@ -216,13 +222,19 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
 
     const FormTag = resolvedAdapter?.FormWrapper ?? DefaultFormWrapper
 
+    const jsxScope = useMemo(
+      () => mergeJsxScope(desktopAdapter, mobileAdapter, scene, userJsxScope),
+      [desktopAdapter, mobileAdapter, scene, userJsxScope],
+    )
+
     const engineCtx = useMemo<FormEngineContextValue>(
       () => ({
         adapter: resolvedAdapter,
         components,
         loading,
+        jsxScope,
       }),
-      [resolvedAdapter, components, loading],
+      [resolvedAdapter, components, loading, jsxScope],
     )
 
     const stateCtx = useMemo<FormStateContextValue>(

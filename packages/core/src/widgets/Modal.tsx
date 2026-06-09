@@ -6,7 +6,7 @@ import { WidgetButton } from './Button'
 export interface WidgetModalProps {
   open: boolean
   title: string
-  width?: 'sm' | 'md'
+  width?: 'sm' | 'md' | 'fullscreen'
   onCancel: () => void
   onConfirm?: () => void
   confirmText?: string
@@ -52,8 +52,11 @@ export const WidgetModal: React.FC<WidgetModalProps> = ({
     background: 'var(--fe-bg-primary)',
     borderRadius: token('borderRadiusLg'),
     boxShadow: token('shadowLg'),
-    width: token(WIDTH_MAP[width]),
-    maxWidth: '90vw',
+    width: width === 'fullscreen' ? '95vw' : token(WIDTH_MAP[width]),
+    maxWidth: width === 'fullscreen' ? '95vw' : '90vw',
+    height: width === 'fullscreen' ? '92vh' : undefined,
+    display: 'flex',
+    flexDirection: 'column',
     padding: token('spacingLg'),
   }
 

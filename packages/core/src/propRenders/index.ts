@@ -1,5 +1,7 @@
 import type { ComponentType } from 'react'
 import AlertPropsRender from '../components/alert/Props'
+import HtmlPropsRender from '../components/html/Props'
+import JsxPropsRender from '../components/jsx/Props'
 import ButtonPropsRender from '../components/button/Props'
 import CardPropsRender from '../components/card/Props'
 import CascaderPropsRender from '../components/cascader/Props'
@@ -65,6 +67,8 @@ export const PropsRenderMap: Record<string, ComponentType<PropsRenderProps>> = {
   cascader: CascaderPropsRender,
   'tree-select': TreeSelectPropsRender,
   card: CardPropsRender,
+  html: HtmlPropsRender,
+  jsx: JsxPropsRender,
   alert: AlertPropsRender,
   segment: SegmentPropsRender,
 }

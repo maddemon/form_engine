@@ -612,7 +612,8 @@ export const enUS: LocalePack = {
         onRemove: { label: 'Remove File', description: 'Triggered when a file is removed' },
       },
     },
-    html: { label: 'HTML' },
+    html: { label: 'HTML', content: 'HTML Content', contentPlaceholder: 'Enter HTML code...' },
+    jsx: { label: 'JSX', code: 'JSX Code', codePlaceholder: 'Enter JSX code...', compile: 'Compile', compiling: 'Compiling...', compileSuccess: 'Compiled', compileError: 'Compile failed' },
     steps: { label: 'Steps' },
     tag: { label: 'Tag' },
     table: { label: 'Table' },
@@ -699,6 +700,16 @@ export const enUS: LocalePack = {
     },
     colorPicker: {
       clear: 'Clear',
+    },
+    codeEditor: {
+      title: 'Code Editor',
+      lines: 'lines',
+      fullscreen: 'Fullscreen',
+      exitFullscreen: 'Exit',
+      compile: 'Compile',
+      compiling: 'Compiling...',
+      compileSuccess: 'Compiled',
+      compileError: 'Compile failed',
     },
   },
 

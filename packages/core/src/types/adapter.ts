@@ -215,6 +215,14 @@ export interface FormEngineAdapter {
    * 不提供时引擎使用内置 validateForm() 兜底
    */
   validate?: ValidateFn
+
+  /**
+   * JSX 组件作用域
+   * 暴露给 JSX 渲染器的组件映射。key 是组件名，value 是组件。
+   * 两个 adapter 的 jsxScope 合并铺平到统一 scope 中，无覆盖规则。
+   * 用户也可通过 FormRender.jsxScope 额外注入。
+   */
+  jsxScope?: Record<string, React.ComponentType<any>>
 }
 
 // ============================

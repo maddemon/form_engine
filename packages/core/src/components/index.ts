@@ -47,6 +47,8 @@ import { meta as time } from './time-picker'
 import { meta as title_ } from './title'
 import { meta as treeSelect } from './tree-select'
 import { meta as upload } from './upload'
+import { meta as html } from './html'
+import { meta as jsx } from './jsx'
 
 import type { AlertProps } from './alert/'
 import type { ButtonProps } from './button/'
@@ -73,6 +75,8 @@ import type { TextProps } from './text/'
 import type { TextAreaProps } from './textarea/'
 import type { TitleProps } from './title/'
 import type { TreeSelectProps } from './tree-select/'
+import type { HtmlProps } from './html/'
+import type { JsxProps } from './jsx/'
 import type { UploadFile, UploadProps } from './upload/'
 export type {
   AlertProps,
@@ -101,6 +105,8 @@ export type {
   TabPaneConfig,
   TabsProps,
   TextAreaProps,
+  HtmlProps,
+  JsxProps,
   TextProps,
   TitleProps,
   TreeSelectProps,
@@ -168,6 +174,8 @@ export const componentRegistry = {
   image: { ...image },
   divider: { ...divider },
   alert: { ...alert },
+  html: { ...html },
+  jsx: { ...jsx },
   segment: { ...segment },
 
   // ── 按钮组件 ─────────────────────────────────────
