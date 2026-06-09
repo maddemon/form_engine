@@ -26,6 +26,12 @@ export interface DesignerConfigContextValue {
   adapter: FormEngineAdapter
   /** 属性面板 widgets 所用的 desktop adapter（始终优先 desktop） */
   desktopAdapter: FormEngineAdapter
+  /**
+   * mobile adapter（用户在 Designer 上传的）。可选：
+   * - 上传时一并注入到 context，让 PropertyPanel 内的 JSX 编辑器能展示移动端可用 scope
+   * - 未上传时为 undefined，PropertyPanel 不会展示移动端 scope
+   */
+  mobileAdapter?: FormEngineAdapter
 }
 
 const DesignerDispatchContext = createContext<DesignerDispatchContextValue | null>(null)

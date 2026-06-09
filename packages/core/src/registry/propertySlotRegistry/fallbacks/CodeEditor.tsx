@@ -49,6 +49,65 @@ const BUTTON_BAR: React.CSSProperties = {
   gap: 8,
 }
 
+const GROUP_TITLE: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 600,
+  color: 'var(--fe-text-secondary)',
+  marginTop: 12,
+  marginBottom: 6,
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+}
+
+/** 单个 prop chip 的样式（所有项统一走 chip） */
+const PROP_ROW_COMPACT: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '2px 8px',
+  margin: '1px 4px 1px 0',
+  fontSize: 12,
+  lineHeight: 1.5,
+  fontFamily: "'Menlo','Consolas',monospace",
+  background: 'var(--fe-bg-secondary)',
+  border: '1px solid var(--fe-border-secondary)',
+  borderRadius: 'var(--fe-border-radius-sm)',
+  color: 'var(--fe-text-primary)',
+}
+
+const CHIP_WRAP: React.CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: 0,
+}
+
+const PROP_HINT: React.CSSProperties = {
+  marginBottom: 8,
+  padding: '6px 10px',
+  fontSize: 12,
+  color: 'var(--fe-text-secondary)',
+  background: 'var(--fe-bg-secondary)',
+  borderRadius: 'var(--fe-border-radius-sm)',
+  whiteSpace: 'pre-line',
+}
+
+/** 单个可注入的 prop 描述项 */
+export interface AvailablePropItem {
+  name: string
+  type?: string
+  description?: string
+}
+
+/** 按来源分组的 prop 集合 */
+export interface AvailablePropGroup {
+  title: string
+  items: AvailablePropItem[]
+}
+
+/** 注入到用户函数顶层的可用 props 数据（按来源分组） */
+export interface AvailablePropsData {
+  groups: AvailablePropGroup[]
+}
+
 function countLines(code: string): number {
   if (!code) return 0
   return code.split('\n').length
@@ -74,10 +133,13 @@ const FallbackCodeEditor: React.FC<PropertySlotProps> = ({ value, onChange, cont
   const [compiling, setCompiling] = useState(false)
   const [compileStatus, setCompileStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [compileError, setCompileError] = useState('')
+  const [propsModalOpen, setPropsModalOpen] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const language = (context?.language as string) ?? 'html'
   const onCompile = context?.onCompile as ((code: string) => Promise<{ success: boolean; error?: string }>) | undefined
+  const availableProps = context?.availableProps as AvailablePropsData | undefined
+  const availablePropsCount = availableProps?.groups.reduce((sum, g) => sum + g.items.length, 0) ?? 0
   const strValue = typeof value === 'string' ? value : ''
   const lineCount = countLines(strValue)
   const c = locale.widget.codeEditor
@@ -175,6 +237,11 @@ const FallbackCodeEditor: React.FC<PropertySlotProps> = ({ value, onChange, cont
               {compiling ? c?.compiling || 'Compiling...' : c?.compile || 'Compile'}
             </WidgetButton>
           )}
+          {availableProps && availableProps.groups.length > 0 && (
+            <WidgetButton type="default" size="sm" onClick={() => setPropsModalOpen(true)}>
+              {c?.availableProps || 'Available Props'} ({availablePropsCount})
+            </WidgetButton>
+          )}
           {statusText && (
             <span
               style={{
@@ -241,6 +308,37 @@ const FallbackCodeEditor: React.FC<PropertySlotProps> = ({ value, onChange, cont
           >
             {compileError}
           </div>
+        )}
+      </WidgetModal>
+      <WidgetModal
+        open={propsModalOpen}
+        title={c?.availablePropsModalTitle || 'Available Props'}
+        width="md"
+        onCancel={() => setPropsModalOpen(false)}
+        footer={
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+            <WidgetButton type="primary" onClick={() => setPropsModalOpen(false)}>
+              {c?.availablePropsClose || 'Close'}
+            </WidgetButton>
+          </div>
+        }
+      >
+        {availableProps && (
+          <>
+            {c?.availablePropsHint && <div style={PROP_HINT}>{c.availablePropsHint}</div>}
+            {availableProps.groups.map((g) => (
+              <div key={g.title}>
+                <div style={GROUP_TITLE}>{g.title}</div>
+                <div style={CHIP_WRAP}>
+                  {g.items.map((p) => (
+                    <span key={p.name} style={PROP_ROW_COMPACT} title={p.name}>
+                      {p.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </>
         )}
       </WidgetModal>
     </>

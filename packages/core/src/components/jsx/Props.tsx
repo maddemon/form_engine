@@ -1,13 +1,29 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
+import { DesignerConfigContext } from '../../designer/DesignerContext'
 import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
 import { resolveSlot } from '../../registry/propertySlotRegistry'
+import type {
+  AvailablePropGroup,
+  AvailablePropItem,
+  AvailablePropsData,
+} from '../../registry/propertySlotRegistry/fallbacks/CodeEditor'
+import { FormEngineContext } from '../../renderer/FormEngineContext'
+
+/** 内部使用的 key，会被过滤掉不向用户展示 */
+const INTERNAL_COMPONENT_PROP_KEYS = new Set(['code', 'compiledCode'])
 
 export default function JsxPropsRender({ widgets: w, slots, values, onChange }: PropsRenderProps) {
   const { locale } = useLocale()
   const c = locale.component.jsx
+  const ce = locale.widget.codeEditor
   const CodeEditor = useMemo(() => resolveSlot('codeEditor', slots, w), [slots, w])
+  // 设计期 PropertyPanel 不在 FormEngineContext.Provider 内；通过 DesignerConfigContext
+  // 拿到 desktopAdapter.jsxScope 才是真实的可用组件清单（如 AntCard / AntButton）。
+  // 运行时（如自定义 FormField 内使用 JSX 编辑器）则走 FormEngineContext.jsxScope。
+  const engineCtx = useContext(FormEngineContext)
+  const designerCtx = useContext(DesignerConfigContext)
 
   const handleCompile = useCallback(
     async (code: string): Promise<{ success: boolean; error?: string }> => {
@@ -45,13 +61,61 @@ export default function JsxPropsRender({ widgets: w, slots, values, onChange }: 
     [onChange],
   )
 
+  /**
+   * 运行时会被注入到 Component 函数顶层的 props 清单（按来源分组）。
+   * 1) 稳定注入：value / onChange / scene；
+   * 2) 字段 componentProps：用户在 PropertyPanel 配置的自定义 key（除内部 code/compiledCode 外）；
+   * 3) jsxScope：design-time 取 DesignerConfigContext 的 desktopAdapter + mobileAdapter 合并；
+   *             runtime 取 FormEngineContext.jsxScope。FormEngineContext 优先。
+   * 不使用 useMemo：依赖 jsxScope 是对象引用，React Compiler 无法证明稳定，
+   * 包 useMemo 会触发"Compilation Skipped"。该计算成本极低（O(k)），无需手动缓存。
+   */
+  const componentPropKeys = Object.keys(values ?? {}).filter((k) => !INTERNAL_COMPONENT_PROP_KEYS.has(k))
+
+  // jsxScope 来源优先级：runtime FormEngineContext > designer desktopAdapter + mobileAdapter 合并
+  // 合并顺序：desktop 在前，mobile 在后（同名 key 时 mobile 覆盖 desktop；实际 antd / antd-mobile
+  // 命名空间 Ant / Antm 互不冲突，所以这只是兜底策略）。
+  const runtimeScope = engineCtx?.jsxScope
+  const designerScope =
+    !runtimeScope && (designerCtx?.desktopAdapter?.jsxScope || designerCtx?.mobileAdapter?.jsxScope)
+      ? { ...designerCtx.desktopAdapter?.jsxScope, ...designerCtx.mobileAdapter?.jsxScope }
+      : undefined
+  const jsxScope = runtimeScope ?? designerScope
+  const scopeKeys = jsxScope ? Object.keys(jsxScope) : []
+
+  const stableGroup: AvailablePropGroup = {
+    title: ce.availablePropsGroupStable ?? 'Stable',
+    items: [{ name: 'value' }, { name: 'onChange' }, { name: 'scene' }],
+  }
+
+  const fieldPropsGroup: AvailablePropGroup | null =
+    componentPropKeys.length === 0
+      ? null
+      : {
+          title: ce.availablePropsGroupFieldProps ?? 'Field Props',
+          items: componentPropKeys.map<AvailablePropItem>((k) => ({ name: k })),
+        }
+
+  const scopeGroup: AvailablePropGroup | null =
+    !jsxScope || scopeKeys.length === 0
+      ? null
+      : {
+          title: ce.availablePropsGroupScope ?? 'Scope',
+          items: scopeKeys.map<AvailablePropItem>((k) => ({ name: k })),
+        }
+
+  const groups: AvailablePropGroup[] = [stableGroup, fieldPropsGroup, scopeGroup].filter(
+    (g): g is AvailablePropGroup => g !== null,
+  )
+  const availableProps: AvailablePropsData = { groups }
+
   return (
     <FieldItem label={c.code}>
       <CodeEditor
         value={(values.code as string) ?? ''}
         onChange={(v) => onChange('code', v)}
         placeholder={c.codePlaceholder}
-        context={{ language: 'jsx', onCompile: handleCompile }}
+        context={{ language: 'jsx', onCompile: handleCompile, availableProps }}
       />
     </FieldItem>
   )

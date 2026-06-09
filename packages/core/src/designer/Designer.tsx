@@ -133,7 +133,10 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
 
   const dispatchCtx = useMemo(() => ({ dispatch }), [dispatch])
   const selectionCtx = useMemo(() => ({ selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField }), [state.selectedFieldId, handleSelectField])
-  const configCtx = useMemo(() => ({ scene, formConfig, adapter: canvasAdapter, desktopAdapter: widgetsAdapter }), [scene, formConfig, canvasAdapter, widgetsAdapter])
+  const configCtx = useMemo(
+    () => ({ scene, formConfig, adapter: canvasAdapter, desktopAdapter: widgetsAdapter, mobileAdapter }),
+    [scene, formConfig, canvasAdapter, widgetsAdapter, mobileAdapter],
+  )
 
   const { token } = useStyle()
 

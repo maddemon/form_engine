@@ -339,7 +339,10 @@ export const enUS: LocalePack = {
       year: 'Year',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selected date changes' },
-        onCalendarChange: { label: 'Calendar Panel Change', description: 'Triggered when calendar panel month/year changes' },
+        onCalendarChange: {
+          label: 'Calendar Panel Change',
+          description: 'Triggered when calendar panel month/year changes',
+        },
         onOpenChange: { label: 'Open State', description: 'Triggered when panel opens/closes' },
         onPanelChange: { label: 'Panel Change', description: 'Triggered when panel type changes' },
         onOk: { label: 'Confirm', description: 'Triggered when confirm button is clicked' },
@@ -360,7 +363,10 @@ export const enUS: LocalePack = {
       year: 'Year',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selected date changes' },
-        onCalendarChange: { label: 'Calendar Panel Change', description: 'Triggered when calendar panel month/year changes' },
+        onCalendarChange: {
+          label: 'Calendar Panel Change',
+          description: 'Triggered when calendar panel month/year changes',
+        },
         onOpenChange: { label: 'Open State', description: 'Triggered when panel opens/closes' },
         onPanelChange: { label: 'Panel Change', description: 'Triggered when panel type changes' },
         onOk: { label: 'Confirm', description: 'Triggered when confirm button is clicked' },
@@ -374,7 +380,10 @@ export const enUS: LocalePack = {
       picker: 'Picker Type',
       events: {
         onChange: { label: 'Value Change', description: 'Triggered when selected date changes' },
-        onCalendarChange: { label: 'Calendar Panel Change', description: 'Triggered when calendar panel month/year changes' },
+        onCalendarChange: {
+          label: 'Calendar Panel Change',
+          description: 'Triggered when calendar panel month/year changes',
+        },
         onOpenChange: { label: 'Open State', description: 'Triggered when panel opens/closes' },
         onPanelChange: { label: 'Panel Change', description: 'Triggered when panel type changes' },
         onOk: { label: 'Confirm', description: 'Triggered when confirm button is clicked' },
@@ -613,7 +622,15 @@ export const enUS: LocalePack = {
       },
     },
     html: { label: 'HTML', content: 'HTML Content', contentPlaceholder: 'Enter HTML code...' },
-    jsx: { label: 'JSX', code: 'JSX Code', codePlaceholder: 'Enter JSX code...', compile: 'Compile', compiling: 'Compiling...', compileSuccess: 'Compiled', compileError: 'Compile failed' },
+    jsx: {
+      label: 'JSX',
+      code: 'JSX Code',
+      codePlaceholder: 'Enter JSX code...',
+      compile: 'Compile',
+      compiling: 'Compiling...',
+      compileSuccess: 'Compiled',
+      compileError: 'Compile failed',
+    },
     steps: { label: 'Steps' },
     tag: { label: 'Tag' },
     table: { label: 'Table' },
@@ -710,6 +727,19 @@ export const enUS: LocalePack = {
       compiling: 'Compiling...',
       compileSuccess: 'Compiled',
       compileError: 'Compile failed',
+      availableProps: 'Available Props',
+      availablePropsModalTitle: 'Available Props (Runtime Injected)',
+      availablePropsHint:
+        "These props are injected into the user function at runtime — destructure directly.\nTo use other components (e.g. antd Form / Modal / Input), inject them via FormRender's jsxScope prop.",
+      availablePropsClose: 'Close',
+      availablePropsGroupStable: 'Stable',
+      availablePropsGroupFieldProps: 'Field Props (from componentProps)',
+      availablePropsGroupScope: 'Scope (from adapter / FormRender.jsxScope)',
+      availablePropsStableValueDesc: 'Current field value',
+      availablePropsStableOnChangeDesc: 'Value change callback',
+      availablePropsStableSceneDesc: 'Current render scene',
+      availablePropsFieldPropDesc: 'Field componentProps',
+      availablePropsScopeDesc: 'Injected via jsxScope',
     },
   },
 

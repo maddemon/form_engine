@@ -708,6 +708,30 @@ export interface LocalePack {
       compiling?: string
       compileSuccess?: string
       compileError?: string
+      /** 代码编辑器工具栏上"可用 Props"按钮文案（带数量后缀） */
+      availableProps?: string
+      /** 可用 Props 弹窗标题 */
+      availablePropsModalTitle?: string
+      /** 弹窗内顶部提示 */
+      availablePropsHint?: string
+      /** 弹窗底部关闭按钮 */
+      availablePropsClose?: string
+      /** 弹窗内：稳定注入项分组标题 */
+      availablePropsGroupStable?: string
+      /** 弹窗内：字段 componentProps 分组标题 */
+      availablePropsGroupFieldProps?: string
+      /** 弹窗内：jsxScope 分组标题 */
+      availablePropsGroupScope?: string
+      /** 稳定组：value 项描述 */
+      availablePropsStableValueDesc?: string
+      /** 稳定组：onChange 项描述 */
+      availablePropsStableOnChangeDesc?: string
+      /** 稳定组：scene 项描述 */
+      availablePropsStableSceneDesc?: string
+      /** 字段 Props 组：每个 key 复用同一描述 */
+      availablePropsFieldPropDesc?: string
+      /** jsxScope 组：每个 key 复用同一描述 */
+      availablePropsScopeDesc?: string
     }
   }
 

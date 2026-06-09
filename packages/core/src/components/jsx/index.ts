@@ -5,7 +5,10 @@ export interface JsxProps extends BaseComponentProps {
   compiledCode?: string
 }
 
-const DEFAULT_CODE = `function Component(props) {
+// 可从 props 解构出的稳定项：value、onChange、scene；
+// 其余 scope 键（AntCard/AntButton/AntmCard/...）以及用户在 PropertyPanel 配置的 componentProps
+// 也都会被平铺到 props 上，按需解构即可。
+const DEFAULT_CODE = `function Component({ AntCard, AntButton }) {
   const [count, setCount] = React.useState(0);
   const [text, setText] = React.useState("");
   return (
