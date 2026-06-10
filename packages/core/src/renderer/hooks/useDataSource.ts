@@ -46,7 +46,6 @@ export function useDataSource({
           const latestValues = formValuesRef.current
           const deps = getDataSourceDeps(ds)
           const snapshot = deps.map((d) => `${d}=${(latestValues as Record<string, unknown>)[d]}`).join(',')
-          setFieldDepsSnapshot((prev) => ({ ...prev, [field.name]: snapshot }))
 
           const options = await resolveDataSource(
             ds,

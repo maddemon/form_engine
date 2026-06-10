@@ -216,7 +216,13 @@ export interface LocalePack {
       label: string
       dataSource: string
       indeterminate: string
+      optionType: string
+      buttonStyle: string
       direction: string
+      defaultType: string
+      button: string
+      border: string
+      solid: string
       horizontal: string
       vertical: string
       defaultOptionTemplate: string

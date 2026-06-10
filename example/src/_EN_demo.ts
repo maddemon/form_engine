@@ -10,7 +10,7 @@ const schemaEn: FormSchema = {
       name: 'welcomeTitle',
       type: 'title',
       label: '',
-      componentProps: { children: 'Welcome to Form Engine', level: 3, textAlign: 'center' },
+      componentProps: { content: 'Welcome to Form Engine', level: 3, textAlign: 'center' },
       children: [],
     },
     {
@@ -19,7 +19,7 @@ const schemaEn: FormSchema = {
       type: 'text',
       label: '',
       componentProps: {
-        children:
+        content:
           'This is a sample form for testing different data source types. You can edit it freely in the Designer, or switch to the Render page to preview.',
         type: 'secondary',
       },
@@ -46,9 +46,8 @@ const schemaEn: FormSchema = {
     {
       id: 'field-gender',
       name: 'gender',
-      type: 'select',
+      type: 'radio',
       label: 'Gender',
-      placeholder: 'Select gender',
       dataSource: {
         type: 'static',
         static: {
@@ -58,8 +57,8 @@ const schemaEn: FormSchema = {
           ],
         },
       },
-      help: 'Data Source: Static',
-      componentProps: { allowClear: true },
+      help: 'Data Source: Static (Radio button mode)',
+      componentProps: { optionType: 'button', direction: 'horizontal' },
       children: [],
     },
     {
@@ -85,7 +84,7 @@ const schemaEn: FormSchema = {
       name: 'dsTitle',
       type: 'text',
       label: '',
-      componentProps: { children: '▼ Data Source Demo: Static & Remote data sources', strong: true },
+      componentProps: { content: '▼ Data Source Demo: Static & Remote data sources', strong: true },
       children: [],
     },
     {
@@ -157,7 +156,7 @@ const schemaEn: FormSchema = {
     {
       id: 'field-color',
       name: 'color',
-      type: 'radio',
+      type: 'checkbox',
       label: 'Favorite Color',
       dataSource: {
         type: 'static',
@@ -170,8 +169,8 @@ const schemaEn: FormSchema = {
           ],
         },
       },
-      help: 'Data Source: Static (Radio)',
-      componentProps: { direction: 'horizontal' },
+      help: 'Data Source: Static (Checkbox button mode, multi-select)',
+      componentProps: { optionType: 'button', direction: 'horizontal' },
       children: [],
     },
     {
@@ -189,7 +188,7 @@ const schemaEn: FormSchema = {
       type: 'text',
       label: '',
       componentProps: {
-        children: '💡 Fields marked with * are required. Remote data sources require the dev server to be running.',
+        content: '💡 Fields marked with * are required. Remote data sources require the dev server to be running.',
         type: 'secondary',
       },
       children: [],

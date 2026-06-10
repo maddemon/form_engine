@@ -8,7 +8,7 @@ import type { FormItemProps } from '../types/adapter'
 import type { FormConfig, FormFieldSchema } from '../types/schema'
 import { mergeJsxScope } from '../renderer'
 import { ContainerPreview } from './ContainerPreview'
-import { FieldItem } from './FieldItem'
+import { FieldItem, type FieldItemProps } from './FieldItem'
 import { useDesignerConfig, useDesignerSelection } from './DesignerContext'
 
 /** 这些容器的 ContainerContent 内部已自行调用 FieldRenderer，外层无需重复包 label */
@@ -81,8 +81,8 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
     <FieldItem
       field={field}
       isSelected={selectedFieldId === field.id}
-      dragListeners={listeners}
-      dragAttributes={attributes}
+      dragListeners={listeners as FieldItemProps['dragListeners']}
+      dragAttributes={attributes as unknown as FieldItemProps['dragAttributes']}
       dragActivatorRef={setActivatorNodeRef}
       dragNodeRef={setNodeRef}
       dragStyle={dragStyle}

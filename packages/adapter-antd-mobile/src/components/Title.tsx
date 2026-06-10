@@ -11,7 +11,6 @@ const typeColorMap: Record<string, string> = {
 }
 
 export const Title: React.FC<TitleProps> = ({
-  children,
   content,
   level = 1,
   strong,
@@ -23,8 +22,7 @@ export const Title: React.FC<TitleProps> = ({
   className,
   id,
 }) => {
-  const textContent = children || content || ''
-  let el: React.ReactNode = textContent
+  let el: React.ReactNode = content || ''
   if (mark) el = <mark>{el}</mark>
   if (underline) el = <u>{el}</u>
   if (italic) el = <i>{el}</i>

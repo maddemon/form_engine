@@ -6,7 +6,6 @@ export interface TitleProps extends BaseComponentProps {
   color?: string
   fontSize?: number
   fontWeight?: 'normal' | 'bold' | 'lighter'
-  children?: React.ReactNode
   content?: string
   type?: 'secondary' | 'success' | 'warning' | 'danger'
   strong?: boolean

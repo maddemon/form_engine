@@ -5,7 +5,6 @@ import React from 'react'
 const { Title: AntTitle } = Typography
 
 export const Title: React.FC<TitleProps> = ({
-  children,
   content,
   level = 1,
   strong = false,
@@ -46,7 +45,5 @@ export const Title: React.FC<TitleProps> = ({
     ...rest,
   }
 
-  const titleContent = children || content || ''
-
-  return <AntTitle {...titleProps}>{titleContent}</AntTitle>
+  return <AntTitle {...titleProps}>{content || ''}</AntTitle>
 }

@@ -7,7 +7,6 @@ export interface TextProps extends BaseComponentProps {
   fontSize?: number
   fontWeight?: 'normal' | 'bold' | 'lighter'
   lineHeight?: number
-  children?: React.ReactNode
   content?: string
   strong?: boolean
   italic?: boolean

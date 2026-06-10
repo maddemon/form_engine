@@ -11,7 +11,7 @@ const schemaZh: FormSchema = {
       name: 'welcomeTitle',
       type: 'title',
       label: '',
-      componentProps: { children: '欢迎使用 Form Engine', level: 3, textAlign: 'center' },
+      componentProps: { content: '欢迎使用 Form Engine', level: 3, textAlign: 'center' },
       children: [],
     },
     {
@@ -20,7 +20,7 @@ const schemaZh: FormSchema = {
       type: 'text',
       label: '',
       componentProps: {
-        children:
+        content:
           '这是一份示例表单，用于测试不同数据源类型的控件。您可以在设计器中自由编辑，或切换到「渲染」页面预览效果。',
         type: 'secondary',
       },
@@ -47,9 +47,8 @@ const schemaZh: FormSchema = {
     {
       id: 'field-gender',
       name: 'gender',
-      type: 'select',
+      type: 'radio',
       label: '性别',
-      placeholder: '请选择性别',
       dataSource: {
         type: 'static',
         static: {
@@ -59,8 +58,8 @@ const schemaZh: FormSchema = {
           ],
         },
       },
-      help: '数据源：静态（Static）',
-      componentProps: { allowClear: true },
+      help: '数据源：静态（Radio 按钮模式）',
+      componentProps: { optionType: 'button', direction: 'horizontal' },
       children: [],
     },
     {
@@ -86,7 +85,7 @@ const schemaZh: FormSchema = {
       name: 'dsTitle',
       type: 'text',
       label: '',
-      componentProps: { children: '▼ 数据源测试区：下面演示了静态数据源和远程数据源', strong: true },
+      componentProps: { content: '▼ 数据源测试区：下面演示了静态数据源和远程数据源', strong: true },
       children: [],
     },
     {
@@ -158,7 +157,7 @@ const schemaZh: FormSchema = {
     {
       id: 'field-color',
       name: 'color',
-      type: 'radio',
+      type: 'checkbox',
       label: '颜色偏好',
       dataSource: {
         type: 'static',
@@ -171,8 +170,8 @@ const schemaZh: FormSchema = {
           ],
         },
       },
-      help: '数据源：静态（Radio 组件）',
-      componentProps: { direction: 'horizontal' },
+      help: '数据源：静态（Checkbox 按钮模式，可多选）',
+      componentProps: { optionType: 'button', direction: 'horizontal' },
       children: [],
     },
     {
@@ -190,7 +189,7 @@ const schemaZh: FormSchema = {
       type: 'text',
       label: '',
       componentProps: {
-        children: '💡 提示：带 * 标记的为必填项，远程数据源需要启动开发服务器才能正常加载。',
+        content: '💡 提示：带 * 标记的为必填项，远程数据源需要启动开发服务器才能正常加载。',
         type: 'secondary',
       },
       children: [],

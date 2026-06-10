@@ -9,7 +9,6 @@ const typeColorMap: Record<string, string> = {
 }
 
 export const Text: React.FC<TextProps> = ({
-  children,
   content,
   type,
   strong = false,
@@ -20,7 +19,7 @@ export const Text: React.FC<TextProps> = ({
   mark = false,
   style,
 }) => {
-  let el: React.ReactNode = children || content || ''
+  let el: React.ReactNode = content || ''
   if (code) el = <code>{el}</code>
   if (mark) el = <mark>{el}</mark>
   if (delProp) el = <del>{el}</del>

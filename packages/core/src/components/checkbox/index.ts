@@ -7,6 +7,8 @@ export interface CheckboxProps extends BaseFormComponentProps<string[] | undefin
   options?: OptionItem[]
   indeterminate?: boolean
   direction?: 'horizontal' | 'vertical'
+  optionType?: 'default' | 'button'
+  buttonStyle?: 'outline' | 'solid'
 }
 
 export const checkboxEventDeclarations: EventDeclaration[] = [

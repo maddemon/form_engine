@@ -14,7 +14,6 @@ const { Text: AntText } = Typography
  * Text 组件
  */
 export const Text: React.FC<TextProps> = ({
-  children,
   content,
   type,
   strong = false,
@@ -56,13 +55,6 @@ export const Text: React.FC<TextProps> = ({
     id,
     ...rest,
   }
-  
-  // 优先使用 children，其次使用 content
-  const textContent = children || content || ''
-  
-  return (
-    <AntText {...textProps}>
-      {textContent}
-    </AntText>
-  )
+
+  return <AntText {...textProps}>{content || ''}</AntText>
 }
