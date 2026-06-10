@@ -16,7 +16,7 @@ export const SubForm: React.FC<{
   fieldSchema: FormFieldSchema
   disabled?: boolean
   readOnly?: boolean
-}> = ({ value = [], onChange, fieldSchema, disabled, ...rest }) => {
+}> = ({ value = [], onChange, fieldSchema, disabled }) => {
   const field = fieldSchema
   const adapter = useAdapter()
   const { locale } = useLocale()
@@ -46,7 +46,7 @@ export const SubForm: React.FC<{
     if (!renderFn) {
       return <span style={{ color: 'var(--fe-text-tertiary)', fontSize: 12 }}>未知类型: {String(child.type)}</span>
     }
-    const { options: _ignored, ...restComponentProps } = childSchema.componentProps ?? {}
+    const { ...restComponentProps } = childSchema.componentProps ?? {}
     return React.createElement(renderFn, {
       value: row[child.name as string],
       onChange: (newValue) => {

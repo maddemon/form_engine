@@ -18,7 +18,7 @@ interface CanvasToolbarProps {
   showTree: boolean
 }
 
-export const CanvasToolbar: React.FC<CanvasToolbarProps> = React.memo(({ scene, onSceneChange, canUndo, canRedo, onUndo, onRedo, onTreeClick, showTree }) => {
+export const CanvasToolbar: React.FC<CanvasToolbarProps> = React.memo(({ scene, onSceneChange, canUndo, canRedo, onUndo, onRedo, onTreeClick, showTree: _showTree }) => {
   const { token } = useStyle()
   const { locale } = useLocale()
   const t = locale.designer.canvasToolbar

@@ -14,8 +14,6 @@ export const GridContainerContent: React.FC<ContainerContentProps> = React.memo(
 
   const colSpans = ((field.componentProps?.colSpans as Array<{ id: string; span: number }>) ?? []).filter(Boolean)
 
-  if (colSpans.length === 0) return <EmptyContainerPlaceholder containerId={field.id} />
-
   const childrenByColumn = useMemo(() => {
     const map: Record<number, FormFieldSchema[]> = {}
     for (const child of field.children) {
@@ -25,6 +23,8 @@ export const GridContainerContent: React.FC<ContainerContentProps> = React.memo(
     }
     return map
   }, [field.children])
+
+  if (colSpans.length === 0) return <EmptyContainerPlaceholder containerId={field.id} />
 
   const isMobile = scene === 'mobile'
   const gap = (field.componentProps?.gap as number) ?? 0

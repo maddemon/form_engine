@@ -8,16 +8,16 @@
  * - callback：回调名输入
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import { listActionNames } from '../events'
 import { useLocale } from '../locale'
-import { resolveSlot } from '../registry/propertySlotRegistry'
 import { FieldItem } from '../propRenders/shared'
+import { resolveSlot } from '../registry/propertySlotRegistry'
 import { useStyle } from '../styles/useStyle'
-import { Text } from '../widgets/Text'
 import type { DesignerWidgets } from '../types/adapter'
 import type { EventHandler, EventHandlerType } from '../types/events'
 import type { PropertySlots } from '../types/property-slot'
+import { Text } from '../widgets/Text'
 
 /** EventHandlerEditor 所需的 widgets 子集（TextArea 为必选） */
 type RequiredWidgets = Omit<DesignerWidgets, 'TextArea'> & {
@@ -37,18 +37,17 @@ export interface EventHandlerEditorProps {
   slots?: PropertySlots
 }
 
-const HANDLER_TYPE_OPTIONS: { label: string; value: EventHandlerType | '' }[] = [
-  { label: '未配置', value: '' },
-  { label: '表达式（expression）', value: 'expression' },
-  { label: '动作（action）', value: 'action' },
-  { label: '回调（callback）', value: 'callback' },
-]
-
-export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, onChange, eventName, widgets: w, slots }) => {
+export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
+  value,
+  onChange,
+  eventName,
+  widgets: w,
+  slots,
+}) => {
   const { token } = useStyle()
   const { locale } = useLocale()
   const eh = locale.designer.eventHandler
-  const [type, setType] = useState<EventHandlerType | ''>(value?.type ?? '')
+  const type = value?.type ?? ''
 
   const handlerTypeOptions = [
     { label: eh.notConfigured, value: '' },
@@ -57,13 +56,8 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
     { label: eh.callback, value: 'callback' },
   ]
 
-  // 外部 value 变化时同步本地 type 状态
-  useEffect(() => {
-    setType(value?.type ?? '')
-  }, [value?.type])
-
-  const ExpressionEditorSlot = resolveSlot('expressionEditor', slots, w)
-  const JsonEditorSlot = resolveSlot('jsonEditor', slots)
+  const ExpressionEditorSlot = useMemo(() => resolveSlot('expressionEditor', slots, w), [slots, w])
+  const JsonEditorSlot = useMemo(() => resolveSlot('jsonEditor', slots), [slots])
 
   const containerStyle: React.CSSProperties = {
     marginBottom: token('spacingSm') as string,
@@ -74,7 +68,6 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
   }
 
   const handleTypeChange = (newType: EventHandlerType | '') => {
-    setType(newType)
     if (!newType) {
       onChange(undefined)
       return
@@ -90,26 +83,38 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
   return (
     <div style={containerStyle}>
       <FieldItem label={eventName}>
-        <w.Select value={type} onChange={(v) => handleTypeChange(v as EventHandlerType | '')} options={handlerTypeOptions.map((opt) => ({ label: opt.label, value: opt.value }))} />
+        <w.Select
+          value={type}
+          onChange={(v) => handleTypeChange(v as EventHandlerType | '')}
+          options={handlerTypeOptions.map((opt) => ({ label: opt.label, value: opt.value }))}
+        />
       </FieldItem>
 
       {type === 'expression' && value?.type === 'expression' && (
         <FieldItem label={eh.expressionLabel} variant="group">
+          {/* eslint-disable-next-line react-hooks/static-components */}
           <ExpressionEditorSlot
             value={value.expression || ''}
             onChange={(v) => onChange({ ...value, expression: v as string })}
             placeholder={eh.expressionPlaceholder}
           />
-          <Text type="tertiary" style={{ marginTop: 2 }}>{eh.expressionHelp}</Text>
+          <Text type="tertiary" style={{ marginTop: token('spacingXxs') }}>
+            {eh.expressionHelp}
+          </Text>
         </FieldItem>
       )}
 
       {type === 'action' && value?.type === 'action' && (
         <>
           <FieldItem label={eh.actionLabel} variant="group">
-            <w.Select value={value.action || ''} onChange={(v) => onChange({ ...value, action: v })} options={listActionNames().map((name) => ({ label: name, value: name }))} />
+            <w.Select
+              value={value.action || ''}
+              onChange={(v) => onChange({ ...value, action: v })}
+              options={listActionNames().map((name) => ({ label: name, value: name }))}
+            />
           </FieldItem>
           <FieldItem label={eh.actionParams}>
+            {/* eslint-disable-next-line react-hooks/static-components */}
             <JsonEditorSlot
               value={value.params}
               onChange={(v) => onChange({ ...value, params: v as Record<string, unknown> | undefined })}
@@ -121,7 +126,11 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({ value, o
 
       {type === 'callback' && value?.type === 'callback' && (
         <FieldItem variant="group" label={eh.callbackNameLabel}>
-          <w.Input value={value.callback || ''} onChange={(v) => onChange({ ...value, callback: String(v) })} placeholder={eh.callbackNamePlaceholder} />
+          <w.Input
+            value={value.callback || ''}
+            onChange={(v) => onChange({ ...value, callback: String(v) })}
+            placeholder={eh.callbackNamePlaceholder}
+          />
         </FieldItem>
       )}
     </div>

@@ -169,7 +169,7 @@ export function createInputStyle(
     hasError?: boolean
   } = {},
 ): React.CSSProperties {
-  const { disabled = false, readOnly = false, hasError = false } = options
+  const { disabled = false, readOnly = false } = options
 
   return {
     width: '100%',

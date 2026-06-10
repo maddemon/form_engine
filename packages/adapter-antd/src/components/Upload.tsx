@@ -46,6 +46,7 @@ export const Upload: React.FC<UploadProps> = ({
 
   return (
     <AntUpload
+      fileList={value as UploadFile[] | undefined}
       action={action}
       accept={accept}
       maxCount={maxCount}

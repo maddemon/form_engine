@@ -1,18 +1,30 @@
-import { Input } from 'antd-mobile'
+import { InputProps } from '@form-engine/core'
 import { useLocale } from '@form-engine/core/locale'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import { Input as AntmInput } from 'antd-mobile'
+import React from 'react'
 
-export const InputField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled, readOnly, fieldSchema } = props
+export const Input: React.FC<InputProps> = ({
+  value,
+  onChange,
+  placeholder: placeholderProp,
+  disabled,
+  readOnly,
+  style,
+  className,
+  id,
+}) => {
   const { locale } = useLocale()
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.input ?? 'Please enter'
   return (
-    <Input
+    <AntmInput
       value={(value as string) ?? ''}
-      onChange={v => onChange?.(v)}
+      onChange={(v) => onChange?.(v)}
       disabled={disabled}
       readOnly={readOnly}
-      placeholder={fieldSchema.placeholder ?? locale.adapter.common.placeholder.input ?? 'Please enter'}
-      style={{ width: '100%' }}
+      placeholder={placeholder}
+      style={{ width: '100%', ...style }}
+      className={className}
+      id={id}
     />
   )
 }

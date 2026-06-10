@@ -1,9 +1,9 @@
-import { DatePicker, Space } from 'antd-mobile'
-import { CalendarOutline, CloseCircleFill } from 'antd-mobile-icons'
+import { DatePickerProps } from '@form-engine/core'
 import { useLocale } from '@form-engine/core/locale'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import { DatePicker as AntmDatePicker, Space } from 'antd-mobile'
+import { CalendarOutline, CloseCircleFill } from 'antd-mobile-icons'
+import React from 'react'
 
-/** 根据 format 字符串自动判断是否包含时间部分 */
 function isTimeFormat(fmt: string): boolean {
   return /\b(H{1,2}|m{1,2}|s{1,2})\b/.test(fmt)
 }
@@ -24,18 +24,25 @@ function formatDisplayDate(d: Date, showTime: boolean): string {
   return datePart
 }
 
-export const DateField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled, fieldSchema } = props
+export const DatePicker: React.FC<DatePickerProps> = ({
+  value,
+  onChange,
+  disabled,
+  format = 'YYYY-MM-DD',
+  showTime: explicitShowTime,
+  allowClear,
+  placeholder: placeholderProp,
+  style,
+  className,
+  id,
+}) => {
   const { locale } = useLocale()
-  const format = fieldSchema.componentProps?.format as string || 'YYYY-MM-DD'
-  const explicitShowTime = !!fieldSchema.componentProps?.showTime
   const showTime = explicitShowTime || isTimeFormat(format)
-  const placeholder = fieldSchema.placeholder ?? locale.adapter.common.placeholder.date ?? 'Select date'
-  const allowClear = fieldSchema.componentProps?.allowClear
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.date ?? 'Select date'
   const hasValue = !!value
 
   return (
-    <DatePicker
+    <AntmDatePicker
       confirmText={locale.adapter.mobile.confirm}
       cancelText={locale.adapter.mobile.cancel}
       precision={showTime ? 'minute' : 'day'}
@@ -54,15 +61,16 @@ export const DateField: FieldRendererFn = (props: FieldComponentProps) => {
           style={{
             color: hasValue ? undefined : 'var(--adm-color-weak)',
             cursor: disabled ? 'default' : 'pointer',
+            ...style,
           }}
+          className={className}
+          id={id}
         >
-          <span>
-            {v ? formatDisplayDate(v as Date, showTime) : placeholder}
-          </span>
+          <span>{v ? formatDisplayDate(v as Date, showTime) : placeholder}</span>
           {hasValue && allowClear ? (
             <CloseCircleFill
               style={{ fontSize: 16, flexShrink: 0 }}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation()
                 onChange?.(undefined)
               }}
@@ -72,6 +80,6 @@ export const DateField: FieldRendererFn = (props: FieldComponentProps) => {
           )}
         </Space>
       )}
-    </DatePicker>
+    </AntmDatePicker>
   )
 }

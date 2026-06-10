@@ -1,14 +1,14 @@
 import { useCallback, useMemo } from 'react'
-import type { FormSchema, OptionItem } from '../../types/schema'
 import type { EventContext } from '../../events'
-import type { EventCallbacks, $Form } from '../../types/events'
-import type { DataSourceResolver } from '../../types/render'
-import type { ValidateFn } from '../../types/adapter'
 import { useLocale } from '../../locale'
+import type { ValidateFn } from '../../types/adapter'
+import type { $Form, EventCallbacks } from '../../types/events'
+import type { DataSourceResolver } from '../../types/render'
+import type { FormSchema, OptionItem } from '../../types/schema'
 import { validateForm } from '../validate'
-import { useFormValues } from './useFormValues'
-import { useFormValidation } from './useFormValidation'
 import { useDataSource } from './useDataSource'
+import { useFormValidation } from './useFormValidation'
+import { useFormValues } from './useFormValues'
 import { useVisibility } from './useVisibility'
 
 export interface UseFormRenderOptions {
@@ -43,37 +43,53 @@ export interface UseFormRenderResult {
 }
 
 export function useFormRender({
-  schema, initialValues, onSubmit, onChange,
-  dataSourceResolver, callbacks = {},
-  adapterValidate, beforeSubmit, afterSubmit,
+  schema,
+  initialValues,
+  onSubmit,
+  onChange,
+  dataSourceResolver,
+  callbacks = {},
+  adapterValidate,
+  beforeSubmit,
+  afterSubmit,
 }: UseFormRenderOptions): UseFormRenderResult {
   const formSchema = useMemo(() => schema, [schema])
 
   const {
-    formValues, formValuesRef, setFormValues,
-    setFieldValue, setFieldsValue, getFieldValue,
-    reset: resetValues, submit: submitValues, debouncedOnChange,
+    formValues,
+    formValuesRef,
+    setFormValues,
+    setFieldValue,
+    setFieldsValue,
+    getFieldValue,
+    reset: resetValues,
+    submit: submitValues,
+    debouncedOnChange,
   } = useFormValues({ initialValues: initialValues ?? {}, onChange })
 
-  const {
-    fieldErrors, fieldOptions, setFieldErrors, setFieldOptions,
-    validate: validateRaw, clearFieldError, clearAllErrors,
-  } = useFormValidation()
+  const { fieldErrors, fieldOptions, setFieldErrors, setFieldOptions, clearFieldError, clearAllErrors } =
+    useFormValidation()
 
   useDataSource({
-    formSchema, formValues, formValuesRef,
-    setFieldOptions, dataSourceResolver,
+    formSchema,
+    formValues,
+    formValuesRef,
+    setFieldOptions,
+    dataSourceResolver,
   })
 
   const { visibleFields } = useVisibility(formSchema, formValues)
   const { locale } = useLocale()
   const validation = locale.validation
 
-  const handleFieldChange = useCallback((name: string, value: unknown) => {
-    setFormValues((prev) => ({ ...prev, [name]: value }))
-    clearFieldError(name)
-    debouncedOnChange()
-  }, [clearFieldError, debouncedOnChange])
+  const handleFieldChange = useCallback(
+    (name: string, value: unknown) => {
+      setFormValues((prev) => ({ ...prev, [name]: value }))
+      clearFieldError(name)
+      debouncedOnChange()
+    },
+    [clearFieldError, debouncedOnChange, setFormValues],
+  )
 
   const reset = useCallback(() => {
     resetValues()
@@ -123,27 +139,45 @@ export function useFormRender({
       })
   }, [visibleFields, formValuesRef, setFieldErrors, onSubmit, adapterValidate, beforeSubmit, afterSubmit, validation])
 
-  const $form: $Form = useMemo(() => ({
-    get values() { return formValuesRef.current },
-    setFieldValue,
-    setFieldsValue,
-    getFieldValue,
-    submit: () => submitValues(onSubmit),
-    reset,
-    validate,
-  }), [setFieldValue, setFieldsValue, getFieldValue, submitValues, reset, validate, onSubmit])
+  const $form: $Form = useMemo(
+    () => ({
+      get values() {
+        return formValuesRef.current
+      },
+      setFieldValue,
+      setFieldsValue,
+      getFieldValue,
+      submit: () => submitValues(onSubmit),
+      reset,
+      validate,
+    }),
+    [setFieldValue, setFieldsValue, getFieldValue, reset, validate, formValuesRef, submitValues, onSubmit],
+  )
 
   const eventContext: EventContext = useMemo(
-    () => ({ formValues: formValuesRef.current, $form, callbacks }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [$form, callbacks],
+    () => ({
+      get formValues() {
+        return formValuesRef.current
+      },
+      $form,
+      callbacks,
+    }),
+    [$form, callbacks, formValuesRef],
   )
 
   return {
-    formValues, formValuesRef, visibleFields,
-    fieldErrors, fieldOptions,
-    handleFieldChange, handleSubmit,
-    $form, eventContext, reset, validate,
-    setFieldErrors, setFieldOptions,
+    formValues,
+    formValuesRef,
+    visibleFields,
+    fieldErrors,
+    fieldOptions,
+    handleFieldChange,
+    handleSubmit,
+    $form,
+    eventContext,
+    reset,
+    validate,
+    setFieldErrors,
+    setFieldOptions,
   }
 }

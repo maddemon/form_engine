@@ -112,9 +112,11 @@ async function executeRemote(
   const url = replaceTemplateVars(String(config.url || ''), formValues)
   if (!url) throw new Error('[form-engine] remote dataSource 缺少 url')
 
-  // 2. URL 安全校验：仅允许同源相对路径（以 / 开头）
-  if (!url.startsWith('/')) {
-    throw new Error(`[form-engine] remote dataSource url 必须以 "/" 开头（仅允许同源相对路径）: ${url}`)
+  // 2. URL 安全校验：禁止绝对路径（含协议）和协议相对路径，仅允许同源路径
+  if (url.includes('://') || url.startsWith('//')) {
+    throw new Error(
+      `[form-engine] remote dataSource url 不允许使用绝对路径（含协议）: ${url}`,
+    )
   }
 
   const method = (config.method as string || 'GET').toUpperCase()
@@ -122,7 +124,6 @@ async function executeRemote(
   const labelField = config.labelField as string | undefined
   const valueField = config.valueField as string | undefined
   const cacheTTL = (config.cacheTTL as number | undefined) || 0
-  const skipEmpty = !!config.skipEmpty
 
   // 3. 缓存读取
   if (cacheTTL > 0) {

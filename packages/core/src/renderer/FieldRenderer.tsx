@@ -51,7 +51,7 @@ const DefaultFormItem: React.FC<FormItemProps> = React.memo(function DefaultForm
   label,
   labelHidden,
   required,
-  validateStatus,
+  validateStatus: _validateStatus,
   errors,
   help,
   tooltip,
@@ -222,7 +222,8 @@ export const FieldRenderer = React.memo(function FieldRenderer({
   const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
 
   const componentProps = useMemo(() => {
-    const { options: _ignored, ...rest } = field.componentProps || {}
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { options: _, ...rest } = field.componentProps || {}
     return rest
   }, [field.componentProps])
 

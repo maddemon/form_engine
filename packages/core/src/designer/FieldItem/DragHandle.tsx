@@ -4,7 +4,7 @@ import { useLocale } from '../../locale'
 
 interface DragHandleProps {
   dragActivatorRef?: (node: HTMLElement | null) => void
-  dragListeners?: Record<string, Function>
+  dragListeners?: Record<string, (...args: unknown[]) => void>
 }
 
 export const DragHandle: React.FC<DragHandleProps> = ({ dragActivatorRef, dragListeners }) => {

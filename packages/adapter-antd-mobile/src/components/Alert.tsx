@@ -1,29 +1,19 @@
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import type { AlertProps } from '@form-engine/core'
 import { iconMap } from '@form-engine/core'
+import { NoticeBar, NoticeBarProps } from 'antd-mobile'
 import React from 'react'
-import { NoticeBar } from 'antd-mobile'
 
-// Alert type → NoticeBar color 映射
-const TYPE_TO_COLOR: Record<string, 'default' | 'info' | 'success' | 'warning' | 'error'> = {
-  primary: 'info',
-  info: 'info',
-  success: 'success',
-  warning: 'warning',
-  error: 'error',
-}
-
-export const AlertField: FieldRendererFn = (props: FieldComponentProps) => {
-  const type = (props.type ?? 'info') as string
-  const title = props.title as string | undefined
-  const content = (props.content ?? '') as string
-  const showIcon = props.showIcon !== false
-  const closable = props.closable as boolean | undefined
-  const icon = props.icon as string | undefined
-  const onClose = props.onClose as (() => void) | undefined
-
-  const color = TYPE_TO_COLOR[type] || 'info'
-
-  // 解析自定义图标
+export const Alert: React.FC<AlertProps> = ({
+  type = 'info',
+  title,
+  content,
+  showIcon = true,
+  closable,
+  icon,
+  onClose,
+  style,
+  className,
+}) => {
   let iconNode: React.ReactNode = undefined
   if (showIcon) {
     if (icon && iconMap[icon]) {
@@ -31,7 +21,6 @@ export const AlertField: FieldRendererFn = (props: FieldComponentProps) => {
       iconNode = <IconComp size={16} />
     }
   } else {
-    // 不显示图标时传 null 覆盖默认图标
     iconNode = null as unknown as React.ReactNode
   }
 
@@ -39,13 +28,14 @@ export const AlertField: FieldRendererFn = (props: FieldComponentProps) => {
 
   return (
     <NoticeBar
-      color={color}
+      color={type as NoticeBarProps['color']}
       content={displayContent}
       closeable={closable}
-      onClose={onClose}
+      onClose={onClose as (() => void) | undefined}
       icon={iconNode}
       wrap
-      style={props.style as React.CSSProperties}
+      style={style}
+      className={className}
     />
   )
 }

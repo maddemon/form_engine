@@ -1,14 +1,18 @@
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import React from 'react'
+import type { HtmlProps } from '@form-engine/core'
 
-export const HtmlField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { content, style, className, id, ...rest } = props
+export const Html: React.FC<HtmlProps> = ({
+  content,
+  style,
+  className,
+  id,
+}) => {
   return (
     <div
       id={id}
       className={className}
       style={style}
       dangerouslySetInnerHTML={{ __html: content ?? '' }}
-      {...rest}
     />
   )
 }

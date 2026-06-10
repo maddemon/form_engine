@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { useLocale } from '../../locale'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
@@ -10,9 +9,9 @@ export default function SubFormPropsRender({ widgets: w, values, onChange }: Pro
   const columns = (values.columns as SubFormColumnConfig[]) ?? []
   const rowMode = (values.rowMode as string) ?? 'dynamic'
 
-  const handleAddColumn = useCallback(() => {
+  function handleAddColumn() {
     onChange('columns', [...columns, { id: genId('col'), label: locale.component.subForm.defaultColumnLabel.replace('{n}', String((columns?.length || 0) + 1)), width: 120 }])
-  }, [columns, onChange, locale])
+  }
 
   return (
     <>

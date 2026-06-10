@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { useLocale } from '../../locale'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
@@ -10,42 +9,39 @@ export default function CollapsePropsRender({ widgets: w, values, onChange }: Pr
   const panels = (values.panels as CollapsePanelConfig[]) ?? []
   const defaultActiveKey = values.defaultActiveKey as string | string[] | undefined
 
-  const collectActiveKeys = useCallback((v: string | string[] | undefined): string[] => {
+  function collectActiveKeys(v: string | string[] | undefined): string[] {
     if (!v) return []
     if (Array.isArray(v)) return v
     return v
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean)
-  }, [])
+  }
 
-  const handlePanelsChange = useCallback(
-    (newPanels: CollapsePanelConfig[]) => {
-      const existingKeys = new Set(newPanels.map((p) => p.key))
-      const activeKeys = collectActiveKeys(defaultActiveKey)
-      const remainingKeys = activeKeys.filter((k) => existingKeys.has(k))
+  function handlePanelsChange(newPanels: CollapsePanelConfig[]) {
+    const existingKeys = new Set(newPanels.map((p) => p.key))
+    const activeKeys = collectActiveKeys(defaultActiveKey)
+    const remainingKeys = activeKeys.filter((k) => existingKeys.has(k))
 
-      onChange('panels', newPanels)
+    onChange('panels', newPanels)
 
-      if (remainingKeys.length < activeKeys.length) {
-        if (remainingKeys.length === 0) {
-          onChange('defaultActiveKey', undefined)
-        } else if (Array.isArray(defaultActiveKey)) {
-          onChange('defaultActiveKey', remainingKeys)
-        } else {
-          onChange('defaultActiveKey', remainingKeys[0])
-        }
+    if (remainingKeys.length < activeKeys.length) {
+      if (remainingKeys.length === 0) {
+        onChange('defaultActiveKey', undefined)
+      } else if (Array.isArray(defaultActiveKey)) {
+        onChange('defaultActiveKey', remainingKeys)
+      } else {
+        onChange('defaultActiveKey', remainingKeys[0])
       }
-    },
-    [defaultActiveKey, onChange, collectActiveKeys],
-  )
+    }
+  }
 
-  const handleAddPanel = useCallback(() => {
+  function handleAddPanel() {
     handlePanelsChange([
       ...panels,
       { id: genId('panel'), key: `panel_${panels.length + 1}`, header: locale.component.collapse.defaultPanelHeader.replace('{n}', String(panels.length + 1)), disabled: false },
     ])
-  }, [panels, handlePanelsChange, locale])
+  }
 
   return (
     <>

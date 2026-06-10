@@ -4,10 +4,10 @@
  * 使用 Ant Design 的 Alert
  */
 
-import React from 'react'
-import { Alert as AntdAlert } from 'antd'
 import type { AlertProps } from '@form-engine/core'
 import { iconMap } from '@form-engine/core'
+import { Alert as AntdAlert } from 'antd'
+import React from 'react'
 
 /**
  * Alert 组件
@@ -24,7 +24,6 @@ export const Alert: React.FC<AlertProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   // antd Alert 不支持 'primary'，映射为 'info'
   const antdType = type === 'primary' ? 'info' : type

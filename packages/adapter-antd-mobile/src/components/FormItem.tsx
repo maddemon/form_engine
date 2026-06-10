@@ -1,6 +1,6 @@
-import { Form } from 'antd-mobile'
 import type { FormItemProps } from '@form-engine/core'
 import { useStyle } from '@form-engine/core'
+import { Form } from 'antd-mobile'
 import React from 'react'
 
 /**
@@ -10,7 +10,13 @@ import React from 'react'
  * 错误信息通过 description prop 显式传入，并用 error token 着色。
  */
 export const AntdMobileFormItem: React.FC<FormItemProps> = ({
-  label, labelHidden, required, errors, help, formConfig, scene, children, name,
+  label,
+  labelHidden,
+  required,
+  errors,
+  help,
+  children,
+  name,
 }) => {
   const { token } = useStyle()
   const errorMsg = errors?.[0]

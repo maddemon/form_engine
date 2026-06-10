@@ -1,60 +1,57 @@
-import React, { useCallback, useMemo } from 'react'
-import { Cascader, Space } from 'antd-mobile'
-import { DownOutline, CloseCircleFill } from 'antd-mobile-icons'
-import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import type { OptionItem, TreeSelectProps } from '@form-engine/core'
+import { Cascader as AntmCascader, Space } from 'antd-mobile'
+import { CloseCircleFill, DownOutline } from 'antd-mobile-icons'
+import React, { useMemo } from 'react'
 import { toCascaderOptions } from '../utils'
 
-/**
- * 移动端 TreeSelect 适配器
- *
- * 使用 antd-mobile Cascader 实现多层树选择。
- * 值格式与 desktop TreeSelect 保持一致：仅存储叶子节点 value（如 "child-1"）。
- * Cascader 内部使用路径数组（["parent-1", "child-1"]），在此组件中完成双向转换。
- */
-export const TreeSelectField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled, fieldSchema, options } = props
+function toPath(opts: OptionItem[], target: string): string[] {
+  for (const opt of opts) {
+    if (String(opt.value) === target) return [String(opt.value)]
+    if (opt.children) {
+      const sub = toPath(opt.children, target)
+      if (sub.length) return [String(opt.value), ...sub]
+    }
+  }
+  return []
+}
+
+function toLabels(opts: OptionItem[], vals: string[]): string[] {
+  const labels: string[] = []
+  let cur: OptionItem[] = opts
+  for (const v of vals) {
+    const found = cur.find((o) => String(o.value) === v)
+    if (!found) break
+    labels.push(found.label)
+    cur = found.children || []
+  }
+  return labels
+}
+
+export const TreeSelect: React.FC<TreeSelectProps> = ({
+  value,
+  onChange,
+  disabled,
+  options = [],
+  allowClear,
+  placeholder: placeholderProp = '请选择',
+  style,
+  className,
+  id,
+}) => {
   const cascaderOptions = useMemo(() => toCascaderOptions((options || []) as OptionItem[]), [options])
-  const placeholder = fieldSchema.placeholder || '请选择'
-  const allowClear = fieldSchema.componentProps?.allowClear
-
-  // 叶子节点值 → 路径数组
-  const toPath = useCallback((opts: OptionItem[], target: string): string[] => {
-    for (const opt of opts) {
-      if (String(opt.value) === target) return [String(opt.value)]
-      if (opt.children) {
-        const sub = toPath(opt.children, target)
-        if (sub.length) return [String(opt.value), ...sub]
-      }
-    }
-    return []
-  }, [])
-
-  // 路径数组 → 标签文本
-  const toLabels = useCallback((opts: OptionItem[], vals: string[]): string[] => {
-    const labels: string[] = []
-    let cur: OptionItem[] = opts
-    for (const v of vals) {
-      const found = cur.find((o) => String(o.value) === v)
-      if (!found) break
-      labels.push(found.label)
-      cur = found.children || []
-    }
-    return labels
-  }, [])
 
   const valArr = useMemo(() => {
     if (!value) return []
     return toPath((options as OptionItem[]) || [], String(value))
-  }, [value, options, toPath])
+  }, [value, options])
 
   const hasValue = valArr.length > 0
 
   return (
-    <Cascader
+    <AntmCascader
       options={cascaderOptions}
       value={valArr}
       onConfirm={(vals) => {
-        // 回传叶子节点 value，保持与 desktop TreeSelect 一致的格式
         onChange?.(vals[vals.length - 1] ?? undefined)
       }}
     >
@@ -70,15 +67,16 @@ export const TreeSelectField: FieldRendererFn = (props: FieldComponentProps) => 
             style={{
               color: hasValue ? undefined : 'var(--adm-color-weak)',
               cursor: disabled ? 'default' : 'pointer',
+              ...style,
             }}
+            className={className}
+            id={id}
           >
-            <span>
-              {labels.length > 0 ? labels.join(' / ') : placeholder}
-            </span>
+            <span>{labels.length > 0 ? labels.join(' / ') : placeholderProp}</span>
             {hasValue && allowClear ? (
               <CloseCircleFill
                 style={{ fontSize: 16, flexShrink: 0 }}
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation()
                   onChange?.(undefined)
                 }}
@@ -89,6 +87,6 @@ export const TreeSelectField: FieldRendererFn = (props: FieldComponentProps) => 
           </Space>
         )
       }}
-    </Cascader>
+    </AntmCascader>
   )
 }

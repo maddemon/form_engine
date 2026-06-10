@@ -111,6 +111,7 @@ export default function JsxPropsRender({ widgets: w, slots, values, onChange }: 
 
   return (
     <FieldItem label={c.code}>
+      {/* eslint-disable-next-line react-hooks/static-components */}
       <CodeEditor
         value={(values.code as string) ?? ''}
         onChange={(v) => onChange('code', v)}

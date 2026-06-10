@@ -4,10 +4,10 @@
  * 使用 Ant Design 的 Card
  */
 
-import React from 'react'
-import { Card as AntdCard } from 'antd'
 import type { CardProps } from '@form-engine/core'
 import { iconMap } from '@form-engine/core'
+import { Card as AntdCard } from 'antd'
+import React from 'react'
 
 /**
  * Card 组件
@@ -23,7 +23,6 @@ export const Card: React.FC<CardProps> = ({
   bodyGap,
   padding,
   margin,
-  gap,
   style,
   className,
   id,
@@ -36,12 +35,13 @@ export const Card: React.FC<CardProps> = ({
     iconNode = <IconComp size={16} />
   }
 
-  const titleNode = title || iconNode ? (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-      {iconNode}
-      {title}
-    </span>
-  ) : undefined
+  const titleNode =
+    title || iconNode ? (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        {iconNode}
+        {title}
+      </span>
+    ) : undefined
 
   const bodyStyle: React.CSSProperties = {
     ...(bodyPadding != null ? { padding: bodyPadding } : {}),

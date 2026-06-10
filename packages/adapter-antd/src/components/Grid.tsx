@@ -4,25 +4,17 @@
  * 使用 Ant Design 的 Row 和 Col
  */
 
-import React from 'react'
-import { Row, Col } from 'antd'
 import type { GridProps } from '@form-engine/core'
 import { useAdapter } from '@form-engine/core'
+import { Col, Row } from 'antd'
+import React from 'react'
 
 /**
  * Grid 组件
  * 提供栅格布局
  * 移动端无视列数，直接垂直平铺
  */
-export const Grid: React.FC<GridProps> = ({
-  children,
-  colSpans,
-  gap = 8,
-  style,
-  className,
-  id,
-  ...rest
-}) => {
+export const Grid: React.FC<GridProps> = ({ children, colSpans, gap = 8, style, className, id, ...rest }) => {
   const adapter = useAdapter()
   const isMobile = adapter?.scene === 'mobile'
   const childrenArray = React.Children.toArray(children)
@@ -32,14 +24,16 @@ export const Grid: React.FC<GridProps> = ({
     return (
       <div style={{ width: '100%', ...style }} className={className} id={id}>
         {childrenArray.map((child, index) => (
-          <div key={index} style={{ width: '100%', marginBottom: index < childrenArray.length - 1 ? gapValue : 0 }}>{child}</div>
+          <div key={index} style={{ width: '100%', marginBottom: index < childrenArray.length - 1 ? gapValue : 0 }}>
+            {child}
+          </div>
         ))}
       </div>
     )
   }
 
   const spans = colSpans?.filter(Boolean) ?? []
-  const totalSpan = spans.reduce((s, c) => s + (c.span || 0), 0) || 24
+  //const totalSpan = spans.reduce((s, c) => s + (c.span || 0), 0) || 24
 
   if (spans.length === 0) {
     const childCount = childrenArray.length || 1
@@ -47,7 +41,9 @@ export const Grid: React.FC<GridProps> = ({
     return (
       <Row gutter={gap} style={style} className={className} id={id} {...rest}>
         {childrenArray.map((child, index) => (
-          <Col key={index} span={colSpan}>{child}</Col>
+          <Col key={index} span={colSpan}>
+            {child}
+          </Col>
         ))}
       </Row>
     )

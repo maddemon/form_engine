@@ -1,6 +1,6 @@
-import React from 'react'
-import { Switch as AntdSwitch } from 'antd'
 import type { SwitchProps } from '@form-engine/core'
+import { Switch as AntdSwitch } from 'antd'
+import React from 'react'
 
 /**
  * Antd Switch 组件
@@ -16,12 +16,11 @@ export const Switch: React.FC<SwitchProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   const handleChange = (checked: boolean) => {
     onChange?.(checked)
   }
-  
+
   return (
     <AntdSwitch
       checked={!!value}

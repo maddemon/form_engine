@@ -1,7 +1,7 @@
-import { Form } from 'antd'
 import type { FormItemProps } from '@form-engine/core'
-import React from 'react'
 import { useInsideContainer } from '@form-engine/core'
+import { Form } from 'antd'
+import React from 'react'
 
 /**
  * Antd FormItem 包裹组件
@@ -15,12 +15,26 @@ import { useInsideContainer } from '@form-engine/core'
  * - FormItemProps.tooltip → antd Form.Item tooltip
  */
 export const AntdFormItem: React.FC<FormItemProps> = ({
-  label, labelHidden, required, rules, validateStatus, help, tooltip, formConfig, scene, children,
+  label,
+  labelHidden,
+  required,
+  rules,
+  validateStatus,
+  help,
+  tooltip,
+  formConfig,
+  scene,
+  children,
 }) => {
   const insideContainer = useInsideContainer()
-  const resolvedLabel = labelHidden ? undefined : (label && formConfig.colon ? label.replace(/[:|：]\s*$/, '') + '：' : label)
+  const resolvedLabel = labelHidden
+    ? undefined
+    : label && formConfig.colon
+      ? label.replace(/[:|：]\s*$/, '') + '：'
+      : label
 
-  const antdRules = rules?.map(r => {
+  const antdRules = rules?.map((r) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { type, validator, ...rest } = r
     return {
       ...rest,

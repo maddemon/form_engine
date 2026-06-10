@@ -42,7 +42,7 @@ function createExpressionHandler(
   expression: string,
   $self: $Self,
   $form: $Form,
-  $event: unknown,
+  _$event: unknown,
 ): ResolvedEventHandler {
   return (...args: unknown[]) => {
     const context: Record<string, unknown> = {

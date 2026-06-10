@@ -9,6 +9,7 @@ export default function HtmlPropsRender({ widgets: w, slots, values, onChange }:
   const CodeEditor = useMemo(() => resolveSlot('codeEditor', slots, w), [slots, w])
   return (
     <FieldItem label={locale.component.html.content}>
+      {/* eslint-disable-next-line react-hooks/static-components */}
       <CodeEditor
         value={(values.content as string) ?? ''}
         onChange={(v) => onChange('content', v)}

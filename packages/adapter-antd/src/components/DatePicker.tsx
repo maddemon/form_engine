@@ -3,15 +3,15 @@
  * 适配 Form Engine 的 DatePickerProps 和 DateRangeProps
  */
 
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
-import 'dayjs/locale/en'
-import React from 'react'
-import { DatePicker as AntDatePicker, TimePicker as AntTimePicker } from 'antd'
-import zhCN from 'antd/es/date-picker/locale/zh_CN'
-import enUS from 'antd/es/date-picker/locale/en_US'
-import { useLocale } from '@form-engine/core/locale'
 import type { DatePickerProps, DateRangeProps } from '@form-engine/core'
+import { useLocale } from '@form-engine/core/locale'
+import { DatePicker as AntDatePicker, TimePicker as AntTimePicker } from 'antd'
+import enUS from 'antd/es/date-picker/locale/en_US'
+import zhCN from 'antd/es/date-picker/locale/zh_CN'
+import dayjs from 'dayjs'
+import 'dayjs/locale/en'
+import 'dayjs/locale/zh-cn'
+import React from 'react'
 
 const { RangePicker } = AntDatePicker
 
@@ -62,7 +62,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   const { locale } = useLocale()
   const antdLocale = useAntdLocale()
@@ -72,9 +71,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     onChange?.(dateString || undefined)
   }
 
-  const resolvedDisabledDate = disabledDate
-    ? (current: dayjs.Dayjs) => disabledDate(current.format(format))
-    : undefined
+  const resolvedDisabledDate = disabledDate ? (current: dayjs.Dayjs) => disabledDate(current.format(format)) : undefined
 
   return (
     <AntDatePicker
@@ -111,20 +108,18 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   const { locale } = useLocale()
   const antdLocale = useAntdLocale()
-  const placeholder = placeholderProp ?? (locale.adapter.common.placeholder.date ?? 'Select date') as unknown as [string, string]
+  const placeholder =
+    placeholderProp ?? ((locale.adapter.common.placeholder.date ?? 'Select date') as unknown as [string, string])
   const showTime = explicitShowTime ?? isTimeFormat(format)
   const handleChange = (_dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null, dateStrings: [string, string]) => {
     const cb = onChange as ((value: string[] | undefined) => void) | undefined
     cb?.(dateStrings || undefined)
   }
 
-  const resolvedDisabledDate = disabledDate
-    ? (current: dayjs.Dayjs) => disabledDate(current.format(format))
-    : undefined
+  const resolvedDisabledDate = disabledDate ? (current: dayjs.Dayjs) => disabledDate(current.format(format)) : undefined
 
   return (
     <RangePicker
@@ -158,7 +153,6 @@ export const TimePicker: React.FC<DatePickerProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   const { locale } = useLocale()
   const placeholder = placeholderProp ?? locale.adapter.common.placeholder.time ?? 'Select time'

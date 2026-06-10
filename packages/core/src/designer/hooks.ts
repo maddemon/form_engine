@@ -91,7 +91,7 @@ export function useDesignerScene(initialScene: DeviceScene = 'desktop') {
  * const [canUndo, canRedo, undo, redo] = useDesignerHistory(fields, pushSnapshot)
  * ```
  */
-export function useDesignerHistory(getFields: () => FormFieldSchema[]) {
+export function useDesignerHistory(_getFields: () => FormFieldSchema[]) {
   const [snapshots, setSnapshots] = useState<FormFieldSchema[][]>([[]])
   const [historyIndex, setHistoryIndex] = useState(0)
 

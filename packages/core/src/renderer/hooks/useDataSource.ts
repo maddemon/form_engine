@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import type { FormFieldSchema, FormSchema, OptionItem } from '../../types/schema'
 import { checkRequiredDeps, getDataSourceDeps, resolveDataSource } from '../../dataSource/resolver'
 import type { DataSourceResolver } from '../../types/render'
@@ -20,7 +20,6 @@ export function useDataSource({
   setFieldOptions, dataSourceResolver,
 }: UseDataSourceOptions): UseDataSourceResult {
   const debounceTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
-  const [fieldDepsSnapshot, setFieldDepsSnapshot] = useState<Record<string, string>>({})
 
   const loadDataSource = useCallback(async (field: FormFieldSchema, debounceMs = 300) => {
     if (!field.dataSource) return

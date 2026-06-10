@@ -1,18 +1,32 @@
-import { TextArea } from 'antd-mobile'
+import { TextAreaProps } from '@form-engine/core'
 import { useLocale } from '@form-engine/core/locale'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import { TextArea as AntmTextArea } from 'antd-mobile'
+import React from 'react'
 
-export const TextAreaField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled, readOnly, fieldSchema } = props
+export const TextArea: React.FC<TextAreaProps> = ({
+  value,
+  onChange,
+  placeholder: placeholderProp,
+  disabled,
+  readOnly,
+  rows,
+  style,
+  className,
+  id,
+}) => {
   const { locale } = useLocale()
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.input ?? 'Please enter'
   return (
-    <TextArea
+    <AntmTextArea
       value={(value as string) ?? ''}
-      onChange={v => onChange?.(v)}
+      onChange={(v) => onChange?.(v)}
       disabled={disabled}
       readOnly={readOnly}
-      placeholder={fieldSchema.placeholder ?? locale.adapter.common.placeholder.input ?? 'Please enter'}
-      style={{ width: '100%' }}
+      placeholder={placeholder}
+      rows={rows}
+      style={{ width: '100%', ...style }}
+      className={className}
+      id={id}
     />
   )
 }

@@ -1,8 +1,7 @@
-import React, { useCallback } from 'react'
+import React, { useMemo } from 'react'
 import { useLocale } from '../locale'
 import { FieldItem } from '../propRenders/shared'
 import { resolveSlot } from '../registry/propertySlotRegistry'
-import { useStyle } from '../styles'
 import type { DesignerWidgets } from '../types/adapter'
 import type { DesignerAction } from '../types/designer'
 import type { PropertySlots } from '../types/property-slot'
@@ -38,25 +37,21 @@ interface RulesEditorProps {
 }
 
 export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorProps) {
-  const { token } = useStyle()
   const { locale } = useLocale()
   const r = locale.designer.rules
   const commonPatterns = useCommonPatterns()
-  const CodeEditorSlot = resolveSlot('codeEditor', slots, w)
+  const ExpressionEditorSlot = useMemo(() => resolveSlot('expressionEditor', slots, w), [slots, w])
   const rule: FormRule = field.rules?.[0] ?? {}
 
-  const updateRule = useCallback(
-    (patch: Partial<FormRule>) => {
-      const nextRule = { ...rule, ...patch }
-      const cleaned = Object.keys(nextRule).length > 0 ? nextRule : undefined
-      dispatch({
-        type: 'UPDATE_FIELD',
-        fieldId: field.id,
-        patch: { rules: cleaned ? [cleaned] : undefined },
-      })
-    },
-    [rule, dispatch, field.id],
-  )
+  function updateRule(patch: Partial<FormRule>) {
+    const nextRule = { ...rule, ...patch }
+    const cleaned = Object.keys(nextRule).length > 0 ? nextRule : undefined
+    dispatch({
+      type: 'UPDATE_FIELD',
+      fieldId: field.id,
+      patch: { rules: cleaned ? [cleaned] : undefined },
+    })
+  }
 
   const [messageValue, handleMessageChange] = useDebouncedInput<string | number>(rule.message || '', (v) =>
     updateRule({ message: String(v) || undefined }),
@@ -68,13 +63,10 @@ export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorP
   )
   const handlePatternChangeTyped = handlePatternChange as (value: unknown) => void
 
-  const handlePatternSelect = useCallback(
-    (v: string) => {
-      cancelPatternPending()
-      updateRule({ pattern: v || undefined })
-    },
-    [updateRule, cancelPatternPending],
-  )
+  const handlePatternSelect = (v: string) => {
+    cancelPatternPending()
+    updateRule({ pattern: v || undefined })
+  }
 
   return (
     <>
@@ -86,7 +78,8 @@ export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorP
         <w.Input value={messageValue} onChange={handleMessageChange} placeholder={r.errorMessagePlaceholder} />
       </FieldItem>
       <FieldItem label={r.regex}>
-        <CodeEditorSlot
+        {/* eslint-disable-next-line react-hooks/static-components */}
+        <ExpressionEditorSlot
           value={patternValue}
           onChange={handlePatternChangeTyped}
           field={field}

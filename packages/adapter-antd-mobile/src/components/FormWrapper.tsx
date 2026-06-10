@@ -1,5 +1,5 @@
-import { Form } from 'antd-mobile'
 import type { FormWrapperProps } from '@form-engine/core'
+import { Form } from 'antd-mobile'
 import React from 'react'
 
 /**
@@ -9,18 +9,16 @@ import React from 'react'
  * 值管理仍由引擎 useFormValues 负责。
  */
 export const AntdMobileFormWrapper: React.FC<FormWrapperProps> = ({
-  formConfig, scene, onSubmit, children, className, style,
+  formConfig,
+  onSubmit,
+  children,
+  className,
+  style,
 }) => {
   const mobileLayout = formConfig.mobile.layout === 'horizontal' ? 'horizontal' : 'vertical'
 
   return (
-    <Form
-      layout={mobileLayout}
-      footer={null}
-      onFinish={() => onSubmit?.()}
-      className={className}
-      style={style}
-    >
+    <Form layout={mobileLayout} footer={null} onFinish={() => onSubmit?.()} className={className} style={style}>
       {children}
     </Form>
   )

@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { useLocale } from '../../locale'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
@@ -27,11 +26,13 @@ export default function GridPropsRender({ widgets: w, values, onChange }: PropsR
   const { locale } = useLocale()
   const colSpans = (values.colSpans as ColSpanItem[]) ?? []
 
-  const handleColSpansChange = useCallback((v: ColSpanItem[]) => onChange('colSpans', normalizeSpans(v)), [onChange])
+  function handleColSpansChange(v: ColSpanItem[]) {
+    onChange('colSpans', normalizeSpans(v))
+  }
 
-  const handleAddCol = useCallback(() => {
+  function handleAddCol() {
     onChange('colSpans', normalizeSpans([...colSpans, { id: genId('col'), span: 8 }]))
-  }, [colSpans, onChange])
+  }
 
   return (
     <>

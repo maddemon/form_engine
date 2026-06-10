@@ -1,6 +1,5 @@
 import React from 'react'
 import { useLocale } from '../../locale'
-import { useStyle } from '../../styles'
 import type { PaletteGroup } from '../../types/designer'
 import { PaletteItemCard } from './PaletteItemCard'
 
@@ -9,7 +8,6 @@ interface ComponentLibContentProps {
 }
 
 export const ComponentLibContent: React.FC<ComponentLibContentProps> = ({ groups }) => {
-  const { token } = useStyle()
   const { t } = useLocale()
   return (
     <>

@@ -1,26 +1,24 @@
-import type { FormFieldSchema, OptionItem } from '@form-engine/core'
-import { Trash, useAdapter, type FieldComponentProps, type FieldRendererFn } from '@form-engine/core'
+import type { FormFieldSchema, OptionItem, SubFormColumnConfig, SubFormProps } from '@form-engine/core'
+import { Trash, useAdapter } from '@form-engine/core'
 import { useLocale } from '@form-engine/core/locale'
 import { Button, Card } from 'antd-mobile'
 import React from 'react'
 
-interface SubFormColumnConfig {
-  id: string
-  label: string
-  width?: number
-  key?: string
-}
-
-export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, fieldSchema, disabled } = props
+export const SubForm: React.FC<SubFormProps> = ({
+  value,
+  onChange,
+  fieldSchema,
+  disabled,
+  columns: propColumns = [],
+  rowMode = 'dynamic',
+  _fixedRowCount,
+}) => {
   const adapter = useAdapter()
   const { locale } = useLocale()
   const rows: Record<string, unknown>[] = (value ?? []) as Record<string, unknown>[]
-  const children: FormFieldSchema[] = fieldSchema.children ?? []
-  const columns: SubFormColumnConfig[] = (fieldSchema.componentProps?.columns as SubFormColumnConfig[]) ?? []
-  const rowMode = fieldSchema.componentProps?.rowMode ?? 'dynamic'
+  const children: FormFieldSchema[] = (fieldSchema as any)?.children ?? []
+  const columns: SubFormColumnConfig[] = propColumns
 
-  // 按 regionKey 分组列字段
   const columnChildren = columns.map((_col, colIdx) =>
     children.filter((child) => (child.columnIndex ?? Number(child.regionKey ?? colIdx)) === colIdx),
   )
@@ -103,7 +101,7 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
               {colChildren.map((child) => {
                 const cellValue = row[child.name]
                 const renderFn = adapter?.components[child.type]
-                const { options: _ignored, ...restComponentProps } = child.componentProps ?? {}
+                const { ...restComponentProps } = child.componentProps ?? {}
                 return (
                   <div key={child.name} style={{ marginBottom: 10 }}>
                     <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>{child.label}</div>
@@ -115,7 +113,7 @@ export const SubFormField: FieldRendererFn = (props: FieldComponentProps) => {
                         disabled,
                         options: resolveChildOptions(child),
                         ...restComponentProps,
-                      })
+                      } as any)
                     ) : (
                       <div style={{ color: '#ccc', fontSize: 12, padding: '6px 0' }}>未知类型: {child.type}</div>
                     )}

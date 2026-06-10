@@ -1,14 +1,25 @@
+import { InputNumberProps } from '@form-engine/core'
 import { Stepper } from 'antd-mobile'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import React from 'react'
 
-export const InputNumberField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled } = props
+export const InputNumber: React.FC<InputNumberProps> = ({
+  value,
+  onChange,
+  disabled,
+  min,
+  max,
+  step,
+  style,
+}) => {
   return (
     <Stepper
       value={(value as number) ?? 0}
-      onChange={v => onChange?.(v)}
+      onChange={(v) => onChange?.(v)}
       disabled={disabled}
-      style={{}}
+      min={min}
+      max={max}
+      step={step}
+      style={{ ...style }}
     />
   )
 }

@@ -1,50 +1,80 @@
-import { Checkbox, Selector, Space } from 'antd-mobile'
-import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import type { OptionItem } from '@form-engine/core'
+import { Checkbox as AntmCheckbox, Selector, Space } from 'antd-mobile'
+import React from 'react'
 
-export const CheckboxField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled, fieldSchema, options } = props
+interface CheckboxProps {
+  value?: string[] | boolean
+  onChange?: (value: string[] | boolean | undefined) => void
+  disabled?: boolean
+  options?: OptionItem[]
+  optionType?: 'default' | 'button'
+  direction?: 'horizontal' | 'vertical'
+  style?: React.CSSProperties
+  className?: string
+  id?: string
+}
+
+export const Checkbox: React.FC<CheckboxProps> = ({
+  value,
+  onChange,
+  disabled,
+  options = [],
+  optionType,
+  style,
+  className,
+  id,
+}) => {
   const checkboxOptions = (options || []) as OptionItem[]
-  const optionType = fieldSchema.componentProps?.optionType as string | undefined
 
   if (checkboxOptions.length > 0) {
-    // 按钮风格 → 使用 Selector 实现多选
     if (optionType === 'button') {
       return (
         <Selector
-          options={checkboxOptions.map(opt => ({ label: opt.label, value: opt.value, disabled: opt.disabled }))}
+          options={checkboxOptions.map((opt) => ({
+            label: opt.label,
+            value: String(opt.value),
+            disabled: opt.disabled,
+          }))}
           value={(value as string[]) || []}
-          onChange={v => onChange?.(v)}
+          onChange={(v) => onChange?.(v)}
           disabled={disabled}
           multiple={true}
+          style={style}
         />
       )
     }
 
     const vals = (value as string[]) || []
     return (
-      <Checkbox.Group
+      <AntmCheckbox.Group
         value={vals}
-        onChange={v => onChange?.(v)}
+        onChange={(v) => onChange?.(v)}
         disabled={disabled}
+        style={style}
+        className={className}
+        id={id}
       >
         <Space direction="horizontal" block wrap>
-          {checkboxOptions.map(opt => (
-            <Checkbox key={String(opt.value)} value={String(opt.value)}>
+          {checkboxOptions.map((opt: any) => (
+            <AntmCheckbox key={String(opt.value)} value={String(opt.value)}>
               {opt.label}
-            </Checkbox>
+            </AntmCheckbox>
           ))}
         </Space>
-      </Checkbox.Group>
+      </AntmCheckbox.Group>
     )
   }
 
   return (
-    <Checkbox
+    <AntmCheckbox
       checked={!!value}
-      onChange={v => onChange?.(v)}
+      onChange={(v) => onChange?.(v)}
       disabled={disabled}
+      style={style}
+      className={className}
+      id={id}
     >
-      {fieldSchema.label}
-    </Checkbox>
+      {''}
+    </AntmCheckbox>
   )
 }

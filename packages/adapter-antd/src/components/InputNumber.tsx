@@ -19,7 +19,6 @@ export const InputNumber: React.FC<InputNumberProps> = ({
   precision,
   decimalSeparator = '.',
   formatter,
-  parser,
   prefix,
   suffix,
   disabled,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { EyeIcon, EyeOffIcon } from '../../components/icons'
 import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders'
@@ -65,10 +65,10 @@ export function DefaultPropertyContent({
   const { locale } = useLocale()
   const lp = locale.designer.propertyPanel
   const hasAdvanced = hasAdvancedConfig(field)
-  const { nameDirty, setNameDirty, nameError, existingNames } = useFieldNameValidation(allFields, field.id, field.name)
+  const { setNameDirty, nameError, existingNames } = useFieldNameValidation(allFields, field.id, field.name)
 
   // ===== Slot 解析 =====
-  const ExpressionEditorSlot = resolveSlot('expressionEditor', slots, w)
+  const ExpressionEditorSlot = useMemo(() => resolveSlot('expressionEditor', slots, w), [slots, w])
 
   // ===== 防抖输入 =====
 
@@ -167,6 +167,7 @@ export function DefaultPropertyContent({
       </FieldItem>
       {isForm && (
         <FieldItem label={lp.defaultValue}>
+          {/* eslint-disable-next-line react-hooks/static-components */}
           <ExpressionEditorSlot
             value={defaultValueValue}
             onChange={handleDefaultValueChangeTyped}

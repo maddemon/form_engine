@@ -1,13 +1,15 @@
-import { Rate } from 'antd-mobile'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import { RateProps } from '@form-engine/core'
+import { Rate as AntmRate } from 'antd-mobile'
+import React from 'react'
 
-export const RateField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled } = props
+export const Rate: React.FC<RateProps> = ({ value, onChange, disabled, count, allowHalf }) => {
   return (
-    <Rate
+    <AntmRate
       value={(value as number) ?? 0}
-      onChange={v => onChange?.(v)}
+      onChange={(v) => onChange?.(v)}
       readOnly={disabled}
+      count={count}
+      allowHalf={allowHalf}
     />
   )
 }

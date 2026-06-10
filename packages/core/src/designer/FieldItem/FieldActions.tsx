@@ -5,7 +5,7 @@ import { useStyle } from '../../styles'
 import { WidgetButton } from '../../widgets/Button'
 import type { FieldActionsProps } from './types'
 
-export const FieldActions: React.FC<FieldActionsProps> = ({ fieldId, onCopy, onRemove }) => {
+export const FieldActions: React.FC<FieldActionsProps> = ({ fieldId: _fieldId, onCopy, onRemove }) => {
   const { token } = useStyle()
   const { locale } = useLocale()
   const fa = locale.designer.fieldActions

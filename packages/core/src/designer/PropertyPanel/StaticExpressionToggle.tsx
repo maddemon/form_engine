@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+
 import { useStyle } from '../../styles'
 import { useLocale } from '../../locale'
 import type { DesignerWidgets } from '../../types/adapter'
@@ -41,15 +41,7 @@ export const StaticExpressionToggle: React.FC<StaticExpressionToggleProps> = ({
   const { locale } = useLocale()
   const se = locale.designer.staticExpressionToggle
   const currentValue = field[propKey]
-
-  const [mode, setMode] = useState<'static' | 'expression'>(
-    typeof currentValue === 'string' ? 'expression' : 'static',
-  )
-
-  // 同步外部状态变更（如 undo/redo）
-  useEffect(() => {
-    setMode(typeof currentValue === 'string' ? 'expression' : 'static')
-  }, [currentValue])
+  const mode: 'static' | 'expression' = typeof currentValue === 'string' ? 'expression' : 'static'
 
   const [exprValue, handleExprChange] = useDebouncedInput<string | number>(
     typeof currentValue === 'string' ? currentValue : '',
@@ -81,10 +73,8 @@ export const StaticExpressionToggle: React.FC<StaticExpressionToggleProps> = ({
           size="sm"
           onClick={() => {
             if (mode === 'static') {
-              setMode('expression')
               dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { [propKey]: '' } })
             } else {
-              setMode('static')
               dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { [propKey]: false } })
             }
           }}

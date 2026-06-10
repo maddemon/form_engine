@@ -192,13 +192,11 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
 
     const {
       formValues,
-      formValuesRef,
       visibleFields,
       fieldErrors,
       fieldOptions,
       handleFieldChange,
       handleSubmit,
-      $form,
       eventContext,
       reset,
       validate,

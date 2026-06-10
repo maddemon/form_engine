@@ -1,11 +1,19 @@
+import { TimePickerProps } from '@form-engine/core'
 import { Picker, Space } from 'antd-mobile'
 import { ClockCircleOutline, CloseCircleFill } from 'antd-mobile-icons'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import React from 'react'
 
-export const TimeField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled, fieldSchema } = props
-  const placeholder = fieldSchema.placeholder || '请选择时间'
-  const allowClear = fieldSchema.componentProps?.allowClear
+export const TimePicker: React.FC<TimePickerProps> = ({
+  value,
+  onChange,
+  disabled,
+  placeholder: placeholderProp = '请选择时间',
+  allowClear,
+  _format = 'HH:mm',
+  style,
+  className,
+  id,
+}) => {
   const hasValue = !!value
 
   const timeOptions: { label: string; value: string }[] = []
@@ -20,7 +28,7 @@ export const TimeField: FieldRendererFn = (props: FieldComponentProps) => {
     <Picker
       columns={[timeOptions]}
       value={value ? [String(value)] : []}
-      onConfirm={vals => onChange?.(vals[0])}
+      onConfirm={(vals) => onChange?.(vals[0])}
     >
       {(vals: any, actions: any) => (
         <Space
@@ -31,15 +39,18 @@ export const TimeField: FieldRendererFn = (props: FieldComponentProps) => {
           style={{
             color: hasValue ? undefined : 'var(--adm-color-weak)',
             cursor: disabled ? 'default' : 'pointer',
+            ...style,
           }}
+          className={className}
+          id={id}
         >
           <span>
-            {value || placeholder}
+            {value || placeholderProp}
           </span>
           {hasValue && allowClear ? (
             <CloseCircleFill
               style={{ fontSize: 16, flexShrink: 0 }}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation()
                 onChange?.(undefined)
               }}

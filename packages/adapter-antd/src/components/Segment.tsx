@@ -23,7 +23,6 @@ export const Segment: React.FC<SegmentProps> = ({
   style,
   className,
   id,
-  ...rest
 }) => {
   // 将 OptionItem[] 转换为 Segmented 支持的 options 格式
   const segOptions = options.map((opt) => ({

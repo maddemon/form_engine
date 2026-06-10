@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { useLocale } from '../../locale'
 import { FieldItem, genId } from '../../propRenders'
 import type { PropsRenderProps } from '../../propRenders/types'
@@ -10,24 +9,21 @@ export default function TabsPropsRender({ widgets: w, values, onChange }: PropsR
   const tabs = (values.tabs as TabPaneConfig[]) ?? []
   const defaultActiveKey = values.defaultActiveKey as string | undefined
 
-  const handleTabsChange = useCallback(
-    (newTabs: TabPaneConfig[]) => {
-      if (defaultActiveKey && !newTabs.some((t) => t.key === defaultActiveKey)) {
-        onChange('tabs', newTabs)
-        onChange('defaultActiveKey', undefined)
-      } else {
-        onChange('tabs', newTabs)
-      }
-    },
-    [defaultActiveKey, onChange],
-  )
+  function handleTabsChange(newTabs: TabPaneConfig[]) {
+    if (defaultActiveKey && !newTabs.some((t) => t.key === defaultActiveKey)) {
+      onChange('tabs', newTabs)
+      onChange('defaultActiveKey', undefined)
+    } else {
+      onChange('tabs', newTabs)
+    }
+  }
 
-  const handleAddTab = useCallback(() => {
+  function handleAddTab() {
     handleTabsChange([
       ...tabs,
       { id: genId('tab'), key: `tab_${tabs.length + 1}`, title: locale.component.tabs.defaultTabTitle.replace('{n}', String(tabs.length + 1)), disabled: false },
     ])
-  }, [tabs, handleTabsChange, locale])
+  }
 
   return (
     <>

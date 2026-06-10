@@ -3,6 +3,9 @@
  *
  * 将 DesignerWidgets 中的组件（ExpressionInput / DataSourceEditor）
  * 适配为统一的 PropertySlotProps 接口。
+ *
+ * 适配组件在模块作用域定义（而非 render 期创建），规避 React 19
+ * "Cannot create components during render" lint 规则。
  */
 
 import React from 'react'
@@ -10,46 +13,39 @@ import { FieldDataSource } from '../../types'
 import type { DesignerWidgets } from '../../types/adapter'
 import type { PropertySlotProps, SlotName } from '../../types/property-slot'
 
-/** 缓存适配后的组件，避免每次渲染创建新组件类型导致 React 卸载/重挂载 */
-const expressionInputCache = new WeakMap<React.ComponentType<any>, React.ComponentType<PropertySlotProps>>()
-const dataSourceEditorCache = new WeakMap<React.ComponentType<any>, React.ComponentType<PropertySlotProps>>()
+// ── 模块级 widget 引用 ────────────────────────────────────────────
+// DesignerWidgets 在应用生命周期内为同一引用，模块级变量安全可⽤。
+let _expressionInput: React.ComponentType<any> | null = null
+let _dataSourceEditor: React.ComponentType<any> | null = null
 
-/** 将 w.ExpressionInput 适配为 PropertySlotProps */
-function adaptExpressionInput(w: DesignerWidgets): React.ComponentType<PropertySlotProps> | null {
-  if (!w.ExpressionInput) return null
-  const cached = expressionInputCache.get(w.ExpressionInput)
-  if (cached) return cached
-  const ExpressionInput = w.ExpressionInput
-  const Adapted: React.FC<PropertySlotProps> = ({ value, onChange, placeholder, fieldNames }) => (
-    <ExpressionInput
+// ── 模块级适配组件（不在 render 期内创建） ─────────────────────────
+
+const AdaptedExpressionInput: React.FC<PropertySlotProps> = ({ value, onChange, placeholder, fieldNames }) => {
+  const ExpInput = _expressionInput
+  if (!ExpInput) return null
+  return (
+    <ExpInput
       value={typeof value === 'string' ? value : ''}
       onChange={onChange}
       placeholder={placeholder}
       fieldNames={fieldNames}
     />
   )
-  Adapted.displayName = 'AdaptedExpressionInput'
-  expressionInputCache.set(w.ExpressionInput, Adapted)
-  return Adapted
 }
+AdaptedExpressionInput.displayName = 'AdaptedExpressionInput'
 
-/** 将 w.DataSourceEditor 适配为 PropertySlotProps */
-function adaptDataSourceEditor(w: DesignerWidgets): React.ComponentType<PropertySlotProps> | null {
-  if (!w.DataSourceEditor) return null
-  const cached = dataSourceEditorCache.get(w.DataSourceEditor)
-  if (cached) return cached
-  const DataSourceEditor = w.DataSourceEditor
-  const Adapted: React.FC<PropertySlotProps> = ({ value, onChange, context }) => (
-    <DataSourceEditor
+const AdaptedDataSourceEditor: React.FC<PropertySlotProps> = ({ value, onChange, context }) => {
+  const DsEditor = _dataSourceEditor
+  if (!DsEditor) return null
+  return (
+    <DsEditor
       value={value as FieldDataSource | undefined}
       onChange={(v) => onChange(v)}
       optionsType={(context?.optionsType as 'flat' | 'tree') ?? 'flat'}
     />
   )
-  Adapted.displayName = 'AdaptedDataSourceEditor'
-  dataSourceEditorCache.set(w.DataSourceEditor, Adapted)
-  return Adapted
 }
+AdaptedDataSourceEditor.displayName = 'AdaptedDataSourceEditor'
 
 /**
  * 从 DesignerWidgets 中获取 Widget 层 fallback
@@ -58,9 +54,13 @@ export function getWidgetFallback(name: SlotName, widgets?: DesignerWidgets): Re
   if (!widgets) return null
   switch (name) {
     case 'expressionEditor':
-      return adaptExpressionInput(widgets)
+      if (!widgets.ExpressionInput) return null
+      _expressionInput = widgets.ExpressionInput
+      return AdaptedExpressionInput
     case 'dataSourceEditor':
-      return adaptDataSourceEditor(widgets)
+      if (!widgets.DataSourceEditor) return null
+      _dataSourceEditor = widgets.DataSourceEditor
+      return AdaptedDataSourceEditor
     default:
       return null
   }

@@ -1,13 +1,19 @@
-import type { FieldComponentProps, FieldRendererFn, OptionItem } from '@form-engine/core'
+import type { SegmentProps } from '@form-engine/core'
 import { Segmented } from 'antd-mobile'
+import React from 'react'
 
-export const SegmentField: FieldRendererFn = (props: FieldComponentProps) => {
-  const options: OptionItem[] = (props.options ?? []) as OptionItem[]
-  const disabled = props.disabled
-  const block = props.block
-  const onChange = props.onChange
-
-  const segOptions = options.map((opt) => ({
+export const Segment: React.FC<SegmentProps> = ({
+  value,
+  onChange,
+  options = [],
+  disabled,
+  block,
+  _size,
+  style,
+  className,
+  id,
+}) => {
+  const segOptions = (options as any[]).map((opt: any) => ({
     label: opt.label,
     value: opt.value,
     disabled: opt.disabled,
@@ -15,13 +21,14 @@ export const SegmentField: FieldRendererFn = (props: FieldComponentProps) => {
 
   return (
     <Segmented
-      value={props.value}
-      defaultValue={props.defaultValue}
+      value={value}
       options={segOptions}
       block={block}
       disabled={disabled}
-      onChange={(val) => onChange?.(val)}
-      style={props.style}
+      onChange={(val) => onChange?.(val as string | number)}
+      style={style}
+      className={className}
+      id={id}
     />
   )
 }

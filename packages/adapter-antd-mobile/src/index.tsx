@@ -32,38 +32,38 @@ import {
   Swiper as AntmSwiper,
 } from 'antd-mobile'
 
-import { AlertField } from './components/Alert'
-import { ButtonField } from './components/Button'
-import { CardField } from './components/Card'
-import { CascaderField } from './components/Cascader'
-import { CheckboxField } from './components/Checkbox'
-import { CollapseField } from './components/Collapse'
-import { DateField } from './components/DatePicker'
-import { DateRangeField } from './components/DateRange'
-import { DividerField } from './components/Divider'
-import { FlexField } from './components/Flex'
+import { Alert } from './components/Alert'
+import { Button } from './components/Button'
+import { Card } from './components/Card'
+import { Cascader } from './components/Cascader'
+import { Checkbox } from './components/Checkbox'
+import { Collapse } from './components/Collapse'
+import { DatePicker } from './components/DatePicker'
+import { DateRangePicker } from './components/DateRange'
+import { Divider } from './components/Divider'
+import { Flex } from './components/Flex'
 import { AntdMobileFormItem } from './components/FormItem'
 import { AntdMobileFormWrapper } from './components/FormWrapper'
-import { GridField } from './components/Grid'
-import { HtmlField } from './components/Html'
-import { ImageField } from './components/Image'
-import { InputField } from './components/Input'
-import { InputNumberField } from './components/InputNumber'
-import { PasswordField } from './components/Password'
-import { RadioField } from './components/Radio'
-import { RateField } from './components/Rate'
-import { SegmentField } from './components/Segment'
-import { SelectField } from './components/Select'
-import { SliderField } from './components/Slider'
-import { SubFormField } from './components/SubForm'
-import { SwitchField } from './components/Switch'
-import { TabsField } from './components/Tabs'
-import { TextField } from './components/Text'
-import { TextAreaField } from './components/TextArea'
-import { TimeField } from './components/TimePicker'
-import { TitleField } from './components/Title'
-import { TreeSelectField } from './components/TreeSelect'
-import { UploadField } from './components/Upload'
+import { Grid } from './components/Grid'
+import { Html } from './components/Html'
+import { Image } from './components/Image'
+import { Input } from './components/Input'
+import { InputNumber } from './components/InputNumber'
+import { Password } from './components/Password'
+import { Radio } from './components/Radio'
+import { Rate } from './components/Rate'
+import { Segment } from './components/Segment'
+import { Select } from './components/Select'
+import { Slider } from './components/Slider'
+import { SubForm } from './components/SubForm'
+import { Switch } from './components/Switch'
+import { Tabs } from './components/Tabs'
+import { Text } from './components/Text'
+import { TextArea } from './components/TextArea'
+import { TimePicker } from './components/TimePicker'
+import { Title } from './components/Title'
+import { TreeSelect } from './components/TreeSelect'
+import { Upload } from './components/Upload'
 import { AntdMobileBridgeProvider } from './themeBridge'
 
 // Theme Bridge
@@ -106,44 +106,44 @@ export const antdMobileAdapter: FormEngineAdapter = {
 
   components: {
     // 表单组件
-    input: InputField,
-    password: PasswordField,
-    textarea: TextAreaField,
-    'input-number': InputNumberField,
-    select: SelectField,
-    'multi-select': SelectField,
-    radio: RadioField,
-    checkbox: CheckboxField,
-    switch: SwitchField,
-    slider: SliderField,
-    rate: RateField,
-    date: DateField,
-    datetime: DateField,
-    'date-range': DateRangeField,
-    time: TimeField,
-    upload: UploadField,
-    cascader: CascaderField,
-    'tree-select': TreeSelectField,
+    input: Input,
+    password: Password,
+    textarea: TextArea,
+    'input-number': InputNumber,
+    select: Select,
+    'multi-select': Select,
+    radio: Radio,
+    checkbox: Checkbox,
+    switch: Switch,
+    slider: Slider,
+    rate: Rate,
+    date: DatePicker,
+    datetime: DatePicker,
+    'date-range': DateRangePicker,
+    time: TimePicker,
+    upload: Upload,
+    cascader: Cascader,
+    'tree-select': TreeSelect,
     // 容器组件
-    grid: GridField,
-    flex: FlexField,
-    collapse: CollapseField,
-    tabs: TabsField,
-    'sub-form': SubFormField,
-    card: CardField,
+    grid: Grid,
+    flex: Flex,
+    collapse: Collapse,
+    tabs: Tabs,
+    'sub-form': SubForm,
+    card: Card,
     // 按钮组件
-    button: ButtonField,
+    button: Button,
     // 展示组件
-    text: TextField,
-    html: HtmlField,
-    image: ImageField,
-    divider: DividerField,
-    title: TitleField,
-    alert: AlertField,
-    segment: SegmentField,
-  },
+    text: Text,
+    html: Html,
+    image: Image,
+    divider: Divider,
+    title: Title,
+    alert: Alert,
+    segment: Segment,
+  } as unknown as Record<string, FieldRendererFn>,
 
-  default: DefaultField,
+  default: DefaultField as FieldRendererFn,
   bridgeProvider: AntdMobileBridgeProvider,
   FormWrapper: AntdMobileFormWrapper,
   FormItem: AntdMobileFormItem,

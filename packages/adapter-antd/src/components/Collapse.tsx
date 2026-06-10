@@ -4,9 +4,9 @@
  * 使用 Ant Design 的 Collapse 组件
  */
 
-import React from 'react'
+import type { CollapsePanelConfig, CollapseProps } from '@form-engine/core'
 import { Collapse as AntCollapse } from 'antd'
-import type { CollapseProps, CollapsePanelConfig } from '@form-engine/core'
+import React from 'react'
 
 const { Panel: AntPanel } = AntCollapse
 
@@ -24,6 +24,7 @@ export const Collapse: React.FC<CollapseProps> = ({
   ghost = false,
   style,
   className,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   id,
   ...rest
 }) => {

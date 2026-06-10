@@ -295,13 +295,11 @@ function WidgetDataSourceEditorInner({
       setDsType(newType)
       if (newType === 'remote') {
         setRemoteModalOpen(true)
-      } else {
-        if (value?.type !== 'static') {
-          onChange?.({ type: 'static', static: { options: [] } })
-        }
       }
+      // 切换类型只改变 UI 视图，不触发 onChange
+      // 实际数据在 handleStaticChange / handleRemoteConfigConfirm 中持久化
     },
-    [value, onChange],
+    [],
   )
 
   const handleRemoteConfigConfirm = useCallback(

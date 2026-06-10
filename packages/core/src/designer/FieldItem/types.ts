@@ -1,12 +1,11 @@
 import type { FormFieldSchema } from '../../types'
-import type { DesignerAction } from '../../types/designer'
 
 export interface FieldItemProps {
   field: FormFieldSchema
   isSelected: boolean
   children: React.ReactNode
-  dragListeners?: Record<string, Function>
-  dragAttributes?: Record<string, any>
+  dragListeners?: Record<string, (...args: unknown[]) => void>
+  dragAttributes?: Record<string, unknown>
   dragActivatorRef?: (node: HTMLElement | null) => void
   dragNodeRef?: (node: HTMLElement | null) => void
   dragStyle?: React.CSSProperties
@@ -14,7 +13,7 @@ export interface FieldItemProps {
 
 export interface DragHandleProps {
   dragActivatorRef?: (node: HTMLElement | null) => void
-  dragListeners?: Record<string, Function>
+  dragListeners?: Record<string, (...args: unknown[]) => void>
 }
 
 export interface FieldActionsProps {

@@ -1,28 +1,46 @@
+import type { UploadFile } from '@form-engine/core'
+import { UploadProps } from '@form-engine/core'
 import { ImageUploader } from 'antd-mobile'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import type { ImageUploadItem } from 'antd-mobile/es/components/image-uploader'
+import React from 'react'
 
-export const UploadField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled, fieldSchema } = props
-  const cp = fieldSchema.componentProps ?? {}
-  const accept = (cp.accept as string) || 'image/*'
-  const maxCount = (cp.maxCount as number) || 5
-  const userUpload = cp.upload as ((file: File) => Promise<{ url: string }>) | undefined
+function toImageUploadItem(file: UploadFile): ImageUploadItem {
+  return {
+    key: file.uid || file.url,
+    url: file.url || '',
+    thumbnailUrl: file.url,
+  }
+}
 
-  const fileList = ((value as string[]) || []).map((url, idx) => ({
-    url,
-    key: String(idx),
-  }))
+function toUploadFile(item: ImageUploadItem): UploadFile {
+  return {
+    uid: String(item.key ?? item.url),
+    name: item.url.split('/').pop() || item.url,
+    url: item.url,
+  }
+}
+
+export const Upload: React.FC<UploadProps> = ({
+  value,
+  onChange,
+  disabled,
+  accept: acceptProp,
+  maxCount,
+}) => {
+  const accept = acceptProp || 'image/*'
+  const maxCountResolved = maxCount || 5
+  const fileList: ImageUploadItem[] = (value ?? []).map(toImageUploadItem)
 
   return (
     <ImageUploader
       value={fileList}
-      onChange={files => onChange?.(files.map(f => f.url))}
+      onChange={(files) => onChange?.(files.map(toUploadFile))}
       disableUpload={disabled}
       deletable={!disabled}
       accept={accept}
-      maxCount={maxCount}
-      showUpload={!disabled && fileList.length < maxCount}
-      upload={userUpload ?? (() => { throw new Error('UploadField: componentProps.upload is required') })}
+      maxCount={maxCountResolved}
+      showUpload={!disabled && fileList.length < maxCountResolved}
+      upload={() => Promise.reject(new Error('Upload: upload handler required'))}
     />
   )
 }

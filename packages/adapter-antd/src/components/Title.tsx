@@ -1,6 +1,6 @@
-import React from 'react'
-import { Typography } from 'antd'
 import type { TitleProps } from '@form-engine/core'
+import { Typography } from 'antd'
+import React from 'react'
 
 const { Title: AntTitle } = Typography
 
@@ -28,7 +28,6 @@ export const Title: React.FC<TitleProps> = ({
     ...(textAlign ? { textAlign } : {}),
     ...style,
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const titleProps: any = {
     level,
     type,
@@ -49,9 +48,5 @@ export const Title: React.FC<TitleProps> = ({
 
   const titleContent = children || content || ''
 
-  return (
-    <AntTitle {...titleProps}>
-      {titleContent}
-    </AntTitle>
-  )
+  return <AntTitle {...titleProps}>{titleContent}</AntTitle>
 }

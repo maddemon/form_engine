@@ -189,4 +189,20 @@ export default [
       'form-engine/ban-hardcoded-style': 'error',
     },
   },
+
+  // Node.js scripts: allow process, console, URL, etc.
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        URL: 'readable',
+        console: 'readable',
+        process: 'readable',
+        setTimeout: 'readable',
+        clearTimeout: 'readable',
+        setInterval: 'readable',
+        clearInterval: 'readable',
+      },
+    },
+  },
 ]

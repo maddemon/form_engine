@@ -1,17 +1,27 @@
+import { SelectProps } from '@form-engine/core'
 import { Picker, Space } from 'antd-mobile'
 import { DownOutline, CloseCircleFill } from 'antd-mobile-icons'
 import { useLocale } from '@form-engine/core/locale'
-import type { OptionItem, FieldComponentProps, FieldRendererFn } from '@form-engine/core'
 import { toPickerColumns } from '../utils'
+import React from 'react'
 
-export const SelectField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { value, onChange, disabled, fieldSchema, options } = props
+export const Select: React.FC<SelectProps> = ({
+  value,
+  onChange,
+  disabled,
+  options = [],
+  placeholder: placeholderProp,
+  allowClear,
+  mode,
+  style,
+  className,
+  id,
+}) => {
   const { locale } = useLocale()
-  const opts = (options || []) as OptionItem[]
+  const opts = (options || []) as any[]
   const columns = toPickerColumns(opts)
-  const isMulti = fieldSchema.componentProps?.mode === 'multiple'
-  const placeholder = fieldSchema.placeholder ?? locale.adapter.common.placeholder.select ?? 'Please select'
-  const allowClear = fieldSchema.componentProps?.allowClear
+  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.select ?? 'Please select'
+  const isMulti = mode === 'multiple'
 
   const valArr = isMulti
     ? ((value as string[]) || []).map(String)
@@ -23,7 +33,7 @@ export const SelectField: FieldRendererFn = (props: FieldComponentProps) => {
     <Picker
       columns={columns}
       value={valArr}
-      onConfirm={vals => {
+      onConfirm={(vals) => {
         if (isMulti) {
           onChange?.(vals)
         } else {
@@ -40,17 +50,20 @@ export const SelectField: FieldRendererFn = (props: FieldComponentProps) => {
           style={{
             color: hasValue ? undefined : 'var(--adm-color-weak)',
             cursor: disabled ? 'default' : 'pointer',
+            ...style,
           }}
+          className={className}
+          id={id}
         >
           <span>
             {hasValue
-              ? vals.map(v => opts.find(o => o.value === v?.value)?.label || v?.label || '').join('，')
+              ? vals.map((v: any) => opts.find((o: any) => o.value === v?.value)?.label || v?.label || '').join('，')
               : placeholder}
           </span>
           {hasValue && allowClear ? (
             <CloseCircleFill
               style={{ fontSize: 16, flexShrink: 0 }}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation()
                 onChange?.(isMulti ? [] : undefined)
               }}

@@ -20,6 +20,7 @@ export const Divider: React.FC<DividerProps> = ({
   thickness,
   style,
   className,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   id,
   ...rest
 }) => {

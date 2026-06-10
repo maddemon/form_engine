@@ -1,26 +1,26 @@
 import React from 'react'
-import type { FieldComponentProps, FieldRendererFn } from '@form-engine/core'
+import type { TextProps } from '@form-engine/core'
 
-export const TextField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { children, style } = props
-  const content = children || props.content || ''
-  const strong = props.strong
-  const italic = props.italic
-  const underline = props.underline
-  const delProp = props.delete
-  const code = props.code
-  const mark = props.mark
-  const type = props.type
+const typeColorMap: Record<string, string> = {
+  secondary: 'var(--fe-text-tertiary)',
+  success: 'var(--fe-success)',
+  warning: 'var(--fe-warning)',
+  danger: 'var(--fe-error)',
+}
 
-  const typeColorMap: Record<string, string> = {
-    secondary: 'var(--fe-text-tertiary)',
-    success: 'var(--fe-success)',
-    warning: 'var(--fe-warning)',
-    danger: 'var(--fe-error)',
-  }
-
-  let el: React.ReactNode = content
-
+export const Text: React.FC<TextProps> = ({
+  children,
+  content,
+  type,
+  strong = false,
+  italic = false,
+  underline = false,
+  delete: delProp = false,
+  code = false,
+  mark = false,
+  style,
+}) => {
+  let el: React.ReactNode = children || content || ''
   if (code) el = <code>{el}</code>
   if (mark) el = <mark>{el}</mark>
   if (delProp) el = <del>{el}</del>
