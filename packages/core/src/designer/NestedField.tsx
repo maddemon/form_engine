@@ -68,26 +68,14 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
 
   const needsLabel = isContainer && !SELF_RENDERED.has(field.type)
   const isFormLike = isFormComponent(field.type)
-
-  const containerLabelProps: FormItemProps = useMemo(
-    () => ({
-      label: field.label,
-      labelHidden: field.labelHidden,
-      required: isFormLike ? field.rules?.some((r) => r.required) : undefined,
-      formConfig,
-      scene: adapter.scene,
-      children: content,
-    }),
-    [field, isFormLike, formConfig, adapter, content],
-  )
-
-  // 缓存最终传给 FieldItem 的 children，使其在拖拽中保持引用稳定
-  const fieldChildren = useMemo(
-    () => (needsLabel
-      ? React.createElement(adapter.FormItem ?? DefaultFormItem, containerLabelProps)
-      : content),
-    [needsLabel, adapter, containerLabelProps, content],
-  )
+  const containerLabelProps: FormItemProps = {
+    label: field.label,
+    labelHidden: field.labelHidden,
+    required: isFormLike ? field.rules?.some((r) => r.required) : undefined,
+    formConfig,
+    scene: adapter.scene,
+    children: content,
+  }
 
   return (
     <FieldItem
@@ -99,7 +87,7 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
       dragNodeRef={setNodeRef}
       dragStyle={dragStyle}
     >
-      {fieldChildren}
+      {needsLabel ? React.createElement(adapter.FormItem ?? DefaultFormItem, containerLabelProps) : content}
     </FieldItem>
   )
 })

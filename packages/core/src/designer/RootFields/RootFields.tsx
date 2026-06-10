@@ -8,9 +8,9 @@ import { NestedField } from '../NestedField'
 
 /** 拖到容器上方时不触发同级排序碰撞（transforms 归零） */
 const containerAwareStrategy: SortingStrategy = (args) => {
-  const overId = args.over?.id
-  if (overId && (String(overId).endsWith('__container') || String(overId).endsWith('__region_'))) {
-    return args.items.map(() => ({ x: 0, y: 0, scaleX: 1, scaleY: 1 }))
+  const overId = (args as unknown as { over?: { id: string } }).over?.id
+  if (overId && (overId.endsWith('__container') || overId.includes('__region_'))) {
+    return { x: 0, y: 0, scaleX: 1, scaleY: 1 }
   }
   return verticalListSortingStrategy(args)
 }

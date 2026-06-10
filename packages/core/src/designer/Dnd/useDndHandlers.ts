@@ -73,10 +73,6 @@ export function useDndHandlers(
     return []
   }, [])
 
-  // ── 性能测量 ──────────────────────────────────────────────────────
-
-  const perfRef = useRef({ callCount: 0, totalTime: 0 })
-
   // ── handleDragStart ───────────────────────────────────────────────
 
   const handleDragStart = useCallback(
@@ -97,14 +93,9 @@ export function useDndHandlers(
       }
 
       setDndState({ activeDragId: event.active.id, activeDragLabel: label, activeDragType: fieldType })
-
-      // 重置 perf 数据
-      perfRef.current = { callCount: 0, totalTime: 0 }
     },
     [fields, fieldIndex],
   )
-
-  const lastDragOverMoveRef = useRef<string | null>(null)
 
   /** 计算鼠标悬浮位置对应的目标容器和插入索引 */
   const computeDropTarget = useCallback(
@@ -223,16 +214,7 @@ export function useDndHandlers(
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
-      lastDragOverMoveRef.current = null
       setDndState({ activeDragId: null, activeDragLabel: '', activeDragType: '' })
-
-      // 日志性能数据
-      const { callCount, totalTime } = perfRef.current
-      if (callCount > 0) {
-        console.log(
-          `[Perf] Drag: ${callCount} calls, total ${totalTime.toFixed(1)}ms, avg ${(totalTime / callCount).toFixed(2)}ms/call`,
-        )
-      }
 
       const { active, over } = event
       if (!over) { updateDragOverState(null); return }
@@ -309,7 +291,6 @@ export function useDndHandlers(
   )
 
   const handleDragCancel = useCallback(() => {
-    lastDragOverMoveRef.current = null
     lastDragOverKeyRef.current = null
     setDndState({ activeDragId: null, activeDragLabel: '', activeDragType: '' })
     updateDragOverState(null)
