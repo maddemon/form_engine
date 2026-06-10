@@ -20,7 +20,7 @@ import {
   Button as AntmButton,
   CapsuleTabs as AntmCapsuleTabs,
   Card as AntmCard,
-  Empty as AntmEmpty,
+  InfiniteScroll as AntmInfiniteScroll,
   List as AntmList,
   NoticeBar as AntmNoticeBar,
   Popover as AntmPopover,
@@ -30,6 +30,7 @@ import {
   SpinLoading as AntmSpinLoading,
   Steps as AntmSteps,
   Swiper as AntmSwiper,
+  Tabs as AntmTabs,
 } from 'antd-mobile'
 
 import { Alert } from './components/Alert'
@@ -152,7 +153,7 @@ export const antdMobileAdapter: FormEngineAdapter = {
     AntmBadge,
     AntmAvatar,
     AntmList,
-    AntmEmpty,
+    AntmInfiniteScroll,
     AntmSpinLoading,
     AntmSwiper,
     AntmCapsuleTabs,
@@ -163,6 +164,7 @@ export const antdMobileAdapter: FormEngineAdapter = {
     AntmNoticeBar,
     AntmPopover,
     AntmButton,
+    AntmTabs,
   },
   // designerWidgets: 不提供 — PropertyPanel 是 desktop 渲染器，
   // 移动端适配器无 widgets 覆盖时自动回退到 core 的 defaultDesignerWidgets。

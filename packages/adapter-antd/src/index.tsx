@@ -16,14 +16,12 @@ import type { DesignerWidgets, FieldComponentProps, FieldRendererFn, FormEngineA
 
 // JSX Scope 组件
 import {
-  Alert as AntAlert,
   Avatar as AntAvatar,
   Badge as AntBadge,
   Button as AntButton,
   Card as AntCard,
   Col as AntCol,
   Descriptions as AntDescriptions,
-  Divider as AntDivider,
   Empty as AntEmpty,
   List as AntList,
   Popover as AntPopover,
@@ -190,7 +188,6 @@ export const antdAdapter: FormEngineAdapter = {
     AntTag,
     AntTable,
     AntBadge,
-    AntAlert,
     AntProgress,
     AntAvatar,
     AntList,
@@ -206,7 +203,6 @@ export const antdAdapter: FormEngineAdapter = {
     AntSpace,
     AntRow,
     AntCol,
-    AntDivider,
     AntText,
     AntTitle,
     AntParagraph,
