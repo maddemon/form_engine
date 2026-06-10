@@ -119,7 +119,7 @@ function getDefaultCode(language?: string): string {
     case 'html':
       return '<div>\n  <h1>Hello World</h1>\n  <p>Welcome to my page!</p>\n  <ul>\n    <li>Item 1</li>\n    <li>Item 2</li>\n  </ul>\n</div>'
     case 'jsx':
-      return 'function Hello() {\n  const [count, setCount] = React.useState(0);\n  const [text, setText] = React.useState("");\n  return (\n    <div style={{ padding: 16 }}>\n      <h1>Hello World</h1>\n      <AntCard title="State Demo">\n        <p>Count: {count}</p>\n        <AntButton onClick={() => setCount(c => c + 1)}>\n          Increment\n        </AntButton>\n      </AntCard>\n      <input value={text} onChange={e => setText(e.target.value)} placeholder="Type here..." />\n      <p>You typed: {text}</p>\n    </div>\n  );\n}'
+      return 'function Hello(props) {\n  const [count, setCount] = React.useState(0);\n  const [text, setText] = React.useState("");\n  const { AntCard, AntButton } = props;\n  return (\n    <div style={{ padding: 16 }}>\n      <h1>Hello World</h1>\n      <AntCard title="State Demo">\n        <p>Count: {count}</p>\n        <AntButton onClick={() => setCount(c => c + 1)}>\n          Increment\n        </AntButton>\n      </AntCard>\n      <input value={text} onChange={e => setText(e.target.value)} placeholder="Type here..." />\n      <p>You typed: {text}</p>\n    </div>\n  );\n}'
     default:
       return ''
   }

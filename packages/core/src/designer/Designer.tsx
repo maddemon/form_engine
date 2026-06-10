@@ -8,7 +8,7 @@ import type { DesignerProps } from '../types/designer'
 import type { FormFieldSchema, FormSchema } from '../types/schema'
 import { Canvas } from './Canvas'
 import { DesignerConfigContext, DesignerDispatchContext, DesignerSelectionContext } from './DesignerContext'
-import { useDndHandlers } from './Dnd/useDndHandlers'
+import { useDndHandlers, type DndState } from './Dnd/useDndHandlers'
 import { FieldList, getFullPaletteGroups } from './FieldList'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
@@ -18,6 +18,69 @@ import { useDesignerSync } from './useDesignerSync'
 function useFieldIndex(fields: FormFieldSchema[]): FieldIndex {
   return useMemo(() => buildFieldIndex(fields), [fields])
 }
+
+// ── 模块级常量（避免每次渲染重建） ───────────────────────────────
+
+/** 滚动条样式（仅一次注入，跨渲染复用） */
+const SCROLLBAR_CSS = `
+  .designer-scroll-container ::-webkit-scrollbar { width: var(--fe-spacing-xs); height: var(--fe-spacing-xs); }
+  .designer-scroll-container ::-webkit-scrollbar-track { background: transparent; }
+  .designer-scroll-container ::-webkit-scrollbar-thumb { background: var(--fe-border-primary); border-radius: var(--fe-border-radius-sm); }
+  .designer-scroll-container ::-webkit-scrollbar-thumb:hover { background: var(--fe-text-tertiary); }
+`
+
+/** 根容器样式 */
+const ROOT_CONTAINER_STYLE: React.CSSProperties = {
+  display: 'flex',
+  height: '100%',
+  fontFamily: '-apple-system, sans-serif',
+  background: 'var(--fe-bg-secondary)',
+  overflow: 'hidden',
+}
+
+/** 中间画布外壳样式 */
+const CANVAS_WRAPPER_STYLE: React.CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  overflow: 'hidden',
+}
+
+/** 拖拽幽灵元素样式（仅 dndShadow 来自 token，剩余部分固定） */
+const DRAG_GHOST_BASE_STYLE: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 'var(--fe-spacing-xs)',
+  padding: '4px 10px',
+  background: 'var(--fe-primary)',
+  color: 'var(--fe-bg-primary)',
+  borderRadius: 'var(--fe-border-radius-sm)',
+  fontSize: 'var(--fe-font-size-sm)',
+  pointerEvents: 'none',
+  whiteSpace: 'nowrap',
+}
+
+/** 拖拽幽灵图标 span 样式 */
+const DRAG_GHOST_ICON_STYLE: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+}
+
+/**
+ * 拖拽悬浮预览（仅在 dndState 有值时显示）。
+ * 抽成独立组件后由 React.memo 包裹，避免 selectionCtx/configCtx 变化时
+ * 重建整棵 DragOverlay 树。
+ */
+const DragGhost: React.FC<DndState> = React.memo(({ activeDragType, activeDragLabel }) => {
+  const { token } = useStyle()
+  if (!activeDragLabel) return null
+  return (
+    <div style={{ ...DRAG_GHOST_BASE_STYLE, boxShadow: token('widgetCanvasDndShadow') as React.CSSProperties['boxShadow'] }}>
+      <span style={DRAG_GHOST_ICON_STYLE}>{getComponentIcon(activeDragType) || null}</span>
+      {activeDragLabel}
+    </div>
+  )
+})
+DragGhost.displayName = 'DragGhost'
 
 export const Designer: React.FC<DesignerProps> = ({
   value,
@@ -138,67 +201,73 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
     [scene, formConfig, canvasAdapter, widgetsAdapter, mobileAdapter],
   )
 
-  const { token } = useStyle()
+  // 核心渲染内容：用 useMemo 缓存，避免每次 reducer 状态变化时重建整棵 JSX 树
+  const content = useMemo(
+    () => (
+      <DesignerDispatchContext.Provider value={dispatchCtx}>
+        <DesignerSelectionContext.Provider value={selectionCtx}>
+          <DesignerConfigContext.Provider value={configCtx}>
+            <div className="designer-scroll-container" style={ROOT_CONTAINER_STYLE}>
+              <style>{SCROLLBAR_CSS}</style>
+              <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
+                {!readOnly && (
+                  <FieldList groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
+                )}
 
-  // 核心渲染内容
-  const content = (
-    <DesignerDispatchContext.Provider value={dispatchCtx}>
-      <DesignerSelectionContext.Provider value={selectionCtx}>
-        <DesignerConfigContext.Provider value={configCtx}>
-          <div className="designer-scroll-container" style={{ display: 'flex', height: '100%', fontFamily: '-apple-system, sans-serif', background: 'var(--fe-bg-secondary)', overflow: 'hidden' }}>
-            <style>{`
-          .designer-scroll-container ::-webkit-scrollbar { width: var(--fe-spacing-xs); height: var(--fe-spacing-xs); }
-          .designer-scroll-container ::-webkit-scrollbar-track { background: transparent; }
-          .designer-scroll-container ::-webkit-scrollbar-thumb { background: var(--fe-border-primary); border-radius: var(--fe-border-radius-sm); }
-          .designer-scroll-container ::-webkit-scrollbar-thumb:hover { background: var(--fe-text-tertiary); }
-        `}</style>
-            <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-              {!readOnly && (
-                <FieldList groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
-              )}
+                <div style={CANVAS_WRAPPER_STYLE}>
+                  <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} dragOverState={dragOverState} />
+                </div>
 
-              <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} dragOverState={dragOverState} />
-              </div>
+                <DragOverlay dropAnimation={null}>
+                  <DragGhost activeDragId={dndState.activeDragId} activeDragLabel={dndState.activeDragLabel} activeDragType={dndState.activeDragType} />
+                </DragOverlay>
+              </DndContext>
 
-              <DragOverlay dropAnimation={null}>
-                {dndState.activeDragLabel ? (
-                  <div
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 'var(--fe-spacing-xs)',
-                      padding: '4px 10px',
-                      background: 'var(--fe-primary)',
-                      color: 'var(--fe-bg-primary)',
-                      borderRadius: 'var(--fe-border-radius-sm)',
-                      fontSize: 'var(--fe-font-size-sm)',
-                      pointerEvents: 'none',
-                      whiteSpace: 'nowrap',
-                      boxShadow: token('widgetCanvasDndShadow') as React.CSSProperties['boxShadow'],
-                    }}
-                  >
-                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>{getComponentIcon(dndState.activeDragType) || null}</span>
-                    {dndState.activeDragLabel}
-                  </div>
-                ) : null}
-              </DragOverlay>
-            </DndContext>
-
-            <PropertyPanel
-              field={selectedField}
-              formConfig={state.schema.form}
-              dispatch={dispatch}
-              designerWidgets={widgetsAdapter?.designerWidgets}
-              width={panelWidths?.properties}
-              propertyPanelTabs={propertyPanelTabs}
-              propertySlots={propertySlots}
-              allFields={state.schema.fields}
-            />
-          </div>
-        </DesignerConfigContext.Provider>
-      </DesignerSelectionContext.Provider>
-    </DesignerDispatchContext.Provider>
+              <PropertyPanel
+                field={selectedField}
+                formConfig={state.schema.form}
+                dispatch={dispatch}
+                designerWidgets={widgetsAdapter?.designerWidgets}
+                width={panelWidths?.properties}
+                propertyPanelTabs={propertyPanelTabs}
+                propertySlots={propertySlots}
+                allFields={state.schema.fields}
+              />
+            </div>
+          </DesignerConfigContext.Provider>
+        </DesignerSelectionContext.Provider>
+      </DesignerDispatchContext.Provider>
+    ),
+    [
+      dispatchCtx,
+      selectionCtx,
+      configCtx,
+      readOnly,
+      finalGroups,
+      panelWidths?.palette,
+      panelWidths?.properties,
+      sidePanelTabs,
+      propertyPanelTabs,
+      propertySlots,
+      sensors,
+      collisionDetection,
+      handleDragStart,
+      handleDragOver,
+      handleDragEnd,
+      handleDragCancel,
+      state.schema.fields,
+      state.selectedFieldId,
+      state.schema.form,
+      dndState.activeDragId,
+      dndState.activeDragLabel,
+      dndState.activeDragType,
+      dragOverState,
+      canUndo,
+      canRedo,
+      selectedField,
+      widgetsAdapter,
+      dispatch,
+    ],
   )
 
   // 根据 scene 动态包裹 BridgeProvider

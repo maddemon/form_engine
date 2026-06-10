@@ -6,7 +6,7 @@ import type { DesignerAction } from '../../types/designer'
 import type { FormFieldSchema } from '../../types/schema'
 import { WidgetButton } from '../../widgets/Button'
 import { FieldItem } from '../../propRenders'
-import { useDebouncedInput } from '../useDebouncedInput'
+import { useDebouncedFieldUpdate } from '../useDebouncedFieldUpdate'
 
 interface StaticExpressionToggleProps {
   /** 字段 schema */
@@ -43,9 +43,12 @@ export const StaticExpressionToggle: React.FC<StaticExpressionToggleProps> = ({
   const currentValue = field[propKey]
   const mode: 'static' | 'expression' = typeof currentValue === 'string' ? 'expression' : 'static'
 
-  const [exprValue, handleExprChange] = useDebouncedInput<string | number>(
+  const [exprValue, handleExprChange] = useDebouncedFieldUpdate<string | number>(
+    dispatch,
+    field.id,
+    propKey,
     typeof currentValue === 'string' ? currentValue : '',
-    (v) => dispatch({ type: 'UPDATE_FIELD', fieldId: field.id, patch: { [propKey]: (v as string) || false } }),
+    { transform: (v) => (v as string) || false },
   )
 
   return (

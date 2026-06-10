@@ -40,3 +40,4 @@ dist-ssr
 packages/core/tmp/
 .qoder/
 .trae/
+.dbg/

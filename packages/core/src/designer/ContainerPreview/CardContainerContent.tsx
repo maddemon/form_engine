@@ -1,19 +1,16 @@
-import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import React, { useMemo } from 'react'
+import React from 'react'
 import { NestedField } from '../NestedField'
-import { useDroppableStyle } from '../useDroppableStyle'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import { SelfRenderedContainer } from './SelfRenderedContainer'
+import { useContainerDroppable } from './useContainerHooks'
 import type { ContainerContentProps } from './types'
 
 /** Card container */
 export const CardContainerContent: React.FC<ContainerContentProps> = React.memo(({ field, formConfig, adapter }) => {
-  const { setNodeRef, isOver } = useDroppable({ id: `${field.id}__container`, data: { parentId: field.id } })
-  const childIds = useMemo(() => field.children.map((c) => c.id), [field.children])
-  const droppableStyle = useDroppableStyle(isOver, field.children.length > 0)
+  const { setNodeRef, childIds, hasChildren, droppableStyle } = useContainerDroppable(field)
 
-  const cardBody = field.children.length > 0 ? (
+  const cardBody = hasChildren ? (
     <div ref={setNodeRef} style={droppableStyle}>
       <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
         {field.children.map((child, index) => (

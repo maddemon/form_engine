@@ -55,7 +55,7 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
   const FormWrapper = adapter?.FormWrapper
   const [showTree, setShowTree] = useState(false)
 
-  const treeData = useMemo(() => buildTreeData(fields), [fields])
+  const treeData = useMemo(() => (showTree ? buildTreeData(fields) : []), [showTree, fields])
   const canvasWidth = scene === 'mobile' ? 375 : '100%'
 
   // Page background: from formConfig, default to white

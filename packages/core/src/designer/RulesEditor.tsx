@@ -1,13 +1,13 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useLocale } from '../locale'
 import { FieldItem } from '../propRenders/shared'
-import { resolveSlot } from '../registry/propertySlotRegistry'
 import type { DesignerWidgets } from '../types/adapter'
 import type { DesignerAction } from '../types/designer'
 import type { PropertySlots } from '../types/property-slot'
 import type { FormFieldSchema, FormRule } from '../types/schema'
 import { SectionTitle } from './UIPrimitives'
 import { useDebouncedInput } from './useDebouncedInput'
+import { useSlot } from './useSlot'
 
 export function useCommonPatterns() {
   const { locale } = useLocale()
@@ -40,7 +40,7 @@ export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorP
   const { locale } = useLocale()
   const r = locale.designer.rules
   const commonPatterns = useCommonPatterns()
-  const ExpressionEditorSlot = useMemo(() => resolveSlot('expressionEditor', slots, w), [slots, w])
+  const ExpressionEditorSlot = useSlot('expressionEditor', slots, w)
   const rule: FormRule = field.rules?.[0] ?? {}
 
   function updateRule(patch: Partial<FormRule>) {

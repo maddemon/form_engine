@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useStyle } from '../styles'
 
 interface JsxRenderProps {
@@ -10,108 +10,105 @@ interface JsxRenderProps {
 }
 
 /**
- * 把 compiledCode 字符串编译成一个真实 React 组件。
+ * JsxRender — 把 compiledCode 字符串编译成一个真实 React 组件并渲染。
  *
- * 关键设计：compiledCode 的格式是 `function Component(props) { ... user body ... } return Component;`，
- * 末尾返回的是组件函数引用（不是调用结果）。我们用 React.createElement(Component, props) 渲染，
- * 这样 React 会把 Component 当作真正的 React 组件，dispatcher 由 React 在渲染 Component 时正确设置，
- * 用户代码内的 useState 等 hook 都会注册到 Component 的 fiber 上，hooks 顺序与用户代码一致。
+ * compiledCode 的格式（Babel 产物 + 末尾追加）：
+ * ```js
+ * function Component(props) { ... user body（含 useState 等 hook）... }
+ * return typeof Component === 'function' ? Component : null;
+ * ```
  *
- * 如果 compiledCode 不是这种格式（例如直接 return 元素），则按 IIFE 形式编译。
+ * **关键设计**：
+ *
+ * 1. `new Function('React', ...scopeKeys, 'props', 'value', 'onChange', compiledCode)`
+ *    scope 以**函数参数**形式注入（兼容旧式 `function Hello() { return <AntCard .../> }` 写法，
+ *    以及新式 `function Hello(props) { return <props.AntCard .../> }` 写法）。
+ *
+ * 2. `fn(React, ...scope, props, value, onChange)` **仅在 compiledCode 变化时调用一次**。
+ *    第一次调用拿到的 `Component` 引用被缓存，父级 re-render 期间保持稳定。
+ *    React 看到组件类型引用稳定 → 不 unmount → useState 等 hook 状态保留。
+ *
+ * 3. scope 引用变化**不**触发重求值（避免破坏 Component 引用稳定性）。
+ *    因此 scope 在运行时基本应当保持稳定（来自 FormEngineContext）。
+ *    如果用户修改了 jsxScope 的内容，需重新编辑字段代码触发重编译。
  */
-function compileJsxComponent(
-  compiledCode: string,
-  scopeKeys: string[],
-): React.ComponentType<Record<string, unknown>> | null {
-  try {
-    const fn = new Function('React', ...scopeKeys, 'props', 'value', 'onChange', compiledCode) as (
-      ...args: unknown[]
-    ) => unknown
-
-    const Component = function JsxWrapper(props: Record<string, unknown>) {
-      const value = (props as { value?: unknown }).value
-      const onChange = (props as { onChange?: unknown }).onChange
-      const args: unknown[] = [React]
-      for (const k of scopeKeys) {
-        args.push((props as Record<string, unknown>)[k])
-      }
-      args.push(props, value, onChange)
-      let result: unknown
-      try {
-        // 兜底捕获：编译时烟雾测试只能发现顶层裸引用，函数体内部抛错
-        // （如组件首次 render 才触发的 ReferenceError）仍需此处拦截，
-        // 避免错误冒到 React 导致整棵树被卸载、页面崩溃。
-        result = fn(...args)
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : String(e)
-        return (
-          <div
-            style={{
-              color: 'var(--fe-error)',
-              fontSize: 'var(--fe-font-size-sm)',
-              padding: '8px 12px',
-              background: 'var(--fe-bg-secondary)',
-              border: '1px solid var(--fe-border-secondary)',
-              borderRadius: 'var(--fe-border-radius-sm)',
-              fontFamily: "'Menlo','Consolas',monospace",
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
-            JSX 运行时错误: {msg}
-          </div>
-        )
-      }
-      if (typeof result === 'function') {
-        return React.createElement(result as React.ComponentType<Record<string, unknown>>, props)
-      }
-      if (result == null || typeof result === 'string') return null
-      return result as React.ReactElement
-    }
-    Component.displayName = 'JsxWrapper'
-    return Component
-  } catch {
-    return null
-  }
-}
-
 export const JsxRender = React.memo<JsxRenderProps>(({ compiledCode, scope, componentProps, value, onChange }) => {
   const { token } = useStyle()
   const scopeKeys = useMemo(() => Object.keys(scope), [scope])
 
-  const componentRef = useRef<{
+  // 编译产物缓存：仅当 compiledCode 变化时重新构造 `fn` 与求值 Component。
+  const compiledRef = useRef<{
     code: string
-    scope: Record<string, unknown>
+    fn: ((...args: unknown[]) => unknown) | null
     component: React.ComponentType<Record<string, unknown>> | null
+    error: string | null
   } | null>(null)
 
-  if (
-    componentRef.current == null ||
-    componentRef.current.code !== compiledCode ||
-    componentRef.current.scope !== scope
-  ) {
-    componentRef.current = {
-      code: compiledCode,
-      scope,
-      component: compileJsxComponent(compiledCode, scopeKeys),
+  if (compiledRef.current == null || compiledRef.current.code !== compiledCode) {
+    let fn: ((...args: unknown[]) => unknown) | null = null
+    let component: React.ComponentType<Record<string, unknown>> | null = null
+    let error: string | null = null
+
+    try {
+      fn = new Function('React', ...scopeKeys, 'props', 'value', 'onChange', compiledCode) as (
+        ...args: unknown[]
+      ) => unknown
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e)
     }
+
+    if (fn) {
+      try {
+        // 用当前 scope 求值一次拿到 Component 引用。
+        // 后续父级 re-render 不再调用 fn → Component 引用稳定 → useState 等 hook 状态保留。
+        const args: unknown[] = [React]
+        for (const k of scopeKeys) {
+          args.push(scope[k])
+        }
+        const evalProps: Record<string, unknown> = { ...componentProps, value, onChange }
+        args.push(evalProps, evalProps.value, evalProps.onChange)
+        const result = fn(...args)
+        if (typeof result === 'function') {
+          component = result as React.ComponentType<Record<string, unknown>>
+        } else if (result != null && typeof result !== 'string') {
+          // 直接 return 元素（非 function 形态）：包一层组件把该元素稳定返回
+          const element = result as React.ReactElement
+          const DirectElementComponent: React.ComponentType<Record<string, unknown>> =
+            function DirectElementComponent() {
+              return element
+            }
+          DirectElementComponent.displayName = 'JsxDirectElement'
+          component = DirectElementComponent
+        }
+      } catch (e) {
+        error = `JSX 运行时错误: ${e instanceof Error ? e.message : String(e)}`
+      }
+    }
+
+    compiledRef.current = { code: compiledCode, fn, component, error }
   }
+
+  // 在父级 re-render 期间，`scope` / `componentProps` / `value` / `onChange` 引用可能变化，
+  // 但 Component 引用必须保持稳定（compiledRef 不重算 → React 不 unmount）。这里再用一个 useMemo
+  // 仅为承载 props 注入口的稳定 React 组件（props 变化时 React 会自动 re-render 这个 wrapper，
+  // 内部 Component 类型不变 → state 保留）。
+  const InnerComponent = useMemo(() => {
+    if (compiledRef.current && compiledRef.current.component) return compiledRef.current.component
+    return null
+    // 仅依赖 compiledCode（透过 compiledRef.current 间接反映），不依赖 scope 等。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [compiledCode])
 
   const errStyle: React.CSSProperties = {
     color: token('error') as string,
     fontSize: token('fontSizeSm') as string,
   }
 
-  useEffect(() => {
-    /* no-op */
-  }, [compiledCode])
-
-  const InnerComponent = componentRef.current.component
   if (!InnerComponent) {
-    return <div style={errStyle}>JSX 编译代码错误</div>
+    return <div style={errStyle}>{compiledRef.current?.error ?? 'JSX 编译代码错误'}</div>
   }
 
-  // 把 scope 注入为 props（供用户代码通过 props.AntCard / props.AntButton 等访问）
+  // 把 scope 注入为 props（供用户代码通过 props.AntCard / props.AntButton 等访问，新式写法）
   const injectedProps: Record<string, unknown> = { ...componentProps, value, onChange }
   for (const k of scopeKeys) {
     if (!(k in injectedProps)) {

@@ -1,17 +1,13 @@
-import { useDroppable } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import React, { useMemo } from 'react'
+import React from 'react'
 import { NestedField } from '../NestedField'
-import { useDroppableStyle } from '../useDroppableStyle'
 import type { ContainerContentProps } from './types'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
+import { useContainerDroppable } from './useContainerHooks'
 
 /** Flex container */
 export const FlexContainerContent: React.FC<ContainerContentProps> = React.memo(({ field }) => {
-  const { setNodeRef, isOver } = useDroppable({ id: `${field.id}__container`, data: { parentId: field.id } })
-  const childIds = useMemo(() => field.children.map((c) => c.id), [field.children])
-  const hasChildren = field.children.length > 0
-  const droppableStyle = useDroppableStyle(isOver, hasChildren)
+  const { setNodeRef, childIds, hasChildren, droppableStyle } = useContainerDroppable(field)
 
   const rawDirection = (field.componentProps?.direction as string) ?? 'row'
   const direction = rawDirection === 'horizontal' ? 'row' : rawDirection

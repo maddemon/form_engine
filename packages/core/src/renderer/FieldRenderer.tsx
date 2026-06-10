@@ -1,16 +1,17 @@
-import React, { useCallback, useContext, useMemo } from 'react'
-import { getEventDeclarations } from '../components'
+import React, { useContext, useMemo } from 'react'
 import { ErrorMessage, TooltipIcon } from '../designer/UIPrimitives'
-import { resolveEvents, type EventContext } from '../events'
+import { type EventContext } from '../events'
 import { useStyle } from '../styles'
-import type { ComponentRenderFn, FieldComponentProps, FormEngineAdapter, FormItemProps } from '../types/adapter'
-import type { $Self, ResolvedEventHandler } from '../types/events'
+import type { ComponentRenderFn, FormEngineAdapter, FormItemProps } from '../types/adapter'
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
 import { Text } from '../widgets/Text'
 import { AdapterContext } from './AdapterContext'
 import { FieldSchemaContext } from './FieldSchemaContext'
 import { useInsideContainer } from './InsideContainerContext'
 import { useFieldExpression } from './hooks/useFieldExpression'
+import { useFieldOptions } from './hooks/useFieldOptions'
+import { useFieldProps } from './hooks/useFieldProps'
+import { useFormItemProps } from './hooks/useFormItemProps'
 import { JsxRender } from './JsxRender'
 import { FormEngineContext } from './FormEngineContext'
 
@@ -170,81 +171,22 @@ export const FieldRenderer = React.memo(function FieldRenderer({
   // 判断是否必填
   const isRequired = field.rules?.some((r) => r.required) || exprRequired
 
-  // 通用 props
-  const resolvedOptions = useMemo<OptionItem[]>(() => {
-    if (field.mock?.options?.length) return field.mock.options
-    if (options.length) return options
-    if (field.dataSource?.type === 'static') return field.dataSource.static.options
-    const cpOptions = field.componentProps?.options as OptionItem[] | undefined
-    if (cpOptions?.length) return cpOptions
-    return []
-  }, [field.mock?.options, options, field.dataSource, field.componentProps?.options])
-
-  // 解析事件处理器（memo 避免每次渲染重建 handler 闭包）
-  const $self: $Self = useMemo(
-    () => ({
-      name: field.name,
-      value,
-      schema: field,
-      props: {
-        disabled: isDisabled,
-        readOnly: !!field.readOnly,
-        placeholder: field.placeholder,
-      },
-    }),
-    [value, field, isDisabled],
-  )
-
-  const eventHandlers: Record<string, ResolvedEventHandler> = useMemo(
-    () =>
-      eventContext
-        ? resolveEvents(
-            field.events,
-            $self,
-            eventContext.$form,
-            eventContext.callbacks,
-            getEventDeclarations(field.type),
-          )
-        : {},
-    [eventContext, field.events, field.type, $self],
-  )
-
-  // onChange 包装：先更新当前字段值，再执行用户事件
-  // IME 组合输入由各 adapter 通过 nativeEvent.isComposing 自行拦截
-  const handleChange = useCallback(
-    (newValue: unknown) => {
-      onChange(newValue)
-      eventHandlers.onChange?.(newValue)
-    },
-    [onChange, eventHandlers],
-  )
+  // options 解析（4 层优先级）
+  const resolvedOptions = useFieldOptions(field, options)
 
   const errorMsg = errors && errors.length > 0 ? errors[0] : undefined
 
-  const componentProps = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { options: _, ...rest } = field.componentProps || {}
-    return rest
-  }, [field.componentProps])
-
-  const fieldProps: FieldComponentProps & Record<string, unknown> = useMemo(
-    () => ({
-      value,
-      onChange: handleChange,
-      disabled: isDisabled,
-      readOnly: field.readOnly,
-      placeholder: field.placeholder,
-      options: resolvedOptions,
-      fieldSchema: field,
-      required: isRequired,
-      rules: field.rules,
-      validateStatus: errorMsg ? 'error' : undefined,
-      help: errorMsg,
-      ...componentProps,
-      ...eventHandlers,
-    }),
-    [value, handleChange, isDisabled, resolvedOptions, field, isRequired, errorMsg, eventHandlers, componentProps],
-  )
+  // fieldProps 组装（含事件解析、onChange 包装、componentProps 合并）
+  const { fieldProps, handleChange } = useFieldProps({
+    field,
+    value,
+    onChange,
+    resolvedOptions,
+    isDisabled,
+    isRequired,
+    errorMsg,
+    eventContext,
+  })
 
   /**
    * 查找渲染函数（按优先级）
@@ -260,34 +202,7 @@ export const FieldRenderer = React.memo(function FieldRenderer({
   // FormItem 选择：adapter.FormItem 优先，否则使用内置 DefaultFormItem
   const FormItemTag = adapter.FormItem ?? DefaultFormItem
 
-  const formItemProps: Omit<FormItemProps, 'children'> = useMemo(
-    () => ({
-      name: field.name,
-      label: field.label,
-      labelHidden: field.labelHidden,
-      rules: field.rules,
-      required: isRequired,
-      validateStatus: errorMsg ? ('error' as const) : undefined,
-      errors,
-      help: field.help,
-      tooltip: field.tooltip,
-      formConfig,
-      scene: adapter.scene,
-    }),
-    [
-      field.name,
-      field.label,
-      field.labelHidden,
-      field.rules,
-      field.help,
-      field.tooltip,
-      isRequired,
-      errorMsg,
-      errors,
-      formConfig,
-      adapter.scene,
-    ],
-  )
+  const formItemProps = useFormItemProps({ field, formConfig, isRequired, errorMsg, errors, scene: adapter.scene })
 
   if (field.type === 'jsx') {
     const compiledCode = (field.componentProps?.compiledCode as string) || ''

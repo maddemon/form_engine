@@ -8,16 +8,16 @@
  * - callback：回调名输入
  */
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { listActionNames } from '../events'
 import { useLocale } from '../locale'
 import { FieldItem } from '../propRenders/shared'
-import { resolveSlot } from '../registry/propertySlotRegistry'
 import { useStyle } from '../styles/useStyle'
 import type { DesignerWidgets } from '../types/adapter'
 import type { EventHandler, EventHandlerType } from '../types/events'
 import type { PropertySlots } from '../types/property-slot'
 import { Text } from '../widgets/Text'
+import { useSlot } from './useSlot'
 
 /** EventHandlerEditor 所需的 widgets 子集（TextArea 为必选） */
 type RequiredWidgets = Omit<DesignerWidgets, 'TextArea'> & {
@@ -56,8 +56,8 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
     { label: eh.callback, value: 'callback' },
   ]
 
-  const ExpressionEditorSlot = useMemo(() => resolveSlot('expressionEditor', slots, w), [slots, w])
-  const JsonEditorSlot = useMemo(() => resolveSlot('jsonEditor', slots), [slots])
+  const ExpressionEditorSlot = useSlot('expressionEditor', slots, w)
+  const JsonEditorSlot = useSlot('jsonEditor', slots)
 
   const containerStyle: React.CSSProperties = {
     marginBottom: token('spacingSm') as string,
