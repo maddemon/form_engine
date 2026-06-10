@@ -38,8 +38,6 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
   )
 
   const isContainer = isContainerComponent(field.type)
-
-  // 根级字段（无 parentContainerId）始终可排序；嵌套字段需要完整的父级信息才可排序
   const isRootMode = parentContainerId === undefined && childIndex === undefined
 
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
@@ -48,22 +46,48 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
     disabled: isRootMode ? false : (parentContainerId === undefined || childIndex === undefined),
   })
 
-  const content = isContainer ? (
-    <ContainerPreview field={field} />
-  ) : (
-    <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} jsxScope={designerJsxScope} />
+  // 缓存子内容：拖拽中不变化，避免 FieldRenderer/ContainerPreview 连锁重渲染
+  const content = useMemo(
+    () => (isContainer ? (
+      <ContainerPreview field={field} />
+    ) : (
+      <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} jsxScope={designerJsxScope} />
+    )),
+    [field, adapter, formConfig, designerJsxScope, isContainer],
+  )
+
+  // 排序时由 SortableContext 自动计算 transform 偏移，配合 transition 实现丝滑碰撞
+  const dragStyle = useMemo(
+    () => ({
+      transform: isDragging ? undefined : CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0 : 1,
+    }),
+    [transform, transition, isDragging],
   )
 
   const needsLabel = isContainer && !SELF_RENDERED.has(field.type)
   const isFormLike = isFormComponent(field.type)
-  const containerLabelProps: FormItemProps = {
-    label: field.label,
-    labelHidden: field.labelHidden,
-    required: isFormLike ? field.rules?.some((r) => r.required) : undefined,
-    formConfig,
-    scene: adapter.scene,
-    children: content,
-  }
+
+  const containerLabelProps: FormItemProps = useMemo(
+    () => ({
+      label: field.label,
+      labelHidden: field.labelHidden,
+      required: isFormLike ? field.rules?.some((r) => r.required) : undefined,
+      formConfig,
+      scene: adapter.scene,
+      children: content,
+    }),
+    [field, isFormLike, formConfig, adapter, content],
+  )
+
+  // 缓存最终传给 FieldItem 的 children，使其在拖拽中保持引用稳定
+  const fieldChildren = useMemo(
+    () => (needsLabel
+      ? React.createElement(adapter.FormItem ?? DefaultFormItem, containerLabelProps)
+      : content),
+    [needsLabel, adapter, containerLabelProps, content],
+  )
 
   return (
     <FieldItem
@@ -73,13 +97,9 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
       dragAttributes={attributes}
       dragActivatorRef={setActivatorNodeRef}
       dragNodeRef={setNodeRef}
-      dragStyle={{
-        transform: isDragging ? undefined : CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0 : 1,
-      }}
+      dragStyle={dragStyle}
     >
-      {needsLabel ? React.createElement(adapter.FormItem ?? DefaultFormItem, containerLabelProps) : content}
+      {fieldChildren}
     </FieldItem>
   )
 })

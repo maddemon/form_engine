@@ -127,7 +127,7 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
   const canRedo = state.historyIndex < state.snapshots.length - 1
 
   // DnD handlers
-  const { dndState, sensors, collisionDetection, handleDragStart, handleDragOver, handleDragEnd, handleDragCancel } = useDndHandlers(state.schema.fields, fieldIndex, dispatch)
+  const { dndState, dragOverState, sensors, collisionDetection, handleDragStart, handleDragOver, handleDragEnd, handleDragCancel } = useDndHandlers(state.schema.fields, fieldIndex, dispatch)
 
   const formConfig = state.schema.form
 
@@ -158,7 +158,7 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
               )}
 
               <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} />
+                <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} dragOverState={dragOverState} />
               </div>
 
               <DragOverlay dropAnimation={null}>

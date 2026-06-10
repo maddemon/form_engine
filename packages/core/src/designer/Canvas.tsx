@@ -7,6 +7,7 @@ import type { FormFieldSchema } from '../types/schema'
 import { CanvasToolbar } from './CanvasToolbar'
 import { ComponentTree, type TreeItem } from './ComponentTree'
 import { useDesignerDispatch, useDesignerSelection, useDesignerConfig } from './DesignerContext'
+import type { DragOverState } from './Dnd/useDndHandlers'
 import { RootFields } from './RootFields'
 import { EmptyContainerPlaceholder } from './ContainerPreview/EmptyContainerPlaceholder'
 
@@ -14,16 +15,9 @@ export const CANVAS_ROOT_ID = 'canvas-root'
 export const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
 
 const CanvasDroppable: React.FC<{ children: React.ReactNode; onClick: () => void; style: React.CSSProperties }> = ({ children, onClick, style }) => {
-  const { setNodeRef, isOver } = useDroppable({ id: CANVAS_ROOT_ID })
+  const { setNodeRef } = useDroppable({ id: CANVAS_ROOT_ID })
   return (
-    <div
-      ref={setNodeRef}
-      onClick={onClick}
-      style={{
-        ...style,
-        background: isOver ? 'var(--fe-canvas-dnd-highlight)' : style.background,
-      }}
-    >
+    <div ref={setNodeRef} onClick={onClick} style={style}>
       {children}
     </div>
   )
@@ -40,6 +34,7 @@ interface CanvasProps {
   onSceneChange?: (scene: DeviceScene) => void
   canUndo?: boolean
   canRedo?: boolean
+  dragOverState?: DragOverState | null
 }
 
 function buildTreeData(fields: FormFieldSchema[]): TreeItem[] {
@@ -51,7 +46,7 @@ function buildTreeData(fields: FormFieldSchema[]): TreeItem[] {
   }))
 }
 
-export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange, canUndo = false, canRedo = false }) => {
+export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange, canUndo = false, canRedo = false, dragOverState }) => {
   const dispatch = useDesignerDispatch()
   const { selectedFieldId, onSelectField } = useDesignerSelection()
   const { scene, formConfig, adapter } = useDesignerConfig()
@@ -119,10 +114,10 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
           <CanvasRootHead />
           {FormWrapper ? (
             <FormWrapper formConfig={formConfig} scene={scene} onSubmit={() => {}}>
-              <RootFields fields={fields} />
+              <RootFields fields={fields} dragOverState={dragOverState} />
             </FormWrapper>
           ) : (
-            <RootFields fields={fields} />
+            <RootFields fields={fields} dragOverState={dragOverState} />
           )}
         </CanvasDroppable>
       </div>
