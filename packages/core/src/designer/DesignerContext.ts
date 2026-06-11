@@ -56,23 +56,4 @@ export function useDesignerConfig(): DesignerConfigContextValue {
   return ctx
 }
 
-// ============================
-// 兼容层（保持旧 API 可用，逐步迁移）
-// ============================
-
-export interface DesignerContextValue extends DesignerDispatchContextValue, DesignerSelectionContextValue, DesignerConfigContextValue {}
-
-/**
- * @deprecated 请使用 useDesignerDispatch / useDesignerSelection / useDesignerConfig
- */
-export function useDesignerContext(): DesignerContextValue {
-  const dispatch = useDesignerDispatch()
-  const s = useDesignerSelection()
-  const c = useDesignerConfig()
-  return { dispatch, ...s, ...c }
-}
-
 export { DesignerDispatchContext, DesignerSelectionContext, DesignerConfigContext }
-
-/** 兼容旧名称（DesignerContext 单体） */
-export const DesignerContext = DesignerDispatchContext

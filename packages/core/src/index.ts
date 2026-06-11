@@ -202,6 +202,7 @@ export type { PropertySlotProps, PropertySlots, SlotName } from './types/propert
 export {
   AdapterContext,
   detectScene,
+  FieldErrorBoundary,
   FieldRenderer,
   FieldSchemaContext,
   FormRender,

@@ -1,5 +1,6 @@
 export { FormRender } from './FormRender'
 export { FieldRenderer } from './FieldRenderer'
+export { FieldErrorBoundary } from './FieldErrorBoundary'
 export { FieldSchemaContext, useFieldSchema } from './FieldSchemaContext'
 export { AdapterContext, useAdapter } from './AdapterContext'
 export { FormConfigContext, useFormConfig } from './FormConfigContext'

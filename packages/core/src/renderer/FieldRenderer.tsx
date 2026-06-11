@@ -6,6 +6,7 @@ import type { ComponentRenderFn, FormEngineAdapter, FormItemProps } from '../typ
 import type { FormConfig, FormFieldSchema, OptionItem } from '../types/schema'
 import { Text } from '../widgets/Text'
 import { AdapterContext } from './AdapterContext'
+import { FieldErrorBoundary } from './FieldErrorBoundary'
 import { FieldSchemaContext } from './FieldSchemaContext'
 import { useInsideContainer } from './InsideContainerContext'
 import { useFieldExpression } from './hooks/useFieldExpression'
@@ -207,39 +208,43 @@ export const FieldRenderer = React.memo(function FieldRenderer({
   if (field.type === 'jsx') {
     const compiledCode = (field.componentProps?.compiledCode as string) || ''
     return (
-      <div className="fe-field">
-        <FormItemTag {...formItemProps}>
-          <JsxRender
-            compiledCode={compiledCode}
-            scope={jsxScope}
-            componentProps={field.componentProps ?? {}}
-            value={value}
-            onChange={handleChange}
-          />
-        </FormItemTag>
-      </div>
+      <FieldErrorBoundary fieldName={field.label || field.name} resetKeys={[field.name, value]}>
+        <div className="fe-field">
+          <FormItemTag {...formItemProps}>
+            <JsxRender
+              compiledCode={compiledCode}
+              scope={jsxScope}
+              componentProps={field.componentProps ?? {}}
+              value={value}
+              onChange={handleChange}
+            />
+          </FormItemTag>
+        </div>
+      </FieldErrorBoundary>
     )
   }
 
   return (
-    <div
-      className="fe-field"
-      style={!renderFn ? { padding: 'var(--fe-spacing-sm, 8px) 0', color: 'var(--fe-text-tertiary)' } : undefined}
-    >
-      <FormItemTag {...formItemProps}>
-        <FieldSchemaContext.Provider value={field}>
-          <AdapterContext.Provider value={adapter}>
-            {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
-              其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
-              Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
-            <React.Suspense fallback={null}>
-              {}
-              {React.createElement(renderFn, fieldProps)}
-            </React.Suspense>
-          </AdapterContext.Provider>
-        </FieldSchemaContext.Provider>
-      </FormItemTag>
-    </div>
+    <FieldErrorBoundary fieldName={field.label || field.name} resetKeys={[field.name, value]}>
+      <div
+        className="fe-field"
+        style={!renderFn ? { padding: 'var(--fe-spacing-sm, 8px) 0', color: 'var(--fe-text-tertiary)' } : undefined}
+      >
+        <FormItemTag {...formItemProps}>
+          <FieldSchemaContext.Provider value={field}>
+            <AdapterContext.Provider value={adapter}>
+              {/* 使用 React.createElement 而非直接调用 renderFn，避免当 renderFn 为函数组件时
+                其内部 hooks 被计入 FieldRenderer 的 hooks 链，导致 hooks 顺序错误。
+                Suspense 包裹：支持 adapter 使用 React.lazy 做代码分割。 */}
+              <React.Suspense fallback={null}>
+                {}
+                {React.createElement(renderFn, fieldProps)}
+              </React.Suspense>
+            </AdapterContext.Provider>
+          </FieldSchemaContext.Provider>
+        </FormItemTag>
+      </div>
+    </FieldErrorBoundary>
   )
 })
 FieldRenderer.displayName = 'FieldRenderer'

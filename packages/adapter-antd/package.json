@@ -36,6 +36,10 @@
     "antd": "^6.4.3",
     "dayjs": "^1.11.21"
   },
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss"
+  ],
   "peerDependencies": {
     "antd": ">=6.0.0",
     "react": ">=19.0.0",

@@ -1,10 +1,10 @@
 import type { FormFieldSchema } from '../../types/schema'
+import { genId } from '../../utils/id'
 
 // ── ID 生成 ────────────────────────────────────────────────────────
 
-let _copyCounter = 0
 export function generateFieldId(): string {
-  return `field_copy_${Date.now()}_${++_copyCounter}`
+  return genId('field_copy')
 }
 
 // ── 树操作工具 ─────────────────────────────────────────────────────
