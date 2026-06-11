@@ -3,15 +3,17 @@
  */
 import { InputNumber as AntdInputNumber } from 'antd'
 import React from 'react'
+import type { DesignerWidgets } from '@form-engine/core'
 
-export const NumberInput: React.FC<any> = ({ value, onChange, min, max, disabled, step, variant, size = 'small', style }) => (
+type NumberInputProps = React.ComponentProps<DesignerWidgets['NumberInput']>
+
+export const NumberInput: React.FC<NumberInputProps> = ({ value, onChange, min, max, disabled, variant, size = 'small', style }) => (
   <AntdInputNumber
     value={value}
-    onChange={(v) => onChange?.(v)}
+    onChange={(v) => onChange?.(v ?? 0)}
     min={min}
     max={max}
     disabled={disabled}
-    step={step}
     variant={variant}
     size={size}
     style={{ width: '100%', ...style }}

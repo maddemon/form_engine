@@ -1,5 +1,6 @@
 import type { FormFieldSchema } from '@form-engine/core'
 import { useAdapter, type CollapsePanelConfig, type CollapseProps } from '@form-engine/core'
+import { defaultFieldRenderer } from '@form-engine/core/styles'
 import { Collapse as AntmCollapse } from 'antd-mobile'
 import React from 'react'
 
@@ -12,6 +13,7 @@ export const Collapse: React.FC<CollapseProps> = ({
   defaultActiveKey,
 }) => {
   const adapter = useAdapter()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- fieldSchema is passed by renderer internally, not in CollapseProps public type
   const schemaChildren: FormFieldSchema[] = (fieldSchema as any)?.children ?? []
 
   if (reactChildren) {
@@ -46,9 +48,7 @@ export const Collapse: React.FC<CollapseProps> = ({
               return renderFn ? (
                 React.createElement(renderFn, { fieldSchema: child, key: child.id } as any)
               ) : (
-                <div key={child.id} style={{ color: '#ccc', fontSize: 12 }}>
-                  未知类型: {child.type}
-                </div>
+                <React.Fragment key={child.id}>{defaultFieldRenderer({ fieldSchema: child, value: undefined, onChange: () => {} })}</React.Fragment>
               )
             })}
           </AntmCollapse.Panel>

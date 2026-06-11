@@ -21,6 +21,30 @@ const containerRendererRegistry: Record<string, React.FC<ContainerContentProps>>
   flex: FlexContainerContent,
 }
 
+/**
+ * 注册自定义容器渲染器。
+ *
+ * 扩展新容器类型时，调用此函数注册渲染器，
+ * ContainerPreview 会自动查找并使用。
+ *
+ * @example
+ * ```ts
+ * import { registerContainerRenderer } from '@form-engine/core/designer'
+ *
+ * registerContainerRenderer('my-container', MyContainerContent)
+ * ```
+ */
+export function registerContainerRenderer(type: string, renderer: React.FC<ContainerContentProps>): void {
+  containerRendererRegistry[type] = renderer
+}
+
+/**
+ * 获取容器渲染器（内部使用）
+ */
+export function getContainerRenderer(type: string): React.FC<ContainerContentProps> | undefined {
+  return containerRendererRegistry[type]
+}
+
 // ── ContainerPreview ────────────────────────────────────────────────
 
 interface ContainerPreviewProps {
@@ -31,7 +55,7 @@ interface ContainerPreviewProps {
 /** 容器预览入口：在此处统一调用 Context hook，将值通过 props 下发给各 Content 组件 */
 export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field }) => {
   const { scene, formConfig, adapter } = useDesignerConfig()
-  const Content = containerRendererRegistry[field.type] ?? GenericContainerContent
+  const Content = getContainerRenderer(field.type) ?? GenericContainerContent
 
   return (
     <div style={{ width: '100%' }}>

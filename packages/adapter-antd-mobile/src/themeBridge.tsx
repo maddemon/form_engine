@@ -21,7 +21,7 @@
  */
 
 import React, { useLayoutEffect } from 'react'
-import { createStyleTag } from '@form-engine/core/styles'
+import { createStyleTag, transformTokenValue } from '@form-engine/core/styles'
 import type { BridgeProviderProps } from '@form-engine/core'
 
 const CSS_VAR_MAP: Record<string, string> = {
@@ -60,22 +60,6 @@ const CSS_VAR_MAP: Record<string, string> = {
   disabledBorder: '--adm-color-border',
 }
 
-function transformValue(feKey: string, _srcCssVar: string, rawValue: string): string {
-  if (!rawValue) return rawValue
-
-  const pxKeys = new Set([
-    'borderRadiusXs', 'borderRadiusSm', 'borderRadiusMd', 'borderRadiusLg', 'borderRadiusXl',
-    'spacingXs', 'spacingSm', 'spacingMd', 'spacingLg', 'spacingXl', 'spacing2xl', 'spacing3xl',
-    'fontSizeXs', 'fontSizeSm', 'fontSizeMd', 'fontSizeLg', 'fontSizeXl', 'fontSize2xl', 'fontSize3xl',
-  ])
-
-  if (pxKeys.has(feKey) && !isNaN(Number(rawValue)) && !rawValue.includes('px')) {
-    return `${rawValue}px`
-  }
-
-  return rawValue
-}
-
 export const AntdMobileBridgeProvider: React.FC<BridgeProviderProps> = ({ children, theme: themeOverrides }) => {
   useLayoutEffect(() => {
     if (typeof document === 'undefined') return
@@ -86,7 +70,7 @@ export const AntdMobileBridgeProvider: React.FC<BridgeProviderProps> = ({ childr
     for (const [feKey, cssVarName] of Object.entries(CSS_VAR_MAP)) {
       const value = rootStyle.getPropertyValue(cssVarName).trim()
       if (value) {
-        mapped[feKey] = transformValue(feKey, cssVarName, value)
+        mapped[feKey] = transformTokenValue(feKey, value)
       }
     }
 

@@ -11,6 +11,11 @@ import { designerReducer, findInTree } from './reducer'
 // Hooks
 // ===========================
 
+/**
+ * @deprecated 请使用 `<Designer>` 组件或 `useReducer(designerReducerWithHistory, ...)`。
+ * 此 hook 使用 `designerReducer`（无撤销重做），与 `Designer.tsx` 的实现不一致。
+ * 将在下个大版本删除。
+ */
 export function useFormDesigner(form: FormSchema) {
   const { locale } = useLocale()
   const [state, dispatch] = useReducer(designerReducer, {
@@ -84,12 +89,8 @@ export function useDesignerScene(initialScene: DeviceScene = 'desktop') {
 }
 
 /**
- * 撤销/重做 Hook（基于快照）
- *
- * @example
- * ```tsx
- * const [canUndo, canRedo, undo, redo] = useDesignerHistory(fields, pushSnapshot)
- * ```
+ * @deprecated 撤销/重做已由 `designerReducerWithHistory` 统一管理，此 hook 冗余。
+ * 将在下个大版本删除。
  */
 export function useDesignerHistory(_getFields: () => FormFieldSchema[]) {
   const [snapshots, setSnapshots] = useState<FormFieldSchema[][]>([[]])

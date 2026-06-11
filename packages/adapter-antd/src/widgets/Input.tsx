@@ -3,8 +3,11 @@
  */
 import { Input as AntdInput } from 'antd'
 import React from 'react'
+import type { DesignerWidgets } from '@form-engine/core'
 
-export const Input: React.FC<any> = ({ value, onChange, placeholder, disabled, variant, size = 'small', style }) => (
+type InputProps = React.ComponentProps<DesignerWidgets['Input']>
+
+export const Input: React.FC<InputProps> = ({ value, onChange, placeholder, disabled, variant, size = 'small', style }) => (
   <AntdInput
     value={value ?? ''}
     onChange={v => onChange?.(v.target.value)}

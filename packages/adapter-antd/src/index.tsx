@@ -12,7 +12,8 @@
  * ```
  */
 
-import type { DesignerWidgets, FieldComponentProps, FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
+import type { DesignerWidgets, FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
+import { defaultFieldRenderer } from '@form-engine/core/styles'
 
 // JSX Scope 组件
 import {
@@ -113,16 +114,6 @@ export { AntdFormWrapper } from './components/FormWrapper'
 export { designerWidgets } from './widgets'
 
 // ============================
-// 兜底渲染
-// ============================
-
-const DefaultField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { fieldSchema } = props
-  const displayName = fieldSchema.label || fieldSchema.name || fieldSchema.type
-  return <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>{displayName}</div>
-}
-
-// ============================
 // 设计器属性面板小组件 — 见 ./widgets
 // ============================
 
@@ -178,7 +169,7 @@ export const antdAdapter: FormEngineAdapter = {
     button: Button,
   } as unknown as Record<string, FieldRendererFn>,
 
-  default: DefaultField,
+  default: defaultFieldRenderer,
   designerWidgets: designerWidgets as DesignerWidgets,
   bridgeProvider: AntdBridgeProvider,
   FormWrapper: AntdFormWrapper,

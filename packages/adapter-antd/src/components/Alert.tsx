@@ -45,7 +45,7 @@ export const Alert: React.FC<AlertProps> = ({
       showIcon={showIcon}
       icon={iconNode}
       closable={closable}
-      onClose={onClose as any}
+      onClose={onClose}
       style={style}
     />
   )

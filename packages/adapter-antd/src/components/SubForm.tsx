@@ -6,6 +6,7 @@
 
 import type { FormFieldSchema, OptionItem, SubFormColumnConfig } from '@form-engine/core'
 import { useAdapter } from '@form-engine/core'
+import { defaultFieldRenderer } from '@form-engine/core/styles'
 import { useLocale } from '@form-engine/core/locale'
 import { Table as AntTable } from 'antd'
 import React from 'react'
@@ -44,7 +45,7 @@ export const SubForm: React.FC<{
     const childSchema = child as unknown as FormFieldSchema
     const renderFn = adapter?.components[child.type as string]
     if (!renderFn) {
-      return <span style={{ color: 'var(--fe-text-tertiary)', fontSize: 12 }}>未知类型: {String(child.type)}</span>
+      return defaultFieldRenderer({ fieldSchema: childSchema, value: undefined, onChange: () => {} })
     }
     const { ...restComponentProps } = childSchema.componentProps ?? {}
     return React.createElement(renderFn, {

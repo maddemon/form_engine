@@ -9,6 +9,7 @@ export interface AlertProps extends BaseComponentProps {
   showIcon?: boolean
   closable?: boolean
   icon?: string
+  onClose?: () => void
 }
 
 export const alertEventDeclarations: EventDeclaration[] = [

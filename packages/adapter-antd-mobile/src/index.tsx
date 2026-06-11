@@ -12,7 +12,8 @@
  * ```
  */
 
-import type { FieldComponentProps, FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
+import type { FieldRendererFn, FormEngineAdapter } from '@form-engine/core'
+import { defaultFieldRenderer } from '@form-engine/core/styles'
 
 import {
   Avatar as AntmAvatar,
@@ -75,16 +76,6 @@ export { AntdMobileFormItem } from './components/FormItem'
 export { AntdMobileFormWrapper } from './components/FormWrapper'
 
 // ============================
-// 兜底渲染
-// ============================
-
-const DefaultField: FieldRendererFn = (props: FieldComponentProps) => {
-  const { fieldSchema } = props
-  const displayName = fieldSchema.label || fieldSchema.name || fieldSchema.type
-  return <div style={{ padding: '8px 0', color: '#999', fontSize: 12 }}>{displayName}</div>
-}
-
-// ============================
 // 设计器属性面板小组件
 // ============================
 // 注意：adapter-antd-mobile 面向移动端场景。属性面板是 desktop 渲染器，
@@ -144,7 +135,7 @@ export const antdMobileAdapter: FormEngineAdapter = {
     segment: Segment,
   } as unknown as Record<string, FieldRendererFn>,
 
-  default: DefaultField as FieldRendererFn,
+  default: defaultFieldRenderer as FieldRendererFn,
   bridgeProvider: AntdMobileBridgeProvider,
   FormWrapper: AntdMobileFormWrapper,
   FormItem: AntdMobileFormItem,

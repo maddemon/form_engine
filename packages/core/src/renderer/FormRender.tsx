@@ -69,13 +69,6 @@ export interface FormRenderProps {
   locale?: SupportedLocale | Partial<LocalePack>
 }
 
-/**
- * 防抖定时器 Map：fieldName → timer
- * 防止依赖快速变化时频繁发请求
- * 注意：此变量仅用于导出给外部测试，实际运行时每个 FormRender 实例使用内部 useRef
- */
-export const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>()
-
 export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(
   (
     {

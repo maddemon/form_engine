@@ -5,8 +5,11 @@
  */
 import { Switch as AntdSwitch } from 'antd'
 import React from 'react'
+import type { DesignerWidgets } from '@form-engine/core'
 
-export const Switch: React.FC<any> = ({ checked, onChange, disabled, size = 'small', style }) => (
+type SwitchProps = React.ComponentProps<DesignerWidgets['Switch']>
+
+export const Switch: React.FC<SwitchProps> = ({ checked, onChange, disabled, size = 'small', style }) => (
   <AntdSwitch
     checked={!!checked}
     onChange={v => onChange?.(v)}

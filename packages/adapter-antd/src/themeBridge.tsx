@@ -30,7 +30,7 @@
  */
 
 import type { BridgeProviderProps } from '@form-engine/core'
-import { createStyleTag } from '@form-engine/core/styles'
+import { createStyleTag, transformTokenValue } from '@form-engine/core/styles'
 import { theme as antdTheme } from 'antd'
 import React, { useLayoutEffect, useMemo } from 'react'
 
@@ -120,37 +120,6 @@ function buildMapped(antd: ReturnType<typeof antdTheme.useToken>['token']): Reco
   }
 }
 
-function transformValue(feKey: string, _src: string, rawValue: string): string {
-  if (!rawValue) return rawValue
-
-  const pxKeys = new Set([
-    'borderRadiusXs',
-    'borderRadiusSm',
-    'borderRadiusMd',
-    'borderRadiusLg',
-    'borderRadiusXl',
-    'spacingXs',
-    'spacingSm',
-    'spacingMd',
-    'spacingLg',
-    'spacingXl',
-    'spacing2xl',
-    'spacing3xl',
-    'fontSizeXs',
-    'fontSizeSm',
-    'fontSizeMd',
-    'fontSizeLg',
-    'fontSizeXl',
-    'fontSize2xl',
-    'fontSize3xl',
-  ])
-
-  if (pxKeys.has(feKey) && !isNaN(Number(rawValue)) && !rawValue.includes('px')) {
-    return `${rawValue}px`
-  }
-  return rawValue
-}
-
 export const AntdBridgeProvider: React.FC<BridgeProviderProps> = ({ children, theme: themeOverrides }) => {
   // 通过 antd v6 的 useToken() 读取当前主题
   // - 自动响应 algorithm 切换（暗/亮）
@@ -163,7 +132,7 @@ export const AntdBridgeProvider: React.FC<BridgeProviderProps> = ({ children, th
   const mapped = useMemo(() => {
     const m = buildMapped(antdToken)
     for (const k of Object.keys(m)) {
-      m[k] = transformValue(k, '', m[k])
+      m[k] = transformTokenValue(k, m[k])
     }
     if (themeOverrides) {
       Object.assign(m, themeOverrides)

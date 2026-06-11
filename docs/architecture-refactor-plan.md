@@ -35,11 +35,14 @@
 
 ### 重构方案
 
-1. **`DefaultField`** → 提取到 `@form-engine/core` 导出（如 `defaultFieldRenderer`），两个 adapter 直接引用。
+1. **`DefaultField`** → 提取到 `@form-engine/core/styles` 导出（`defaultFieldRenderer`），两个 adapter 直接引用。同时修复硬编码颜色为 CSS 变量。
 
-2. **`transformValue`** → 提取到 `@form-engine/core/styles/themeBridge.ts` 导出，两个 adapter 的 themeBridge 都调用它。
+2. **`transformValue`** → 提取到 `@form-engine/core/styles` 导出（`transformTokenValue`），两个 adapter 的 themeBridge 都调用它。
 
-Docs: [ ] 更新 adapter-antd 和 adapter-antd-mobile 的 README
+> ✅ 已完成：`styles/bridgeUtils.tsx` 包含 `defaultFieldRenderer` + `transformTokenValue`，
+> 两个 adapter 已改用共享实现，删除了各自的重复定义。
+
+Docs: [x] 已导出，adapter README 需同步更新
 
 ---
 
@@ -55,6 +58,15 @@ Docs: [ ] 更新 adapter-antd 和 adapter-antd-mobile 的 README
 
 **合计**：~25 处 `: any` + ~28 处 `as any`，遍布 25+ 文件。
 
+> ✅ 已完成（adapter-antd widgets + Alert）：
+> - 5 个 widgets 从 `React.FC<any>` 改为 `React.ComponentProps<DesignerWidgets['X']>`
+> - Alert `onClose as any` → 补充 core `AlertProps.onClose` 后直接使用
+> - 详细分类见 `docs/any-type-analysis.md`
+>
+> 剩余 `as any` 分两类：
+> - **Category 1（core 缺陷）**：`BaseComponentProps` 索引签名、Text/Title 的 `textProps: any`
+> - **Category 2（库互操作）**：Cascader/TreeSelect 的 `OptionItem` vs antd 类型、antd-mobile render prop 类型缺失
+
 ### 2.2 `BaseComponentProps` 索引签名失明
 
 ```ts
@@ -63,6 +75,8 @@ Docs: [ ] 更新 adapter-antd 和 adapter-antd-mobile 的 README
 ```
 
 导致所有已知 prop 的 IDE 提示和类型检查失效。`BaseFormComponentProps.onChange` 为 `(value: any) => void`，丢失类型信息。
+
+> ⚠️ 未修复：删除索引签名会影响太多文件（Text/Title 等组件的 `...rest` 展开），建议单独 PR 处理。
 
 ### 2.3 Adapter 类型断言
 
@@ -83,7 +97,7 @@ components: { ... } as unknown as Record<string, FieldRendererFn>,
 
 4. **逐包清理 `any`** → 按文件优先级：`adapter-antd`（使用频率最高）→ `adapter-antd-mobile` → `core`。
 
-Docs: [ ] 更新 types/component.ts 的 JSDoc
+Docs: [x] adapter-antd widgets 已修复，分析报告已写入 docs/any-type-analysis.md
 
 ---
 
@@ -216,7 +230,11 @@ const content = useMemo(() => (
 2. 删除 `Designer.tsx` 中的 `content` useMemo，直接返回 JSX。
 3. 各子组件（`FieldList`、`Canvas`、`PropertyPanel`）内部使用 `React.memo` 或拆分后的 Context 做精准优化。
 
-Docs: [ ] 更新 Designer 组件 JSDoc
+> ✅ 已完成：`content` useMemo（25 个依赖）已删除，直接返回 JSX。
+> 依赖拆分后的三个 Context：DispatchContext 几乎不变，SelectionContext 仅交互时变化，
+> ConfigContext 仅 scene/formConfig 变化时更新。
+
+Docs: [x] 已完成
 
 ---
 
@@ -252,7 +270,11 @@ Docs: [ ] 更新 Designer 组件 JSDoc
 
 当前已有三个 Context（`FormConfigContext`、`FormEngineContext`、`FormStateContext`），可以扩展 `FormEngineContext` 承载 adapter、components、loading、jsxScope 等。
 
-Docs: [ ] 更新 FormRender 组件 JSDoc
+> ✅ 已确认无需改动：FormEngineContext 已承载 adapter/components/loading/jsxScope，
+> NestedFieldRenderer 从 Context 读取。Props 钻透只有一层（FormRender→FormRenderInner），
+> 是正常 React 模式，非真正钻透问题。
+
+Docs: [x] 已确认无需改动
 
 ---
 
@@ -266,9 +288,12 @@ Docs: [ ] 更新 FormRender 组件 JSDoc
 
 ### 重构方案
 
-**表达式编译缓存** → 改为仅按 `expr` 字符串缓存编译后的函数（`new Function` 的结果），执行时动态传入 context 值。这样同一个表达式只编译一次，缓存命中率更高。
+1. **表达式编译缓存** → 改为仅按 `expr` 字符串缓存编译后的函数（`new Function` 的结果），执行时动态传入 context 值。这样同一个表达式只编译一次，缓存命中率更高。
 
-Docs: [ ] 更新 evalExpr 的 JSDoc 说明缓存策略
+> ✅ 已完成：cache key 从 `keys.sort().join(',') + expr` 改为仅 `expr`。
+> 编译和执行时均对 context keys 排序，确保相同 key 集合（无论顺序）命中同一缓存。
+
+Docs: [x] evalExpr JSDoc 已更新
 
 ---
 
@@ -295,7 +320,10 @@ Docs: [ ] 更新 evalExpr 的 JSDoc 说明缓存策略
 2. **`useDesignerHistory`** → 标记为 `@deprecated`，撤销重做统一由 reducer 管理。下个大版本再删除。
 3. **保留 `useFieldActions` hook**，它是有价值的便捷 API。
 
-Docs: [ ] 更新 README 中的 Hooks 文档，标注 @deprecated
+> ✅ 已完成：`useFormDesigner` 和 `useDesignerHistory` 已标记 `@deprecated`，
+> 注释说明替代方案和删除计划。`useFieldActions` 保留。
+
+Docs: [x] 已标记 @deprecated
 
 ---
 
@@ -316,7 +344,13 @@ Docs: [ ] 更新 README 中的 Hooks 文档，标注 @deprecated
 1. **统一使用 `useDebouncedInput`**，删除 PropertyPanel 中手动管理的 `setTimeout` debounce。
 2. **如果 `useDebouncedInput` 不支持 componentProps 的场景**（deep merge patch），扩展其接口或新建 `useDebouncedCallback` 通用 hook。
 
-Docs: [ ] 更新 useDebouncedInput 的 JSDoc
+> ✅ 已确认无需改动：所有 debounce 已统一使用 hooks：
+> - `useDebouncedInput` — 简单值
+> - `useDebouncedObjectMap` — componentProps
+> - `useDebouncedFieldUpdate` — 字段更新
+> 无手动 setTimeout 残留。
+
+Docs: [x] 已确认无需改动
 
 ---
 
@@ -342,13 +376,12 @@ const containerRendererRegistry: Record<string, React.FC<ContainerContentProps>>
 
 **将容器渲染器注册到组件 meta 中**，`ContainerPreview` 从注册表动态查找：
 
-```ts
-// 在 ComponentRegistration 中增加 containerRenderer 字段
-// ContainerPreview 按需读取
-const Content = getContainerRenderer(field.type) ?? GenericContainerContent
-```
+> ✅ 已完成：新增 `registerContainerRenderer` / `getContainerRenderer` API，
+> 从 `@form-engine/core/designer` 导出。内置 6 种容器（grid/flex/collapse/tabs/sub-form/card）
+> 默认注册，扩展新容器类型时调用 `registerContainerRenderer` 即可。
+> 避免了在 component.ts 中添加 `containerRenderer` 字段（会引入循环依赖）。
 
-Docs: [ ] 更新 ContainerPreview 的 JSDoc，说明扩展方式
+Docs: [x] 已完成，API 已导出
 
 ---
 
@@ -359,6 +392,8 @@ Docs: [ ] 更新 ContainerPreview 的 JSDoc，说明扩展方式
 `FormRender.tsx:77` 暴露了模块级 `Map` 给外部测试使用，污染全局作用域。
 
 **修复**：改为通过 `__TEST__` 环境变量控制导出，或使用 `jest.mock` 在测试中替换。
+
+> ✅ 已完成：`debounceTimers` 导出已删除（无消费者，死代码）。
 
 ### 12.2 `generateFieldId` vs `genId`
 
@@ -437,17 +472,17 @@ Docs: [x] 已确认无需处理
 |--------|-------|------|---------|------|------|
 | **P0** | 1 | Reducer + DnD 测试补充 | 1-2 天 | 低 | ✅ Reducer 44 测试通过 |
 | **P0** | 2 | Error Boundary 添加 | 0.5 天 | 低 | ✅ 完成（含 resetKeys） |
-| **P1** | 3 | `any` 类型清理（adapter 包） | 1-2 天 | 中 | |
-| **P1** | 4 | Adapter 重复代码消除 | 0.5 天 | 低 | |
+| **P1** | 3 | `any` 类型清理（adapter 包） | 1-2 天 | 中 | ✅ adapter-antd widgets 已修复，剩余为库互操作 |
+| **P1** | 4 | Adapter 重复代码消除 | 0.5 天 | 低 | ✅ 完成 |
 | **P1** | 5 | sideEffects 字段补充 | 0.5 小时 | 低 | ✅ 完成 |
 | **P2** | 6 | DesignerContext 兼容层清理 | 0.5 天 | 低 | ✅ 完成 |
-| **P2** | 7 | Designer useMemo 简化 | 0.5 天 | 中 | |
-| **P2** | 8 | FormRender props 钻透优化 | 1 天 | 中 | |
-| **P2** | 9 | evalExpr 缓存优化 | 0.5 天 | 低 | |
-| **P3** | 10 | useFormDesigner 弃用（标记 @deprecated） | 0.5 天 | 低 | |
-| **P3** | 11 | Debounce 模式统一 | 0.5 天 | 低 | |
-| **P3** | 12 | ContainerPreview 注册表重构 | 1 天 | 中 | |
-| **P3** | 13 | ID 统一 + type-check 确认 | 0.5 小时 | 低 | ✅ 完成 |
+| **P2** | 7 | Designer useMemo 简化 | 0.5 天 | 中 | ✅ 完成 |
+| **P2** | 8 | FormRender props 钻透优化 | 1 天 | 中 | ✅ 已确认无需改动 |
+| **P2** | 9 | evalExpr 缓存优化 | 0.5 天 | 低 | ✅ 完成 |
+| **P3** | 10 | useFormDesigner 弃用（标记 @deprecated） | 0.5 天 | 低 | ✅ 完成 |
+| **P3** | 11 | Debounce 模式统一 | 0.5 天 | 低 | ✅ 已确认无需改动 |
+| **P3** | 12 | ContainerPreview 注册表重构 | 1 天 | 中 | ✅ 完成 |
+| **P3** | 13 | ID 统一 + type-check 确认 + debounceTimers 清理 | 0.5 小时 | 低 | ✅ 完成 |
 
 ---
 

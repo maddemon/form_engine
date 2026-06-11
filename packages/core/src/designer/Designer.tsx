@@ -201,73 +201,45 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
     [scene, formConfig, canvasAdapter, widgetsAdapter, mobileAdapter],
   )
 
-  // 核心渲染内容：用 useMemo 缓存，避免每次 reducer 状态变化时重建整棵 JSX 树
-  const content = useMemo(
-    () => (
-      <DesignerDispatchContext.Provider value={dispatchCtx}>
-        <DesignerSelectionContext.Provider value={selectionCtx}>
-          <DesignerConfigContext.Provider value={configCtx}>
-            <div className="designer-scroll-container" style={ROOT_CONTAINER_STYLE}>
-              <style>{SCROLLBAR_CSS}</style>
-              <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-                {!readOnly && (
-                  <FieldList groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
-                )}
+  // 核心渲染内容：不再用 useMemo 缓存整棵 JSX 树（依赖太多形同虚设）。
+  // 依赖已拆分的三个 Context（Dispatch/Selection/Config）做精准重渲：
+  // - DispatchContext 几乎不变 → 消费方极少重渲
+  // - SelectionContext 仅交互时变化 → 仅 FieldItem/Canvas 等重渲
+  // - ConfigContext 仅 scene/formConfig 变化时更新
+  const content = (
+    <DesignerDispatchContext.Provider value={dispatchCtx}>
+      <DesignerSelectionContext.Provider value={selectionCtx}>
+        <DesignerConfigContext.Provider value={configCtx}>
+          <div className="designer-scroll-container" style={ROOT_CONTAINER_STYLE}>
+            <style>{SCROLLBAR_CSS}</style>
+            <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
+              {!readOnly && (
+                <FieldList groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
+              )}
 
-                <div style={CANVAS_WRAPPER_STYLE}>
-                  <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} dragOverState={dragOverState} />
-                </div>
+              <div style={CANVAS_WRAPPER_STYLE}>
+                <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} dragOverState={dragOverState} />
+              </div>
 
-                <DragOverlay dropAnimation={null}>
-                  <DragGhost activeDragId={dndState.activeDragId} activeDragLabel={dndState.activeDragLabel} activeDragType={dndState.activeDragType} />
-                </DragOverlay>
-              </DndContext>
+              <DragOverlay dropAnimation={null}>
+                <DragGhost activeDragId={dndState.activeDragId} activeDragLabel={dndState.activeDragLabel} activeDragType={dndState.activeDragType} />
+              </DragOverlay>
+            </DndContext>
 
-              <PropertyPanel
-                field={selectedField}
-                formConfig={state.schema.form}
-                dispatch={dispatch}
-                designerWidgets={widgetsAdapter?.designerWidgets}
-                width={panelWidths?.properties}
-                propertyPanelTabs={propertyPanelTabs}
-                propertySlots={propertySlots}
-                allFields={state.schema.fields}
-              />
-            </div>
-          </DesignerConfigContext.Provider>
-        </DesignerSelectionContext.Provider>
-      </DesignerDispatchContext.Provider>
-    ),
-    [
-      dispatchCtx,
-      selectionCtx,
-      configCtx,
-      readOnly,
-      finalGroups,
-      panelWidths?.palette,
-      panelWidths?.properties,
-      sidePanelTabs,
-      propertyPanelTabs,
-      propertySlots,
-      sensors,
-      collisionDetection,
-      handleDragStart,
-      handleDragOver,
-      handleDragEnd,
-      handleDragCancel,
-      state.schema.fields,
-      state.selectedFieldId,
-      state.schema.form,
-      dndState.activeDragId,
-      dndState.activeDragLabel,
-      dndState.activeDragType,
-      dragOverState,
-      canUndo,
-      canRedo,
-      selectedField,
-      widgetsAdapter,
-      dispatch,
-    ],
+            <PropertyPanel
+              field={selectedField}
+              formConfig={state.schema.form}
+              dispatch={dispatch}
+              designerWidgets={widgetsAdapter?.designerWidgets}
+              width={panelWidths?.properties}
+              propertyPanelTabs={propertyPanelTabs}
+              propertySlots={propertySlots}
+              allFields={state.schema.fields}
+            />
+          </div>
+        </DesignerConfigContext.Provider>
+      </DesignerSelectionContext.Provider>
+    </DesignerDispatchContext.Provider>
   )
 
   // 根据 scene 动态包裹 BridgeProvider

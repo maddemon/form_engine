@@ -1,5 +1,6 @@
 import type { FormFieldSchema, OptionItem, SubFormColumnConfig, SubFormProps } from '@form-engine/core'
 import { Trash, useAdapter } from '@form-engine/core'
+import { defaultFieldRenderer } from '@form-engine/core/styles'
 import { useLocale } from '@form-engine/core/locale'
 import { Button, Card } from 'antd-mobile'
 import React from 'react'
@@ -115,7 +116,7 @@ export const SubForm: React.FC<SubFormProps> = ({
                         ...restComponentProps,
                       } as any)
                     ) : (
-                      <div style={{ color: '#ccc', fontSize: 12, padding: '6px 0' }}>未知类型: {child.type}</div>
+                      defaultFieldRenderer({ fieldSchema: child, value: cellValue, onChange: () => {} })
                     )}
                   </div>
                 )

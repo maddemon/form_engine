@@ -1,4 +1,5 @@
 import { useAdapter, type FormFieldSchema, type TabsProps } from '@form-engine/core'
+import { defaultFieldRenderer } from '@form-engine/core/styles'
 import { Tabs as AntmTabs } from 'antd-mobile'
 import React from 'react'
 
@@ -59,9 +60,7 @@ export const Tabs: React.FC<TabsProps> = ({
               return renderFn ? (
                 React.createElement(renderFn, { fieldSchema: child, key: child.id } as any)
               ) : (
-                <div key={child.id} style={{ color: '#ccc', fontSize: 12 }}>
-                  未知类型: {child.type}
-                </div>
+                <React.Fragment key={child.id}>{defaultFieldRenderer({ fieldSchema: child, value: undefined, onChange: () => {} })}</React.Fragment>
               )
             })}
           </AntmTabs.Tab>

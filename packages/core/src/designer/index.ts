@@ -9,6 +9,9 @@ export { Designer } from './Designer'
 export { FieldList } from './FieldList'
 export { PropertyPanel } from './PropertyPanel'
 
+// 导出容器渲染器注册 API
+export { registerContainerRenderer, getContainerRenderer } from './ContainerPreview'
+
 // 导出默认设计器小组件（可传入 PropertyPanel 的 designerWidgets prop）
 export { defaultDesignerWidgets as designerWidgets } from '../widgets'
 

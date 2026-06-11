@@ -126,6 +126,12 @@ export {
 } from './useStyle'
 
 // ============================
+// Theme Bridge 共享工具
+// ============================
+
+export { transformTokenValue, defaultFieldRenderer } from './bridgeUtils'
+
+// ============================
 // CSS Variables File
 // ============================
 

@@ -42,13 +42,11 @@ function hasDangerousGlobals(expr: string): boolean {
 const MAX_CACHE_SIZE = 200
 const exprCache = new Map<string, (...args: unknown[]) => unknown>()
 
-function getCacheKey(expr: string, keys: string[]): string {
-  return `${keys.sort().join(',')}::${expr}`
-}
-
 /**
  * 工具函数：计算表达式
- * 安全执行字符串表达式，返回计算结果
+ *
+ * 缓存策略：按 expr 字符串缓存编译后的函数，不依赖 context keys。
+ * 编译和执行时均对 keys 排序，确保相同 key 集合（无论顺序）命中同一缓存。
  */
 export function evalExpr(expr: string, context: Record<string, unknown>): unknown {
   // 安全校验：禁止危险 API
@@ -58,21 +56,20 @@ export function evalExpr(expr: string, context: Record<string, unknown>): unknow
   }
 
   try {
-    const keys = Object.keys(context)
-    const values = Object.values(context)
-
-    // LRU 缓存：按 (keys + expr) 缓存编译结果，避免同名表达式跨上下文复用
-    const cacheKey = getCacheKey(expr, keys)
-    let fn = exprCache.get(cacheKey)
+    let fn = exprCache.get(expr)
     if (!fn) {
+      const keys = Object.keys(context).sort()
       fn = new Function(...keys, `return (${expr})`) as (...args: unknown[]) => unknown
       if (exprCache.size >= MAX_CACHE_SIZE) {
         const firstKey = exprCache.keys().next().value
         if (firstKey !== undefined) exprCache.delete(firstKey)
       }
-      exprCache.set(cacheKey, fn)
+      exprCache.set(expr, fn)
     }
 
+    // 执行时也排序，确保值与编译时的参数名对齐
+    const sortedKeys = Object.keys(context).sort()
+    const values = sortedKeys.map(k => context[k])
     return fn(...values)
   } catch {
     console.warn(`[form-engine] 表达式执行失败: ${expr}`)
