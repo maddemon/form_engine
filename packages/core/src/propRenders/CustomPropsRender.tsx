@@ -1,6 +1,6 @@
 import React from 'react'
 import { customPropertyWidgetRegistry } from '../registry/customComponentRegistry'
-import { resolveSlot } from '../registry/propertySlotRegistry'
+import { useSlot } from '../designer/hooks/useSlot'
 import { useStyle } from '../styles'
 import type { DesignerWidgets } from '../types/adapter'
 import type { PropertyConfigItem } from '../types/custom-component'
@@ -20,8 +20,8 @@ interface CustomPropsRenderProps {
 export default function CustomPropsRender({ configs, widgets: w, values, onChange, slots }: CustomPropsRenderProps) {
   const { token } = useStyle()
 
-  const ExpressionEditorSlot = resolveSlot('expressionEditor', slots, w)
-  const JsonEditorSlot = resolveSlot('jsonEditor', slots)
+  const ExpressionEditorSlot = useSlot('expressionEditor', slots, w)
+  const JsonEditorSlot = useSlot('jsonEditor', slots)
 
   const renderWidget = (config: PropertyConfigItem, value: unknown, onValueChange: (value: unknown) => void): React.ReactNode => {
     const { widget, widgetProps } = config

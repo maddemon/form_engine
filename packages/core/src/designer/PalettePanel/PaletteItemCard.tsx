@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/core'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useLocale } from '../../locale'
 import { useStyle } from '../../styles'
 import type { PaletteItemCardProps } from './types'
@@ -21,6 +21,7 @@ export const PaletteItemCard: React.FC<PaletteItemCardProps> = React.memo(({ ite
     },
   })
   const { token } = useStyle()
+  const icon = useMemo(() => getIcon(item, token), [item, token])
 
   return (
     <div
@@ -49,7 +50,7 @@ export const PaletteItemCard: React.FC<PaletteItemCardProps> = React.memo(({ ite
         opacity: isDragging ? 0.5 : 1,
       }}
     >
-      <span style={{ display: 'inline-flex', alignItems: 'center' }}>{getIcon(item, token)}</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center' }}>{icon}</span>
       <span>{displayLabel}</span>
     </div>
   )

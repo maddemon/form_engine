@@ -1,5 +1,5 @@
 import { useDroppable, type UniqueIdentifier } from '@dnd-kit/core'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import type { DeviceScene } from '../../types/adapter'
 import { useStyle } from '../../styles'
 import { useLocale } from '../../locale'
@@ -65,6 +65,11 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
     : formConfig.desktop.pageBackground) ?? defaultBg
 
   const { token } = useStyle()
+  const handleUndo = useCallback(() => dispatch({ type: 'UNDO' }), [dispatch])
+  const handleRedo = useCallback(() => dispatch({ type: 'REDO' }), [dispatch])
+  const handleTreeClick = useCallback(() => setShowTree((prev) => !prev), [])
+  const handleSelectField = useCallback((id: string | null) => onSelectField(id), [onSelectField])
+  const handleCloseTree = useCallback(() => setShowTree(false), [])
 
   return (
     <div
@@ -78,9 +83,9 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
         overflow: 'hidden',
       }}
     >
-      <CanvasToolbar scene={scene} onSceneChange={onSceneChange} canUndo={canUndo} canRedo={canRedo} onUndo={() => dispatch({ type: 'UNDO' })} onRedo={() => dispatch({ type: 'REDO' })} onTreeClick={() => setShowTree(!showTree)} showTree={showTree} />
+      <CanvasToolbar scene={scene} onSceneChange={onSceneChange} canUndo={canUndo} canRedo={canRedo} onUndo={handleUndo} onRedo={handleRedo} onTreeClick={handleTreeClick} showTree={showTree} />
 
-      {showTree && <ComponentTree items={treeData} selectedId={selectedFieldId} onSelect={(id) => onSelectField(id)} onClose={() => setShowTree(false)} />}
+      {showTree && <ComponentTree items={treeData} selectedId={selectedFieldId} onSelect={handleSelectField} onClose={handleCloseTree} />}
 
       <div
         style={{

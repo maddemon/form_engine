@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { getEventDeclarations } from '../../components'
 import { useLocale } from '../../locale'
 import { customComponentRegistry } from '../../registry/customComponentRegistry'
@@ -10,12 +10,12 @@ import type { FormFieldSchema } from '../../types/schema'
 import { CollapsibleSection } from './CollapsibleSection'
 import { EventHandlerEditor } from './EventHandlerEditor'
 
-function getFieldEventDeclarations(field: FormFieldSchema): EventDeclaration[] {
-  const customConfig = customComponentRegistry.get(field.type)
+function getFieldEventDeclarations(fieldType: string): EventDeclaration[] {
+  const customConfig = customComponentRegistry.get(fieldType)
   if (customConfig?.events?.length) {
     return customConfig.events
   }
-  return getEventDeclarations(field.type)
+  return getEventDeclarations(fieldType)
 }
 
 interface EventEditorProps {
@@ -27,7 +27,7 @@ interface EventEditorProps {
 
 export function EventEditor({ field, w, dispatch, slots }: EventEditorProps) {
   const { locale } = useLocale()
-  const eventDeclarations = getFieldEventDeclarations(field)
+  const eventDeclarations = useMemo(() => getFieldEventDeclarations(field.type), [field.type])
   if (eventDeclarations.length === 0) return null
 
   return (

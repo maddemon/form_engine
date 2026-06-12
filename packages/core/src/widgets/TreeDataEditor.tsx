@@ -66,22 +66,13 @@ function fromTreeLines(text: string): OptionItem[] {
   return root
 }
 
-function countTreeNodes(options: OptionItem[]): number {
+function getTreeSummary(options: OptionItem[]): { totalNodes: number; depth: number; summary: string } {
   let count = 0
-  const walk = (nodes: OptionItem[]) => {
-    for (const node of nodes) {
-      count++
-      if (node.children) walk(node.children)
-    }
-  }
-  walk(options)
-  return count
-}
-
-function getDepthSummary(options: OptionItem[]): number {
   let maxDepth = 0
+
   const walk = (nodes: OptionItem[], depth: number) => {
     for (const node of nodes) {
+      count++
       const d = depth + 1
       if (node.children?.length) {
         walk(node.children, d)
@@ -91,15 +82,17 @@ function getDepthSummary(options: OptionItem[]): number {
     }
   }
   walk(options, 0)
-  return maxDepth
-}
 
-function getTopLevelSummary(options: OptionItem[]): string {
-  if (options.length === 0) return ''
-  if (options.length <= 3) {
-    return options.map((o) => o.label).join('、')
+  let summary = ''
+  if (options.length > 0) {
+    if (options.length <= 3) {
+      summary = options.map((o) => o.label).join('、')
+    } else {
+      summary = `${options.slice(0, 3).map((o) => o.label).join('、')}…`
+    }
   }
-  return `${options.slice(0, 3).map((o) => o.label).join('、')}…`
+
+  return { totalNodes: count, depth: maxDepth, summary }
 }
 
 function BatchEditModal({
@@ -158,10 +151,8 @@ function WidgetTreeDataEditorInner({
   const { token } = useStyle()
   const { locale } = useLocale()
   const [batchOpen, setBatchOpen] = useState(false)
-  const options = value ?? []
-  const totalNodes = countTreeNodes(options)
-  const depth = getDepthSummary(options)
-  const summary = getTopLevelSummary(options)
+  const options = React.useMemo(() => value ?? [], [value])
+  const { totalNodes, depth, summary } = React.useMemo(() => getTreeSummary(options), [options])
 
   const handleBatchConfirm = useCallback(
     (newOptions: OptionItem[]) => {

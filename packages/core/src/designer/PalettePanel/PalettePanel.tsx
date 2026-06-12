@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { getComponentIcon } from '../../components'
 import { useLocale } from '../../locale'
 import { useStyle } from '../../styles'
@@ -21,7 +21,7 @@ export const PalettePanel: React.FC<PalettePanelProps> = ({
   selectedFieldId = null,
   dispatch,
 }) => {
-  const finalGroups = groups || getFullPaletteGroups(excludeTypes)
+  const finalGroups = useMemo(() => groups || getFullPaletteGroups(excludeTypes), [groups, excludeTypes])
   const { token } = useStyle()
   const { locale } = useLocale()
   const resolvedWidth = resolvePanelWidth(width, token('panelFieldListWidth') as string, MIN_PALETTE_WIDTH)

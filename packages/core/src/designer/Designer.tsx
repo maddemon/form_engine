@@ -155,7 +155,7 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
   propertySlots,
 }) => {
   useEnsureDefaultTheme()
-  const finalGroups = groups || getFullPaletteGroups(excludeTypes)
+  const finalGroups = useMemo(() => groups || getFullPaletteGroups(excludeTypes), [groups, excludeTypes])
 
   const [state, dispatch] = useReducer(designerReducerWithHistory, {
     schema,
@@ -173,7 +173,10 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
   }, [scene, onSceneChange])
 
   const fieldIndex = useFieldIndex(state.schema.fields)
-  const selectedField = state.selectedFieldId ? (fieldIndex.get(state.selectedFieldId)?.field ?? findInTree(state.schema.fields, state.selectedFieldId)) || null : null
+  const selectedField = useMemo(
+    () => (state.selectedFieldId ? (fieldIndex.get(state.selectedFieldId)?.field ?? findInTree(state.schema.fields, state.selectedFieldId)) || null : null),
+    [state.selectedFieldId, fieldIndex, state.schema.fields],
+  )
 
   // 根据 scene 选取画布 adapter；属性面板始终优先使用 desktopAdapter
   const canvasAdapter = desktopAdapter && mobileAdapter ? (scene === 'mobile' ? mobileAdapter : desktopAdapter) : ((desktopAdapter ?? mobileAdapter) as FormEngineAdapter)

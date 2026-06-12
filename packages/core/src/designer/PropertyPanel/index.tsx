@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { getComponentCategory, getComponentLabel } from '../../components'
 import { useLocale } from '../../locale'
 import { PropsRenderMap } from '../../propRenders'
@@ -66,7 +66,7 @@ function PropertyPanelInner({
 }) {
   const { t } = useLocale()
   const ComponentPropsRender = PropsRenderMap[field.type]
-  const customConfig = !ComponentPropsRender ? customComponentRegistry.get(field.type) : null
+  const customConfig = useMemo(() => (!ComponentPropsRender ? customComponentRegistry.get(field.type) : null), [ComponentPropsRender, field.type])
   const category = getComponentCategory(field.type)
   const isForm = Array.isArray(category) ? category.includes('form') : category === 'form'
   const isContainer = Array.isArray(category) ? category.includes('container') : category === 'container'
