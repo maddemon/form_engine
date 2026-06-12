@@ -2,6 +2,15 @@ import type { SelectProps } from '@form-engine/core'
 import { Select as AntdSelect } from 'antd'
 import { useLocale } from '@form-engine/core/locale'
 import React from 'react'
+import { useAdapterPlaceholder } from '../createAdapterComponent'
+
+// Antd Select 期望的选项类型（DefaultOptionType 的简化版本，不含索引签名）
+interface AntdOptionType {
+  label?: React.ReactNode
+  value?: unknown
+  disabled?: boolean
+  children?: AntdOptionType[]
+}
 
 /**
  * Antd Select 组件
@@ -28,7 +37,7 @@ export const Select: React.FC<SelectProps> = ({
   ...rest
 }) => {
   const { locale } = useLocale()
-  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.select ?? 'Please select'
+  const placeholder = useAdapterPlaceholder(placeholderProp, 'select')
   const notFoundContent = notFoundContentProp ?? locale.widget.select.noOptions
   const handleChange = (val?: string | string[] | null) => {
     onChange?.(val)
@@ -59,7 +68,7 @@ export const Select: React.FC<SelectProps> = ({
       className={className}
       id={id}
       {...rest}
-      options={options as unknown as Record<string, unknown>[]}
+      options={options as AntdOptionType[]}
     />
   )
 }

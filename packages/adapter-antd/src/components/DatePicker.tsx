@@ -12,6 +12,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/en'
 import 'dayjs/locale/zh-cn'
 import React from 'react'
+import { useAdapterPlaceholder } from '../createAdapterComponent'
 
 const { RangePicker } = AntDatePicker
 
@@ -109,10 +110,9 @@ export const DateRangePicker: React.FC<DateRangeProps> = ({
   className,
   id,
 }) => {
-  const { locale } = useLocale()
   const antdLocale = useAntdLocale()
-  const placeholder =
-    placeholderProp ?? ((locale.adapter.common.placeholder.date ?? 'Select date') as unknown as [string, string])
+  const localePlaceholder = useAdapterPlaceholder(undefined, 'date')
+  const placeholder = placeholderProp ?? (localePlaceholder as unknown as [string, string])
   const showTime = explicitShowTime ?? isTimeFormat(format)
   const handleChange = (_dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null, dateStrings: [string, string]) => {
     const cb = onChange as ((value: string[] | undefined) => void) | undefined
@@ -154,8 +154,7 @@ export const TimePicker: React.FC<DatePickerProps> = ({
   className,
   id,
 }) => {
-  const { locale } = useLocale()
-  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.time ?? 'Select time'
+  const placeholder = useAdapterPlaceholder(placeholderProp, 'time')
   const handleChange = (_time: dayjs.Dayjs | null, timeString: string | null) => {
     onChange?.(timeString || undefined)
   }

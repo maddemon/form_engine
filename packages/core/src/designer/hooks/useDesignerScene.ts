@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DeviceScene } from '../../types'
+import type { DeviceScene } from '../../types/adapter-field'
 
 /**
  * 场景切换 Hook

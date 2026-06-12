@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useMemo } from 'react'
-import { DesignerConfigContext } from '../../designer/DesignerContext'
+import { useDesignerAdapters } from '../../designer/DesignerContext'
 import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders/shared'
 import type { PropsRenderProps } from '../../propRenders/types'
@@ -19,11 +19,11 @@ export default function JsxPropsRender({ widgets: w, slots, values, onChange }: 
   const c = locale.component.jsx
   const ce = locale.widget.codeEditor
   const CodeEditor = useMemo(() => resolveSlot('codeEditor', slots, w), [slots, w])
-  // 设计期 PropertyPanel 不在 FormEngineContext.Provider 内；通过 DesignerConfigContext
+  // 设计期 PropertyPanel 不在 FormEngineContext.Provider 内；通过 useDesignerAdapters()
   // 拿到 desktopAdapter.jsxScope 才是真实的可用组件清单（如 AntCard / AntButton）。
   // 运行时（如自定义 FormField 内使用 JSX 编辑器）则走 FormEngineContext.jsxScope。
   const engineCtx = useContext(FormEngineContext)
-  const designerCtx = useContext(DesignerConfigContext)
+  const adapters = useDesignerAdapters()
 
   const handleCompile = useCallback(
     async (code: string): Promise<{ success: boolean; error?: string }> => {
@@ -77,8 +77,8 @@ export default function JsxPropsRender({ widgets: w, slots, values, onChange }: 
   // 命名空间 Ant / Antm 互不冲突，所以这只是兜底策略）。
   const runtimeScope = engineCtx?.jsxScope
   const designerScope =
-    !runtimeScope && (designerCtx?.desktopAdapter?.jsxScope || designerCtx?.mobileAdapter?.jsxScope)
-      ? { ...designerCtx.desktopAdapter?.jsxScope, ...designerCtx.mobileAdapter?.jsxScope }
+    !runtimeScope && (adapters.desktopAdapter?.jsxScope || adapters.mobileAdapter?.jsxScope)
+      ? { ...adapters.desktopAdapter?.jsxScope, ...adapters.mobileAdapter?.jsxScope }
       : undefined
   const jsxScope = runtimeScope ?? designerScope
   const scopeKeys = jsxScope ? Object.keys(jsxScope) : []

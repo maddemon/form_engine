@@ -1,7 +1,7 @@
 
 import { useStyle } from '../../styles'
 import { useLocale } from '../../locale'
-import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { DesignerAction } from '../../types/designer'
 import type { FormFieldSchema } from '../../types/schema'
 import { WidgetButton } from '../../widgets/Button'

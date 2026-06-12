@@ -1,13 +1,23 @@
 import React from 'react'
 import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders/shared'
-import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { DesignerAction } from '../../types/designer'
 import type { PropertySlots } from '../../types/property-slot'
 import type { FormFieldSchema, FormRule } from '../../types/schema'
 import { SectionTitle } from '../../shared/UIPrimitives'
 import { useDebouncedInput } from '../hooks/useDebouncedInput'
 import { useSlot } from '../hooks/useSlot'
+
+function updateFieldRule(rule: FormRule, dispatch: React.Dispatch<DesignerAction>, fieldId: string, patch: Partial<FormRule>) {
+  const nextRule = { ...rule, ...patch }
+  const cleaned = Object.keys(nextRule).length > 0 ? nextRule : undefined
+  dispatch({
+    type: 'UPDATE_FIELD',
+    fieldId,
+    patch: { rules: cleaned ? [cleaned] : undefined },
+  })
+}
 
 export function useCommonPatterns() {
   const { locale } = useLocale()
@@ -20,14 +30,6 @@ export function useCommonPatterns() {
     { label: r.url, value: '^https?://[\\w.-]+(:\\d+)?(/[\\w./-]*)?$' },
   ]
 }
-
-export const COMMON_PATTERNS: { label: string; value: string }[] = [
-  { label: '自定义', value: '' },
-  { label: '手机号（中国）', value: '^1[3-9]\\d{9}$' },
-  { label: '身份证号（18位）', value: '^[1-9]\\d{5}(19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx]$' },
-  { label: '邮箱', value: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$' },
-  { label: '网址', value: '^https?://[\\w.-]+(:\\d+)?(/[\\w./-]*)?$' },
-]
 
 interface RulesEditorProps {
   field: FormFieldSchema
@@ -42,15 +44,10 @@ export function RulesEditor({ field, widgets: w, dispatch, slots }: RulesEditorP
   const commonPatterns = useCommonPatterns()
   const ExpressionEditorSlot = useSlot('expressionEditor', slots, w)
   const rule: FormRule = field.rules?.[0] ?? {}
+  const fieldId = field.id
 
   function updateRule(patch: Partial<FormRule>) {
-    const nextRule = { ...rule, ...patch }
-    const cleaned = Object.keys(nextRule).length > 0 ? nextRule : undefined
-    dispatch({
-      type: 'UPDATE_FIELD',
-      fieldId: field.id,
-      patch: { rules: cleaned ? [cleaned] : undefined },
-    })
+    updateFieldRule(rule, dispatch, fieldId, patch)
   }
 
   const [messageValue, handleMessageChange] = useDebouncedInput<string | number>(rule.message || '', (v) =>

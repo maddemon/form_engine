@@ -1,4 +1,4 @@
-import type { DesignerWidgets } from '../types/adapter'
+import type { DesignerWidgets } from '../types/adapter-designer'
 import { WidgetButton } from './Button'
 import { WidgetButtonGroup } from './ButtonGroup'
 import { WidgetCheckbox } from './Checkbox'

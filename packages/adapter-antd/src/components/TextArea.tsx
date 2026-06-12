@@ -1,7 +1,7 @@
 import React from 'react'
 import { Input as AntdInput } from 'antd'
-import { useLocale } from '@form-engine/core/locale'
 import type { TextAreaProps } from '@form-engine/core'
+import { useAdapterPlaceholder, useComposingChange } from '../createAdapterComponent'
 
 const { TextArea: AntdTextArea } = AntdInput
 
@@ -23,13 +23,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
   className,
   id,
 }) => {
-  const { locale } = useLocale()
-  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.input ?? 'Please enter'
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if ((e.nativeEvent as InputEvent)?.isComposing) return
-    onChange?.(e.target.value)
-  }
-  
+  const placeholder = useAdapterPlaceholder(placeholderProp, 'input')
+  const handleChange = useComposingChange(onChange)
+
   return (
     <AntdTextArea
       value={(value as string) ?? ''}

@@ -10,6 +10,7 @@ import { defaultFieldRenderer } from '@form-engine/core/styles'
 import { useLocale } from '@form-engine/core/locale'
 import { Table as AntTable } from 'antd'
 import React from 'react'
+import { useSubFormRows } from '../hooks/useSubFormRows'
 
 export const SubForm: React.FC<{
   value?: Record<string, unknown>[]
@@ -23,6 +24,8 @@ export const SubForm: React.FC<{
   const { locale } = useLocale()
   const children = field.children ?? []
   const columns = ((field.componentProps?.columns as SubFormColumnConfig[]) || []).filter(Boolean)
+
+  const { handleAddRow, handleRemoveRow } = useSubFormRows(value, onChange, children)
 
   if (columns.length === 0) {
     return (
@@ -60,18 +63,6 @@ export const SubForm: React.FC<{
       options: resolveChildOptions(childSchema),
       ...restComponentProps,
     } as React.ComponentProps<typeof renderFn>)
-  }
-
-  const handleAddRow = () => {
-    const newRow: Record<string, unknown> = {}
-    children.forEach((child) => {
-      newRow[child.name as string] = child.defaultValue ?? ''
-    })
-    onChange?.([...value, newRow])
-  }
-
-  const handleRemoveRow = (rowIndex: number) => {
-    onChange?.(value.filter((_, i) => i !== rowIndex))
   }
 
   // 表格列定义

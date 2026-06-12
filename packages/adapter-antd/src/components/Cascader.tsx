@@ -1,7 +1,7 @@
 import type { CascaderProps } from '@form-engine/core'
 import { Cascader as AntdCascader } from 'antd'
-import { useLocale } from '@form-engine/core/locale'
 import React from 'react'
+import { useAdapterPlaceholder } from '../createAdapterComponent'
 
 /**
  * Antd Cascader 组件
@@ -18,8 +18,7 @@ export const Cascader: React.FC<CascaderProps> = ({
 
   ...rest
 }) => {
-  const { locale } = useLocale()
-  const placeholder = placeholderProp ?? locale.adapter.common.placeholder.select ?? 'Please select'
+  const placeholder = useAdapterPlaceholder(placeholderProp, 'select')
   const handleChange = (val: (string | number)[]) => {
     onChange?.(val as string[])
   }

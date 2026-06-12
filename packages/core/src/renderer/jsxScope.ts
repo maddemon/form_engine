@@ -1,4 +1,5 @@
-import type { FormEngineAdapter, DeviceScene } from '../types/adapter'
+import type { DeviceScene } from '../types/adapter-field'
+import type { FormEngineAdapter } from '../types/adapter'
 
 export function mergeJsxScope(
   desktopAdapter?: FormEngineAdapter,

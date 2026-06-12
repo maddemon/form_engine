@@ -1,4 +1,5 @@
-import type { DeviceScene, FormEngineAdapter } from '../types/adapter'
+import type { DeviceScene } from '../types/adapter-field'
+import type { FormEngineAdapter } from '../types/adapter'
 
 /**
  * 根据 scene 选取 adapter

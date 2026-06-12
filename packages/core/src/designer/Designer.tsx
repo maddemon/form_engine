@@ -3,11 +3,12 @@ import React, { useCallback, useEffect, useMemo, useReducer, useState } from 're
 import { getComponentIcon } from '../components'
 import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
 import { LocaleProvider } from '../locale/LocaleProvider'
-import type { DeviceScene, FormEngineAdapter } from '../types/adapter'
+import type { DeviceScene } from '../types/adapter-field'
+import type { FormEngineAdapter } from '../types/adapter'
 import type { DesignerProps } from '../types/designer'
 import type { FormFieldSchema, FormSchema } from '../types/schema'
 import { Canvas } from './Canvas'
-import { DesignerConfigContext, DesignerDispatchContext, DesignerSelectionContext } from './DesignerContext'
+import { DesignerDispatchContext, DesignerSelectionContext, DesignerSceneContext, DesignerFormConfigContext, DesignerAdapterContext, DesignerConfigContext } from './DesignerContext'
 import { useDndHandlers, type DndState } from './Dnd/useDndHandlers'
 import { PalettePanel, getFullPaletteGroups } from './PalettePanel'
 import { PropertyPanel } from './PropertyPanel'
@@ -212,35 +213,41 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
   const content = (
     <DesignerDispatchContext.Provider value={dispatchCtx}>
       <DesignerSelectionContext.Provider value={selectionCtx}>
-        <DesignerConfigContext.Provider value={configCtx}>
-          <div className="designer-scroll-container" style={ROOT_CONTAINER_STYLE}>
-            <style>{SCROLLBAR_CSS}</style>
-            <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-              {!readOnly && (
-                <PalettePanel groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
-              )}
+        <DesignerSceneContext.Provider value={{ scene }}>
+          <DesignerFormConfigContext.Provider value={{ formConfig }}>
+            <DesignerAdapterContext.Provider value={{ adapter: canvasAdapter, desktopAdapter: widgetsAdapter, mobileAdapter }}>
+              <DesignerConfigContext.Provider value={configCtx}>
+                <div className="designer-scroll-container" style={ROOT_CONTAINER_STYLE}>
+                  <style>{SCROLLBAR_CSS}</style>
+                  <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
+                    {!readOnly && (
+                      <PalettePanel groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
+                    )}
 
-              <div style={CANVAS_WRAPPER_STYLE}>
-                <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} dragOverState={dragOverState} />
-              </div>
+                    <div style={CANVAS_WRAPPER_STYLE}>
+                      <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} dragOverState={dragOverState} />
+                    </div>
 
-              <DragOverlay dropAnimation={null}>
-                <DragGhost activeDragId={dndState.activeDragId} activeDragLabel={dndState.activeDragLabel} activeDragType={dndState.activeDragType} />
-              </DragOverlay>
-            </DndContext>
+                    <DragOverlay dropAnimation={null}>
+                      <DragGhost activeDragId={dndState.activeDragId} activeDragLabel={dndState.activeDragLabel} activeDragType={dndState.activeDragType} />
+                    </DragOverlay>
+                  </DndContext>
 
-            <PropertyPanel
-              field={selectedField}
-              formConfig={state.schema.form}
-              dispatch={dispatch}
-              designerWidgets={widgetsAdapter?.designerWidgets}
-              width={panelWidths?.properties}
-              propertyPanelTabs={propertyPanelTabs}
-              propertySlots={propertySlots}
-              allFields={state.schema.fields}
-            />
-          </div>
-        </DesignerConfigContext.Provider>
+                  <PropertyPanel
+                    field={selectedField}
+                    formConfig={state.schema.form}
+                    dispatch={dispatch}
+                    designerWidgets={widgetsAdapter?.designerWidgets}
+                    width={panelWidths?.properties}
+                    propertyPanelTabs={propertyPanelTabs}
+                    propertySlots={propertySlots}
+                    allFields={state.schema.fields}
+                  />
+                </div>
+              </DesignerConfigContext.Provider>
+            </DesignerAdapterContext.Provider>
+          </DesignerFormConfigContext.Provider>
+        </DesignerSceneContext.Provider>
       </DesignerSelectionContext.Provider>
     </DesignerDispatchContext.Provider>
   )

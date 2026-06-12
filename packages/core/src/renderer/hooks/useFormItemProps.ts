@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
-import type { DeviceScene, FormItemProps } from '../../types/adapter'
+import type { DeviceScene } from '../../types/adapter-field'
+import type { FormItemProps } from '../../types/adapter-form'
 import type { FormConfig, FormFieldSchema } from '../../types/schema'
 
 export interface UseFormItemPropsArgs {

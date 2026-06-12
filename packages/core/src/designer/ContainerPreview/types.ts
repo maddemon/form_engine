@@ -1,5 +1,9 @@
-import type { DeviceScene, FormEngineAdapter } from '../../types/adapter'
+import type { DeviceScene } from '../../types/adapter-field'
+import type { FormEngineAdapter } from '../../types/adapter'
 import type { FormConfig, FormFieldSchema } from '../../types/schema'
+
+/** 这些容器的 ContainerContent 内部已自行调用 FieldRenderer，外层无需重复包 label */
+export const SELF_RENDERED_CONTAINERS = new Set(['card', 'collapse', 'tabs'])
 
 /** 所有容器内容组件的统一 props（按需取用） */
 export interface ContainerContentProps {

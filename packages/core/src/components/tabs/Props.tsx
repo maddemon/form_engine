@@ -1,5 +1,6 @@
 import { useLocale } from '../../locale'
-import { FieldItem, genId } from '../../propRenders'
+import { FieldItem } from '../../propRenders/shared'
+import { genId } from '../../utils/id'
 import type { PropsRenderProps } from '../../propRenders/types'
 import { SortableTableEditor, WidgetButton } from '../../widgets'
 import type { TabPaneConfig } from '.'

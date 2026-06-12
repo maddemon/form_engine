@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import type { EventContext } from '../../events'
 import { useLocale } from '../../locale'
-import type { ValidateFn } from '../../types/adapter'
+import type { ValidateFn } from '../../types/adapter-form'
 import type { $Form, EventCallbacks } from '../../types/events'
 import type { DataSourceResolver } from '../../types/render'
 import type { FormSchema, OptionItem } from '../../types/schema'

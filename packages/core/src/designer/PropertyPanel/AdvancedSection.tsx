@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders'
-import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { DesignerAction } from '../../types/designer'
 import type { PropertySlots } from '../../types/property-slot'
 import type { FormFieldSchema } from '../../types/schema'

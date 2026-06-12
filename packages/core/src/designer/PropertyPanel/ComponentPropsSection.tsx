@@ -1,7 +1,7 @@
 import CustomPropsRender from '../../propRenders/CustomPropsRender'
 import type { PropsRenderProps } from '../../propRenders/types'
 import { useStyle } from '../../styles'
-import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { CustomComponentConfig } from '../../types/custom-component'
 import type { DesignerAction } from '../../types/designer'
 import type { PropertySlots } from '../../types/property-slot'

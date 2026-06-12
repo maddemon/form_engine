@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders'
-import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { DesignerAction } from '../../types/designer'
 import type { FormFieldSchema } from '../../types/schema'
 import { Space } from '../../widgets/Space'

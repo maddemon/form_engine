@@ -5,7 +5,7 @@
  */
 
 import type * as React from 'react'
-import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { PropertySlotProps, PropertySlots, SlotName } from '../../types/property-slot'
 import FallbackCodeEditor from './fallbacks/CodeEditor'
 import FallbackDataSourceEditor from './fallbacks/DataSourceEditor'

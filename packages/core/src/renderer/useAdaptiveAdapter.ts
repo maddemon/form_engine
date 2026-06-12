@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { DeviceScene, FormEngineAdapter } from '../types/adapter'
+import type { DeviceScene } from '../types/adapter-field'
+import type { FormEngineAdapter } from '../types/adapter'
 
 /**
  * 根据设备宽度自动选择 desktop/mobile adapter

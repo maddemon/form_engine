@@ -1,4 +1,4 @@
-import type { DesignerWidgets } from '../types/adapter'
+import type { DesignerWidgets } from '../types/adapter-designer'
 import type { PropertySlots } from '../types/property-slot'
 import type { FieldDataSource } from '../types/schema'
 

@@ -1,12 +1,12 @@
 import { useDroppable, type UniqueIdentifier } from '@dnd-kit/core'
 import React, { useCallback, useMemo, useState } from 'react'
-import type { DeviceScene } from '../../types/adapter'
+import type { DeviceScene } from '../../types/adapter-field'
 import { useStyle } from '../../styles'
 import { useLocale } from '../../locale'
 import type { FormFieldSchema } from '../../types/schema'
 import { CanvasToolbar } from './CanvasToolbar'
 import { ComponentTree, type TreeItem } from './ComponentTree'
-import { useDesignerDispatch, useDesignerSelection, useDesignerConfig } from '../DesignerContext'
+import { useDesignerDispatch, useDesignerSelection, useDesignerScene, useDesignerFormConfig, useDesignerAdapters } from '../DesignerContext'
 import type { DragOverState } from '../Dnd/useDndHandlers'
 import { RootFields } from '../RootFields'
 import { EmptyContainerPlaceholder } from '../ContainerPreview/EmptyContainerPlaceholder'
@@ -14,7 +14,13 @@ import { EmptyContainerPlaceholder } from '../ContainerPreview/EmptyContainerPla
 export const CANVAS_ROOT_ID = 'canvas-root'
 export const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
 
-const CanvasDroppable: React.FC<{ children: React.ReactNode; onClick: () => void; style: React.CSSProperties }> = ({ children, onClick, style }) => {
+interface CanvasDroppableProps {
+  children: React.ReactNode
+  onClick: () => void
+  style: React.CSSProperties
+}
+
+const CanvasDroppable: React.FC<CanvasDroppableProps> = ({ children, onClick, style }) => {
   const { setNodeRef } = useDroppable({ id: CANVAS_ROOT_ID })
   return (
     <div ref={setNodeRef} onClick={onClick} style={style}>
@@ -49,7 +55,9 @@ function buildTreeData(fields: FormFieldSchema[]): TreeItem[] {
 export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange, canUndo = false, canRedo = false, dragOverState }) => {
   const dispatch = useDesignerDispatch()
   const { selectedFieldId, onSelectField } = useDesignerSelection()
-  const { scene, formConfig, adapter } = useDesignerConfig()
+  const scene = useDesignerScene()
+  const formConfig = useDesignerFormConfig()
+  const { adapter } = useDesignerAdapters()
   const { t } = useLocale()
 
   const FormWrapper = adapter?.FormWrapper

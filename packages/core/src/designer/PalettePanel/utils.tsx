@@ -36,10 +36,8 @@ function isValidFieldType(type: string): type is FieldType {
   return ALL_FIELD_TYPES.includes(type) || type.startsWith('custom:')
 }
 
-let _counter = 0
 export function generateFieldId(type: FieldType): string {
-  _counter++
-  return `field_${type}_${Date.now()}_${_counter}`
+  return `field_${type}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`
 }
 
 function resolveDefaultProps(item: PaletteItem, locale?: LocalePack): Partial<FormFieldSchema> {

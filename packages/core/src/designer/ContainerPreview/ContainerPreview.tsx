@@ -1,6 +1,6 @@
 import React from 'react'
 import type { FormFieldSchema } from '../../types/schema'
-import { useDesignerConfig } from '../DesignerContext'
+import { useDesignerScene, useDesignerFormConfig, useDesignerAdapters } from '../DesignerContext'
 import { defaultContainerRenderers } from './defaultContainerRenderers'
 import { GenericContainerContent } from './GenericContainerContent'
 import type { ContainerContentProps } from './types'
@@ -46,7 +46,9 @@ interface ContainerPreviewProps {
 
 /** 容器预览入口：在此处统一调用 Context hook，将值通过 props 下发给各 Content 组件 */
 export const ContainerPreview: React.FC<ContainerPreviewProps> = ({ field }) => {
-  const { scene, formConfig, adapter } = useDesignerConfig()
+  const scene = useDesignerScene()
+  const formConfig = useDesignerFormConfig()
+  const { adapter } = useDesignerAdapters()
   const Content = getContainerRenderer(field.type) ?? GenericContainerContent
 
   return (

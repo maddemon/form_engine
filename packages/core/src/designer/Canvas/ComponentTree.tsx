@@ -18,7 +18,14 @@ interface ComponentTreeProps {
   onClose: () => void
 }
 
-const TreeNode: React.FC<{ item: TreeItem; selectedId: string | null; onSelect: (id: string) => void; depth: number }> = ({ item, selectedId, onSelect, depth }) => {
+interface TreeNodeProps {
+  item: TreeItem
+  selectedId: string | null
+  onSelect: (id: string) => void
+  depth: number
+}
+
+const TreeNode: React.FC<TreeNodeProps> = ({ item, selectedId, onSelect, depth }) => {
   const { token } = useStyle()
   return (
     <div>

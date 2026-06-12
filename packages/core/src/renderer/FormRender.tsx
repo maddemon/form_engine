@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { isContainerComponent } from '../components'
 import type { SupportedLocale } from '../locale/LocaleProvider'
 import { LocaleProvider } from '../locale/LocaleProvider'
@@ -6,20 +6,20 @@ import type { LocalePack } from '../locale/types'
 import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
 import type { SizeMode, ThemeMode } from '../styles/StyleProvider'
 import type { PartialThemeTokens } from '../styles/types'
-import type { ComponentRenderFn, DeviceScene, FormEngineAdapter, FormWrapperProps } from '../types/adapter'
+import type { ComponentRenderFn, DeviceScene } from '../types/adapter-field'
+import type { FormEngineAdapter } from '../types/adapter'
 import type { EventCallbacks } from '../types/events'
 import type { DataSourceResolver } from '../types/render'
-import { type FormFieldSchema, type FormSchema } from '../types/schema'
+import { type FormSchema } from '../types/schema'
 import { pickAdapter } from '../utils'
-import { FieldErrorBoundary } from './FieldErrorBoundary'
-import { FieldRenderer } from './FieldRenderer'
-import { FormConfigContext, useFormConfig } from './FormConfigContext'
-import { FormEngineContext, useFormEngine, type FormEngineContextValue } from './FormEngineContext'
+import { FormConfigContext } from './FormConfigContext'
+import { FormEngineContext, type FormEngineContextValue } from './FormEngineContext'
 import { FormErrorBoundary } from './FormErrorBoundary'
 import { mergeJsxScope } from './jsxScope'
-import { FormStateContext, useFormState, type FormStateContextValue } from './FormStateContext'
+import { FormStateContext, type FormStateContextValue } from './FormStateContext'
 import { useFormRender } from './hooks/useFormRender'
-import { InsideContainerContext } from './InsideContainerContext'
+import { DefaultFormWrapper } from './DefaultFormWrapper'
+import { NestedFieldRenderer } from './NestedFieldRenderer'
 
 export interface FormRenderHandle {
   submit(): void
@@ -138,25 +138,6 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(
 )
 FormRender.displayName = 'FormRender'
 
-/** 内置默认 Form 容器 — 使用原生 <form> 元素 */
-const DefaultFormWrapper: React.FC<FormWrapperProps> = ({ onSubmit, children, className, style }) => (
-  <form
-    onSubmit={(e) => {
-      e.preventDefault()
-      onSubmit?.()
-    }}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') {
-        e.preventDefault()
-      }
-    }}
-    className={className}
-    style={style}
-  >
-    {children}
-  </form>
-)
-
 /** FormRender 内部实现，在 StyleProvider + BridgeProvider 内部渲染 */
 const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps, 'themeMode' | 'sizeMode' | 'theme'>>(
   (
@@ -267,46 +248,3 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
   },
 )
 FormRenderInner.displayName = 'FormRenderInner'
-
-// ── NestedFieldRenderer（递归字段渲染器，含 React.memo）─────────────
-
-interface NestedFieldRendererProps {
-  field: FormFieldSchema
-  onFieldChange: (name: string, value: unknown) => void
-}
-
-const NestedFieldRenderer: React.FC<NestedFieldRendererProps> = React.memo(({ field, onFieldChange }) => {
-  const { adapter, components, loading } = useFormEngine()
-  const { formValues, fieldOptions, fieldErrors, eventContext } = useFormState()
-  const formConfig = useFormConfig()
-
-  const isContainer = isContainerComponent(field.type)
-
-  const handleChange = useCallback((val: unknown) => onFieldChange(field.name, val), [field.name, onFieldChange])
-
-  const enhancedField: FormFieldSchema = useMemo(() => {
-    if (!isContainer || !field.children.length) return field
-    const childNodes = field.children.map((child) => (
-      <InsideContainerContext.Provider key={child.id} value={true}>
-        <NestedFieldRenderer field={child} onFieldChange={onFieldChange} />
-      </InsideContainerContext.Provider>
-    ))
-    return { ...field, componentProps: { ...field.componentProps, children: childNodes } }
-  }, [field, isContainer, onFieldChange])
-
-  return (
-    <FieldRenderer
-      field={enhancedField}
-      value={formValues[field.name]}
-      onChange={handleChange}
-      options={fieldOptions[field.name] || []}
-      disabled={loading || field.disabled === true}
-      adapter={adapter}
-      components={components}
-      eventContext={eventContext}
-      errors={fieldErrors[field.name]}
-      formConfig={formConfig}
-    />
-  )
-})
-NestedFieldRenderer.displayName = 'NestedFieldRenderer'

@@ -1,5 +1,5 @@
 import { useLocale } from '../../locale'
-import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { DesignerAction } from '../../types/designer'
 import type { FormConfig } from '../../types/schema'
 import { Divider, SectionTitle } from '../../shared/UIPrimitives'

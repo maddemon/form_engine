@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react'
-import type { FormEngineAdapter, ComponentRenderFn } from '../types/adapter'
+import type { ComponentRenderFn } from '../types/adapter-field'
+import type { FormEngineAdapter } from '../types/adapter'
 
 /**
  * FormEngine Context

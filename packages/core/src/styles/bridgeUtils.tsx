@@ -4,7 +4,7 @@
  * 供 adapter-antd / adapter-antd-mobile 的 themeBridge 使用。
  */
 
-import type { FieldComponentProps, FieldRendererFn } from '../types/adapter'
+import type { FieldComponentProps, FieldRendererFn } from '../types/adapter-field'
 
 // ── 需要追加 px 后缀的 token key ────────────────────────────────
 

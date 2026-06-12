@@ -1,40 +1,30 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import React, { useMemo } from 'react'
-import { FieldRenderer, DefaultFormItem } from '../../renderer/FieldRenderer'
 import { isContainerComponent, isFormComponent } from '../../components'
-import type { FormEngineAdapter } from '../../types/adapter'
-import type { FormItemProps } from '../../types/adapter'
-import type { FormConfig, FormFieldSchema } from '../../types/schema'
 import { mergeJsxScope } from '../../renderer'
-import { ContainerPreview } from '.'
+import { DefaultFormItem, FieldRenderer } from '../../renderer/FieldRenderer'
+import type { FormItemProps } from '../../types/adapter-form'
+import type { FormFieldSchema } from '../../types/schema'
+import { useDesignerAdapters, useDesignerFormConfig, useDesignerSelection } from '../DesignerContext'
 import { FieldItem, type FieldItemProps } from '../FieldItem'
-import { useDesignerConfig, useDesignerSelection } from '../DesignerContext'
-
-/** 这些容器的 ContainerContent 内部已自行调用 FieldRenderer，外层无需重复包 label */
-const SELF_RENDERED = new Set(['card', 'collapse', 'tabs'])
+import { ContainerPreview } from './ContainerPreview'
+import { SELF_RENDERED_CONTAINERS } from './types'
 
 interface NestedFieldProps {
   field: FormFieldSchema
   parentContainerId?: string
   childIndex?: number
-  /** 根级字段模式下通过 props 传入，覆盖 Context */
-  selectedFieldId?: string | null
-  formConfig?: FormConfig
-  adapter?: FormEngineAdapter
 }
 
-export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, parentContainerId, childIndex, selectedFieldId: selectedFieldIdProp, formConfig: formConfigProp, adapter: adapterProp }) => {
-  const { selectedFieldId: selectedFieldIdCtx } = useDesignerSelection()
-  const { formConfig: formConfigCtx, adapter: adapterCtx, desktopAdapter: desktopAdapterCtx } = useDesignerConfig()
-
-  const selectedFieldId = selectedFieldIdProp ?? selectedFieldIdCtx
-  const formConfig = formConfigProp ?? formConfigCtx
-  const adapter = adapterProp ?? adapterCtx
+export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, parentContainerId, childIndex }) => {
+  const { selectedFieldId } = useDesignerSelection()
+  const formConfig = useDesignerFormConfig()
+  const { adapter, desktopAdapter } = useDesignerAdapters()
 
   const designerJsxScope = useMemo(
-    () => mergeJsxScope(desktopAdapterCtx, adapter, adapter.scene),
-    [desktopAdapterCtx, adapter],
+    () => mergeJsxScope(desktopAdapter, adapter, adapter.scene),
+    [desktopAdapter, adapter],
   )
 
   const isContainer = isContainerComponent(field.type)
@@ -43,16 +33,26 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
     data: { source: 'canvas', fieldId: field.id },
-    disabled: isRootMode ? false : (parentContainerId === undefined || childIndex === undefined),
+    disabled: isRootMode ? false : parentContainerId === undefined || childIndex === undefined,
   })
 
   // 缓存子内容：拖拽中不变化，避免 FieldRenderer/ContainerPreview 连锁重渲染
   const content = useMemo(
-    () => (isContainer ? (
-      <ContainerPreview field={field} />
-    ) : (
-      <FieldRenderer field={field} value={undefined} onChange={() => {}} options={[]} disabled={false} adapter={adapter} formConfig={formConfig} jsxScope={designerJsxScope} />
-    )),
+    () =>
+      isContainer ? (
+        <ContainerPreview field={field} />
+      ) : (
+        <FieldRenderer
+          field={field}
+          value={undefined}
+          onChange={() => {}}
+          options={[]}
+          disabled={false}
+          adapter={adapter}
+          formConfig={formConfig}
+          jsxScope={designerJsxScope}
+        />
+      ),
     [field, adapter, formConfig, designerJsxScope, isContainer],
   )
 
@@ -66,7 +66,7 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
     [transform, transition, isDragging],
   )
 
-  const needsLabel = isContainer && !SELF_RENDERED.has(field.type)
+  const needsLabel = isContainer && !SELF_RENDERED_CONTAINERS.has(field.type)
   const isFormLike = isFormComponent(field.type)
   const containerLabelProps: FormItemProps = {
     label: field.label,
@@ -82,7 +82,7 @@ export const NestedField: React.FC<NestedFieldProps> = React.memo(({ field, pare
       field={field}
       isSelected={selectedFieldId === field.id}
       dragListeners={listeners as FieldItemProps['dragListeners']}
-      dragAttributes={attributes as unknown as FieldItemProps['dragAttributes']}
+      dragAttributes={attributes as unknown as Record<string, unknown>}
       dragActivatorRef={setActivatorNodeRef}
       dragNodeRef={setNodeRef}
       dragStyle={dragStyle}

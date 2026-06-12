@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { getEventDeclarations } from '../../components'
 import { resolveEvents, type EventContext } from '../../events'
-import type { FieldComponentProps } from '../../types/adapter'
+import type { FieldComponentProps } from '../../types/adapter-field'
 import type { $Self, ResolvedEventHandler } from '../../types/events'
 import type { FormFieldSchema, OptionItem } from '../../types/schema'
 

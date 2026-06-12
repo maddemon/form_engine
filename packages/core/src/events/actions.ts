@@ -76,28 +76,21 @@ export function invokeAction(
     console.warn(`[form-engine] action ${name} 不支持 method 调用方式`)
     return
   }
-  const method = ($form as unknown as Record<string, (...args: unknown[]) => unknown>)[name]
-  if (typeof method !== 'function') {
-    console.warn(`[form-engine] $form.${name} 不是函数`)
-    return
-  }
   switch (name) {
     case 'submit':
+      $form.submit()
+      return
     case 'reset':
-      ;(method as () => void).call($form)
+      $form.reset()
       return
     case 'validate':
-      ;(method as (n?: string) => Promise<boolean>).call($form, params?.name as string | undefined)
+      $form.validate(params?.name as string | undefined)
       return
     case 'setFieldValue':
-      ;(method as (n: string, v: unknown) => void).call(
-        $form,
-        params?.name as string,
-        params?.value,
-      )
+      $form.setFieldValue(params?.name as string, params?.value)
       return
     default:
-      ;(method as (...args: unknown[]) => unknown).call($form, params)
+      console.warn(`[form-engine] action ${name} 不是内置方法`)
       return
   }
 }

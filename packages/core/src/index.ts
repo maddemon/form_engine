@@ -229,7 +229,16 @@ export type { SupportedLocale } from './locale/LocaleProvider'
 // 工具函数
 // ============================
 
-export * from './utils'
+// 工具函数
+export {
+  evalExpr,
+  genId,
+  getNested,
+  matchVisibleWhen,
+  pickAdapter,
+  replaceTemplateVars,
+  resolvePanelWidth,
+} from './utils'
 
 // ============================
 // 事件系统

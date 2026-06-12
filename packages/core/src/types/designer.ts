@@ -1,7 +1,9 @@
 import type React from 'react'
 import type { LocalePack, SupportedLocale } from '../locale'
 import { PartialThemeTokens, SizeMode, ThemeMode } from '../styles'
-import type { DesignerWidgets, DeviceScene, FormEngineAdapter } from './adapter'
+import type { DesignerWidgets } from './adapter-designer'
+import type { DeviceScene } from './adapter-field'
+import type { FormEngineAdapter } from './adapter'
 import type { PropertySlots } from './property-slot'
 import type { FormConfig, FormFieldSchema, FormSchema } from './schema'
 

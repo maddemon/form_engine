@@ -1,5 +1,6 @@
 import { useLocale } from '../../locale'
-import { FieldItem, PropsRenderProps } from '../../propRenders'
+import { FieldItem } from '../../propRenders/shared'
+import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function DatePickerPropsRender({ widgets: w, values, onChange }: PropsRenderProps) {
   const { locale } = useLocale()

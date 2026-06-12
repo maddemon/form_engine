@@ -1,5 +1,6 @@
 import { useLocale } from '../../locale'
-import { FieldItem, PropsRenderProps, DataSourceEditorField } from '../../propRenders'
+import { FieldItem, DataSourceEditorField } from '../../propRenders/shared'
+import type { PropsRenderProps } from '../../propRenders/types'
 
 export default function SegmentPropsRender({ widgets: w, values, onChange, dataSource, onDataSourceChange, slots }: PropsRenderProps) {
   const { locale } = useLocale()

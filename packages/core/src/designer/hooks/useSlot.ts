@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { resolveSlot } from '../../registry/propertySlotRegistry'
-import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { PropertySlots, SlotName } from '../../types/property-slot'
 
 /**

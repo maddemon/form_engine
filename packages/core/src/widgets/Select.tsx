@@ -155,7 +155,7 @@ export const WidgetSelect: React.FC<{
             boxShadow: token('shadowLg') as string,
             maxHeight: 200,
             overflowY: 'auto',
-            marginTop: token('spacingXxs') as unknown as number,
+            marginTop: token('spacingXxs'),
           }}
         >
           {options.length === 0 ? (

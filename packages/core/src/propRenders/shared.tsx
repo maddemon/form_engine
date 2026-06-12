@@ -4,7 +4,7 @@ import { TooltipIcon } from '../shared/UIPrimitives'
 import { Space } from '../widgets/Space'
 import { resolveSlot } from '../registry/propertySlotRegistry'
 import type { PropertySlots } from '../types/property-slot'
-import type { DesignerWidgets } from '../types/adapter'
+import type { DesignerWidgets } from '../types/adapter-designer'
 import type { FieldDataSource } from '../types/schema'
 
 interface FieldItemProps {
