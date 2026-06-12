@@ -7,7 +7,7 @@ import type { DesignerAction } from '../../types/designer'
 import type { PropertySlots } from '../../types/property-slot'
 import type { FieldDataSource, FormFieldSchema } from '../../types/schema'
 import { Divider } from '../../widgets/Divider'
-import { useDebouncedObjectMap } from '../useDebouncedInput'
+import { useDebouncedObjectMap } from '../hooks/useDebouncedInput'
 
 interface ComponentPropsSectionProps {
   field: FormFieldSchema

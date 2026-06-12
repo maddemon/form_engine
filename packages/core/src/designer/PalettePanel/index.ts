@@ -1,5 +1,5 @@
 // 组件
-export { FieldList } from './FieldList'
+export { PalettePanel } from './PalettePanel'
 export { DefaultIcon } from './DefaultIcon'
 export { PaletteItemCard } from './PaletteItemCard'
 export { ComponentLibContent } from './ComponentLibContent'

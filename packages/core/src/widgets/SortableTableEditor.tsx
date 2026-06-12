@@ -2,7 +2,7 @@ import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type D
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import React, { useCallback, useMemo } from 'react'
-import { ErrorMessage } from '../designer/UIPrimitives'
+import { ErrorMessage } from '../shared/UIPrimitives'
 import { useStyle } from '../styles'
 import { useLocale } from '../locale'
 import { arrayMove, DragHandleIcon, InlineDeleteButton } from './sortableListShared'

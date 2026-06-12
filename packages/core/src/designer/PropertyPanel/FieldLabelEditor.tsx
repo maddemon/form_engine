@@ -6,7 +6,7 @@ import type { DesignerAction } from '../../types/designer'
 import type { FormFieldSchema } from '../../types/schema'
 import { WidgetButton } from '../../widgets/Button'
 import { Space } from '../../widgets/Space'
-import { useDebouncedFieldUpdate } from '../useDebouncedFieldUpdate'
+import { useDebouncedFieldUpdate } from '../hooks/useDebouncedFieldUpdate'
 
 interface FieldLabelEditorProps {
   field: FormFieldSchema

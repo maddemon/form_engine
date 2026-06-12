@@ -1,6 +1,6 @@
 import React from 'react'
 import { useStyle } from '../styles'
-import { TooltipIcon } from '../designer/UIPrimitives'
+import { TooltipIcon } from '../shared/UIPrimitives'
 import { Space } from '../widgets/Space'
 import { resolveSlot } from '../registry/propertySlotRegistry'
 import type { PropertySlots } from '../types/property-slot'

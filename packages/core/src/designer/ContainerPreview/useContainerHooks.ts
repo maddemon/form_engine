@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import { useMemo } from 'react'
 import type { FormFieldSchema } from '../../types/schema'
-import { useDroppableStyle } from '../useDroppableStyle'
+import { useDroppableStyle } from '../hooks/useDroppableStyle'
 
 /**
  * 容器组件通用的 droppable 逻辑

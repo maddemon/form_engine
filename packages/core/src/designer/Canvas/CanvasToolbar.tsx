@@ -1,11 +1,11 @@
 import React from 'react'
-import { Monitor, Smartphone } from '../components/icons'
-import { useStyle } from '../styles'
-import { useLocale } from '../locale'
-import type { DeviceScene } from '../types/adapter'
-import { WidgetButton, WidgetButtonGroup } from '../widgets'
-import { Space } from '../widgets/Space'
-import { Divider } from '../widgets/Divider'
+import { Monitor, Smartphone } from '../../components/icons'
+import { useStyle } from '../../styles'
+import { useLocale } from '../../locale'
+import type { DeviceScene } from '../../types/adapter'
+import { WidgetButton, WidgetButtonGroup } from '../../widgets'
+import { Space } from '../../widgets/Space'
+import { Divider } from '../../widgets/Divider'
 
 interface CanvasToolbarProps {
   scene: DeviceScene

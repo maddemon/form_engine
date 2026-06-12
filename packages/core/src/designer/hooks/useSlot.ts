@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { resolveSlot } from '../registry/propertySlotRegistry'
-import type { DesignerWidgets } from '../types/adapter'
-import type { PropertySlots, SlotName } from '../types/property-slot'
+import { resolveSlot } from '../../registry/propertySlotRegistry'
+import type { DesignerWidgets } from '../../types/adapter'
+import type { PropertySlots, SlotName } from '../../types/property-slot'
 
 /**
  * 解析 Slot 组件的 Hook

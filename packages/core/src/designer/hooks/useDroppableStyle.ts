@@ -1,4 +1,4 @@
-import { useStyle } from '../styles'
+import { useStyle } from '../../styles'
 
 /**
  * 可拖放区域的通用样式计算

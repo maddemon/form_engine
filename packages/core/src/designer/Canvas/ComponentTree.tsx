@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react'
-import { useStyle } from '../styles'
-import { useLocale } from '../locale'
-import { Space } from '../widgets/Space'
-import { WidgetButton } from '../widgets/Button'
+import { useStyle } from '../../styles'
+import { useLocale } from '../../locale'
+import { Space } from '../../widgets/Space'
+import { WidgetButton } from '../../widgets/Button'
 
 export interface TreeItem {
   id: string

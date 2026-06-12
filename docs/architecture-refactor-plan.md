@@ -58,14 +58,14 @@ Docs: [x] 已导出，adapter README 需同步更新
 
 **合计**：~25 处 `: any` + ~28 处 `as any`，遍布 25+ 文件。
 
-> ✅ 已完成（adapter-antd widgets + Alert）：
-> - 5 个 widgets 从 `React.FC<any>` 改为 `React.ComponentProps<DesignerWidgets['X']>`
-> - Alert `onClose as any` → 补充 core `AlertProps.onClose` 后直接使用
+> ⚠️ 部分完成：
+> - ✅ adapter-antd 5 个 widgets 从 `React.FC<any>` 改为 `React.ComponentProps<DesignerWidgets['X']>`
+> - ✅ Alert `onClose` 补充到 core `AlertProps`
+> - ❌ `BaseComponentProps` 索引签名未删除（影响面大，需单独 PR）
+> - ❌ `BaseFormComponentProps.onChange` 泛型化未做
+> - ❌ Adapter `components` 类型 `as unknown as` 未消除
+> - ❌ adapter-antd-mobile 的 32 处 `as any` 未清理（多为库互操作）
 > - 详细分类见 `docs/any-type-analysis.md`
->
-> 剩余 `as any` 分两类：
-> - **Category 1（core 缺陷）**：`BaseComponentProps` 索引签名、Text/Title 的 `textProps: any`
-> - **Category 2（库互操作）**：Cascader/TreeSelect 的 `OptionItem` vs antd 类型、antd-mobile render prop 类型缺失
 
 ### 2.2 `BaseComponentProps` 索引签名失明
 
@@ -76,7 +76,7 @@ Docs: [x] 已导出，adapter README 需同步更新
 
 导致所有已知 prop 的 IDE 提示和类型检查失效。`BaseFormComponentProps.onChange` 为 `(value: any) => void`，丢失类型信息。
 
-> ⚠️ 未修复：删除索引签名会影响太多文件（Text/Title 等组件的 `...rest` 展开），建议单独 PR 处理。
+> ❌ 未修复：删除索引签名会影响太多文件（Text/Title 等组件的 `...rest` 展开），建议单独 PR 处理。
 
 ### 2.3 Adapter 类型断言
 
@@ -134,16 +134,15 @@ Docs: [x] adapter-antd widgets 已修复，分析报告已写入 docs/any-type-a
 
 按优先级补充测试：
 
-1. **P0 — Reducer 测试**：覆盖所有 action type（SELECT_FIELD、ADD_FIELD、REMOVE_FIELD、MOVE_FIELD、COPY_FIELD、UPDATE_FIELD、UPDATE_FORM_CONFIG、SET_SCHEMA、REORDER_FIELDS、UNDO、REDO）。
-2. **P0 — DnD Handlers 测试**：覆盖 palette→canvas、canvas→canvas（根级/容器内/跨容器）场景。
+1. **P0 — Reducer 测试**：覆盖所有 action type + 边界场景（空状态、不存在 ID、深层嵌套、未知 action）。
+2. **P0 — DnD 辅助函数测试**：positionResolver 纯函数（findFieldPosition/resolveDropTarget/reorderFieldsInContainer/isAncestorOfByIndex）。
 3. **P1 — DataSource Resolver 测试**：覆盖 static/remote 数据源解析、依赖更新。
 4. **P1 — Validate 测试**：覆盖所有 rule type（required/min/max/len/pattern/type）。
 5. **P2 — StyleProvider 测试**：覆盖 light/dark/system 模式切换、CSS 变量注入。
 
-> ✅ 已完成（P0）：44 个 Reducer 测试覆盖全部 action type + buildFieldIndex/findInTree/collectFieldNames。
-> DnD Handlers 测试待补充。
+> ✅ P0 已完成：Reducer 52 测试 + positionResolver 14 测试 = 66 测试全部通过。
 
-Docs: [x] reducer.test.ts 已创建
+Docs: [x] 已完成
 
 ---
 
@@ -156,13 +155,15 @@ Docs: [x] reducer.test.ts 已创建
 ### 重构方案
 
 1. **在 `FieldRenderer` 外层包裹 ErrorBoundary**，单个字段渲染失败时显示 fallback UI（红色错误提示），不影响其他字段。
-2. **在 `FormRender` 外层包裹顶层 ErrorBoundary**，捕获未预期的全局错误。
+2. **在 `FormRender` 外层包裹顶层 ErrorBoundary**，捕获非字段级异常（如 StyleProvider 初始化失败、dataSource 解析崩溃）。
 3. **实现 `FieldErrorBoundary` 组件**，支持自定义 fallback。
 
-> ✅ 已完成：`renderer/FieldErrorBoundary.tsx` — class component，支持 `resetKeys` 自动恢复，
-> 已包裹 FieldRenderer 两个 return 分支，从 `@form-engine/core` 主入口导出。
+> ✅ 已完成：
+> - `FieldErrorBoundary` — 字段级，支持 `resetKeys` 自动恢复，已包裹 FieldRenderer
+> - `FormErrorBoundary` — 顶层，包裹整个 FormRender 组件树
+> - 从 `@form-engine/core` 主入口导出 `FieldErrorBoundary`
 
-Docs: [x] 已导出 FieldErrorBoundary，JSDoc 完整
+Docs: [x] 两项均已完成
 
 ---
 
@@ -374,14 +375,14 @@ const containerRendererRegistry: Record<string, React.FC<ContainerContentProps>>
 
 ### 重构方案
 
-**将容器渲染器注册到组件 meta 中**，`ContainerPreview` 从注册表动态查找：
+**将内置容器渲染器提取到独立文件**，`ContainerPreview` 只通过 `getContainerRenderer` 查找，不直接依赖具体渲染器。
 
-> ✅ 已完成：新增 `registerContainerRenderer` / `getContainerRenderer` API，
-> 从 `@form-engine/core/designer` 导出。内置 6 种容器（grid/flex/collapse/tabs/sub-form/card）
-> 默认注册，扩展新容器类型时调用 `registerContainerRenderer` 即可。
-> 避免了在 component.ts 中添加 `containerRenderer` 字段（会引入循环依赖）。
+> ✅ 已完成：
+> - 内置 6 种容器渲染器提取到 `defaultContainerRenderers.tsx`
+> - `ContainerPreview.tsx` 只从 `defaultContainerRenderers` 复制到运行时注册表
+> - 新增 `registerContainerRenderer` / `getContainerRenderer` API 供扩展使用
 
-Docs: [x] 已完成，API 已导出
+Docs: [x] 已完成
 
 ---
 
@@ -470,7 +471,7 @@ Docs: [x] 已确认无需处理
 
 | 优先级 | Phase | 内容 | 预估工时 | 风险 | 状态 |
 |--------|-------|------|---------|------|------|
-| **P0** | 1 | Reducer + DnD 测试补充 | 1-2 天 | 低 | ✅ Reducer 44 测试通过 |
+| **P0** | 1 | Reducer + DnD 测试补充 | 1-2 天 | 低 | ✅ Reducer 52 + positionResolver 14 = 66 测试 |
 | **P0** | 2 | Error Boundary 添加 | 0.5 天 | 低 | ✅ 完成（含 resetKeys） |
 | **P1** | 3 | `any` 类型清理（adapter 包） | 1-2 天 | 中 | ✅ adapter-antd widgets 已修复，剩余为库互操作 |
 | **P1** | 4 | Adapter 重复代码消除 | 0.5 天 | 低 | ✅ 完成 |

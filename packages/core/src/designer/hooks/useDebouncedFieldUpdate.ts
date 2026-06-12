@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { DesignerAction } from '../types/designer'
+import type { DesignerAction } from '../../types/designer'
 
 /**
  * 字段级防抖更新 Hook

@@ -9,15 +9,15 @@
  */
 
 import React from 'react'
-import { listActionNames } from '../events'
-import { useLocale } from '../locale'
-import { FieldItem } from '../propRenders/shared'
-import { useStyle } from '../styles/useStyle'
-import type { DesignerWidgets } from '../types/adapter'
-import type { EventHandler, EventHandlerType } from '../types/events'
-import type { PropertySlots } from '../types/property-slot'
-import { Text } from '../widgets/Text'
-import { useSlot } from './useSlot'
+import { listActionNames } from '../../events'
+import { useLocale } from '../../locale'
+import { FieldItem } from '../../propRenders/shared'
+import { useStyle } from '../../styles/useStyle'
+import type { DesignerWidgets } from '../../types/adapter'
+import type { EventHandler, EventHandlerType } from '../../types/events'
+import type { PropertySlots } from '../../types/property-slot'
+import { Text } from '../../widgets/Text'
+import { useSlot } from '../hooks/useSlot'
 
 /** EventHandlerEditor 所需的 widgets 子集（TextArea 为必选） */
 type RequiredWidgets = Omit<DesignerWidgets, 'TextArea'> & {

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import type { DesignerAction } from '../types/designer'
-import type { FormSchema } from '../types/schema'
+import type { DesignerAction } from '../../types/designer'
+import type { FormSchema } from '../../types/schema'
 
 export function useDesignerSync(
   schema: FormSchema | undefined,

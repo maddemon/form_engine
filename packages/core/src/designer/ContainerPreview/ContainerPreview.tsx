@@ -1,25 +1,17 @@
 import React from 'react'
 import type { FormFieldSchema } from '../../types/schema'
 import { useDesignerConfig } from '../DesignerContext'
-import { CardContainerContent } from './CardContainerContent'
-import { CollapseContainerContent } from './CollapseContainerContent'
-import type { ContainerContentProps } from './types'
-import { FlexContainerContent } from './FlexContainerContent'
+import { defaultContainerRenderers } from './defaultContainerRenderers'
 import { GenericContainerContent } from './GenericContainerContent'
-import { GridContainerContent } from './GridContainerContent'
-import { SubFormContainerContent } from './SubFormContainerContent'
-import { TabsContainerContent } from './TabsContainerContent'
+import type { ContainerContentProps } from './types'
 
 // ── Container renderer registry ─────────────────────────────────────
 
-const containerRendererRegistry: Record<string, React.FC<ContainerContentProps>> = {
-  card: CardContainerContent,
-  grid: GridContainerContent,
-  'sub-form': SubFormContainerContent,
-  collapse: CollapseContainerContent,
-  tabs: TabsContainerContent,
-  flex: FlexContainerContent,
-}
+/**
+ * 运行时注册表：包含内置渲染器 + 用户扩展。
+ * 初始化时从 defaultContainerRenderers 复制，避免修改原始对象。
+ */
+const containerRendererRegistry: Record<string, React.FC<ContainerContentProps>> = { ...defaultContainerRenderers }
 
 /**
  * 注册自定义容器渲染器。

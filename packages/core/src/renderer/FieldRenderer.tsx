@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react'
-import { ErrorMessage, TooltipIcon } from '../designer/UIPrimitives'
+import { ErrorMessage, TooltipIcon } from '../shared/UIPrimitives'
 import { type EventContext } from '../events'
 import { useStyle } from '../styles'
 import type { ComponentRenderFn, FormEngineAdapter, FormItemProps } from '../types/adapter'

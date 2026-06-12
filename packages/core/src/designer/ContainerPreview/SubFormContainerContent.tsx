@@ -1,7 +1,7 @@
 import { useDroppable } from '@dnd-kit/core'
 import React from 'react'
 import { useStyle } from '../../styles'
-import { RegionPreview } from '../RegionPreview'
+import { RegionPreview } from './RegionPreview'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import { useChildrenByColumn } from './useContainerHooks'
 import type { ContainerContentProps } from './types'

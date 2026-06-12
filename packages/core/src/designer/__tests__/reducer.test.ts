@@ -543,3 +543,75 @@ describe('collectFieldNames', () => {
     expect(names).toEqual(new Set(['parentName', 'childName']))
   })
 })
+
+// ── 边界测试 ──────────────────────────────────────────────────────
+
+describe('边界测试', () => {
+  it('REMOVE_FIELD on empty fields', () => {
+    const state = makeState([])
+    const next = designerReducer(state, { type: 'REMOVE_FIELD', fieldId: 'nonexistent' })
+    expect(next.schema.fields).toHaveLength(0)
+  })
+
+  it('UPDATE_FIELD with nonexistent field id', () => {
+    const f1 = makeField({ id: 'f1' })
+    const state = makeState([f1])
+    const next = designerReducer(state, {
+      type: 'UPDATE_FIELD',
+      fieldId: 'nonexistent',
+      patch: { label: 'new' },
+    })
+    expect(next.schema.fields[0].label).toBeUndefined()
+  })
+
+  it('MOVE_FIELD with nonexistent field', () => {
+    const state = makeState([makeField({ id: 'f1' })])
+    const next = designerReducer(state, {
+      type: 'MOVE_FIELD',
+      fromIndex: 0,
+      toIndex: 1,
+    })
+    expect(next.schema.fields).toHaveLength(1)
+  })
+
+  it('COPY_FIELD with nonexistent field', () => {
+    const state = makeState([makeField({ id: 'f1' })])
+    const next = designerReducer(state, { type: 'COPY_FIELD', fieldId: 'nonexistent' })
+    expect(next).toBe(state)
+  })
+
+  it('deeply nested fields', () => {
+    const deepChild = makeField({ id: 'deep' })
+    const mid = makeField({ id: 'mid', type: 'grid', children: [deepChild] })
+    const root = makeField({ id: 'root', type: 'grid', children: [mid] })
+    const state = makeState([root])
+    const next = designerReducer(state, {
+      type: 'UPDATE_FIELD',
+      fieldId: 'deep',
+      patch: { label: 'updated' },
+    })
+    expect(next.schema.fields[0].children[0].children[0].label).toBe('updated')
+  })
+
+  it('default action returns same state', () => {
+    const state = makeState([makeField({ id: 'f1' })])
+    const next = designerReducer(state, { type: 'UNKNOWN_ACTION' } as any)
+    expect(next).toBe(state)
+  })
+
+  it('REDO at last index stays', () => {
+    const state = makeStateWithHistory([makeField({ id: 'f1' })])
+    state.snapshots = [[{ id: 'f1', name: 'n', type: 'input', children: [] }]]
+    state.historyIndex = 0
+    const next = designerReducerWithHistory(state, { type: 'REDO' })
+    expect(next.historyIndex).toBe(0)
+  })
+
+  it('UNDO at index 0 stays', () => {
+    const state = makeStateWithHistory([makeField({ id: 'f1' })])
+    state.snapshots = [[{ id: 'f1', name: 'n', type: 'input', children: [] }]]
+    state.historyIndex = 0
+    const next = designerReducerWithHistory(state, { type: 'UNDO' })
+    expect(next.historyIndex).toBe(0)
+  })
+})

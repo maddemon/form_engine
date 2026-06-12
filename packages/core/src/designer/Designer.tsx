@@ -9,11 +9,11 @@ import type { FormFieldSchema, FormSchema } from '../types/schema'
 import { Canvas } from './Canvas'
 import { DesignerConfigContext, DesignerDispatchContext, DesignerSelectionContext } from './DesignerContext'
 import { useDndHandlers, type DndState } from './Dnd/useDndHandlers'
-import { FieldList, getFullPaletteGroups } from './FieldList'
+import { PalettePanel, getFullPaletteGroups } from './PalettePanel'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
 import { buildFieldIndex, designerReducerWithHistory, findInTree, type FieldIndex } from './reducer'
-import { useDesignerSync } from './useDesignerSync'
+import { useDesignerSync } from './hooks/useDesignerSync'
 
 function useFieldIndex(fields: FormFieldSchema[]): FieldIndex {
   return useMemo(() => buildFieldIndex(fields), [fields])
@@ -214,7 +214,7 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
             <style>{SCROLLBAR_CSS}</style>
             <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
               {!readOnly && (
-                <FieldList groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
+                <PalettePanel groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
               )}
 
               <div style={CANVAS_WRAPPER_STYLE}>

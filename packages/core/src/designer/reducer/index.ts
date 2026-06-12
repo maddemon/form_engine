@@ -1,6 +1,6 @@
-import type { FormSchema, FormFieldSchema } from '../types/schema'
-import type { DesignerAction } from '../types/designer'
-import { cloneField, cloneFields, insertAfter, insertIntoTree, removeFieldById, removeFieldFromTree, updateFieldInTree } from './reducer/fieldOperations'
+import type { FormSchema, FormFieldSchema } from '../../types/schema'
+import type { DesignerAction } from '../../types/designer'
+import { cloneField, cloneFields, insertAfter, insertIntoTree, removeFieldById, removeFieldFromTree, updateFieldInTree } from './fieldOperations'
 
 export interface DesignerState {
   schema: FormSchema

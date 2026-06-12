@@ -2,7 +2,7 @@ import { useDroppable } from '@dnd-kit/core'
 import React from 'react'
 import { useLocale } from '../../locale'
 import { useStyle } from '../../styles'
-import { useEmptyContainerStyle } from '../useDroppableStyle'
+import { useEmptyContainerStyle } from '../hooks/useDroppableStyle'
 
 interface EmptyPlaceholderProps {
   containerId: string

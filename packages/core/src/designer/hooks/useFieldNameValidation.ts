@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import type { FormFieldSchema } from '../types/schema'
-import { collectFieldNames } from './reducer'
+import type { FormFieldSchema } from '../../types/schema'
+import { collectFieldNames } from '../reducer'
 
 export interface UseFieldNameValidationResult {
   nameDirty: boolean

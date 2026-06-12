@@ -1,7 +1,7 @@
-import { componentRegistry } from '../components'
-import { ComponentRegistration } from '../types/component'
-import type { PaletteGroup } from '../types/designer'
-import type { FieldType } from '../types/schema'
+import { componentRegistry } from '../../components'
+import { ComponentRegistration } from '../../types/component'
+import type { PaletteGroup } from '../../types/designer'
+import type { FieldType } from '../../types/schema'
 
 const GROUP_MEMBERS: Record<string, FieldType[]> = {
   'designer.paletteGroups.textInput': ['input', 'textarea', 'password'],

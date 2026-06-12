@@ -5,7 +5,7 @@ import { customComponentRegistry } from '../../registry/customComponentRegistry'
 import type { ThemeTokens } from '../../styles'
 import { FieldType, FormFieldSchema } from '../../types'
 import type { PaletteGroup, PaletteItem } from '../../types/designer'
-import { defaultPaletteGroups } from '../paletteData'
+import { defaultPaletteGroups } from '../data/paletteData'
 import { DefaultIcon } from './DefaultIcon'
 
 // ── 图标工具 ───────────────────────────────────────────────────────

@@ -5,9 +5,9 @@ import type { DesignerWidgets } from '../../types/adapter'
 import type { DesignerAction } from '../../types/designer'
 import type { FormFieldSchema } from '../../types/schema'
 import { Space } from '../../widgets/Space'
-import { useDebouncedFieldUpdate } from '../useDebouncedFieldUpdate'
-import { useFieldNameValidation } from '../useFieldNameValidation'
-import { ErrorMessage } from '../UIPrimitives'
+import { useDebouncedFieldUpdate } from '../hooks/useDebouncedFieldUpdate'
+import { useFieldNameValidation } from '../hooks/useFieldNameValidation'
+import { ErrorMessage } from '../../shared/UIPrimitives'
 
 interface FieldNameEditorProps {
   field: FormFieldSchema

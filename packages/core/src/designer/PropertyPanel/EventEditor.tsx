@@ -7,8 +7,8 @@ import type { DesignerAction } from '../../types/designer'
 import type { EventDeclaration, FormFieldEvents } from '../../types/events'
 import type { PropertySlots } from '../../types/property-slot'
 import type { FormFieldSchema } from '../../types/schema'
-import { CollapsibleSection } from '../CollapsibleSection'
-import { EventHandlerEditor } from '../EventHandlerEditor'
+import { CollapsibleSection } from './CollapsibleSection'
+import { EventHandlerEditor } from './EventHandlerEditor'
 
 function getFieldEventDeclarations(field: FormFieldSchema): EventDeclaration[] {
   const customConfig = customComponentRegistry.get(field.type)

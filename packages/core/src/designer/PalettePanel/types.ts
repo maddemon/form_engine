@@ -1,7 +1,7 @@
 import type { FormFieldSchema } from '../../types'
 import type { DesignerAction, PaletteGroup, PaletteItem, SidePanelTab } from '../../types/designer'
 
-export interface FieldListProps {
+export interface PalettePanelProps {
   groups?: PaletteGroup[]
   excludeTypes?: string[]
   width?: number | string

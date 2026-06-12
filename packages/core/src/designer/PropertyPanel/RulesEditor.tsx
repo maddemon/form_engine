@@ -1,13 +1,13 @@
 import React from 'react'
-import { useLocale } from '../locale'
-import { FieldItem } from '../propRenders/shared'
-import type { DesignerWidgets } from '../types/adapter'
-import type { DesignerAction } from '../types/designer'
-import type { PropertySlots } from '../types/property-slot'
-import type { FormFieldSchema, FormRule } from '../types/schema'
-import { SectionTitle } from './UIPrimitives'
-import { useDebouncedInput } from './useDebouncedInput'
-import { useSlot } from './useSlot'
+import { useLocale } from '../../locale'
+import { FieldItem } from '../../propRenders/shared'
+import type { DesignerWidgets } from '../../types/adapter'
+import type { DesignerAction } from '../../types/designer'
+import type { PropertySlots } from '../../types/property-slot'
+import type { FormFieldSchema, FormRule } from '../../types/schema'
+import { SectionTitle } from '../../shared/UIPrimitives'
+import { useDebouncedInput } from '../hooks/useDebouncedInput'
+import { useSlot } from '../hooks/useSlot'
 
 export function useCommonPatterns() {
   const { locale } = useLocale()

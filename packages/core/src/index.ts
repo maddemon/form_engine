@@ -258,15 +258,15 @@ export * from './dataSource/resolver'
 
 export { Canvas } from './designer/Canvas'
 export { Designer } from './designer/Designer'
-export { DraggablePaletteItem, type DraggablePaletteItemProps } from './designer/DraggablePaletteItem'
-export { createFieldFromPalette, FieldList, generateFieldId } from './designer/FieldList'
-export { defaultPaletteGroups as defaultPalette } from './designer/paletteData'
+export { DraggablePaletteItem, type DraggablePaletteItemProps } from './designer/PalettePanel/DraggablePaletteItem'
+export { createFieldFromPalette, PalettePanel, generateFieldId } from './designer/PalettePanel'
+export { defaultPaletteGroups as defaultPalette } from './designer/data/paletteData'
 export { PropertyPanel } from './designer/PropertyPanel'
 
 export { Designer as FormDesigner } from './designer/Designer'
 
 // 设计器 Hooks（方便开发者自定义设计器）
-export { useDesignerHistory, useDesignerScene, useFieldActions, useFormDesigner } from './designer/hooks'
+export { useDesignerScene, useFieldActions } from './designer/hooks'
 
 // ============================
 // 样式系统（CSS 变量 & 主题）

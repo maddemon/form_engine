@@ -8,10 +8,10 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import React, { useMemo } from 'react'
-import type { FormFieldSchema } from '../types/schema'
-import { useStyle } from '../styles'
+import type { FormFieldSchema } from '../../types/schema'
+import { useStyle } from '../../styles'
 import { NestedField } from './NestedField'
-import { EmptyContainerPlaceholder } from './ContainerPreview/EmptyContainerPlaceholder'
+import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 
 export interface RegionPreviewProps {
   parent: FormFieldSchema

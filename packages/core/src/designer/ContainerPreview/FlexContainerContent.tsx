@@ -1,6 +1,6 @@
 import { horizontalListSortingStrategy, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import React from 'react'
-import { NestedField } from '../NestedField'
+import { NestedField } from './NestedField'
 import type { ContainerContentProps } from './types'
 import { EmptyContainerPlaceholder } from './EmptyContainerPlaceholder'
 import { useContainerDroppable } from './useContainerHooks'

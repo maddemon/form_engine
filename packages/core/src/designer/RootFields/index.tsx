@@ -3,8 +3,8 @@ import React, { useMemo } from 'react'
 import { FormFieldSchema } from '../../types'
 import { useDesignerConfig, useDesignerSelection } from '../DesignerContext'
 import type { DragOverState } from '../Dnd/useDndHandlers'
-import { DropIndicator } from '../DropIndicator'
-import { NestedField } from '../NestedField'
+import { DropIndicator } from './DropIndicator'
+import { NestedField } from '../ContainerPreview/NestedField'
 
 /** 拖到容器上方时不触发同级排序碰撞（transforms 归零） */
 const containerAwareStrategy: SortingStrategy = (args) => {

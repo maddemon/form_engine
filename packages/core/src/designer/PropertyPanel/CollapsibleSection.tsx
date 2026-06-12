@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { useStyle } from '../styles'
-import { Space } from '../widgets/Space'
-import { Divider } from '../widgets/Divider'
+import { useStyle } from '../../styles'
+import { Space } from '../../widgets/Space'
+import { Divider } from '../../widgets/Divider'
 
 interface CollapsibleSectionProps {
   title: string

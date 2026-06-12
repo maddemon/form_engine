@@ -6,7 +6,7 @@ import type { DesignerAction } from '../../types/designer'
 import type { FormFieldSchema } from '../../types/schema'
 import { WidgetButton } from '../../widgets/Button'
 import { FieldItem } from '../../propRenders'
-import { useDebouncedFieldUpdate } from '../useDebouncedFieldUpdate'
+import { useDebouncedFieldUpdate } from '../hooks/useDebouncedFieldUpdate'
 
 interface StaticExpressionToggleProps {
   /** 字段 schema */

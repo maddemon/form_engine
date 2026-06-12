@@ -6,13 +6,13 @@ import type { SidePanelTabContentProps } from '../../types/designer'
 import { resolvePanelWidth } from '../../utils'
 import { WidgetButton } from '../../widgets/Button'
 import { Space } from '../../widgets/Space'
-import { PANEL_BORDER_RIGHT } from '../UIPrimitives'
+import { PANEL_BORDER_RIGHT } from '../../shared/UIPrimitives'
 import { ComponentLibContent } from './ComponentLibContent'
 import { DefaultIcon } from './DefaultIcon'
-import { COMPONENT_LIB_TAB_KEY, MIN_PALETTE_WIDTH, type FieldListProps } from './types'
+import { COMPONENT_LIB_TAB_KEY, MIN_PALETTE_WIDTH, type PalettePanelProps } from './types'
 import { getFullPaletteGroups } from './utils'
 
-export const FieldList: React.FC<FieldListProps> = ({
+export const PalettePanel: React.FC<PalettePanelProps> = ({
   groups,
   excludeTypes,
   width,

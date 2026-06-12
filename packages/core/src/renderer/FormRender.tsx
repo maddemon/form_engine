@@ -11,9 +11,11 @@ import type { EventCallbacks } from '../types/events'
 import type { DataSourceResolver } from '../types/render'
 import { type FormFieldSchema, type FormSchema } from '../types/schema'
 import { pickAdapter } from '../utils'
+import { FieldErrorBoundary } from './FieldErrorBoundary'
 import { FieldRenderer } from './FieldRenderer'
 import { FormConfigContext, useFormConfig } from './FormConfigContext'
 import { FormEngineContext, useFormEngine, type FormEngineContextValue } from './FormEngineContext'
+import { FormErrorBoundary } from './FormErrorBoundary'
 import { mergeJsxScope } from './jsxScope'
 import { FormStateContext, useFormState, type FormStateContextValue } from './FormStateContext'
 import { useFormRender } from './hooks/useFormRender'
@@ -124,15 +126,14 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(
     const withBridge = bridgeProvider ? React.createElement(bridgeProvider, null, inner) : inner
 
     // 包裹 StyleProvider（如果外层没有）
-    if (hasStyleProvider) {
-      return withBridge as React.ReactElement
-    }
-
-    return (
+    const withStyle = hasStyleProvider ? withBridge : (
       <StyleProvider themeMode={themeMode} sizeMode={sizeMode} theme={theme}>
         {withBridge}
       </StyleProvider>
-    ) as React.ReactElement
+    )
+
+    // 最外层包裹 ErrorBoundary
+    return <FormErrorBoundary>{withStyle}</FormErrorBoundary> as React.ReactElement
   },
 )
 FormRender.displayName = 'FormRender'
