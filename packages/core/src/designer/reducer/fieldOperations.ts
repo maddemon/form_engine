@@ -10,20 +10,18 @@ export function generateFieldId(): string {
 // ── 树操作工具 ─────────────────────────────────────────────────────
 
 export function insertAfter(fields: FormFieldSchema[], targetId: string, newField: FormFieldSchema): FormFieldSchema[] {
-  const idx = fields.findIndex(f => f.id === targetId)
+  const idx = fields.findIndex((f) => f.id === targetId)
   if (idx >= 0) {
     const result = [...fields]
     result.splice(idx + 1, 0, newField)
     return result
   }
-  return fields.map(f =>
-    ({ ...f, children: insertAfter(f.children, targetId, newField) }),
-  )
+  return fields.map((f) => ({ ...f, children: insertAfter(f.children, targetId, newField) }))
 }
 
 export function cloneField(field: FormFieldSchema): FormFieldSchema {
   return {
-    ...structuredClone(field),
+    ...field,
     id: generateFieldId(),
     children: field.children.map(cloneField),
   }
@@ -40,7 +38,7 @@ export function removeFieldFromTree(
 ): { fields: FormFieldSchema[]; removed: FormFieldSchema | null } {
   if (parentId) {
     let removed: FormFieldSchema | null = null
-    const result = fields.map(n => {
+    const result = fields.map((n) => {
       if (n.id === parentId) {
         removed = n.children[index] || null
         return { ...n, children: n.children.filter((_, i) => i !== index) }
@@ -61,7 +59,7 @@ export function insertIntoTree(
   field: FormFieldSchema,
 ): FormFieldSchema[] {
   if (parentId) {
-    return fields.map(n => {
+    return fields.map((n) => {
       if (n.id === parentId) {
         const children = [...n.children]
         children.splice(index, 0, field)
@@ -76,13 +74,15 @@ export function insertIntoTree(
 }
 
 export function removeFieldById(fields: FormFieldSchema[], fieldId: string): FormFieldSchema[] {
-  return fields
-    .filter(f => f.id !== fieldId)
-    .map(f => ({ ...f, children: removeFieldById(f.children, fieldId) }))
+  return fields.filter((f) => f.id !== fieldId).map((f) => ({ ...f, children: removeFieldById(f.children, fieldId) }))
 }
 
-export function updateFieldInTree(fields: FormFieldSchema[], fieldId: string, patch: Partial<FormFieldSchema>): FormFieldSchema[] {
-  return fields.map(f => {
+export function updateFieldInTree(
+  fields: FormFieldSchema[],
+  fieldId: string,
+  patch: Partial<FormFieldSchema>,
+): FormFieldSchema[] {
+  return fields.map((f) => {
     if (f.id === fieldId) return { ...f, ...patch }
     return { ...f, children: updateFieldInTree(f.children, fieldId, patch) }
   })

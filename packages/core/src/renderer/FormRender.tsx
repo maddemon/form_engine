@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { isContainerComponent } from '../components'
 import type { SupportedLocale } from '../locale/LocaleProvider'
 import { LocaleProvider } from '../locale/LocaleProvider'
@@ -6,19 +6,19 @@ import type { LocalePack } from '../locale/types'
 import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
 import type { SizeMode, ThemeMode } from '../styles/StyleProvider'
 import type { PartialThemeTokens } from '../styles/types'
-import type { ComponentRenderFn, DeviceScene } from '../types/adapter-field'
 import type { FormEngineAdapter } from '../types/adapter'
+import type { ComponentRenderFn, DeviceScene } from '../types/adapter-field'
 import type { EventCallbacks } from '../types/events'
 import type { DataSourceResolver } from '../types/render'
 import { type FormSchema } from '../types/schema'
 import { pickAdapter } from '../utils'
+import { DefaultFormWrapper } from './DefaultFormWrapper'
 import { FormConfigContext } from './FormConfigContext'
 import { FormEngineContext, type FormEngineContextValue } from './FormEngineContext'
 import { FormErrorBoundary } from './FormErrorBoundary'
-import { mergeJsxScope } from './jsxScope'
 import { FormStateContext, type FormStateContextValue } from './FormStateContext'
 import { useFormRender } from './hooks/useFormRender'
-import { DefaultFormWrapper } from './DefaultFormWrapper'
+import { mergeJsxScope } from './jsxScope'
 import { NestedFieldRenderer } from './NestedFieldRenderer'
 
 export interface FormRenderHandle {
@@ -126,14 +126,16 @@ export const FormRender = React.forwardRef<FormRenderHandle, FormRenderProps>(
     const withBridge = bridgeProvider ? React.createElement(bridgeProvider, null, inner) : inner
 
     // 包裹 StyleProvider（如果外层没有）
-    const withStyle = hasStyleProvider ? withBridge : (
+    const withStyle = hasStyleProvider ? (
+      withBridge
+    ) : (
       <StyleProvider themeMode={themeMode} sizeMode={sizeMode} theme={theme}>
         {withBridge}
       </StyleProvider>
     )
 
     // 最外层包裹 ErrorBoundary
-    return <FormErrorBoundary>{withStyle}</FormErrorBoundary> as React.ReactElement
+    return (<FormErrorBoundary>{withStyle}</FormErrorBoundary>) as React.ReactElement
   },
 )
 FormRender.displayName = 'FormRender'
@@ -189,10 +191,6 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
 
     React.useImperativeHandle(ref, () => ({ submit: handleSubmit, reset, validate }), [handleSubmit, reset, validate])
 
-    const handleFormSubmit = () => {
-      handleSubmit()
-    }
-
     const FormTag = resolvedAdapter?.FormWrapper ?? DefaultFormWrapper
 
     const jsxScope = useMemo(
@@ -220,6 +218,18 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
       [formValues, fieldOptions, fieldErrors, eventContext],
     )
 
+    const fieldsContainerStyle = useMemo<React.CSSProperties>(
+      () => ({ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }),
+      [token],
+    )
+
+    const getFieldWidthStyle = useCallback(
+      (field: (typeof visibleFields)[number]): React.CSSProperties => ({
+        width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%`,
+      }),
+      [],
+    )
+
     return (
       <FormConfigContext.Provider value={formConfig}>
         <FormEngineContext.Provider value={engineCtx}>
@@ -227,15 +237,12 @@ const FormRenderInner = React.forwardRef<FormRenderHandle, Omit<FormRenderProps,
             <FormTag
               formConfig={formConfig}
               scene={resolvedAdapter?.scene ?? 'desktop'}
-              onSubmit={handleFormSubmit}
+              onSubmit={handleSubmit}
               className="fe-form"
             >
-              <div className="fe-form-fields" style={{ display: 'flex', flexWrap: 'wrap', gap: token('spacingSm') }}>
+              <div className="fe-form-fields" style={fieldsContainerStyle}>
                 {visibleFields.map((field) => (
-                  <div
-                    key={field.id}
-                    style={{ width: `${((isContainerComponent(field.type) ? 24 : field.colSpan || 24) / 24) * 100}%` }}
-                  >
+                  <div key={field.id} style={getFieldWidthStyle(field)}>
                     <NestedFieldRenderer field={field} onFieldChange={handleFieldChange} />
                   </div>
                 ))}

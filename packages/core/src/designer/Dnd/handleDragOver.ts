@@ -2,11 +2,10 @@ import type { DragOverEvent } from '@dnd-kit/core'
 import type React from 'react'
 import { isPaletteDrag, type DesignerDragData } from '../../types/designer-drag'
 import type { FormFieldSchema } from '../../types/schema'
-import type { FieldIndex } from '../reducer'
-import { findInTree } from '../reducer'
 import { CANVAS_ROOT_HEAD_ID, CANVAS_ROOT_ID } from '../Canvas'
-import { isAncestorOfByIndex } from './positionResolver'
+import type { FieldIndex } from '../reducer'
 import { computeDropTarget, type DragOverState } from './computeDropTarget'
+import { isAncestorOfByIndex, parseOverId, resolveContainer } from './positionResolver'
 
 export function createHandleDragOver(
   tryUpdateDragOverState: (state: DragOverState) => void,
@@ -40,23 +39,32 @@ export function createHandleDragOver(
     }
 
     // 拖到 region 空白区
-    const regionMatch = overId.match(/^(.+)__region_(\w+)$/)
-    if (regionMatch) {
-      const containerId = regionMatch[1]
-      if (isAncestorOfByIndex(fieldIndex, activeId, containerId)) return
-      const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
+    const parsed = parseOverId(overId)
+    if (parsed.type === 'region') {
+      if (isAncestorOfByIndex(fieldIndex, activeId, parsed.containerId!)) return
+      const container = resolveContainer(parsed, fields, fieldIndex)
       if (!container) return
-      tryUpdateDragOverState({ activeId, parentId: containerId, index: container.children.length, regionKey: regionMatch[2], source: 'canvas' })
+      tryUpdateDragOverState({
+        activeId,
+        parentId: parsed.containerId,
+        index: container.children.length,
+        regionKey: parsed.regionKey,
+        source: 'canvas',
+      })
       return
     }
 
     // 拖到容器空白区
-    if (overId.endsWith('__container')) {
-      const containerId = overId.replace(/__container$/, '')
-      if (isAncestorOfByIndex(fieldIndex, activeId, containerId)) return
-      const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
+    if (parsed.type === 'container') {
+      if (isAncestorOfByIndex(fieldIndex, activeId, parsed.containerId!)) return
+      const container = resolveContainer(parsed, fields, fieldIndex)
       if (!container) return
-      tryUpdateDragOverState({ activeId, parentId: containerId, index: container.children.length, source: 'canvas' })
+      tryUpdateDragOverState({
+        activeId,
+        parentId: parsed.containerId,
+        index: container.children.length,
+        source: 'canvas',
+      })
       return
     }
 
@@ -69,7 +77,13 @@ export function createHandleDragOver(
       const key = `${activeId}|${overEntry.parentId ?? ''}|${overEntry.index}|${overEntry.regionKey ?? ''}|canvas`
       if (lastDragOverKeyRef.current !== key) {
         lastDragOverKeyRef.current = key
-        updateDragOverState({ activeId, parentId: overEntry.parentId ?? undefined, index: overEntry.index, regionKey: overEntry.regionKey, source: 'canvas' })
+        updateDragOverState({
+          activeId,
+          parentId: overEntry.parentId ?? undefined,
+          index: overEntry.index,
+          regionKey: overEntry.regionKey,
+          source: 'canvas',
+        })
       }
       return
     }

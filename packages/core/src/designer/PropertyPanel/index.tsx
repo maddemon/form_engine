@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { getComponentCategory, getComponentLabel } from '../../components'
+import { getComponentLabel, isButtonComponent, isContainerComponent, isFormComponent } from '../../components'
 import { useLocale } from '../../locale'
 import { PropsRenderMap } from '../../propRenders'
 import { customComponentRegistry } from '../../registry/customComponentRegistry'
+import { PANEL_BORDER, SectionTitle } from '../../shared/UIPrimitives'
 import { useStyle } from '../../styles'
 import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { DesignerAction, PropertyPanelTab } from '../../types/designer'
@@ -11,7 +12,6 @@ import type { FormConfig, FormFieldSchema } from '../../types/schema'
 import { resolvePanelWidth } from '../../utils'
 import { defaultDesignerWidgets } from '../../widgets'
 import { FormConfigPanel } from '../FormConfigPanel'
-import { PANEL_BORDER, SectionTitle } from '../../shared/UIPrimitives'
 import { DefaultPropertyContent } from './DefaultPropertyContent'
 import { PropertyPanelTabs } from './PropertyPanelTabs'
 
@@ -42,7 +42,7 @@ interface PropertyPanelProps {
 }
 
 function useWidgets(designerWidgets?: DesignerWidgets) {
-  return { ...defaultDesignerWidgets, ...designerWidgets } as DesignerWidgets
+  return useMemo(() => ({ ...defaultDesignerWidgets, ...designerWidgets }) as DesignerWidgets, [designerWidgets])
 }
 
 function PropertyPanelInner({
@@ -66,11 +66,13 @@ function PropertyPanelInner({
 }) {
   const { t } = useLocale()
   const ComponentPropsRender = PropsRenderMap[field.type]
-  const customConfig = useMemo(() => (!ComponentPropsRender ? customComponentRegistry.get(field.type) : null), [ComponentPropsRender, field.type])
-  const category = getComponentCategory(field.type)
-  const isForm = Array.isArray(category) ? category.includes('form') : category === 'form'
-  const isContainer = Array.isArray(category) ? category.includes('container') : category === 'container'
-  const isButton = Array.isArray(category) ? category.includes('button') : category === 'button'
+  const customConfig = useMemo(
+    () => (!ComponentPropsRender ? customComponentRegistry.get(field.type) : null),
+    [ComponentPropsRender, field.type],
+  )
+  const isForm = isFormComponent(field.type)
+  const isContainer = isContainerComponent(field.type)
+  const isButton = isButtonComponent(field.type)
 
   const onUpdateProp = useCallback(
     (key: string, value: unknown) => {
@@ -143,7 +145,9 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   const resolvedWidth = resolvePanelWidth(width, token('panelConfigWidth') as string, MIN_PROPERTIES_WIDTH)
   const hasTabs = propertyPanelTabs && propertyPanelTabs.length > 0
   const [activeTab, setActiveTab] = useState(PROPERTIES_DEFAULT_TAB_KEY)
-  const allTabs = hasTabs ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: locale.designer.propertyPanel.title }, ...(propertyPanelTabs || [])] : []
+  const allTabs = hasTabs
+    ? [{ key: PROPERTIES_DEFAULT_TAB_KEY, title: locale.designer.propertyPanel.title }, ...(propertyPanelTabs || [])]
+    : []
 
   /**
    * 无字段时扩展 Tab 的 onUpdate / onUpdateProp 退化为 no-op

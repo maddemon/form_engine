@@ -1,15 +1,21 @@
 import { useDroppable, type UniqueIdentifier } from '@dnd-kit/core'
 import React, { useCallback, useMemo, useState } from 'react'
-import type { DeviceScene } from '../../types/adapter-field'
-import { useStyle } from '../../styles'
 import { useLocale } from '../../locale'
+import { useStyle } from '../../styles'
+import type { DeviceScene } from '../../types/adapter-field'
 import type { FormFieldSchema } from '../../types/schema'
-import { CanvasToolbar } from './CanvasToolbar'
-import { ComponentTree, type TreeItem } from './ComponentTree'
-import { useDesignerDispatch, useDesignerSelection, useDesignerScene, useDesignerFormConfig, useDesignerAdapters } from '../DesignerContext'
+import { EmptyContainerPlaceholder } from '../ContainerPreview/EmptyContainerPlaceholder'
+import {
+  useDesignerAdapters,
+  useDesignerDispatch,
+  useDesignerFormConfig,
+  useDesignerScene,
+  useDesignerSelection,
+} from '../DesignerContext'
 import type { DragOverState } from '../Dnd/useDndHandlers'
 import { RootFields } from '../RootFields'
-import { EmptyContainerPlaceholder } from '../ContainerPreview/EmptyContainerPlaceholder'
+import { CanvasToolbar } from './CanvasToolbar'
+import { ComponentTree, type TreeItem } from './ComponentTree'
 
 export const CANVAS_ROOT_ID = 'canvas-root'
 export const CANVAS_ROOT_HEAD_ID = 'canvas-root-head'
@@ -52,7 +58,14 @@ function buildTreeData(fields: FormFieldSchema[]): TreeItem[] {
   }))
 }
 
-export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange, canUndo = false, canRedo = false, dragOverState }) => {
+export const Canvas: React.FC<CanvasProps> = ({
+  fields,
+  activeId,
+  onSceneChange,
+  canUndo = false,
+  canRedo = false,
+  dragOverState,
+}) => {
   const dispatch = useDesignerDispatch()
   const { selectedFieldId, onSelectField } = useDesignerSelection()
   const scene = useDesignerScene()
@@ -68,15 +81,13 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
 
   // Page background: from formConfig, default to white
   const defaultBg = 'var(--fe-bg-primary)'
-  const pageBg = (scene === 'mobile'
-    ? formConfig.mobile.pageBackground
-    : formConfig.desktop.pageBackground) ?? defaultBg
+  const pageBg =
+    (scene === 'mobile' ? formConfig.mobile.pageBackground : formConfig.desktop.pageBackground) ?? defaultBg
 
   const { token } = useStyle()
   const handleUndo = useCallback(() => dispatch({ type: 'UNDO' }), [dispatch])
   const handleRedo = useCallback(() => dispatch({ type: 'REDO' }), [dispatch])
   const handleTreeClick = useCallback(() => setShowTree((prev) => !prev), [])
-  const handleSelectField = useCallback((id: string | null) => onSelectField(id), [onSelectField])
   const handleCloseTree = useCallback(() => setShowTree(false), [])
 
   return (
@@ -91,9 +102,25 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
         overflow: 'hidden',
       }}
     >
-      <CanvasToolbar scene={scene} onSceneChange={onSceneChange} canUndo={canUndo} canRedo={canRedo} onUndo={handleUndo} onRedo={handleRedo} onTreeClick={handleTreeClick} showTree={showTree} />
+      <CanvasToolbar
+        scene={scene}
+        onSceneChange={onSceneChange}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onTreeClick={handleTreeClick}
+        showTree={showTree}
+      />
 
-      {showTree && <ComponentTree items={treeData} selectedId={selectedFieldId} onSelect={handleSelectField} onClose={handleCloseTree} />}
+      {showTree && (
+        <ComponentTree
+          items={treeData}
+          selectedId={selectedFieldId}
+          onSelect={onSelectField}
+          onClose={handleCloseTree}
+        />
+      )}
 
       <div
         style={{
@@ -121,7 +148,11 @@ export const Canvas: React.FC<CanvasProps> = ({ fields, activeId, onSceneChange,
           }}
         >
           {fields.length === 0 && !activeId && (
-            <EmptyContainerPlaceholder containerId={CANVAS_ROOT_ID} variant="dashed" text={t('designer.canvasEmptyHint') ?? 'Drag components here'} />
+            <EmptyContainerPlaceholder
+              containerId={CANVAS_ROOT_ID}
+              variant="dashed"
+              text={t('designer.canvasEmptyHint') ?? 'Drag components here'}
+            />
           )}
 
           <CanvasRootHead />

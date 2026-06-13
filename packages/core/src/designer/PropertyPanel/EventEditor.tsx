@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { getEventDeclarations } from '../../components'
 import { useLocale } from '../../locale'
 import { customComponentRegistry } from '../../registry/customComponentRegistry'
 import type { DesignerWidgets } from '../../types/adapter-designer'
 import type { DesignerAction } from '../../types/designer'
-import type { EventDeclaration, FormFieldEvents } from '../../types/events'
+import type { EventDeclaration, EventHandler, FormFieldEvents } from '../../types/events'
 import type { PropertySlots } from '../../types/property-slot'
 import type { FormFieldSchema } from '../../types/schema'
 import { CollapsibleSection } from './CollapsibleSection'
@@ -28,6 +28,25 @@ interface EventEditorProps {
 export function EventEditor({ field, w, dispatch, slots }: EventEditorProps) {
   const { locale } = useLocale()
   const eventDeclarations = useMemo(() => getFieldEventDeclarations(field.type), [field.type])
+
+  const handleEventChange = useCallback(
+    (eventName: string, handler: EventHandler | undefined) => {
+      const next: FormFieldEvents = { ...(field.events || {}) }
+      if (handler) {
+        next[eventName] = handler
+      } else {
+        delete next[eventName]
+      }
+      const cleaned = Object.keys(next).length > 0 ? next : undefined
+      dispatch({
+        type: 'UPDATE_FIELD',
+        fieldId: field.id,
+        patch: { events: cleaned },
+      })
+    },
+    [field.events, field.id, dispatch],
+  )
+
   if (eventDeclarations.length === 0) return null
 
   return (
@@ -43,20 +62,7 @@ export function EventEditor({ field, w, dispatch, slots }: EventEditorProps) {
           value={field.events?.[decl.name]}
           widgets={w}
           slots={slots}
-          onChange={(handler) => {
-            const next: FormFieldEvents = { ...(field.events || {}) }
-            if (handler) {
-              next[decl.name] = handler
-            } else {
-              delete next[decl.name]
-            }
-            const cleaned = Object.keys(next).length > 0 ? next : undefined
-            dispatch({
-              type: 'UPDATE_FIELD',
-              fieldId: field.id,
-              patch: { events: cleaned },
-            })
-          }}
+          onChange={(handler) => handleEventChange(decl.name, handler)}
         />
       ))}
     </CollapsibleSection>

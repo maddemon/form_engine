@@ -58,6 +58,15 @@ export function useDebouncedFieldUpdate<T>(
     skipRef.current = skip
   })
 
+  // 切换字段/属性时重置编辑状态，确保 sync effect 正常执行
+  useEffect(() => {
+    isEditingRef.current = false
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = undefined
+    }
+  }, [fieldId, key])
+
   // 外部值变化时同步到本地（仅当用户未在编辑时，避免覆盖用户输入）
   useEffect(() => {
     if (!isEditingRef.current) {

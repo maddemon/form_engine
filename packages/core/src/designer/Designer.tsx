@@ -1,20 +1,26 @@
 import { DndContext, DragOverlay } from '@dnd-kit/core'
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 import { getComponentIcon } from '../components'
-import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
 import { LocaleProvider } from '../locale/LocaleProvider'
-import type { DeviceScene } from '../types/adapter-field'
+import { StyleProvider, useEnsureDefaultTheme, useHasStyleProvider, useStyle } from '../styles'
 import type { FormEngineAdapter } from '../types/adapter'
+import type { DeviceScene } from '../types/adapter-field'
 import type { DesignerProps } from '../types/designer'
 import type { FormFieldSchema, FormSchema } from '../types/schema'
 import { Canvas } from './Canvas'
-import { DesignerDispatchContext, DesignerSelectionContext, DesignerSceneContext, DesignerFormConfigContext, DesignerAdapterContext, DesignerConfigContext } from './DesignerContext'
+import {
+  DesignerDispatchContext,
+  DesignerSceneContext,
+  DesignerSelectionContext,
+  DesignerFormConfigContext,
+  DesignerAdapterContext,
+} from './DesignerContext'
 import { useDndHandlers, type DndState } from './Dnd/useDndHandlers'
+import { useDesignerSync } from './hooks/useDesignerSync'
 import { PalettePanel, getFullPaletteGroups } from './PalettePanel'
 import { PropertyPanel } from './PropertyPanel'
 import type { DesignerStateWithHistory } from './reducer'
 import { buildFieldIndex, designerReducerWithHistory, findInTree, type FieldIndex } from './reducer'
-import { useDesignerSync } from './hooks/useDesignerSync'
 
 function useFieldIndex(fields: FormFieldSchema[]): FieldIndex {
   return useMemo(() => buildFieldIndex(fields), [fields])
@@ -75,7 +81,12 @@ const DragGhost: React.FC<DndState> = React.memo(({ activeDragType, activeDragLa
   const { token } = useStyle()
   if (!activeDragLabel) return null
   return (
-    <div style={{ ...DRAG_GHOST_BASE_STYLE, boxShadow: token('widgetCanvasDndShadow') as React.CSSProperties['boxShadow'] }}>
+    <div
+      style={{
+        ...DRAG_GHOST_BASE_STYLE,
+        boxShadow: token('widgetCanvasDndShadow') as React.CSSProperties['boxShadow'],
+      }}
+    >
       <span style={DRAG_GHOST_ICON_STYLE}>{getComponentIcon(activeDragType) || null}</span>
       {activeDragLabel}
     </div>
@@ -175,12 +186,21 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
 
   const fieldIndex = useFieldIndex(state.schema.fields)
   const selectedField = useMemo(
-    () => (state.selectedFieldId ? (fieldIndex.get(state.selectedFieldId)?.field ?? findInTree(state.schema.fields, state.selectedFieldId)) || null : null),
+    () =>
+      state.selectedFieldId
+        ? (fieldIndex.get(state.selectedFieldId)?.field ?? findInTree(state.schema.fields, state.selectedFieldId)) ||
+          null
+        : null,
     [state.selectedFieldId, fieldIndex, state.schema.fields],
   )
 
   // 根据 scene 选取画布 adapter；属性面板始终优先使用 desktopAdapter
-  const canvasAdapter = desktopAdapter && mobileAdapter ? (scene === 'mobile' ? mobileAdapter : desktopAdapter) : ((desktopAdapter ?? mobileAdapter) as FormEngineAdapter)
+  const canvasAdapter =
+    desktopAdapter && mobileAdapter
+      ? scene === 'mobile'
+        ? mobileAdapter
+        : desktopAdapter
+      : ((desktopAdapter ?? mobileAdapter) as FormEngineAdapter)
   const widgetsAdapter = (desktopAdapter ?? mobileAdapter) as FormEngineAdapter
 
   // 根据当前 scene 动态选择 bridgeProvider
@@ -194,15 +214,29 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
   const canRedo = state.historyIndex < state.snapshots.length - 1
 
   // DnD handlers
-  const { dndState, dragOverState, sensors, collisionDetection, handleDragStart, handleDragOver, handleDragEnd, handleDragCancel } = useDndHandlers(state.schema.fields, fieldIndex, dispatch)
+  const {
+    dndState,
+    dragOverState,
+    sensors,
+    collisionDetection,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    handleDragCancel,
+  } = useDndHandlers(state.schema.fields, fieldIndex, dispatch)
 
   const formConfig = state.schema.form
 
   const dispatchCtx = useMemo(() => ({ dispatch }), [dispatch])
-  const selectionCtx = useMemo(() => ({ selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField }), [state.selectedFieldId, handleSelectField])
-  const configCtx = useMemo(
-    () => ({ scene, formConfig, adapter: canvasAdapter, desktopAdapter: widgetsAdapter, mobileAdapter }),
-    [scene, formConfig, canvasAdapter, widgetsAdapter, mobileAdapter],
+  const selectionCtx = useMemo(
+    () => ({ selectedFieldId: state.selectedFieldId, onSelectField: handleSelectField }),
+    [state.selectedFieldId, handleSelectField],
+  )
+  const sceneCtx = useMemo(() => ({ scene }), [scene])
+  const formConfigCtx = useMemo(() => ({ formConfig }), [formConfig])
+  const adapterCtx = useMemo(
+    () => ({ adapter: canvasAdapter, desktopAdapter: widgetsAdapter, mobileAdapter }),
+    [canvasAdapter, widgetsAdapter, mobileAdapter],
   )
 
   // 核心渲染内容：不再用 useMemo 缓存整棵 JSX 树（依赖太多形同虚设）。
@@ -213,38 +247,61 @@ const DesignerInner: React.FC<DesignerInnerProps> = ({
   const content = (
     <DesignerDispatchContext.Provider value={dispatchCtx}>
       <DesignerSelectionContext.Provider value={selectionCtx}>
-        <DesignerSceneContext.Provider value={{ scene }}>
-          <DesignerFormConfigContext.Provider value={{ formConfig }}>
-            <DesignerAdapterContext.Provider value={{ adapter: canvasAdapter, desktopAdapter: widgetsAdapter, mobileAdapter }}>
-              <DesignerConfigContext.Provider value={configCtx}>
-                <div className="designer-scroll-container" style={ROOT_CONTAINER_STYLE}>
-                  <style>{SCROLLBAR_CSS}</style>
-                  <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-                    {!readOnly && (
-                      <PalettePanel groups={finalGroups} width={panelWidths?.palette} sidePanelTabs={sidePanelTabs} fields={state.schema.fields} selectedFieldId={state.selectedFieldId} dispatch={dispatch} />
-                    )}
+        <DesignerSceneContext.Provider value={sceneCtx}>
+          <DesignerFormConfigContext.Provider value={formConfigCtx}>
+            <DesignerAdapterContext.Provider value={adapterCtx}>
+              <div className="designer-scroll-container" style={ROOT_CONTAINER_STYLE}>
+                <style>{SCROLLBAR_CSS}</style>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={collisionDetection}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDragEnd={handleDragEnd}
+                  onDragCancel={handleDragCancel}
+                >
+                  {!readOnly && (
+                    <PalettePanel
+                      groups={finalGroups}
+                      width={panelWidths?.palette}
+                      sidePanelTabs={sidePanelTabs}
+                      fields={state.schema.fields}
+                      selectedFieldId={state.selectedFieldId}
+                      dispatch={dispatch}
+                    />
+                  )}
 
-                    <div style={CANVAS_WRAPPER_STYLE}>
-                      <Canvas fields={state.schema.fields} activeId={dndState.activeDragId} onSceneChange={setSceneState} canUndo={canUndo} canRedo={canRedo} dragOverState={dragOverState} />
-                    </div>
+                  <div style={CANVAS_WRAPPER_STYLE}>
+                    <Canvas
+                      fields={state.schema.fields}
+                      activeId={dndState.activeDragId}
+                      onSceneChange={setSceneState}
+                      canUndo={canUndo}
+                      canRedo={canRedo}
+                      dragOverState={dragOverState}
+                    />
+                  </div>
 
-                    <DragOverlay dropAnimation={null}>
-                      <DragGhost activeDragId={dndState.activeDragId} activeDragLabel={dndState.activeDragLabel} activeDragType={dndState.activeDragType} />
-                    </DragOverlay>
-                  </DndContext>
+                  <DragOverlay dropAnimation={null}>
+                    <DragGhost
+                      activeDragId={dndState.activeDragId}
+                      activeDragLabel={dndState.activeDragLabel}
+                      activeDragType={dndState.activeDragType}
+                    />
+                  </DragOverlay>
+                </DndContext>
 
-                  <PropertyPanel
-                    field={selectedField}
-                    formConfig={state.schema.form}
-                    dispatch={dispatch}
-                    designerWidgets={widgetsAdapter?.designerWidgets}
-                    width={panelWidths?.properties}
-                    propertyPanelTabs={propertyPanelTabs}
-                    propertySlots={propertySlots}
-                    allFields={state.schema.fields}
-                  />
-                </div>
-              </DesignerConfigContext.Provider>
+                <PropertyPanel
+                  field={selectedField}
+                  formConfig={state.schema.form}
+                  dispatch={dispatch}
+                  designerWidgets={widgetsAdapter?.designerWidgets}
+                  width={panelWidths?.properties}
+                  propertyPanelTabs={propertyPanelTabs}
+                  propertySlots={propertySlots}
+                  allFields={state.schema.fields}
+                />
+              </div>
             </DesignerAdapterContext.Provider>
           </DesignerFormConfigContext.Provider>
         </DesignerSceneContext.Provider>

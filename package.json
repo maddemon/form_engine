@@ -8,6 +8,7 @@
     "dev": "pnpm --filter @form-engine/* dev",
     "dev:example": "pnpm --filter example dev",
     "build": "pnpm check:tokens && pnpm --filter @form-engine/core --filter @form-engine/adapter-antd --filter @form-engine/adapter-antd-mobile build",
+    "build:example": "pnpm build && pnpm --filter @form-engine/example build",
     "clean": "pnpm -r clean",
     "test": "pnpm check:tokens && pnpm --filter @form-engine/* test",
     "lint": "eslint .",

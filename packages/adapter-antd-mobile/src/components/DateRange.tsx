@@ -1,16 +1,10 @@
 import type { DateRangeProps } from '@form-engine/core'
+import { isTimeFormat } from '@form-engine/core/utils/date'
 import { DatePicker, Space } from 'antd-mobile'
 import { CalendarOutline, CloseCircleFill } from 'antd-mobile-icons'
 import { useLocale } from '@form-engine/core/locale'
 import React from 'react'
-
-function isTimeFormat(fmt: string): boolean {
-  return /\b(H{1,2}|m{1,2}|s{1,2})\b/.test(fmt)
-}
-
-function formatDate(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
+import { formatDate } from '../utils'
 
 export const DateRangePicker: React.FC<DateRangeProps> = ({
   value,

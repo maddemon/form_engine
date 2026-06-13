@@ -8,7 +8,7 @@
  * - callback：回调名输入
  */
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { listActionNames } from '../../events'
 import { useLocale } from '../../locale'
 import { FieldItem } from '../../propRenders/shared'
@@ -67,18 +67,48 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
     borderRadius: token('borderRadiusSm') as string,
   }
 
-  const handleTypeChange = (newType: EventHandlerType | '') => {
-    if (!newType) {
-      onChange(undefined)
-      return
-    }
-    // 切换类型时初始化对应字段
-    const next: EventHandler = { type: newType }
-    if (newType === 'expression') next.expression = ''
-    else if (newType === 'action') next.action = listActionNames()[0] ?? ''
-    else if (newType === 'callback') next.callback = ''
-    onChange(next)
-  }
+  const handleTypeChange = useCallback(
+    (newType: EventHandlerType | '') => {
+      if (!newType) {
+        onChange(undefined)
+        return
+      }
+      const next: EventHandler = { type: newType }
+      if (newType === 'expression') next.expression = ''
+      else if (newType === 'action') next.action = listActionNames()[0] ?? ''
+      else if (newType === 'callback') next.callback = ''
+      onChange(next)
+    },
+    [onChange],
+  )
+
+  const handleExpressionChange = useCallback(
+    (v: unknown) => {
+      if (value?.type === 'expression') onChange({ ...value, expression: v as string })
+    },
+    [value, onChange],
+  )
+
+  const handleActionChange = useCallback(
+    (v: unknown) => {
+      if (value?.type === 'action') onChange({ ...value, action: v as string })
+    },
+    [value, onChange],
+  )
+
+  const handleParamsChange = useCallback(
+    (v: unknown) => {
+      if (value?.type === 'action') onChange({ ...value, params: v as Record<string, unknown> | undefined })
+    },
+    [value, onChange],
+  )
+
+  const handleCallbackChange = useCallback(
+    (v: unknown) => {
+      if (value?.type === 'callback') onChange({ ...value, callback: String(v) })
+    },
+    [value, onChange],
+  )
 
   return (
     <div style={containerStyle}>
@@ -95,7 +125,7 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
           {/* eslint-disable-next-line react-hooks/static-components */}
           <ExpressionEditorSlot
             value={value.expression || ''}
-            onChange={(v) => onChange({ ...value, expression: v as string })}
+            onChange={handleExpressionChange}
             placeholder={eh.expressionPlaceholder}
           />
           <Text type="tertiary" style={{ marginTop: token('spacingXxs') }}>
@@ -109,7 +139,7 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
           <FieldItem label={eh.actionLabel} variant="group">
             <w.Select
               value={value.action || ''}
-              onChange={(v) => onChange({ ...value, action: v })}
+              onChange={handleActionChange}
               options={listActionNames().map((name) => ({ label: name, value: name }))}
             />
           </FieldItem>
@@ -117,7 +147,7 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
             {/* eslint-disable-next-line react-hooks/static-components */}
             <JsonEditorSlot
               value={value.params}
-              onChange={(v) => onChange({ ...value, params: v as Record<string, unknown> | undefined })}
+              onChange={handleParamsChange}
               placeholder={eh.actionParamsPlaceholder}
             />
           </FieldItem>
@@ -128,7 +158,7 @@ export const EventHandlerEditor: React.FC<EventHandlerEditorProps> = ({
         <FieldItem variant="group" label={eh.callbackNameLabel}>
           <w.Input
             value={value.callback || ''}
-            onChange={(v) => onChange({ ...value, callback: String(v) })}
+            onChange={handleCallbackChange}
             placeholder={eh.callbackNamePlaceholder}
           />
         </FieldItem>

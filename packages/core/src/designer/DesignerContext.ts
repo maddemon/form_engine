@@ -1,7 +1,7 @@
 import React, { createContext, useContext } from 'react'
-import type { SelectedFieldId, DesignerAction } from '../types/designer'
-import type { DeviceScene } from '../types/adapter-field'
 import type { FormEngineAdapter } from '../types/adapter'
+import type { DeviceScene } from '../types/adapter-field'
+import type { DesignerAction, SelectedFieldId } from '../types/designer'
 import type { FormConfig } from '../types/schema'
 
 // ============================
@@ -17,22 +17,6 @@ export interface DesignerDispatchContextValue {
 export interface DesignerSelectionContextValue {
   selectedFieldId: SelectedFieldId
   onSelectField: (id: string | null) => void
-}
-
-/** Config Context（配置级，极少变化） */
-export interface DesignerConfigContextValue {
-  scene: DeviceScene
-  formConfig: FormConfig
-  /** 画布 adapter（跟随 scene 切换） */
-  adapter: FormEngineAdapter
-  /** 属性面板 widgets 所用的 desktop adapter（始终优先 desktop） */
-  desktopAdapter: FormEngineAdapter
-  /**
-   * mobile adapter（用户在 Designer 上传的）。可选：
-   * - 上传时一并注入到 context，让 PropertyPanel 内的 JSX 编辑器能展示移动端可用 scope
-   * - 未上传时为 undefined，PropertyPanel 不会展示移动端 scope
-   */
-  mobileAdapter?: FormEngineAdapter
 }
 
 // ── Scene Context ──────────────────────────────────────────────────
@@ -65,12 +49,6 @@ export interface DesignerAdapterContextValue {
 const DesignerDispatchContext = createContext<DesignerDispatchContextValue | null>(null)
 const DesignerSelectionContext = createContext<DesignerSelectionContextValue | null>(null)
 
-/**
- * @deprecated 请使用更细粒度的 DesignerSceneContext / DesignerFormConfigContext / DesignerAdapterContext。
- * 此 Context 保留导出以兼容外部直接 `useContext(DesignerConfigContext)` 的 consumer。
- */
-const DesignerConfigContext = createContext<DesignerConfigContextValue | null>(null)
-
 // ── 新增的三个细粒度 Context ──────────────────────────────────────
 
 const DesignerSceneContext = createContext<DesignerSceneContextValue | null>(null)
@@ -87,16 +65,6 @@ export function useDesignerSelection(): DesignerSelectionContextValue {
   const ctx = useContext(DesignerSelectionContext)
   if (!ctx) throw new Error('useDesignerSelection must be used inside DesignerContext.Provider')
   return ctx
-}
-
-/**
- * @deprecated 请改用 useDesignerScene() / useDesignerFormConfig() / useDesignerAdapters()。
- */
-export function useDesignerConfig(): DesignerConfigContextValue {
-  const scene = useDesignerScene()
-  const formConfig = useDesignerFormConfig()
-  const adapters = useDesignerAdapters()
-  return { scene, formConfig, ...adapters }
 }
 
 /** 仅返回 scene 值，订阅最小粒度 */
@@ -121,11 +89,10 @@ export function useDesignerAdapters(): DesignerAdapterContextValue {
 }
 
 export {
-  DesignerDispatchContext,
-  DesignerSelectionContext,
-  /** @deprecated 请使用 DesignerSceneContext / DesignerFormConfigContext / DesignerAdapterContext */
-  DesignerConfigContext,
-  DesignerSceneContext,
-  DesignerFormConfigContext,
   DesignerAdapterContext,
+  DesignerDispatchContext,
+  DesignerFormConfigContext,
+  DesignerSceneContext,
+  DesignerSelectionContext
 }
+

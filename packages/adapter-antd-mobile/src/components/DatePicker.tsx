@@ -1,20 +1,10 @@
 import { DatePickerProps } from '@form-engine/core'
+import { isTimeFormat } from '@form-engine/core/utils/date'
 import { useLocale } from '@form-engine/core/locale'
 import { DatePicker as AntmDatePicker, Space } from 'antd-mobile'
 import { CalendarOutline, CloseCircleFill } from 'antd-mobile-icons'
 import React from 'react'
-
-function isTimeFormat(fmt: string): boolean {
-  return /\b(H{1,2}|m{1,2}|s{1,2})\b/.test(fmt)
-}
-
-function formatDate(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-function formatDateTime(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-}
+import { formatDate, formatDateTime } from '../utils'
 
 function formatDisplayDate(d: Date, showTime: boolean): string {
   const datePart = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`

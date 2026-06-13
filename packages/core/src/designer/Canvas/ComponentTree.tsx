@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { useStyle } from '../../styles'
 import { useLocale } from '../../locale'
 import { Space } from '../../widgets/Space'
+import { Text } from '../../widgets/Text'
 import { WidgetButton } from '../../widgets/Button'
 
 export interface TreeItem {
@@ -25,25 +26,23 @@ interface TreeNodeProps {
   depth: number
 }
 
-const TreeNode: React.FC<TreeNodeProps> = ({ item, selectedId, onSelect, depth }) => {
+const TreeNode: React.FC<TreeNodeProps> = React.memo(({ item, selectedId, onSelect, depth }) => {
   const { token } = useStyle()
+  const nodeStyle: React.CSSProperties = {
+    padding: '2px 4px',
+    cursor: 'pointer',
+    fontSize: token('fontSizeSm'),
+    background: selectedId === item.id ? 'var(--fe-primary-bg)' : 'transparent',
+    color: selectedId === item.id ? 'var(--fe-primary)' : 'var(--fe-text-primary)',
+    borderRadius: 'var(--fe-border-radius-xs)',
+    marginLeft: depth * parseInt(token('spacingMd') as string),
+  }
   return (
     <div>
-      <div
-        onClick={() => onSelect(item.id)}
-        style={{
-          padding: '2px 4px',
-          cursor: 'pointer',
-          fontSize: token('fontSizeSm'),
-          background: selectedId === item.id ? 'var(--fe-primary-bg)' : 'transparent',
-          color: selectedId === item.id ? 'var(--fe-primary)' : 'var(--fe-text-primary)',
-          borderRadius: 'var(--fe-border-radius-xs)',
-          marginLeft: depth * parseInt(token('spacingMd') as string),
-        }}
-      >
+      <div onClick={() => onSelect(item.id)} style={nodeStyle}>
         <Space gap="xs" align="center">
           {item.children.length ? '📁' : '📄'} {item.label}
-          <span style={{ color: 'var(--fe-text-muted)', fontSize: token('fontSizeIcon') }}>({item.type})</span>
+          <Text type="secondary">({item.type})</Text>
         </Space>
       </div>
       {item.children.map(child => (
@@ -51,7 +50,8 @@ const TreeNode: React.FC<TreeNodeProps> = ({ item, selectedId, onSelect, depth }
       ))}
     </div>
   )
-}
+})
+TreeNode.displayName = 'TreeNode'
 
 export const ComponentTree: React.FC<ComponentTreeProps> = ({ items, selectedId, onSelect, onClose }) => {
   const { token } = useStyle()
@@ -68,25 +68,24 @@ export const ComponentTree: React.FC<ComponentTreeProps> = ({ items, selectedId,
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [onClose])
 
+  const popupStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: 36,
+    left: 0,
+    width: token('panelFieldListWidth'),
+    padding: `${token('spacingSm')} ${token('spacingMd')}`,
+    background: 'var(--fe-bg-elevated)',
+    border: '1px solid var(--fe-border-light)',
+    borderRadius: token('borderRadiusMd'),
+    boxShadow: 'var(--fe-shadow-lg)',
+    maxHeight: 300,
+    overflow: 'auto',
+    fontSize: token('fontSizeSm'),
+    zIndex: 100,
+  }
+
   return (
-    <div
-      ref={ref}
-      style={{
-        position: 'absolute',
-        top: 36,
-        left: 0,
-        width: token('panelFieldListWidth'),
-        padding: `${token('spacingSm')} ${token('spacingMd')}`,
-        background: 'var(--fe-bg-elevated)',
-        border: '1px solid var(--fe-border-light)',
-        borderRadius: token('borderRadiusMd'),
-        boxShadow: 'var(--fe-shadow-lg)',
-        maxHeight: 300,
-        overflow: 'auto',
-        fontSize: token('fontSizeSm'),
-        zIndex: 100,
-      }}
-    >
+    <div ref={ref} style={popupStyle}>
       <Space justify="space-between" gap={0} style={{ marginBottom: token('spacingSm') }}>
         <strong style={{ fontSize: token('fontSizeSm') }}>{locale.designer.canvasToolbar.componentTree}</strong>
         <WidgetButton type="text" size="sm" onClick={onClose} label={locale.designer.canvasToolbar.close} style={{ padding: '0 2px', lineHeight: 1 }}>✕</WidgetButton>

@@ -4,7 +4,43 @@ import { CANVAS_ROOT_HEAD_ID, CANVAS_ROOT_ID } from '../Canvas'
 import type { FieldIndex } from '../reducer'
 import { findInTree } from '../reducer'
 
-export function findFieldPosition(fields: FormFieldSchema[], fieldId: string, parentId?: string): { parentId?: string; index: number; regionKey?: string } | null {
+export interface ParsedOverId {
+  type: 'root' | 'rootHead' | 'container' | 'region' | 'field'
+  id: string
+  containerId?: string
+  regionKey?: string
+}
+
+export function parseOverId(overId: string): ParsedOverId {
+  if (overId === CANVAS_ROOT_HEAD_ID) return { type: 'rootHead', id: overId }
+  if (overId === CANVAS_ROOT_ID) return { type: 'root', id: overId }
+
+  const regionMatch = overId.match(/^(.+)__region_(\w+)$/)
+  if (regionMatch) {
+    return { type: 'region', id: overId, containerId: regionMatch[1], regionKey: regionMatch[2] }
+  }
+
+  if (overId.endsWith('__container')) {
+    return { type: 'container', id: overId, containerId: overId.replace(/__container$/, '') }
+  }
+
+  return { type: 'field', id: overId }
+}
+
+export function resolveContainer(
+  parsed: ParsedOverId,
+  fields: FormFieldSchema[],
+  fieldIndex: FieldIndex,
+): FormFieldSchema | undefined {
+  if (!parsed.containerId) return undefined
+  return fieldIndex.get(parsed.containerId)?.field ?? findInTree(fields, parsed.containerId)
+}
+
+export function findFieldPosition(
+  fields: FormFieldSchema[],
+  fieldId: string,
+  parentId?: string,
+): { parentId?: string; index: number; regionKey?: string } | null {
   const field = fields.find((f) => f.id === fieldId)
   if (field) return { parentId, index: fields.indexOf(field), regionKey: field.regionKey }
 
@@ -17,25 +53,20 @@ export function findFieldPosition(fields: FormFieldSchema[], fieldId: string, pa
   return null
 }
 
-export function resolveDropTarget(overId: string, fields: FormFieldSchema[], fieldIndex: FieldIndex): { parentId?: string; index: number; regionKey?: string } {
-  if (overId === CANVAS_ROOT_HEAD_ID) return { parentId: undefined, index: 0 }
-  if (overId === CANVAS_ROOT_ID) return { parentId: undefined, index: fields.length }
+export function resolveDropTarget(
+  overId: string,
+  fields: FormFieldSchema[],
+  fieldIndex: FieldIndex,
+): { parentId?: string; index: number; regionKey?: string } {
+  const parsed = parseOverId(overId)
 
-  if (overId.endsWith('__container')) {
-    const containerId = overId.replace(/__container$/, '')
-    const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
-    if (container) {
-      return { parentId: containerId, index: container.children.length }
-    }
-  }
+  if (parsed.type === 'rootHead') return { parentId: undefined, index: 0 }
+  if (parsed.type === 'root') return { parentId: undefined, index: fields.length }
 
-  const regionMatch = overId.match(/^(.+)__region_(\w+)$/)
-  if (regionMatch) {
-    const containerId = regionMatch[1]
-    const regionKey = regionMatch[2]
-    const container = fieldIndex.get(containerId)?.field ?? findInTree(fields, containerId)
+  if (parsed.type === 'region' || parsed.type === 'container') {
+    const container = resolveContainer(parsed, fields, fieldIndex)
     if (container) {
-      return { parentId: containerId, index: container.children.length, regionKey }
+      return { parentId: parsed.containerId, index: container.children.length, regionKey: parsed.regionKey }
     }
   }
 
@@ -50,7 +81,12 @@ export function resolveDropTarget(overId: string, fields: FormFieldSchema[], fie
   return { parentId: undefined, index: fields.length }
 }
 
-export function reorderFieldsInContainer(fields: FormFieldSchema[], containerId: string | undefined, fromIdx: number, toIdx: number): FormFieldSchema[] {
+export function reorderFieldsInContainer(
+  fields: FormFieldSchema[],
+  containerId: string | undefined,
+  fromIdx: number,
+  toIdx: number,
+): FormFieldSchema[] {
   if (!containerId) return arrayMove(fields, fromIdx, toIdx)
   return fields.map((f) => {
     if (f.id === containerId) {

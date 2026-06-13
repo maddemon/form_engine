@@ -5,6 +5,7 @@
 
 import type { DatePickerProps, DateRangeProps } from '@form-engine/core'
 import { useLocale } from '@form-engine/core/locale'
+import { isTimeFormat } from '@form-engine/core/utils/date'
 import { DatePicker as AntDatePicker, TimePicker as AntTimePicker } from 'antd'
 import enUS from 'antd/es/date-picker/locale/en_US'
 import zhCN from 'antd/es/date-picker/locale/zh_CN'
@@ -15,11 +16,6 @@ import React from 'react'
 import { useAdapterPlaceholder } from '../createAdapterComponent'
 
 const { RangePicker } = AntDatePicker
-
-/** 根据 format 字符串自动判断是否包含时间部分 */
-function isTimeFormat(fmt: string): boolean {
-  return /\b(H{1,2}|m{1,2}|s{1,2})\b/.test(fmt)
-}
 
 function toDayjs(value: string | undefined): dayjs.Dayjs | null {
   return value ? dayjs(value) : null

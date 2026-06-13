@@ -1,6 +1,14 @@
-import type { FormSchema, FormFieldSchema } from '../../types/schema'
 import type { DesignerAction } from '../../types/designer'
-import { cloneField, cloneFields, insertAfter, insertIntoTree, removeFieldById, removeFieldFromTree, updateFieldInTree } from './fieldOperations'
+import type { FormFieldSchema, FormSchema } from '../../types/schema'
+import {
+  cloneField,
+  cloneFields,
+  insertAfter,
+  insertIntoTree,
+  removeFieldById,
+  removeFieldFromTree,
+  updateFieldInTree,
+} from './fieldOperations'
 
 export interface DesignerState {
   schema: FormSchema
@@ -15,7 +23,9 @@ export interface DesignerStateWithHistory extends DesignerState {
 const MAX_SNAPSHOTS = 50
 
 function shouldSnapshot(action: DesignerAction): boolean {
-  return ['ADD_FIELD', 'REMOVE_FIELD', 'MOVE_FIELD', 'UPDATE_FIELD', 'COPY_FIELD', 'REORDER_FIELDS'].includes(action.type)
+  return ['ADD_FIELD', 'REMOVE_FIELD', 'MOVE_FIELD', 'UPDATE_FIELD', 'COPY_FIELD', 'REORDER_FIELDS'].includes(
+    action.type,
+  )
 }
 
 export interface FieldIndexEntry {
@@ -59,7 +69,7 @@ export function collectFieldNames(fields: FormFieldSchema[], excludeFieldId: str
   const names = new Set<string>()
   const walk = (list: FormFieldSchema[]) => {
     for (const f of list) {
-      if (f.id !== excludeFieldId) {
+      if (f.id !== excludeFieldId && f.name) {
         names.add(f.name)
       }
       walk(f.children)
@@ -71,7 +81,10 @@ export function collectFieldNames(fields: FormFieldSchema[], excludeFieldId: str
 
 // ── Action handlers ────────────────────────────────────────────────
 
-function handleSelectField(state: DesignerState, action: Extract<DesignerAction, { type: 'SELECT_FIELD' }>): DesignerState {
+function handleSelectField(
+  state: DesignerState,
+  action: Extract<DesignerAction, { type: 'SELECT_FIELD' }>,
+): DesignerState {
   return { ...state, selectedFieldId: action.fieldId }
 }
 
@@ -85,7 +98,7 @@ function handleAddField(state: DesignerState, action: Extract<DesignerAction, { 
   }
   if (action.parentId) {
     const addToParent = (nodes: FormFieldSchema[]): FormFieldSchema[] =>
-      nodes.map(n => {
+      nodes.map((n) => {
         if (n.id === action.parentId) return { ...n, children: [...n.children, fieldToAdd] }
         return { ...n, children: addToParent(n.children) }
       })
@@ -104,7 +117,10 @@ function handleAddField(state: DesignerState, action: Extract<DesignerAction, { 
   }
 }
 
-function handleRemoveField(state: DesignerState, action: Extract<DesignerAction, { type: 'REMOVE_FIELD' }>): DesignerState {
+function handleRemoveField(
+  state: DesignerState,
+  action: Extract<DesignerAction, { type: 'REMOVE_FIELD' }>,
+): DesignerState {
   const fields = removeFieldById(state.schema.fields, action.fieldId)
   return {
     ...state,
@@ -144,7 +160,10 @@ function handleCopyField(state: DesignerState, action: Extract<DesignerAction, {
   return { ...state, schema: { ...state.schema, fields }, selectedFieldId: copy.id || null }
 }
 
-function handleUpdateField(state: DesignerState, action: Extract<DesignerAction, { type: 'UPDATE_FIELD' }>): DesignerState {
+function handleUpdateField(
+  state: DesignerState,
+  action: Extract<DesignerAction, { type: 'UPDATE_FIELD' }>,
+): DesignerState {
   if (action.patch.name) {
     const allNames = collectFieldNames(state.schema.fields, action.fieldId)
     if (allNames.has(action.patch.name)) return state
@@ -153,7 +172,10 @@ function handleUpdateField(state: DesignerState, action: Extract<DesignerAction,
   return { ...state, schema: { ...state.schema, fields } }
 }
 
-function handleUpdateFormConfig(state: DesignerState, action: Extract<DesignerAction, { type: 'UPDATE_FORM_CONFIG' }>): DesignerState {
+function handleUpdateFormConfig(
+  state: DesignerState,
+  action: Extract<DesignerAction, { type: 'UPDATE_FORM_CONFIG' }>,
+): DesignerState {
   return {
     ...state,
     schema: { ...state.schema, form: { ...state.schema.form, ...action.patch } },
@@ -169,7 +191,10 @@ function handleSetSchema(state: DesignerState, action: Extract<DesignerAction, {
   }
 }
 
-function handleReorderFields(state: DesignerState, action: Extract<DesignerAction, { type: 'REORDER_FIELDS' }>): DesignerState {
+function handleReorderFields(
+  state: DesignerState,
+  action: Extract<DesignerAction, { type: 'REORDER_FIELDS' }>,
+): DesignerState {
   return { ...state, schema: { ...state.schema, fields: action.fields } }
 }
 
@@ -177,16 +202,26 @@ function handleReorderFields(state: DesignerState, action: Extract<DesignerActio
 
 export function designerReducer(state: DesignerState, action: DesignerAction): DesignerState {
   switch (action.type) {
-    case 'SELECT_FIELD':     return handleSelectField(state, action)
-    case 'ADD_FIELD':        return handleAddField(state, action)
-    case 'REMOVE_FIELD':     return handleRemoveField(state, action)
-    case 'MOVE_FIELD':       return handleMoveField(state, action)
-    case 'COPY_FIELD':       return handleCopyField(state, action)
-    case 'UPDATE_FIELD':     return handleUpdateField(state, action)
-    case 'UPDATE_FORM_CONFIG': return handleUpdateFormConfig(state, action)
-    case 'SET_SCHEMA':       return handleSetSchema(state, action)
-    case 'REORDER_FIELDS':   return handleReorderFields(state, action)
-    default:                 return state
+    case 'SELECT_FIELD':
+      return handleSelectField(state, action)
+    case 'ADD_FIELD':
+      return handleAddField(state, action)
+    case 'REMOVE_FIELD':
+      return handleRemoveField(state, action)
+    case 'MOVE_FIELD':
+      return handleMoveField(state, action)
+    case 'COPY_FIELD':
+      return handleCopyField(state, action)
+    case 'UPDATE_FIELD':
+      return handleUpdateField(state, action)
+    case 'UPDATE_FORM_CONFIG':
+      return handleUpdateFormConfig(state, action)
+    case 'SET_SCHEMA':
+      return handleSetSchema(state, action)
+    case 'REORDER_FIELDS':
+      return handleReorderFields(state, action)
+    default:
+      return state
   }
 }
 

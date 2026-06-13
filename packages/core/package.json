@@ -50,6 +50,11 @@
         "import": "./dist/locale/index.mjs",
         "require": "./dist/locale/index.js",
         "types": "./dist/locale/index.d.ts"
+      },
+      "./utils/date": {
+        "import": "./dist/utils/date.mjs",
+        "require": "./dist/utils/date.js",
+        "types": "./dist/utils/date.d.ts"
       }
     }
   },
@@ -89,6 +94,10 @@
     "./locale": {
       "import": "./src/locale/index.ts",
       "types": "./src/locale/index.ts"
+    },
+    "./utils/date": {
+      "import": "./src/utils/date.ts",
+      "types": "./src/utils/date.ts"
     }
   },
   "sideEffects": [
