@@ -24,29 +24,26 @@ A lightweight, schema-driven React form engine with a visual designer and multi-
 ### Install
 
 ```bash
-npm install @form-engine/core @form-engine/adapter-antd antd
+npm install @form-engine/core @form-engine/antd antd
 ```
 
 ### Basic Usage
 
 ```tsx
 import { Designer } from '@form-engine/core'
-import { antdAdapter } from '@form-engine/adapter-antd'
+import { antdAdapter } from '@form-engine/antd'
 import { ConfigProvider, theme } from 'antd'
 
 function App() {
   const [schema, setSchema] = useState(defaultSchema)
 
   return (
-    <ConfigProvider theme={{
-      algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
-    }}>
-      <Designer
-        value={schema}
-        onChange={setSchema}
-        desktopAdapter={antdAdapter}
-        themeMode="system"
-      />
+    <ConfigProvider
+      theme={{
+        algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+      }}
+    >
+      <Designer value={schema} onChange={setSchema} desktopAdapter={antdAdapter} themeMode="system" />
     </ConfigProvider>
   )
 }
@@ -56,7 +53,7 @@ function App() {
 
 ```tsx
 import { FormRender } from '@form-engine/core'
-import { antdAdapter } from '@form-engine/adapter-antd'
+import { antdAdapter } from '@form-engine/antd'
 
 function MyForm({ schema }) {
   const formRef = useRef<FormRenderHandle>(null)
@@ -79,11 +76,11 @@ function MyForm({ schema }) {
 
 ## Packages
 
-| Package | Description |
-|---|---|
-| `@form-engine/core` | Core types, designer, renderer, theme system |
-| `@form-engine/adapter-antd` | Ant Design adapter (desktop) |
-| `@form-engine/adapter-antd-mobile` | Ant Design Mobile adapter |
+| Package                    | Description                                  |
+| -------------------------- | -------------------------------------------- |
+| `@form-engine/core`        | Core types, designer, renderer, theme system |
+| `@form-engine/antd`        | Ant Design adapter (desktop)                 |
+| `@form-engine/antd-mobile` | Ant Design Mobile adapter                    |
 
 ## Development
 
@@ -106,4 +103,4 @@ MIT
 > Beside the sunken boat a thousand sails glide past,
 > Before the withered tree ten thousand blooms spring forth.
 >
-> — Liu Yuxi, *To Bai Juyi Met at the First Banquet in Yangzhou*
+> — Liu Yuxi, _To Bai Juyi Met at the First Banquet in Yangzhou_

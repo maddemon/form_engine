@@ -21,8 +21,8 @@ Trae IDE sandbox 中 `git stash` 会触发 sandbox bug 导致 `.git` 目录被�
 ```text
 packages/
   core/              @form-engine/core     — 类型、设计器、渲染器、主题系统（有测试）
-  adapter-antd/      @form-engine/adapter-antd — 桌面端 antd v6 适配（无测试）
-  adapter-antd-mobile/ @form-engine/adapter-antd-mobile — 移动端 antd-mobile v5（无测试）
+  antd/      @form-engine/antd — 桌面端 antd v6 适配（无测试）
+  antd-mobile/ @form-engine/antd-mobile — 移动端 antd-mobile v5（无测试）
 example/             — 演示应用（`pnpm dev:example`）
 ```
 
@@ -51,8 +51,8 @@ example/             — 演示应用（`pnpm dev:example`）
 
 ```tsx
 import { FormRender } from '@form-engine/core'
-import { antdAdapter } from '@form-engine/adapter-antd'
-import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+import { antdAdapter } from '@form-engine/antd'
+import { antdMobileAdapter } from '@form-engine/antd-mobile'
 
 // 显式选 adapter
 ;<FormRender schema={schema} adapter={scene === 'mobile' ? antdMobileAdapter : antdAdapter} />

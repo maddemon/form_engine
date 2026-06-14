@@ -24,14 +24,14 @@
 ### 安装
 
 ```bash
-npm install @form-engine/core @form-engine/adapter-antd antd
+npm install @form-engine/core @form-engine/antd antd
 ```
 
 ### 基本用法
 
 ```tsx
 import { Designer } from '@form-engine/core'
-import { antdAdapter } from '@form-engine/adapter-antd'
+import { antdAdapter } from '@form-engine/antd'
 import { ConfigProvider, theme } from 'antd'
 
 function App() {
@@ -56,7 +56,7 @@ function App() {
 
 ```tsx
 import { FormRender } from '@form-engine/core'
-import { antdAdapter } from '@form-engine/adapter-antd'
+import { antdAdapter } from '@form-engine/antd'
 
 function MyForm({ schema }) {
   const formRef = useRef<FormRenderHandle>(null)
@@ -82,8 +82,8 @@ function MyForm({ schema }) {
 | 包 | 说明 |
 |---|---|
 | `@form-engine/core` | 核心类型、设计器、渲染器、主题系统 |
-| `@form-engine/adapter-antd` | Ant Design 适配器（桌面端） |
-| `@form-engine/adapter-antd-mobile` | Ant Design Mobile 适配器 |
+| `@form-engine/antd` | Ant Design 适配器（桌面端） |
+| `@form-engine/antd-mobile` | Ant Design Mobile 适配器 |
 
 ## 开发
 
