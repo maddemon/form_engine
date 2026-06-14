@@ -19,7 +19,7 @@ export default defineConfig({
           if (id.includes('node_modules/antd')) return 'ui'
           if (id.includes('node_modules/antd-mobile')) return 'ui-mobile'
           if (id.includes('@babel/standalone')) return 'babel'
-          if (/[\\/]packages[\\/](core|adapter-antd|adapter-antd-mobile)[\\/]/.test(id)) return 'form-engine'
+          if (/[\\/]packages[\\/](core|antd|antd-mobile)[\\/]/.test(id)) return 'form-engine'
         },
       },
     },

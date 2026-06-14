@@ -230,7 +230,7 @@ export default function ZhDocContent() {
           <Typography.Title level={5} style={{ marginTop: 16 }}>
             安装
           </Typography.Title>
-          <CodeBlock code={`npm install @form-engine/core @form-engine/adapter-antd antd`} />
+          <CodeBlock code={`npm install @form-engine/core @form-engine/antd antd`} />
 
           <Typography.Title level={5} style={{ marginTop: 24 }}>
             基本结构
@@ -241,7 +241,7 @@ export default function ZhDocContent() {
           </Typography.Paragraph>
           <CodeBlock
             code={`import { Designer } from '@form-engine/core'
-import { antdAdapter } from '@form-engine/adapter-antd'
+import { antdAdapter } from '@form-engine/antd'
 import { ConfigProvider, theme } from 'antd'
 
 function App() {
@@ -387,7 +387,7 @@ function App() {
           </Typography.Title>
           <CodeBlock
             code={`import { FormRender } from '@form-engine/core'
-import { antdAdapter } from '@form-engine/adapter-antd'
+import { antdAdapter } from '@form-engine/antd'
 
 function MyForm({ schema }) {
   const formRef = useRef(null)

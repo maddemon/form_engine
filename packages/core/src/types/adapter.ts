@@ -16,27 +16,14 @@
 
 import * as React from 'react'
 import type { BridgeProviderProps } from '../styles/themeBridge'
-import type { FieldRendererFn, DeviceScene } from './adapter-field'
-import type { FormWrapperProps, FormItemProps, ValidateFn } from './adapter-form'
 import type { DesignerWidgets } from './adapter-designer'
+import type { DeviceScene, FieldRendererFn } from './adapter-field'
+import type { FormItemProps, FormWrapperProps, ValidateFn } from './adapter-form'
 
 // Barrel re-export — consumer 的 import 路径不变
-export type {
-  FieldComponentProps,
-  FieldRendererFn,
-  ComponentRenderFn,
-  DeviceScene,
-} from './adapter-field'
-export type {
-  FormWrapperProps,
-  FormItemProps,
-  ValidateFn,
-} from './adapter-form'
-export type {
-  DesignerWidgets,
-  PropEditorConfig,
-  PropertyPanelRenderProps,
-} from './adapter-designer'
+export type { DesignerWidgets, PropEditorConfig, PropertyPanelRenderProps } from './adapter-designer'
+export type { ComponentRenderFn, DeviceScene, FieldComponentProps, FieldRendererFn } from './adapter-field'
+export type { FormItemProps, FormWrapperProps, ValidateFn } from './adapter-form'
 
 // ============================
 // Adapter 接口
@@ -50,8 +37,8 @@ export type {
  *
  * 使用方式：
  * ```tsx
- * import { antdAdapter } from '@form-engine/adapter-antd'
- * import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+ * import { antdAdapter } from '@form-engine/antd'
+ * import { antdMobileAdapter } from '@form-engine/antd-mobile'
  *
  * // 设计/预览：传两个 adapter，框架按 scene 自动切换
  * <Designer desktopAdapter={antdAdapter} mobileAdapter={antdMobileAdapter} />
@@ -90,7 +77,7 @@ export interface FormEngineAdapter {
    *
    * @example
    * ```ts
-   * // adapter-antd 内部
+   * // antd 内部
    * import { AntdBridgeProvider } from './themeBridge'
    * export const antdAdapter: FormEngineAdapter = {
    *   bridgeProvider: AntdBridgeProvider,

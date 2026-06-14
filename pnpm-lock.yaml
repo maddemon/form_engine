@@ -35,12 +35,12 @@ importers:
 
   example:
     dependencies:
-      '@form-engine/adapter-antd':
+      '@form-engine/antd':
         specifier: workspace:*
-        version: link:../packages/adapter-antd
-      '@form-engine/adapter-antd-mobile':
+        version: link:../packages/antd
+      '@form-engine/antd-mobile':
         specifier: workspace:*
-        version: link:../packages/adapter-antd-mobile
+        version: link:../packages/antd-mobile
       '@form-engine/core':
         specifier: workspace:*
         version: link:../packages/core
@@ -76,7 +76,7 @@ importers:
         specifier: ^5.0.0
         version: 5.4.21(@types/node@20.19.41)
 
-  packages/adapter-antd:
+  packages/antd:
     dependencies:
       '@ant-design/icons':
         specifier: ^6.2.3
@@ -116,7 +116,7 @@ importers:
         specifier: ~6.0.2
         version: 6.0.3
 
-  packages/adapter-antd-mobile:
+  packages/antd-mobile:
     dependencies:
       '@form-engine/core':
         specifier: workspace:*

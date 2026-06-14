@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@form-engine/adapter-antd": "workspace:*",
-    "@form-engine/adapter-antd-mobile": "workspace:*",
+    "@form-engine/antd": "workspace:*",
+    "@form-engine/antd-mobile": "workspace:*",
     "@form-engine/core": "workspace:*",
     "antd": "^6.4.3",
     "antd-mobile": "^5.42.3",

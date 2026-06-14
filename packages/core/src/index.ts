@@ -4,8 +4,8 @@
  * 使用方式：
  * ```tsx
  * import { FormRender, useAdaptiveAdapter } from '@form-engine/core'
- * import { antdAdapter } from '@form-engine/adapter-antd'
- * import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+ * import { antdAdapter } from '@form-engine/antd'
+ * import { antdMobileAdapter } from '@form-engine/antd-mobile'
  *
  * // 方式1：显式指定 adapter
  * <FormRender schema={schema} adapter={antdAdapter} />
@@ -27,84 +27,84 @@ import { ComponentCategory } from './types/component'
 
 // Schema 类型
 export type {
-  CustomComponent,
-  CustomSource,
-  DataSourceType,
-  FieldDataSource,
-  FieldMock,
-  FieldType,
-  FormConfig,
-  FormFieldSchema,
-  FormRule,
-  FormSchema,
-  OptionItem,
-  RegisteredComponent,
-  RegisteredComponentProp,
-  ValidateResult,
-  VisibleWhen
+    CustomComponent,
+    CustomSource,
+    DataSourceType,
+    FieldDataSource,
+    FieldMock,
+    FieldType,
+    FormConfig,
+    FormFieldSchema,
+    FormRule,
+    FormSchema,
+    OptionItem,
+    RegisteredComponent,
+    RegisteredComponentProp,
+    ValidateResult,
+    VisibleWhen
 } from './types/schema'
 
 // 事件类型
 export type {
-  $Form,
-  $Self,
-  EventCallbacks,
-  EventDeclaration,
-  EventHandler,
-  EventHandlerType,
-  EventParamDeclaration,
-  FormFieldEvents,
-  ResolvedEventHandler
+    $Form,
+    $Self,
+    EventCallbacks,
+    EventDeclaration,
+    EventHandler,
+    EventHandlerType,
+    EventParamDeclaration,
+    FormFieldEvents,
+    ResolvedEventHandler
 } from './types/events'
 
 // 组件 Props 类型
 
 export type {
-  AlertProps,
-  ButtonProps,
-  CardProps,
-  CascaderProps,
-  CheckboxProps,
-  CollapsePanelConfig,
-  CollapseProps,
-  DatePickerProps,
-  DateRangeProps,
-  DividerProps,
-  FlexProps,
-  GridProps,
-  HtmlProps,
-  ImageProps,
-  InputNumberProps,
-  InputProps,
-  RadioProps,
-  RateProps,
-  SegmentProps,
-  SelectProps,
-  SliderProps,
-  SubFormColumnConfig,
-  SubFormProps,
-  SwitchProps,
-  TabPaneConfig,
-  TabsProps,
-  TextAreaProps,
-  TextProps,
-  TitleProps,
-  TreeSelectProps,
-  UploadFile,
-  UploadProps
+    AlertProps,
+    ButtonProps,
+    CardProps,
+    CascaderProps,
+    CheckboxProps,
+    CollapsePanelConfig,
+    CollapseProps,
+    DatePickerProps,
+    DateRangeProps,
+    DividerProps,
+    FlexProps,
+    GridProps,
+    HtmlProps,
+    ImageProps,
+    InputNumberProps,
+    InputProps,
+    RadioProps,
+    RateProps,
+    SegmentProps,
+    SelectProps,
+    SliderProps,
+    SubFormColumnConfig,
+    SubFormProps,
+    SwitchProps,
+    TabPaneConfig,
+    TabsProps,
+    TextAreaProps,
+    TextProps,
+    TitleProps,
+    TreeSelectProps,
+    UploadFile,
+    UploadProps
 } from './components'
 
 // Adapter 类型
 export type {
-  DesignerWidgets,
-  FieldComponentProps,
-  FieldRendererFn,
-  FormEngineAdapter,
-  FormItemProps,
-  FormWrapperProps,
-  PropEditorConfig,
-  PropertyPanelRenderProps,
-  ValidateFn
+    DesignerWidgets,
+    FieldComponentProps,
+    FieldRendererFn,
+    FormEngineAdapter,
+    FormItemProps,
+    FormWrapperProps,
+    PropEditorConfig,
+    PropertyPanelRenderProps,
+    ValidateFn
 } from './types/adapter'
 
 // Adapter 值导出（DeviceScene 既是类型也是值）
@@ -117,24 +117,24 @@ export type { FieldRendererProps } from './renderer/FieldRenderer'
 
 // 设计器类型
 export type {
-  DesignerProps,
-  PaletteGroup,
-  PaletteItem,
-  PropertyPanelTab,
-  PropertyPanelTabContentProps,
-  SidePanelTab,
-  SidePanelTabContentProps
+    DesignerProps,
+    PaletteGroup,
+    PaletteItem,
+    PropertyPanelTab,
+    PropertyPanelTabContentProps,
+    SidePanelTab,
+    SidePanelTabContentProps
 } from './types/designer'
 
 // 组件分类
 export {
-  getComponentCategory,
-  getContainerFieldTypes,
-  getFormFieldTypes,
-  isButtonComponent,
-  isContainerComponent,
-  isDisplayComponent,
-  isFormComponent
+    getComponentCategory,
+    getContainerFieldTypes,
+    getFormFieldTypes,
+    isButtonComponent,
+    isContainerComponent,
+    isDisplayComponent,
+    isFormComponent
 } from './components'
 export type { ComponentCategory }
 
@@ -143,12 +143,12 @@ export { getEventDeclarations } from './components'
 
 // 组件注册表
 export {
-  ALL_FIELD_TYPES,
-  componentRegistry,
-  getComponentDefaultProps,
-  getComponentIcon,
-  getComponentIconName,
-  getComponentLabel
+    ALL_FIELD_TYPES,
+    componentRegistry,
+    getComponentDefaultProps,
+    getComponentIcon,
+    getComponentIconName,
+    getComponentLabel
 } from './components'
 
 // 图标映射（供 adapter 解析图标字符串）
@@ -162,34 +162,34 @@ export { Copy, Grip, Monitor, Smartphone, Trash } from './components/icons'
 // ============================
 
 export {
-  registerCustomComponent,
-  registerSimpleCustomComponent,
-  unregisterCustomComponent,
-  type SimpleCustomComponentOptions
+    registerCustomComponent,
+    registerSimpleCustomComponent,
+    unregisterCustomComponent,
+    type SimpleCustomComponentOptions
 } from './registry/simpleCustomComponentRegistry'
 
 export {
-  customComponentRegistry,
-  customPropertyWidgetRegistry,
-  type CustomComponentRegistry,
-  type CustomPropertyWidgetRegistry
+    customComponentRegistry,
+    customPropertyWidgetRegistry,
+    type CustomComponentRegistry,
+    type CustomPropertyWidgetRegistry
 } from './registry/customComponentRegistry'
 
 // Property Slot 注册表
 export {
-  defaultSlotFallbacks,
-  propertySlotRegistry,
-  PropertySlotRegistry,
-  resolveSlot
+    defaultSlotFallbacks,
+    propertySlotRegistry,
+    PropertySlotRegistry,
+    resolveSlot
 } from './registry/propertySlotRegistry'
 
 // 导出自定义组件类型
 export type {
-  CustomComponentConfig,
-  PropertyConfigItem,
-  PropertyWidgetComponentProps,
-  PropertyWidgetProps,
-  PropertyWidgetType
+    CustomComponentConfig,
+    PropertyConfigItem,
+    PropertyWidgetComponentProps,
+    PropertyWidgetProps,
+    PropertyWidgetType
 } from './types/custom-component'
 
 // Property Slot 类型
@@ -200,21 +200,21 @@ export type { PropertySlotProps, PropertySlots, SlotName } from './types/propert
 // ============================
 
 export {
-  AdapterContext,
-  detectScene,
-  FieldErrorBoundary,
-  FieldRenderer,
-  FieldSchemaContext,
-  FormRender,
-  InsideContainerContext,
-  useAdapter,
-  useAdaptiveAdapter,
-  useFieldSchema,
-  useFormRender,
-  useFormValidation,
-  useFormValues,
-  useInsideContainer,
-  useVisibility
+    AdapterContext,
+    detectScene,
+    FieldErrorBoundary,
+    FieldRenderer,
+    FieldSchemaContext,
+    FormRender,
+    InsideContainerContext,
+    useAdapter,
+    useAdaptiveAdapter,
+    useFieldSchema,
+    useFormRender,
+    useFormValidation,
+    useFormValues,
+    useInsideContainer,
+    useVisibility
 } from './renderer'
 
 // ============================
@@ -231,13 +231,13 @@ export type { SupportedLocale } from './locale/LocaleProvider'
 
 // 工具函数
 export {
-  evalExpr,
-  genId,
-  getNested,
-  matchVisibleWhen,
-  pickAdapter,
-  replaceTemplateVars,
-  resolvePanelWidth,
+    evalExpr,
+    genId,
+    getNested,
+    matchVisibleWhen,
+    pickAdapter,
+    replaceTemplateVars,
+    resolvePanelWidth
 } from './utils'
 
 // ============================
@@ -245,14 +245,14 @@ export {
 // ============================
 
 export {
-  bindEventArgs,
-  getActionDef,
-  invokeAction,
-  listActionNames,
-  resolveEventHandler,
-  resolveEvents,
-  type ActionDef,
-  type EventContext
+    bindEventArgs,
+    getActionDef,
+    invokeAction,
+    listActionNames,
+    resolveEventHandler,
+    resolveEvents,
+    type ActionDef,
+    type EventContext
 } from './events'
 
 // ============================
@@ -266,10 +266,10 @@ export * from './dataSource/resolver'
 // ============================
 
 export { Canvas } from './designer/Canvas'
-export { Designer } from './designer/Designer'
-export { DraggablePaletteItem, type DraggablePaletteItemProps } from './designer/PalettePanel/DraggablePaletteItem'
-export { createFieldFromPalette, PalettePanel, generateFieldId } from './designer/PalettePanel'
 export { defaultPaletteGroups as defaultPalette } from './designer/data/paletteData'
+export { Designer } from './designer/Designer'
+export { createFieldFromPalette, generateFieldId, PalettePanel } from './designer/PalettePanel'
+export { DraggablePaletteItem, type DraggablePaletteItemProps } from './designer/PalettePanel/DraggablePaletteItem'
 export { PropertyPanel } from './designer/PropertyPanel'
 
 export { Designer as FormDesigner } from './designer/Designer'
@@ -318,18 +318,18 @@ export { useDesignerScene, useFieldActions } from './designer/hooks'
  */
 
 export {
-  StyleProvider,
-  useStyle,
-  useTheme,
-  useToken,
-  type BridgeProviderProps,
-  // Theme Bridge 类型（用于 adapter 实现）
-  type CssVarMapping,
-  type PartialThemeTokens,
-  type SizeMode,
-  type ThemeBridgeConfig,
-  type ThemeMode,
-  // 类型
-  type ThemeTokens
+    StyleProvider,
+    useStyle,
+    useTheme,
+    useToken,
+    type BridgeProviderProps,
+    // Theme Bridge 类型（用于 adapter 实现）
+    type CssVarMapping,
+    type PartialThemeTokens,
+    type SizeMode,
+    type ThemeBridgeConfig,
+    type ThemeMode,
+    // 类型
+    type ThemeTokens
 } from './styles'
 

@@ -1,5 +1,5 @@
-import { antdAdapter } from '@form-engine/adapter-antd'
-import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+import { antdAdapter } from '@form-engine/antd'
+import { antdMobileAdapter } from '@form-engine/antd-mobile'
 import type { FormRenderHandle, FormSchema, SupportedLocale } from '@form-engine/core'
 import { FormRender, Monitor, Smartphone, type DeviceScene } from '@form-engine/core'
 import { Button, Card, Empty, Flex, Segmented } from 'antd'

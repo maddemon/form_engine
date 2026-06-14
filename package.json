@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "pnpm --filter @form-engine/* dev",
     "dev:example": "pnpm --filter example dev",
-    "build": "pnpm check:tokens && pnpm --filter @form-engine/core --filter @form-engine/adapter-antd --filter @form-engine/adapter-antd-mobile build",
+    "build": "pnpm check:tokens && pnpm --filter @form-engine/core --filter @form-engine/antd --filter @form-engine/antd-mobile build",
     "build:example": "pnpm build && pnpm --filter @form-engine/example build",
     "clean": "pnpm -r clean",
     "test": "pnpm check:tokens && pnpm --filter @form-engine/* test",
@@ -16,9 +16,9 @@
     "check:tokens": "node scripts/check-tokens.mjs",
     "prepare": "simple-git-hooks || true",
     "publish:core": "pnpm --filter @form-engine/core publish",
-    "publish:adapter-antd": "pnpm --filter @form-engine/adapter-antd publish",
-    "publish:adapter-antd-mobile": "pnpm --filter @form-engine/adapter-antd-mobile publish",
-    "publish:all": "pnpm --filter @form-engine/core --filter @form-engine/adapter-antd --filter @form-engine/adapter-antd-mobile publish"
+    "publish:antd": "pnpm --filter @form-engine/antd publish",
+    "publish:antd-mobile": "pnpm --filter @form-engine/antd-mobile publish",
+    "publish:all": "pnpm --filter @form-engine/core --filter @form-engine/antd --filter @form-engine/antd-mobile publish"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

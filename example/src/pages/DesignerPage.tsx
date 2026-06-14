@@ -1,5 +1,5 @@
-import { antdAdapter } from '@form-engine/adapter-antd'
-import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+import { antdAdapter } from '@form-engine/antd'
+import { antdMobileAdapter } from '@form-engine/antd-mobile'
 import type { FormSchema, PropertyPanelTab, SidePanelTab } from '@form-engine/core'
 import { Designer } from '@form-engine/core'
 import React from 'react'
