@@ -1,5 +1,5 @@
 {
-  "name": "@form-engine/adapter-antd",
+  "name": "@form-engine/antd",
   "version": "0.1.0",
   "description": "Form Engine - Antd 组件适配器",
   "main": "./dist/index.js",

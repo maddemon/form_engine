@@ -8,7 +8,7 @@
  *
  * 使用方式：
  * ```tsx
- * import { AntdMobileBridgeProvider } from '@form-engine/adapter-antd-mobile'
+ * import { AntdMobileBridgeProvider } from '@form-engine/antd-mobile'
  *
  * function App() {
  *   return (
@@ -20,9 +20,9 @@
  * ```
  */
 
-import React, { useLayoutEffect } from 'react'
-import { createStyleTag, transformTokenValue } from '@form-engine/core/styles'
 import type { BridgeProviderProps } from '@form-engine/core'
+import { createStyleTag, transformTokenValue } from '@form-engine/core/styles'
+import React, { useLayoutEffect } from 'react'
 
 const CSS_VAR_MAP: Record<string, string> = {
   primary: '--adm-color-primary',

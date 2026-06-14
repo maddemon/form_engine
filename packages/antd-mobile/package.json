@@ -1,5 +1,5 @@
 {
-  "name": "@form-engine/adapter-antd-mobile",
+  "name": "@form-engine/antd-mobile",
   "version": "0.1.0",
   "description": "Form Engine - Antd Mobile 组件适配器",
   "main": "./dist/index.js",

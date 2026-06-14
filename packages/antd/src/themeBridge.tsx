@@ -17,7 +17,7 @@
  * ```tsx
  * import { ConfigProvider } from 'antd'
  * import { Designer } from '@form-engine/core'
- * import { antdAdapter } from '@form-engine/adapter-antd'
+ * import { antdAdapter } from '@form-engine/antd'
  *
  * function App() {
  *   return (

@@ -5,7 +5,7 @@
  *
  * 使用方式：
  * ```tsx
- * import { antdMobileAdapter } from '@form-engine/adapter-antd-mobile'
+ * import { antdMobileAdapter } from '@form-engine/antd-mobile'
  * import { FormRender } from '@form-engine/core'
  *
  * <FormRender schema={schema} adapter={antdMobileAdapter} />
@@ -78,7 +78,7 @@ export { AntdMobileFormWrapper } from './components/FormWrapper'
 // ============================
 // 设计器属性面板小组件
 // ============================
-// 注意：adapter-antd-mobile 面向移动端场景。属性面板是 desktop 渲染器，
+// 注意：antd-mobile 面向移动端场景。属性面板是 desktop 渲染器，
 // 不应在此提供 widgets 覆盖，应回退到 core 的 defaultDesignerWidgets。
 // 移动端适配器按场景只需提供 components（field.type 渲染器）。
 

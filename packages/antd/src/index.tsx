@@ -5,7 +5,7 @@
  *
  * 使用方式：
  * ```tsx
- * import { antdAdapter } from '@form-engine/adapter-antd'
+ * import { antdAdapter } from '@form-engine/antd'
  * import { FormRender } from '@form-engine/core'
  *
  * <FormRender schema={schema} adapter={antdAdapter} />
